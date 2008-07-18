@@ -1,0 +1,16 @@
+% if field.error:
+<div class="field error">
+% else:
+<div class="field">
+% endif
+  <label>${field.title}</label>
+  <div class="widget">
+    ${field.widget()}
+  </div>
+  % if field.error:
+  <span class="error">${field.error}</span>
+  % endif
+  % if field.description:
+  <span class="description">${field.description}</span>
+  % endif
+</div>

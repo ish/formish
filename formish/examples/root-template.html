@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <title>Test</title>
+    <style type="text/css">
+      form {
+        border: 5px solid #eee;
+        padding: 1em;
+      }
+      form .field {
+        margin-bottom: 0.5em;
+      }
+      form .field .error {
+        color: #900;
+        font-size: 80%;
+        font-weight: bold;
+      }
+      form .field .description {
+        font-size: 80%;
+      }
+      form .actions {
+        border-top: 1px dashed #ccc;
+        margin-top: 1em;
+        padding-top: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Automatically layed out form</h1>
+    ${c.form()}
+
+    <h1>Manually layed out form</h1>
+    <form>
+      <table>
+        <tr>
+          <th>${c.form.one.title}</th>
+          <th>${c.form.two.title}</th>
+        </tr>
+        <tr>
+          <td>${c.form.one.widget()}</td>
+          <td>${c.form.two.widget()}</td>
+        </tr>
+        <tr>
+          <td colspan="2"><input type="submit" /></td>
+        </tr>
+      </table>
+    </form>
+  </body>
+</html>

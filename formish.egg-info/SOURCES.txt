@@ -1,0 +1,9 @@
+setup.cfg
+setup.py
+formish/__init__.py
+formish.egg-info/PKG-INFO
+formish.egg-info/SOURCES.txt
+formish.egg-info/dependency_links.txt
+formish.egg-info/entry_points.txt
+formish.egg-info/not-zip-safe
+formish.egg-info/top_level.txt

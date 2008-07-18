@@ -1,0 +1,11 @@
+<form method="post">
+  <div>
+    % for field in form.fields:
+    ${field()}
+    % endfor
+    <div class="actions">
+      <input type="submit" />
+    </div>
+  </div>
+</form>
+
