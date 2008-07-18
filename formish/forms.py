@@ -1,11 +1,13 @@
 from webhelpers.html import literal
-from pylons.templating import render
+from restish.templating import render
 
 import formencode
+
 
 def keytoid(name, key):
     # Create a combined key from the form name and the field name (key)
     return '%s-%s'%(name,key)
+
 
 def validate(schema, data, name):
     # Use formencode to validate each field in the schema, return 
@@ -99,7 +101,7 @@ class BoundField(object):
 
     def __call__(self):
         """Default template renderer for the field (not the widget itself) """
-        return literal(render("forms/field.html", field=self, form=self.form))
+        return literal(render(self.form.request, "formish/field.html", {'field': self, 'form': self.form}))
     
     @property
     def value(self):
@@ -151,14 +153,15 @@ class BoundWidget(object):
 class Widget(object):
 
     def __call__(self, form, field):
-        return literal(render("forms/widgets/default.html", widget=self, form=form, field=field))
+        return literal(render(form.request, "formish/widgets/default.html", {'widget': self, 'form': form, 'field': field}))
 
 
 class Form(object):
 
-    def __init__(self, name, schema, data={}, widgets={}, errors={}):
+    def __init__(self, name, schema, request, data={}, widgets={}, errors={}):
         self.name = name
         self.schema = schema
+        self.request = request
         self.boundfields = {}
         self.data = data
         self.errors = errors
@@ -168,7 +171,7 @@ class Form(object):
 
 
     def __call__(self):
-        return literal(render("forms/form.html", form=self))
+        return literal(render(self.request, "formish/form.html", {'form': self}))
 
     def __getattr__(self, name):
         return self.bind(self.schema.get(name))
@@ -186,15 +189,16 @@ class Form(object):
         for field in self.schema.fields:
             yield self.bind(field)
             
-    def validateRequest(self,request):
+    def validateRequest(self):
         data = {}
         for f in self.fields:
-            data[ f.originalname ] = request.POST.get( keytoid(self.name, f.originalname), None ) 
+            data[ f.originalname ] = self.request.POST.get( keytoid(self.name, f.originalname), None ) 
         errors = validate(self.schema, data, self.name)
         self.data = data
         self.errors = errors
         return len(errors.keys()) == 0
             
+
 class TextArea(object):
     
     def __init__(self, cols=None, rows=None):
@@ -204,19 +208,5 @@ class TextArea(object):
             self.rows = rows 
             
     def __call__(self, form, field):
-        return literal(render("forms/widgets/textarea.html", widget=self, form=form, field=field))
-            
-            
-            
-class TextArea_(Widget):
-    
-    def __init__(self, cols=None, rows=None):
-        if cols is not None:
-            self.cols = cols
-        if rows is not None:
-            self.rows = rows 
-            
-    def __call__(self):
-        return literal(render("forms/widgets/textarea.html", widget=self, form=self.form, field=self.field))
-            
-            
+        return literal(render(form.request, "formish/widgets/textarea.html", {'widget': self, 'form': form, 'field': field}))
+
