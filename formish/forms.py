@@ -3,9 +3,10 @@ from restish.templating import render
 
 import formencode
 
+import wingdbstub
 
 def keytoid(name, key):
-    # Create a combined key from the form name and the field name (key)
+    # Create a combined key from the form name and the attr name (key)
     return '%s-%s'%(name,key)
 
 
@@ -13,71 +14,16 @@ def validate(schema, data, name):
     # Use formencode to validate each field in the schema, return 
     # a dictionary of errors keyed by field name
     errors = {}
-    for field in schema.fields:
+    for attr in schema.attrs:
         try:
-            if field.validator is not None:
-                field.validator.to_python(data.get(field.name,None))
+            if attr[1].validator is not None:
+                attr[1].validator.to_python(data.get(attr[0],None))
         except formencode.Invalid, e:
-            errors[field.name] = e
+            errors[attr[0]] = e
     return errors
 
 
-class Schema(object):
-    """
-    Simple object to hold field definitions
-    """
-
-    def __init__(self):
-        self.fields = []
-
-    def add(self, field):
-        self.fields.append(field)
-
-    def get(self, name):
-        for field in self.fields:
-            if field.name == name:
-                return field
-        raise KeyError(name)
-
-
 class Field(object):
-    """
-    A field definion for the Schema object
-    
-    Keyword arguments:
-    
-    @param name:          a text id 
-    @type name:           camelcase string [a-zA-Z]
-    @param title:         a short title for the field (used as a label on forms)
-    @type title:          string - short sentence
-    @param description:   longer description of this field 
-    @type description:    string - a paragraph at most
-    @param readonly:      a flag to mark the field as readonly
-    @type readonly:       boolean
-    @param default:       default value for the field
-    @type default:        any
-    @param validator:     a formencode validator
-    @type validator:      formencode.validator object
-
-    """
-
-    def __init__(self, name, title, description=None, readonly=None, default=None, validator=None):
-        self.name = name
-        self.title = title
-        self.description = description
-        self.readonly = readonly
-        self.default = default
-        self.validator = validator
-
-
-class String(Field):
-    """
-    Marker object for String schema type
-    """
-    pass
-
-
-class BoundField(object):
     """
     A wrapper for a schema field type that includes form information. 
     
@@ -87,86 +33,122 @@ class BoundField(object):
     
     """
 
-    def __init__(self, form, field):
+    def __init__(self, container, attr, form):
         """
-        @param form:       a form to bind the field to
-        @type form:        Form object
-        @param field:      a Schema field to bind with the form
-        @type field:       Field object
+        @param container:       a structure object to bind the field to
+        @type container:        Structure object 
+        @param attr:      a Schema attr to bind to the container
+        @type attr:       Attribute object
         """
         
-        self.form = form
-        self.field = field
+        self.container = container
+        self.attr = attr
         self._widget = Widget()
+        self.form = form
+        self._fields = {}
 
     def __call__(self):
         """Default template renderer for the field (not the widget itself) """
-        return literal(render(self.form.request, "formish/field.html", {'field': self, 'form': self.form}))
+        if hasattr(self.attr[1],'attrs'):
+            return literal(render(self.form.request, "formish/structure.html", {'field': self, 'fields': self.fields}))
+        else:
+            return literal(render(self.form.request, "formish/field.html", {'field': self}))
     
     @property
     def value(self):
         """ Lazily get the value from the form.data when needed """
-        return self.form.data.get(self.field.name)
+        return self.container.values.get(self.name)
 
+    @property
+    def values(self):
+        return self.container.values.get(self.name, {})
+        
     @property
     def error(self):
         """ Lazily get the error from the form.errors when needed """
-        return self.form.errors.get(self.field.name)
+        return self.errors.get(self.name)
+
+    @property
+    def errors(self):
+        return self.container.errors
     
     @property
     def originalname(self):
         """ The original, un-bound, field name """
-        return self.field.name
+        return self.attr[0]
 
     @property
     def name(self):
-        return keytoid(self.form.name, self.field.name)
+        return keytoid(self.container.name, self.originalname)
     
     @property
     def title(self):
-        return self.field.title
+        return self.attr[1].title
 
     @property
+    def fields(self):
+        for attr in self.attr[1].attrs:
+            yield self.bind(attr)
+            
+    
+    @property
     def description(self):
-        return self.field.description
+        return self.attr[1].description
+
+    
+    def __getattr__(self, name):
+        return self.bind(self.attr[1].get(name))
+
+    def bind(self, attr):
+        try:
+            return self._fields[attr[0]]
+        except KeyError:
+            bf = Field(self, attr, self.form)
+            if hasattr(attr[1],'attrs'):
+                for a in attr[1].attrs:
+                    bf.bind(a)
+            self._fields[attr[0]] = bf
+            return bf
+    
     
     def _getWidget(self):
-        return BoundWidget(self._widget, self.form, self)
+        return BoundWidget(self._widget, self)
     
     def _setWidget(self, widget):
         self._widget = widget
+        
+    
         
     widget = property(_getWidget, _setWidget)
     
     
 class BoundWidget(object):
     
-    def __init__(self, widget, form, field):
+    def __init__(self, widget, field):
         self.widget = widget
-        self.form = form
         self.field = field
         
     def __call__(self):
-        return self.widget(self.form, self.field)
+        return self.widget(self.field)
 
 
 class Widget(object):
 
-    def __call__(self, form, field):
-        return literal(render(form.request, "formish/widgets/default.html", {'widget': self, 'form': form, 'field': field}))
+    def __call__(self, field):
+        return literal(render(field.form.request, "formish/widgets/default.html", {'widget': self, 'field': field}))
 
 
 class Form(object):
 
-    def __init__(self, name, schema, request, data={}, widgets={}, errors={}):
+    def __init__(self, name, structure, request, data={}, widgets={}, errors={}):
         self.name = name
-        self.schema = schema
+        self.structure = structure
         self.request = request
-        self.boundfields = {}
+        self._fields = {}
         self.data = data
         self.errors = errors
         for name, widget in widgets.iteritems():
-            bf = self.bind(self.schema.get(name))
+            bf = self.bind(self.structure.get(name))
             bf.widget=widget
 
 
@@ -174,26 +156,30 @@ class Form(object):
         return literal(render(self.request, "formish/form.html", {'form': self}))
 
     def __getattr__(self, name):
-        return self.bind(self.schema.get(name))
+        return self.bind(self.structure.get(name))
 
-    def bind(self, field):
+    def bind(self, attr):
         try:
-            return self.boundfields[field.name]
+            return self._fields[attr[0]]
         except KeyError:
-            bf = BoundField(self, field)
-            self.boundfields[field.name] = bf
+            bf = Field(self, attr, self)
+            if hasattr(attr[1],'attrs'):
+                for a in attr[1].attrs:
+                    bf.bind(a)
+            self._fields[attr[0]] = bf
             return bf
 
     @property
+    def values(self):
+        return {}
+    
+    @property
     def fields(self):
-        for field in self.schema.fields:
-            yield self.bind(field)
+        for attr in self.structure.attrs:
+            yield self.bind(attr)
             
     def validateRequest(self):
-        data = {}
-        for f in self.fields:
-            data[ f.originalname ] = self.request.POST.get( keytoid(self.name, f.originalname), None ) 
-        errors = validate(self.schema, data, self.name)
+        data, errors = validate(self.schema, request.POST, context='POST')
         self.data = data
         self.errors = errors
         return len(errors.keys()) == 0
@@ -208,5 +194,4 @@ class TextArea(object):
             self.rows = rows 
             
     def __call__(self, form, field):
-        return literal(render(form.request, "formish/widgets/textarea.html", {'widget': self, 'form': form, 'field': field}))
-
+        return literal(render(form.request, "formish/widgets/textarea.html", {'widget': self, 'field': field}))
