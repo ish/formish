@@ -7,21 +7,49 @@ import wingdbstub
 
 def keytoid(name, key):
     # Create a combined key from the form name and the attr name (key)
-    return '%s-%s'%(name,key)
+    return '%s.%s'%(name,key)
 
+def setDict(out, keys, value):
+    if len(keys) == 1:
+        out[keys[0]] = value
+    else:
+        if not out.has_key(keys[0]):
+            out[keys[0]] = {}
+        return setDict(out[keys[0]], keys[1:], value)
 
-def validate(schema, data, name):
+def getDictFromDottedDict(data):
+    out = {}
+    keyslist=[key.split('.') for key in data.keys()]
+    keyslist.sort(reverse=True)
+    for keys in keyslist:
+        setDict(out, keys, data['.'.join(keys)])
+    return out    
+
+def validate(structure, data, context=None, errors={}):
+    if context == 'POST':
+        data = getDictFromDottedDict(data)
     # Use formencode to validate each field in the schema, return 
     # a dictionary of errors keyed by field name
-    errors = {}
-    for attr in schema.attrs:
+    for attr in structure.attrs:
         try:
-            if attr[1].validator is not None:
-                attr[1].validator.to_python(data.get(attr[0],None))
+            if hasattr(attr[1],'attrs'):
+                validate(attr, data[attr[0]], context=context, errors=errors[attr[0]])
+            else: 
+                attr[1].validator.validate(data.get(attr[0]))
         except formencode.Invalid, e:
             errors[attr[0]] = e
-    return errors
+    return data, errors
 
+def getDataUsingDottedKey(data,dottedkey):
+    keys = dottedkey.split('.')
+    d = data
+    try:
+        for key in keys[1:]:
+            d = d[key]
+    except KeyError, e:
+        d = None
+    return d
+        
 
 class Field(object):
     """
@@ -57,20 +85,12 @@ class Field(object):
     @property
     def value(self):
         """ Lazily get the value from the form.data when needed """
-        return self.container.values.get(self.name)
-
-    @property
-    def values(self):
-        return self.container.values.get(self.name, {})
+        return getDataUsingDottedKey(self.form.data, self.name)
         
     @property
     def error(self):
         """ Lazily get the error from the form.errors when needed """
-        return self.errors.get(self.name)
-
-    @property
-    def errors(self):
-        return self.container.errors
+        return getDataUsingDottedKey(self.form.errors, self.name)
     
     @property
     def originalname(self):
@@ -79,6 +99,9 @@ class Field(object):
 
     @property
     def name(self):
+        # Check if the container is a form and if it is, don't add it's key
+        if hasattr(self.container,'structure'):
+            return self.originalname
         return keytoid(self.container.name, self.originalname)
     
     @property
@@ -153,6 +176,7 @@ class Form(object):
 
 
     def __call__(self):
+        
         return literal(render(self.request, "formish/form.html", {'form': self}))
 
     def __getattr__(self, name):
@@ -179,7 +203,7 @@ class Form(object):
             yield self.bind(attr)
             
     def validateRequest(self):
-        data, errors = validate(self.schema, request.POST, context='POST')
+        data, errors = validate(self.structure, self.request.POST, context='POST')
         self.data = data
         self.errors = errors
         return len(errors.keys()) == 0
