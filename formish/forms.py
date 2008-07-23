@@ -27,6 +27,8 @@ def keytoid(name, key):
 
 def setDict(out, keys, value):
     if len(keys) == 1:
+        if out.has_key(keys[0]):
+            raise KeyError('Clash in keys when converting from dotted to nested')
         out[keys[0]] = value
     else:
         if not out.has_key(keys[0]):
@@ -48,7 +50,7 @@ def getDataUsingDottedKey(data,dottedkey):
         for key in keys:
             d = d[key]
     except KeyError, e:
-        d = None
+        raise KeyError('Dotted key does not exist')
     return d
         
 
@@ -120,7 +122,7 @@ class Field(object):
 
     
     def __getattr__(self, name):
-        return self.bind(self.attr[1].get(name))
+        return self.bind( (name, self.attr[1].get(name)) )
 
     def bind(self, attr):
         try:
@@ -170,17 +172,37 @@ class Form(object):
         self._fields = {}
         self.data = data
         self.errors = errors
+        #self.recursiveBind(self, widgets)
         for name, widget in widgets.iteritems():
             bf = self.bind(self.structure.get(name))
             bf.widget=widget
 
 
+    def recursiveBind(self, structure, widgets, name=None):
+        if not widgets: 
+            return
+        if name is None:
+            name = self.name
+        bf = structure.bind( (name, structure) )
+
+        print structure, widgets, isinstance( widgets, Widget )
+        if isinstance( widgets, Widget ):
+            bf.widget = widgets
+            print 'printing widget assigment'
+            print '***',bf
+            print '###',bf.widget
+            print '@@@',bf.widget.widget
+        else:
+            for name, widget in widgets.iteritems():
+                self.recursiveBind( bf, widget, name=name )
+                
+            
+
     def __call__(self):
-        
         return literal(render(self.request, "formish/form.html", {'form': self}))
 
     def __getattr__(self, name):
-        return self.bind(self.structure.get(name))
+        return self.bind( (name,self.structure.get(name)) )
 
     def bind(self, attr):
         try:
@@ -209,7 +231,7 @@ class Form(object):
         return len(errors.keys()) == 0
             
 
-class TextArea(object):
+class TextArea(Widget):
     
     def __init__(self, cols=None, rows=None):
         if cols is not None:
