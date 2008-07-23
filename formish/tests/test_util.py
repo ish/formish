@@ -2,8 +2,6 @@ from formish.forms import *
 import unittest
 from schemaish import *
 
-import wingdbstub
-
 class TestDictFromDottedDict(unittest.TestCase):
     """
     Testing conversion from dotted notation dictionary to nested dictionary
@@ -65,7 +63,7 @@ class TestFormBuilding(unittest.TestCase):
         name = "Empty Form"
         form = Form(name, self.schema_empty, request)
         self.assert_(form.request is request)
-        self.assert_(form.structure is self.schema_empty)
+        self.assert_(form.structure.attr[1] is self.schema_empty)
         self.assert_(form.name is name)
         self.assertEquals(form.data, {})
         fd = {'a':1,'b':2}
@@ -86,7 +84,7 @@ class TestFormBuilding(unittest.TestCase):
         request =  Request({})
         name = "Flat Form"
         form = Form(name, self.schema_flat, request)
-        self.assert_(form.structure is self.schema_flat)
+        self.assert_(form.structure.attr[1] is self.schema_flat)
         self.assertEquals(len(list(form.fields)), 2)
         fd = {'one':1,'two':2}
         form.data = fd
@@ -110,7 +108,7 @@ class TestFormBuilding(unittest.TestCase):
         request =  Request({})
         name = "Nested Form"
         form = Form(name, self.schema_nested, request)
-        self.assert_(form.structure is self.schema_nested)
+        self.assert_(form.structure.attr[1] is self.schema_nested)
         self.assertEquals(len(list(form.fields)), 1)
         fd = {'one': {'a': 3, 'b':9, 'c': {'x':3, 'y':5}}}
         form.data = fd
@@ -147,11 +145,10 @@ class TestFormBuilding(unittest.TestCase):
         self.assert_( isinstance(form.one.a.widget.field, Field) )
         form.one.a.widget = TextArea()
         self.assert_( isinstance(form.one.a.widget.widget, TextArea) )
-        #widgets = {'one': {'a': TextArea()}}
-        #form = Form(name, self.schema_nested, request, widgets=widgets)
-        
-       
-        #self.assert_( isinstance(form.one.a.widget, TextArea) )
+        widgets = {'one': {'a': TextArea()}}
+        form = Form(name, self.schema_nested, request, widgets=widgets)
+        self.assert_( isinstance(form.one.a.widget, BoundWidget) )
+        self.assert_( isinstance(form.one.a.widget.widget, TextArea) )
         
         
         

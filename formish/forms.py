@@ -22,7 +22,9 @@ def validate(structure, data, context=None, errors=None):
     return data, errors
 
 def keytoid(name, key):
-    # Create a combined key from the form name and the attr name (key)
+    # Create a combined key from the name and the attr name (key)
+    if name is None:
+        return key
     return '%s.%s'%(name,key)
 
 def setDict(out, keys, value):
@@ -50,6 +52,7 @@ def getDataUsingDottedKey(data,dottedkey):
         for key in keys:
             d = d[key]
     except KeyError, e:
+        print data, dottedkey
         raise KeyError('Dotted key does not exist')
     return d
         
@@ -97,7 +100,7 @@ class Field(object):
     
     @property
     def originalname(self):
-        """ The original, un-bound, field name """
+        """ The original, un-bound, attribute name """
         return self.attr[0]
 
     @property
@@ -112,14 +115,30 @@ class Field(object):
         return self.attr[1].title
 
     @property
-    def fields(self):
-        for attr in self.attr[1].attrs:
-            yield self.bind(attr)        
-    
-    @property
     def description(self):
         return self.attr[1].description
 
+    def _getWidget(self):
+        return BoundWidget(self._widget, self)
+    
+    def _setWidget(self, widget):
+        self._widget = widget
+        
+    widget = property(_getWidget, _setWidget)
+    
+
+    #
+    # These should move to some sort of "Group" object - a bound Structure.
+    #
+    
+    @property
+    def attrs(self):
+        return self.attr[1].attrs
+    
+    @property
+    def fields(self):
+        for attr in self.attr[1].attrs:
+            yield self.bind(attr)        
     
     def __getattr__(self, name):
         return self.bind( (name, self.attr[1].get(name)) )
@@ -136,17 +155,6 @@ class Field(object):
             return bf
     
     
-    def _getWidget(self):
-        return BoundWidget(self._widget, self)
-    
-    def _setWidget(self, widget):
-        self._widget = widget
-        
-    
-        
-    widget = property(_getWidget, _setWidget)
-    
-    
 class BoundWidget(object):
     
     def __init__(self, widget, field):
@@ -161,59 +169,38 @@ class Widget(object):
 
     def __call__(self, field):
         return literal(render(field.form.request, "formish/widgets/default.html", {'widget': self, 'field': field}))
-
-
+    
+    
 class Form(object):
 
     def __init__(self, name, structure, request, data={}, widgets={}, errors={}):
         self.name = name
-        self.structure = structure
+        self.structure = Field(self, (None, structure) ,self)
         self.request = request
-        self._fields = {}
         self.data = data
         self.errors = errors
-        #self.recursiveBind(self, widgets)
-        for name, widget in widgets.iteritems():
-            bf = self.bind(self.structure.get(name))
-            bf.widget=widget
-
-
-    def recursiveBind(self, structure, widgets, name=None):
+        self.set_widgets(self.structure, widgets)
+        if widgets:
+            print 'a'
+        
+    def set_widgets(self, structure, widgets):
         if not widgets: 
             return
-        if name is None:
-            name = self.name
-        bf = structure.bind( (name, structure) )
-
-        print structure, widgets, isinstance( widgets, Widget )
-        if isinstance( widgets, Widget ):
-            bf.widget = widgets
-            print 'printing widget assigment'
-            print '***',bf
-            print '###',bf.widget
-            print '@@@',bf.widget.widget
-        else:
-            for name, widget in widgets.iteritems():
-                self.recursiveBind( bf, widget, name=name )
-                
-            
+        for name, widget in widgets.iteritems():
+            form_item = getattr(structure, name)
+            if isinstance(widget, dict):
+                # We have a dict of widgets presumably desitined for form_item that *should* be a bound structure.
+                self.set_widgets( form_item, widget )
+            else:
+                # Set the widget on this form item
+                print form_item.name, widget
+                form_item.widget = widget
 
     def __call__(self):
         return literal(render(self.request, "formish/form.html", {'form': self}))
 
     def __getattr__(self, name):
-        return self.bind( (name,self.structure.get(name)) )
-
-    def bind(self, attr):
-        try:
-            return self._fields[attr[0]]
-        except KeyError:
-            bf = Field(self, attr, self)
-            if hasattr(attr[1],'attrs'):
-                for a in attr[1].attrs:
-                    bf.bind(a)
-            self._fields[attr[0]] = bf
-            return bf
+        return getattr( self.structure, name )
 
     @property
     def values(self):
@@ -221,8 +208,7 @@ class Form(object):
     
     @property
     def fields(self):
-        for attr in self.structure.attrs:
-            yield self.bind(attr)
+        return self.structure.fields
             
     def validateRequest(self):
         data, errors = validate(self.structure, self.request.POST, context='POST')
