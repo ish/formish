@@ -83,16 +83,17 @@ class TestFormBuilding(unittest.TestCase):
     def test_flat_form(self):
         request =  Request({})
         name = "Flat Form"
-        form = Form(name, self.schema_flat, request)
+        form = Form("wibble", self.schema_flat, request)
         self.assert_(form.structure.attr is self.schema_flat)
         self.assertEquals(len(list(form.fields)), 2)
-        fd = {'one':1,'two':2}
+        fd = {'one': { 'a': 2, 'b': 3 },'two': { 'a': 2, 'b': 3 }}
         form.data = fd
         self.assert_(form.data is fd)
-        self.assert_(form.one.value, 1)
-        self.assert_(form.two.value, 2)
+        self.assert_(form.one.a.value, 2)
+        self.assert_(form.two.b.value, 3)
         self.assert_(form.one.title, 'one')
-        self.assert_(form.one.title, 'two')
+        self.assert_(form.two.title, 'two')
+        self.assert_(form.two.b.title, 'b')
         
     schema_nested = Structure("Structure", attrs=[
             ("one", Structure("One", attrs=[

@@ -21,11 +21,6 @@ def validate(structure, data, context=None, errors=None):
             errors[attr[0]] = e
     return data, errors
 
-def keytoid(name, key):
-    # Create a combined key from the name and the attr name (key)
-    if name is None:
-        return key
-    return '%s.%s'%(name,key)
 
 def setDict(out, keys, value):
     if len(keys) == 1:
@@ -52,7 +47,6 @@ def getDataUsingDottedKey(data,dottedkey):
         for key in keys:
             d = d[key]
     except KeyError, e:
-        print data, dottedkey
         raise KeyError('Dotted key does not exist')
     return d
         
@@ -67,27 +61,31 @@ class Field(object):
     
     """
 
-    def __init__(self, container, attr_name, attr, form):
+    def __init__(self, name, attr, form):
         """
-        @param container:       a structure object to bind the field to
-        @type container:        Structure object 
-        @param attr:      a Schema attr to bind to the container
-        @type attr:       Attribute object
+        @param name:            Fields dotted name
+        @type name:             String
+        @param attr_name:       a name for the field
+        @type attr_name:        String
+        @param attr:            a Schema attr to bind to the container
+        @type attr:             Attribute object
         """
-        
-        self.container = container
-        self.attr_name = attr_name
+        self.name = name
         self.attr = attr
         self._widget = Widget()
         self.form = form
-        self._fields = {}
 
+    @property
+    def title(self):
+        return self.attr.title
+
+    @property
+    def description(self):
+        return self.attr.description        
+        
     def __call__(self):
         """Default template renderer for the field (not the widget itself) """
-        if hasattr(self.attr,'attrs'):
-            return literal(render(self.form.request, "formish/structure.html", {'field': self, 'fields': self.fields}))
-        else:
-            return literal(render(self.form.request, "formish/field.html", {'field': self}))
+        return literal(render(self.form.request, "formish/field.html", {'field': self}))
     
     @property
     def value(self):
@@ -99,26 +97,6 @@ class Field(object):
         """ Lazily get the error from the form.errors when needed """
         return getDataUsingDottedKey(self.form.errors, self.name)
     
-    @property
-    def originalname(self):
-        """ The original, un-bound, attribute name """
-        return self.attr_name
-
-    @property
-    def name(self):
-        # Check if the container is a form and if it is, don't add it's key
-        if hasattr(self.container,'structure'):
-            return self.originalname
-        return keytoid(self.container.name, self.originalname)
-    
-    @property
-    def title(self):
-        return self.attr.title
-
-    @property
-    def description(self):
-        return self.attr.description
-
     def _getWidget(self):
         return BoundWidget(self._widget, self)
     
@@ -128,10 +106,31 @@ class Field(object):
     widget = property(_getWidget, _setWidget)
     
 
-    #
-    # These should move to some sort of "Group" object - a bound Structure.
-    #
-    
+class Group(object):
+
+    def __init__(self, name, attr, form):
+        """
+        @param name:            Fields dotted name
+        @type name:             String
+        @param attr_name:       a name for the field
+        @type attr_name:        String
+        @param attr:            a Schema attr to bind to the container
+        @type attr:             Attribute object
+        """
+        self.name = name
+        self.attr = attr
+        self._widget = Widget()
+        self.form = form
+        self._fields = {}    
+
+    @property
+    def title(self):
+        return self.attr.title
+
+    @property
+    def description(self):
+        return self.attr.description        
+        
     @property
     def attrs(self):
         return self.attr.attrs
@@ -142,20 +141,29 @@ class Field(object):
             yield self.bind(attr[0], attr[1])        
     
     def __getattr__(self, name):
+        if name == "value":
+            print "***", self.attr
         return self.bind( name, self.attr.get(name) )
 
     def bind(self, attr_name, attr):
         try:
             return self._fields[attr_name]
         except KeyError:
-            bf = Field(self, attr_name, attr, self.form)
-            if hasattr(attr,'attrs'):
-                for a in attr.attrs:
-                    bf.bind(a[0], a[1])
+            if self.name is None:
+                keyprefix = attr_name
+            else:
+                keyprefix = '%s.%s'%(self.name,attr_name)
+            if isinstance( attr, schemaish.Structure ):
+                bf = Group(keyprefix, attr, self.form)
+            else:
+                bf = Field(keyprefix, attr, self.form)
             self._fields[attr_name] = bf
             return bf
-    
-    
+        
+    def __call__(self):
+        return literal(render(self.form.request, "formish/structure.html", {'field': self, 'fields': self.fields}))
+
+        
 class BoundWidget(object):
     
     def __init__(self, widget, field):
@@ -176,7 +184,7 @@ class Form(object):
 
     def __init__(self, name, structure, request, data={}, widgets={}, errors={}):
         self.name = name
-        self.structure = Field(self, None, structure, self)
+        self.structure = Group(None, structure, self)
         self.request = request
         self.data = data
         self.errors = errors
@@ -193,7 +201,6 @@ class Form(object):
                 self.set_widgets( form_item, widget )
             else:
                 # Set the widget on this form item
-                print form_item.name, widget
                 form_item.widget = widget
 
     def __call__(self):
