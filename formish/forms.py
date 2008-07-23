@@ -67,7 +67,7 @@ class Field(object):
     
     """
 
-    def __init__(self, container, attr, form):
+    def __init__(self, container, attr_name, attr, form):
         """
         @param container:       a structure object to bind the field to
         @type container:        Structure object 
@@ -76,6 +76,7 @@ class Field(object):
         """
         
         self.container = container
+        self.attr_name = attr_name
         self.attr = attr
         self._widget = Widget()
         self.form = form
@@ -83,7 +84,7 @@ class Field(object):
 
     def __call__(self):
         """Default template renderer for the field (not the widget itself) """
-        if hasattr(self.attr[1],'attrs'):
+        if hasattr(self.attr,'attrs'):
             return literal(render(self.form.request, "formish/structure.html", {'field': self, 'fields': self.fields}))
         else:
             return literal(render(self.form.request, "formish/field.html", {'field': self}))
@@ -101,7 +102,7 @@ class Field(object):
     @property
     def originalname(self):
         """ The original, un-bound, attribute name """
-        return self.attr[0]
+        return self.attr_name
 
     @property
     def name(self):
@@ -112,11 +113,11 @@ class Field(object):
     
     @property
     def title(self):
-        return self.attr[1].title
+        return self.attr.title
 
     @property
     def description(self):
-        return self.attr[1].description
+        return self.attr.description
 
     def _getWidget(self):
         return BoundWidget(self._widget, self)
@@ -133,25 +134,25 @@ class Field(object):
     
     @property
     def attrs(self):
-        return self.attr[1].attrs
+        return self.attr.attrs
     
     @property
     def fields(self):
-        for attr in self.attr[1].attrs:
-            yield self.bind(attr)        
+        for attr in self.attr.attrs:
+            yield self.bind(attr[0], attr[1])        
     
     def __getattr__(self, name):
-        return self.bind( (name, self.attr[1].get(name)) )
+        return self.bind( name, self.attr.get(name) )
 
-    def bind(self, attr):
+    def bind(self, attr_name, attr):
         try:
-            return self._fields[attr[0]]
+            return self._fields[attr_name]
         except KeyError:
-            bf = Field(self, attr, self.form)
-            if hasattr(attr[1],'attrs'):
-                for a in attr[1].attrs:
-                    bf.bind(a)
-            self._fields[attr[0]] = bf
+            bf = Field(self, attr_name, attr, self.form)
+            if hasattr(attr,'attrs'):
+                for a in attr.attrs:
+                    bf.bind(a[0], a[1])
+            self._fields[attr_name] = bf
             return bf
     
     
@@ -175,13 +176,12 @@ class Form(object):
 
     def __init__(self, name, structure, request, data={}, widgets={}, errors={}):
         self.name = name
-        self.structure = Field(self, (None, structure) ,self)
+        self.structure = Field(self, None, structure, self)
         self.request = request
         self.data = data
         self.errors = errors
         self.set_widgets(self.structure, widgets)
-        if widgets:
-            print 'a'
+
         
     def set_widgets(self, structure, widgets):
         if not widgets: 
