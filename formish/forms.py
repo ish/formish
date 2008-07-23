@@ -1,9 +1,27 @@
 from webhelpers.html import literal
 from restish.templating import render
-
-import formencode
+import schemaish
 
 import wingdbstub
+
+def validate(structure, data, context=None, errors=None):
+    if errors is None:
+        errors = {}
+    if context == 'POST':
+        data = getDictFromDottedDict(data)
+    # Use formencode to validate each field in the schema, return 
+    # a dictionary of errors keyed by field name
+    for attr in structure.attrs:
+        try:
+            if hasattr(attr[1],'attrs'):
+                d, e = validate(attr[1], data[attr[0]], errors=errors.get(attr[0],{}))
+                if len(e.keys()) != 0:
+                    errors[attr[0]] = e
+            else: 
+                attr[1].validate(data.get(attr[0]))
+        except schemaish.Invalid, e:
+            errors[attr[0]] = e
+    return data, errors
 
 def keytoid(name, key):
     # Create a combined key from the form name and the attr name (key)
@@ -25,26 +43,11 @@ def getDictFromDottedDict(data):
         setDict(out, keys, data['.'.join(keys)])
     return out    
 
-def validate(structure, data, context=None, errors={}):
-    if context == 'POST':
-        data = getDictFromDottedDict(data)
-    # Use formencode to validate each field in the schema, return 
-    # a dictionary of errors keyed by field name
-    for attr in structure.attrs:
-        try:
-            if hasattr(attr[1],'attrs'):
-                validate(attr, data[attr[0]], context=context, errors=errors[attr[0]])
-            else: 
-                attr[1].validator.validate(data.get(attr[0]))
-        except formencode.Invalid, e:
-            errors[attr[0]] = e
-    return data, errors
-
 def getDataUsingDottedKey(data,dottedkey):
     keys = dottedkey.split('.')
     d = data
     try:
-        for key in keys[1:]:
+        for key in keys:
             d = d[key]
     except KeyError, e:
         d = None
@@ -111,8 +114,7 @@ class Field(object):
     @property
     def fields(self):
         for attr in self.attr[1].attrs:
-            yield self.bind(attr)
-            
+            yield self.bind(attr)        
     
     @property
     def description(self):
