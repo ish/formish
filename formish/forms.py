@@ -2,8 +2,6 @@ from webhelpers.html import literal
 from restish.templating import render
 import schemaish
 
-import wingdbstub
-
 def validate(structure, data, context=None, errors=None):
     if errors is None:
         errors = {}
