@@ -182,14 +182,13 @@ class Widget(object):
     
 class Form(object):
 
-    def __init__(self, name, structure, request, data={}, widgets={}, errors={}):
+    def __init__(self, name, structure, request, data=None, widgets=None, errors=None):
         self.name = name
         self.structure = Group(None, structure, self)
         self.request = request
-        self.data = data
-        self.errors = errors
+        self.data = data or {}
+        self.errors = errors or {}
         self.set_widgets(self.structure, widgets)
-
         
     def set_widgets(self, structure, widgets):
         if not widgets: 
