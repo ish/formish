@@ -2,6 +2,12 @@ from webhelpers.html import literal
 from restish.templating import render
 import schemaish
 
+
+# Singleton used to represent no argument passed, for when None is a valid
+# value for the arg.
+NOARG = object()
+
+
 def validate(structure, data, context=None, errors=None):
     if errors is None:
         errors = {}
@@ -32,6 +38,7 @@ def setDict(out, keys, value):
             out[keys[0]] = {}
         return setDict(out[keys[0]], keys[1:], value)
 
+
 def getDictFromDottedDict(data):
     out = {}
     keyslist=[key.split('.') for key in data.keys()]
@@ -40,13 +47,16 @@ def getDictFromDottedDict(data):
         setDict(out, keys, data['.'.join(keys)])
     return out    
 
-def getDataUsingDottedKey(data,dottedkey):
+
+def getDataUsingDottedKey(data, dottedkey, default=NOARG):
     keys = dottedkey.split('.')
     d = data
     try:
         for key in keys:
             d = d[key]
     except KeyError, e:
+        if default is not NOARG:
+            return default
         raise KeyError('Dotted key does not exist')
     return d
         
@@ -90,12 +100,12 @@ class Field(object):
     @property
     def value(self):
         """ Lazily get the value from the form.data when needed """
-        return getDataUsingDottedKey(self.form.data, self.name)
+        return getDataUsingDottedKey(self.form.data, self.name, None)
         
     @property
     def error(self):
         """ Lazily get the error from the form.errors when needed """
-        return getDataUsingDottedKey(self.form.errors, self.name)
+        return getDataUsingDottedKey(self.form.errors, self.name, None)
     
     def _getWidget(self):
         return BoundWidget(self._widget, self)

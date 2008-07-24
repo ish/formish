@@ -45,6 +45,11 @@ class TestGetDataUsingDottedKey(unittest.TestCase):
             self.assertEquals(getDataUsingDottedKey(test[0], test[1]), test[2])
         self.assertRaises(KeyError, getDataUsingDottedKey, {'a':{'a':1}, 'b':2}, 'x.x.x')
 
+    def test_missing(self):
+        self.assertRaises(KeyError, getDataUsingDottedKey, {}, 'missing')
+        self.assertEquals(getDataUsingDottedKey({}, 'missing', None), None)
+        self.assertEquals(getDataUsingDottedKey({}, 'missing', "value"), "value")
+
 
 class Request(object):
     
