@@ -1,6 +1,9 @@
 from formish.forms import *
+from formish import validation
 import unittest
 from schemaish import *
+
+import wingdbstub
 
 class TestDictFromDottedDict(unittest.TestCase):
     """
@@ -70,10 +73,10 @@ class TestFormBuilding(unittest.TestCase):
         self.assert_(form.request is request)
         self.assert_(form.structure.attr is self.schema_empty)
         self.assert_(form.name is name)
-        self.assertEquals(form.data, {})
+        self.assertEquals(form._data, {})
         fd = {'a':1,'b':2}
-        form.data = fd
-        self.assert_(form.data is fd)
+        form._data = fd
+        self.assert_(form._data is fd)
         
     def test_empty_form(self):
         request =  Request({})
@@ -92,10 +95,10 @@ class TestFormBuilding(unittest.TestCase):
         self.assert_(form.structure.attr is self.schema_flat)
         self.assertEquals(len(list(form.fields)), 2)
         fd = {'one': { 'a': 2, 'b': 3 },'two': { 'a': 2, 'b': 3 }}
-        form.data = fd
-        self.assert_(form.data is fd)
-        self.assert_(form.one.a.value, 2)
-        self.assert_(form.two.b.value, 3)
+        form._data = fd
+        self.assert_(form._data is fd)
+        self.assert_(form.one.a._data, 2)
+        self.assert_(form.two.b._data, 3)
         self.assert_(form.one.title, 'one')
         self.assert_(form.two.title, 'two')
         self.assert_(form.two.b.title, 'b')
@@ -117,9 +120,9 @@ class TestFormBuilding(unittest.TestCase):
         self.assert_(form.structure.attr is self.schema_nested)
         self.assertEquals(len(list(form.fields)), 1)
         fd = {'one': {'a': 3, 'b':9, 'c': {'x':3, 'y':5}}}
-        form.data = fd
-        self.assert_(form.data is fd)
-        self.assert_(form.one.a.value, None)
+        form._data = fd
+        self.assert_(form._data is fd)
+        self.assert_(form.one.a._data, None)
         self.assert_(form.one.a.title, "A")
         self.assert_(form.one.b.title, "B")
         self.assert_(form.one.c.x.title, "X")
@@ -134,7 +137,8 @@ class TestFormBuilding(unittest.TestCase):
         request =  Request({'one': {'a':'','b':'', 'c': {'x':'','y':''}}})
         name = "Nested Form"
         form = Form(name, self.schema_nested, request)
-        self.assertEquals(form.validateRequest(), False)
+        self.assertRaises(validation.FormError, getattr, form, 'data')
+        #self.assertEquals(form.data, {'one': {'a':'','b':'', 'c': {'x':'','y':''}}})
 
         self.assert_( isinstance(form.errors['one']['a'], Invalid) )
         self.assert_( form.errors['one']['a'].message == "Please enter a value" )
