@@ -1,5 +1,7 @@
-<form method="post">
+<form method="post" enctype="multipart/form-data" accept-charset="utf-8">
   <div>
+    <input type="hidden" name="_charset_" />
+    <input type="hidden" name="__formish_form__" value="${form.name}" />
     % for field in form.fields:
     ${field()}
     % endfor
