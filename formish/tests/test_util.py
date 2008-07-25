@@ -209,18 +209,19 @@ class TestFormBuilding(unittest.TestCase):
         self.assert_( isinstance(form.one.a.widget.widget, TextArea) )
 
         
-    schema_flat = Structure("One", attrs=[("a", Integer("A")), ("b", String("B"))])
 
     def test_integer_type(self):
+        schema_flat = Structure("One", attrs=[("a", Integer("A")), ("b", String("B"))])
         request = Request({'a': '3', 'b': '4'})
         name = "Integer Form"
-        form = Form(name, self.schema_flat, request)
-        self.assert_(form.structure.attr is self.schema_flat)
+        form = Form(name, schema_flat, request)
+        self.assert_(form.structure.attr is schema_flat)
         fd = {'a': 1,'b': 2}
         form._data = fd
         self.assertEquals(form.data, {'a': 3, 'b': '4'})
+        self.assertEqual( convertRequestDataToData(form.structure, dottedDict(request.POST)) , {'a': 3, 'b': '4'})
+        self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == {'a': '3', 'b': '4'})
          
-        
     
             
 if __name__ == "__main__":
