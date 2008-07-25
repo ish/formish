@@ -30,7 +30,12 @@ class FieldError(FormsError):
     def __init__(self, message, fieldName=None):
         FormsError.__init__(self, message)
         self.fieldName = fieldName
-    
+
+class ConversionError(FieldError):
+    """
+    Exception that signals that a type conversion failed.
+    """
+    pass        
     
 class FieldValidationError(FieldError):
     """

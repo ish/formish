@@ -310,11 +310,13 @@ class Form(object):
         self.errors = errors
         if len(errors.keys()) > 0:
             raise validation.FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(errors.keys()), errors.data))
-        self.data = data
+        self._data = dottedDict(data)
         return self._data
     
     def _setData(self, data):
         """ assign data """
+        ## Check that the data being set is correct for the structure on the form
+        self.structure.attr.validate(data)
         self._data = dottedDict(data)
         
     data = property(_getData, _setData)

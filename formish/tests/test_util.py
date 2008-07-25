@@ -23,13 +23,13 @@ class TestDictFromDottedDict(unittest.TestCase):
 
     def test_convert(self):
         for test in self.test_data:
-            self.assertEquals(dottedDict(test[0]).data, test[1])
+            self.assertEqual(dottedDict(test[0]).data, test[1])
         for test in self.test_error:
             self.assertRaises(KeyError,dottedDict, test)
     
     def test_references(self):
         d = {'a.a.a':1, 'a.b.a':3, 'b':2}
-        self.assertEquals( dottedDict(d).data, dottedDict(dottedDict(d)).data )
+        self.assertEqual( dottedDict(d).data, dottedDict(dottedDict(d)).data )
 
 
 class TestGetDataUsingDottedKey(unittest.TestCase):
@@ -49,7 +49,7 @@ class TestGetDataUsingDottedKey(unittest.TestCase):
 
     def test_get(self):
         for test in self.test_data:
-            self.assertEquals(dottedDict(test[0]).get(test[1]), test[2])
+            self.assertEqual(dottedDict(test[0]).get(test[1]), test[2])
             
     #def test_get_missingattr(self):
         #self.assertRaises(AttributeError, getattr( dottedDict( {'a':{'a':1}, 'b':2} ), 'x.x.x'))
@@ -57,8 +57,8 @@ class TestGetDataUsingDottedKey(unittest.TestCase):
         
 
     def test_missing(self):
-        self.assertEquals(dottedDict({}).get('missing', None), None)
-        self.assertEquals(dottedDict({}).get('missing', "value"), "value")
+        self.assertEqual(dottedDict({}).get('missing', None), None)
+        self.assertEqual(dottedDict({}).get('missing', "value"), "value")
 
 
 class Request(object):
@@ -78,9 +78,9 @@ class TestFormBuilding(unittest.TestCase):
         request =  Request()
         name = "Empty Form"
         form = Form(name, schema_empty, request)
-        self.assert_(form.request is request)
-        self.assert_(form.structure.attr is schema_empty)
-        self.assert_(form.name is name)
+        self.assertEqual(form.request,request)
+        self.assertEqual(form.structure.attr,schema_empty)
+        self.assertEqual(form.name,name)
         fd = {'a':1,'b':2}
         form._data = fd
         self.assert_(form._data is fd)
@@ -103,10 +103,10 @@ class TestFormBuilding(unittest.TestCase):
         fd = {'a': 1,'b': 2}
         form._data = fd
         self.assert_(form._data is fd)
-        self.assert_(form.a._data, 1)
-        self.assert_(form.b._data, 2)
-        self.assert_(form.a.title, 'a')
-        self.assert_(form.b.title, 'b')
+        self.assertEqual(form.a._data, 1)
+        self.assertEqual(form.b._data, 2)
+        self.assertEqual(form.a.title, 'A')
+        self.assertEqual(form.b.title, 'B')
         
     one = Structure("One", attrs=[("a", String("A")), ("b", String("B"))])
     two = Structure("Two", attrs=[("a", String("A")), ("b", String("B"))])
@@ -121,11 +121,11 @@ class TestFormBuilding(unittest.TestCase):
         fd = {'one': { 'a': 2, 'b': 3 },'two': { 'a': 2, 'b': 3 }}
         form.data = fd
         self.assert_(form._data == fd)
-        self.assert_(form.one.a._data, 2)
-        self.assert_(form.two.b._data, 3)
-        self.assert_(form.one.title, 'one')
-        self.assert_(form.two.title, 'two')
-        self.assert_(form.two.b.title, 'b')
+        self.assertEqual(form.one.a._data, 2)
+        self.assertEqual(form.two.b._data, 3)
+        self.assertEqual(form.one.title, 'One')
+        self.assertEqual(form.two.title, 'Two')
+        self.assertEqual(form.two.b.title, 'B')
         
 
 
@@ -146,17 +146,20 @@ class TestFormBuilding(unittest.TestCase):
         self.assertEquals(len(list(form.fields)), 1)
         fd = {'one': {'a': 3, 'b':9, 'c': {'x':3, 'y':5}}}
         form.data = fd
-        self.assert_(form._data, fd)
-        self.assert_(form.one.a._data, None)
-        self.assert_(form.one.a.title, "A")
-        self.assert_(form.one.b.title, "B")
-        self.assert_(form.one.c.x.title, "X")
-        self.assert_(form.one.a.description, "This is a field with name a and title A and has a NotEmpty validator")
+        self.assertEqual(form._data, fd)
+        self.assertEqual(form.one.a._data, 3)
+        self.assertEqual(form.one.a.title, "A")
+        self.assertEqual(form.one.b.title, "B")
+        self.assertEqual(form.one.c.x.title, "X")
+        self.assertEqual(form.one.a.description, "This is a field with name a and title A and has a NotEmpty validator")
         self.assert_(len(list(form.one.fields)) == 3)
+    
+        form.one.a = 7
+        self.assertEqual(form.one.a, 7)
        
         
         
-    def test_nested_form_validation_one(self):
+    def test_nested_form_validation(self):
         schema_nested = Structure("Structure", attrs=[
             ("one", Structure("One", attrs=[
                 ("a", String("A", validator=NotEmpty, 
@@ -178,11 +181,11 @@ class TestFormBuilding(unittest.TestCase):
         self.assertRaises(validation.FormError, getattr, form, 'data')
 
         self.assert_( isinstance(form.errors['one']['a'], Invalid) )
-        self.assert_( form.errors['one']['a'].message == "Please enter a value" )
+        self.assertEqual( form.errors['one']['a'].message, "Please enter a value" )
         self.assert_( isinstance(form.one.a.error, Invalid) )
-        self.assert_( form.one.a.error.message == "Please enter a value" )
+        self.assertEqual( form.one.a.error.message, "Please enter a value" )
         
-    def test_nested_form_validation_two(self):
+    def test_nested_form_typecheck(self):
         schema_nested = Structure("Structure", attrs=[
             ("one", Structure("One", attrs=[
                 ("a", String("A", validator=NotEmpty, 
@@ -216,12 +219,26 @@ class TestFormBuilding(unittest.TestCase):
         name = "Integer Form"
         form = Form(name, schema_flat, request)
         self.assert_(form.structure.attr is schema_flat)
-        fd = {'a': 1,'b': 2}
-        form._data = fd
+        fd = {'a': 1,'b': '2'}
+        form.data = fd
         self.assertEquals(form.data, {'a': 3, 'b': '4'})
         self.assertEqual( convertRequestDataToData(form.structure, dottedDict(request.POST)) , {'a': 3, 'b': '4'})
         self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == {'a': '3', 'b': '4'})
          
+    def test_incorrect_initial_data(self):
+        """ TODO: This should raise an error when we get inbound checking which will rely on the schema having inbuilt schema checking!!! """
+        schema_flat = Structure("One", attrs=[("a", Integer("A")), ("b", String("B"))])
+        request = Request({'a': '3', 'b': '4'})
+        name = "Integer Form"
+        form = Form(name, schema_flat, request)
+        fd = {'a': '1','b': 2}
+        print '-----',form._data
+        form.data = fd
+        print '======',form._data
+        self.assertEquals(form.data, {'a': 3, 'b': '4'})
+        self.assertEqual( convertRequestDataToData(form.structure, dottedDict(request.POST)) , {'a': 3, 'b': '4'})
+        self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == {'a': '3', 'b': '4'})
+          
     
             
 if __name__ == "__main__":
