@@ -3,83 +3,63 @@ from restish.templating import render
 import schemaish
 from formish.converter import string_converter
 from formish import validation
+from formish.dottedDict import dottedDict
+from pprint import pprint
 
-
-# Singleton used to represent no argument passed, for when None is a valid
-# value for the arg.
-NOARG = object()
-
-
-def validate(structure, requestData, errors=None, data=None):
+def validate(structure, requestData, errors=None, keyprefix=None):    
     """ Take a schemaish structure and use it's validators to return any errors"""
-    errors = errors or {}
-    data = data or {}
+    if errors is None:
+        errors = dottedDict()
     # Use formencode to validate each field in the schema, return 
     # a dictionary of errors keyed by field name
     for attr in structure.attrs:
+        if keyprefix is None:
+            newprefix = attr[0]
+        else:
+            newprefix = '%s.%s'%(keyprefix,attr[0])
         try:
             if hasattr(attr[1],'attrs'):
-                d, e = validate(attr[1], requestData[attr[0]], errors=errors.get(attr[0],{}), data=data.get(attr[0],{}))
-                if len(e.keys()) != 0:
-                    errors[attr[0]] = e
-                else:
-                    data[attr[0]] = d
+                validate(attr[1], requestData, errors=errors, keyprefix=newprefix)
             else: 
-                attr[1].validate(requestData.get(attr[0]))
+                attr[1].validate(requestData.get(newprefix))
         except schemaish.Invalid, e:
-            errors[attr[0]] = e
-    return data, errors
+            errors[newprefix] = e
+    return errors
 
 def convertDataToRequestData(formStructure, data, requestData=None, errors=None):
     """ Take a form structure and use it's widgets to convert data to request data """
     if requestData is None:
-        requestData = {}
+        requestData = dottedDict()
+    if errors is None:
+        errors = dottedDict()
+    for field in formStructure.fields:
+        try:
+            if hasattr(field,'fields'):
+                convertDataToRequestData(field, data, requestData=requestData, errors=errors)
+            else: 
+                requestData[field.name] = field.widget.pre_render(field.attr,data[field.name])
+        except schemaish.Invalid, e:
+            errors[field.name] = e
+    return requestData
+        
+
+
+def convertRequestDataToData(formStructure, requestData, data=None, errors=None):
+    """ Take a form structure and use it's widgets to convert data to request data """
+    if data is None:
+        data = {}
     if errors is None:
         errors = {}
     for field in formStructure.fields:
         try:
-            if hasattr(field[1],'fields'):
-                c, e = convertDataToRequestData(field, data[field.attr.name], requestData=requestData.get(field.attr.name,{}), errors=errors.get(field.attr.name, {}))
-                if len(e.keys()) != 0:
-                    errors[field.attr.name] = e
+            if hasattr(field,'fields'):
+                convertRequestDataToData(field, requestData, data=data, errors=errors)
             else: 
-                field.widget.pre_render(field.attr,data.get(field.attr.name))
+                x = field.widget.convert(field.attr,requestData[field.name])
+                data[field.name] = x
         except schemaish.Invalid, e:
-            errors[attr[0]] = e
-    return errors
-
-def setDict(out, keys, value):
-    if len(keys) == 1:
-        if out.has_key(keys[0]):
-            raise KeyError('Clash in keys when converting from dotted to nested')
-        out[keys[0]] = value
-    else:
-        if not out.has_key(keys[0]):
-            out[keys[0]] = {}
-        return setDict(out[keys[0]], keys[1:], value)
-
-
-def getDictFromDottedDict(data):
-    out = {}
-    keyslist=[key.split('.') for key in data.keys()]
-    keyslist.sort(reverse=True)
-    for keys in keyslist:
-        setDict(out, keys, data['.'.join(keys)])
-    return out    
-
-
-def getDataUsingDottedKey(data, dottedkey, default=NOARG):
-    keys = dottedkey.split('.')
-    d = data
-    try:
-        for key in keys:
-            d = d[key]
-    except KeyError, e:
-        if default is not NOARG:
-            return default
-        raise KeyError('Dotted key does not exist')
-    return d
-        
+            errors[field.name] = e
+    return data
 
 class Field(object):
     """
@@ -120,22 +100,22 @@ class Field(object):
     @property
     def data(self):
         """ Lazily get the data from the form.data when needed """
-        return getDataUsingDottedKey(self.form.data, self.name)
+        return self.form.data[self.name]
     
     @property
     def _data(self):
         """ Lazily get the data from the form.data when needed """
-        return getDataUsingDottedKey(self.form._data, self.name)    
+        return self.form._data[self.name]
     
     @property
     def value(self):
         """Convert the form.data to a value object for the form"""
-        return getDataUsingDottedKey(self.form.requestData, self.name, None)
+        return self.form.requestData.get(self.name, None)
         
     @property
     def error(self):
         """ Lazily get the error from the form.errors when needed """
-        return getDataUsingDottedKey(self.form.errors, self.name, None)
+        return self.form.errors.get(self.name, None)
     
     def _getWidget(self):
         return BoundWidget(self._widget, self)
@@ -210,36 +190,43 @@ class BoundWidget(object):
         
     def __call__(self):
         return self.widget(self.field)
+    
+    def pre_render(self, schemaType, data):
+        return self.widget.pre_render(schemaType, data)
+
+    def convert(self, schemaType, data):
+        return self.widget.convert(schemaType, data)
+        
+    def validate(self, data):
+        return self.widget.validate(data)
 
 
 class Widget(object):
     
-    converter = string_converter
-    
     def pre_render(self, schemaType, data):
-        if self.converter is None:
-            return data
-        return self.converter(schemaType).fromType(data)
+        return string_converter(schemaType).fromType(data)
 
     def validate(self, data):
         errors = None
         return data, errors
 
+    def convert(self, schemaType, data):
+        return string_converter(schemaType).toType(data)    
+    
     def __call__(self, field):
         return literal(render(field.form.request, "formish/widgets/default.html", {'widget': self, 'field': field}))
 
 class Input(Widget):
     
-    converter = string_converter
-
     def pre_render(self, schemaType, data):
-        if self.converter is None:
-            return data
-        return self.converter(schemaType).fromType(data)
+        return string_converter(schemaType).fromType(data)
 
     def validate(self, data):
         errors = None
         return data, errors
+    
+    def convert(self, schemaType, data):
+        return string_converter(schemaType).toType(data)
     
     def __call__(self, field):
         return literal(render(field.form.request, "formish/widgets/input.html", {'widget': self, 'field': field}))
@@ -267,9 +254,9 @@ class Form(object):
         self.name = name
         self.structure = Group(None, structure, self)
         self.request = request
-        self.data = data or {}
-        self.errors = errors or {}
-        self._requestData = requestData or {}
+        self._data = dottedDict(data or {})
+        self.errors = dottedDict(errors or {})
+        self._requestData = dottedDict(requestData)
         self.set_widgets(self.structure, widgets)
         
     def set_widgets(self, structure, widgets):
@@ -295,17 +282,20 @@ class Form(object):
     # Getting the requestData from the form converts self.data if necessary.
     #        
     def convertDataToRequestData(self):
-        return convertDataToRequestData(self.structure, self.data)
+        return convertDataToRequestData(self.structure, self._data)
 
     def _getRequestData(self):
         """ if we have request data then use it, if not then convert the data to request data """
-        if self.requestData is None:
-            self._requestData = self.convertDataToRequestData()
-        return self._requestData
+        try:
+            if self._requestData is None:    
+                self._requestData = self.convertDataToRequestData()
+            return self._requestData
+        except Exception, e:
+            print '---->',e
     
     def _setRequestData(self, requestData):
         """ assign data """
-        self._requestData = requestData
+        self._requestData = dottedDict(requestData)
         
     requestData = property(_getRequestData, _setRequestData)
     
@@ -314,17 +304,18 @@ class Form(object):
     #
     def _getData(self):
         """ validate first and raise exceptions if necessary """
-        data = getDictFromDottedDict(self.request.POST)
-        data, errors = validate(self.structure, data)
-        self._data = data
+        requestData = dottedDict(self.request.POST)
+        data = convertRequestDataToData(self.structure, requestData) 
+        errors = validate(self.structure, data)
         self.errors = errors
-        if len(errors) > 0:
-            raise validation.FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(errors), errors))
+        if len(errors.keys()) > 0:
+            raise validation.FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(errors.keys()), errors.data))
+        self.data = data
         return self._data
     
     def _setData(self, data):
         """ assign data """
-        self._data = data
+        self._data = dottedDict(data)
         
     data = property(_getData, _setData)
 
@@ -333,14 +324,5 @@ class Form(object):
     def fields(self):
         return self.structure.fields
             
-    def validateRequest(self):
-        """
-        Takes the request data and runs the validators against it.
-        """
-        data, errors = validate(self.structure, self.request.POST)
-        self.data = data
-        self.errors = errors
-
-        return len(errors.keys()) == 0
             
 

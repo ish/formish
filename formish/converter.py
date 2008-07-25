@@ -7,35 +7,6 @@ except ImportError:
     haveDecimal = False
 from formish import validation
 
-@abstract()
-def string_converter(value):
-    pass
-
-@when(string_converter, (schemaish.String,))
-def string_to_string(value):
-    return NullConverter()
-
-@when(string_converter, (schemaish.Integer,))
-def int_to_string(value):
-    return IntToString()
-
-@when(string_converter, (schemaish.Float,))
-def int_to_string(value):
-    return IntegerToStringConverter()
-
-@when(string_converter, (schemaish.Decimal,))
-def decimal_to_string(value):
-    return DecimalToStringConverter()
-
-@when(string_converter, (schemaish.Date,))
-def date_to_string(value):
-    return DateToStringConverter()
-
-@when(string_converter, (schemaish.Time,))
-def date_to_string(value):
-    return TimeToStringConverter()
-
-
 class NullConverter(object):
     
     def fromType(self, value):
@@ -250,4 +221,31 @@ class SequenceToStringConverter(object):
         sf.seek(0,0)
         return csvReader.next()    
 
-    
+
+@abstract()
+def string_converter(value):
+    pass
+
+@when(string_converter, (schemaish.String,))
+def string_to_string(value):
+    return NullConverter()
+
+@when(string_converter, (schemaish.Integer,))
+def int_to_string(value):
+    return IntegerToStringConverter()
+
+@when(string_converter, (schemaish.Float,))
+def int_to_string(value):
+    return IntegerToStringConverter()
+
+@when(string_converter, (schemaish.Decimal,))
+def decimal_to_string(value):
+    return DecimalToStringConverter()
+
+@when(string_converter, (schemaish.Date,))
+def date_to_string(value):
+    return DateToStringConverter()
+
+@when(string_converter, (schemaish.Time,))
+def date_to_string(value):
+    return TimeToStringConverter()
