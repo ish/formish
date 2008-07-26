@@ -37,9 +37,10 @@ def convertDataToRequestData(formStructure, data, requestData=None, errors=None)
             if hasattr(field,'fields'):
                 convertDataToRequestData(field, data, requestData=requestData, errors=errors)
             else: 
-                requestData[field.name] = field.widget.pre_render(field.attr,data[field.name])
+                requestData[field.name] = field.widget.pre_render(field.attr,data.get(field.name,None))
         except schemaish.Invalid, e:
             errors[field.name] = e
+            raise
     return requestData
         
 
@@ -254,7 +255,7 @@ class DateParts(Widget):
         return datetuple_converter(schemaType).toType((year, month, day))
     
     def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/input.html", {'widget': self, 'field': field}))
+        return literal(render(field.form.request, "formish/widgets/dateparts.html", {'widget': self, 'field': field}))
     
     
 
@@ -281,7 +282,10 @@ class Form(object):
         self.request = request
         self._data = dottedDict(data or {})
         self.errors = dottedDict(errors or {})
-        self._requestData = dottedDict(requestData)
+        if requestData is None:
+            self._requestData = None
+        else:
+            self._requestData = dottedDict(requestData)
         self.set_widgets(self.structure, widgets)
         
     def set_widgets(self, structure, widgets):
@@ -316,7 +320,9 @@ class Form(object):
                 self._requestData = self.convertDataToRequestData()
             return self._requestData
         except Exception, e:
+            # TODO: This is currently blowing if we can't convert the data to request data (presuming we don't already have request data)
             print '---->',e
+            raise
     
     def _setRequestData(self, requestData):
         """ assign data """
