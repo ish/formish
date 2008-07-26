@@ -1,7 +1,7 @@
 from webhelpers.html import literal
 from restish.templating import render
 import schemaish
-from formish.converter import string_converter
+from formish.converter import string_converter, datetuple_converter
 from formish import validation
 from formish.dottedDict import dottedDict
 from pprint import pprint
@@ -232,6 +232,31 @@ class Input(Widget):
         return literal(render(field.form.request, "formish/widgets/input.html", {'widget': self, 'field': field}))
     
     
+class DateParts(Widget):
+    
+    def pre_render(self, schemaType, data):
+        data = datetuple_converter(schemaType).fromType(data)
+        d = {}
+        d['year'] = data[0]
+        d['month'] = data[1]
+        d['day'] = data[2]
+        return d
+
+    # ??: Should the validate be here? Confused
+    def validate(self, data):
+        errors = None
+        return data, errors
+    
+    def convert(self, schemaType, data):
+        year = data.get('year', '')
+        month = data.get('month', '')
+        day = data.get('day', '')
+        return datetuple_converter(schemaType).toType((year, month, day))
+    
+    def __call__(self, field):
+        return literal(render(field.form.request, "formish/widgets/input.html", {'widget': self, 'field': field}))
+    
+    
 
     
     
@@ -316,7 +341,7 @@ class Form(object):
     def _setData(self, data):
         """ assign data """
         ## Check that the data being set is correct for the structure on the form
-        self.structure.attr.validate(data)
+        ## self.structure.attr.validate(data)
         self._data = dottedDict(data)
         
     data = property(_getData, _setData)
