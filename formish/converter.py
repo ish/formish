@@ -155,7 +155,7 @@ class DateToDateTupleConverter(object):
         if value is None:
             return None
         try:
-            value = date(*value)
+            value = date(*[int(v) for v in value])
         except (TypeError, ValueError), e:
             raise validation.FieldValidationError('Invalid date: '+str(e))
         return value
