@@ -232,15 +232,26 @@ class TestFormBuilding(unittest.TestCase):
         name = "Integer Form"
         form = Form(name, schema_flat, request)
         fd = {'a': '1','b': 2}
-        print '-----',form._data
         form.data = fd
-        print '======',form._data
         self.assertEquals(form.data, {'a': 3, 'b': '4'})
         self.assertEqual( convertRequestDataToData(form.structure, dottedDict(request.POST)) , {'a': 3, 'b': '4'})
         self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == {'a': '3', 'b': '4'})
           
-    
-            
+    def test_datetuple_type(self):
+        schema_flat = Structure("One", attrs=[("a", Date("A")), ("b", String("B"))])
+        r = {'a': {'day':1,'month':3,'year':1966}, 'b': '4'}
+        request = Request(r)
+        name = "Date Form"
+        form = Form(name, schema_flat, request)
+        form.a.widget = DateParts()
+        from datetime import date
+        d = date(1966,3,1)
+        fd = {'a': d,'b': '2'}
+        form.data = fd
+        self.assertEquals(form.data, {'a': d, 'b': '4'})
+        self.assertEqual( convertRequestDataToData(form.structure, dottedDict(request.POST)) , {'a': d, 'b': '4'})
+        self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': d, 'b': '4'} )) == r)
+               
 if __name__ == "__main__":
     unittest.main()
 
