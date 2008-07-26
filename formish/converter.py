@@ -6,6 +6,7 @@ try:
 except ImportError:
     haveDecimal = False
 from formish import validation
+from datetime import date, time
 
 class NullConverter(object):
     
@@ -226,6 +227,7 @@ class SequenceToStringConverter(object):
 def string_converter(value):
     pass
 
+
 @when(string_converter, (schemaish.String,))
 def string_to_string(value):
     return NullConverter()
@@ -249,3 +251,11 @@ def date_to_string(value):
 @when(string_converter, (schemaish.Time,))
 def date_to_string(value):
     return TimeToStringConverter()
+
+@abstract()
+def datetuple_converter(value):
+    pass
+
+@when(datetuple_converter, (schemaish.Date,))
+def date_to_datetuple(value):
+    return DateToDateTupleConverter()
