@@ -39,15 +39,15 @@ class TextArea(Widget):
             self.cols = cols
         if rows is not None:
             self.rows = rows 
-            
+                
     def pre_render(self, schemaType, data):
         return [string_converter(schemaType).fromType(data)]
     
     def convert(self, schemaType, data):
-        return string_converter(schemaType).toType(data[0])            
-            
-    def __call__(self, form, field):
-        return literal(render(form.request, "formish/widgets/textarea.html", {'widget': self, 'field': field}))
+        return string_converter(schemaType).toType(data[0])
+    
+    def __call__(self, field):
+        return literal(render(field.form.request, "formish/widgets/textarea.html", {'widget': self, 'field': field}))
     
 class Checkbox(Widget):
 

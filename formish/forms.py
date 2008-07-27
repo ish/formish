@@ -191,19 +191,12 @@ class Form(object):
     #
     def _getData(self):
         """ validate first and raise exceptions if necessary """
-        print '0'
         requestData = dottedDict(self.request.POST)
-        print '1'
         errors = dottedDict()
-        print '2'
         data = convertRequestDataToData(self.structure, requestData, errors=errors) 
-        print '3'
         errors = validate(self.structure, data, errors=errors)
-        print '4'
         self.errors = errors
-        print '5'
         if len(errors.keys()) > 0:
-            print '6'
             raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(errors.keys()), errors.data))
         self._data = dottedDict(data)
         return self._data
