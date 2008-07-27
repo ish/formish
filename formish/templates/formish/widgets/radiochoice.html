@@ -1,0 +1,8 @@
+<div class="radiochoice">
+%if noneOption:
+  <input type="radio" id="${field.form.name}-${field.name}-widget-no" value="${noneOption[1]}" /><label for="${field.form.name}-${field.name}-widget-no">${noneOption[0]}</label>
+%endif
+%for n, option in enumerate(options):
+  <input type="radio" name="${field.name}" id="${field.form.name}-${field.name}-widget-${n}" value="${option[1]}"${widget.selected(option,field.value[0])} /><label for="${field.form.name}-${field.name}-widget-${n}">${option[0]}</label>
+%endfor
+</div>
