@@ -14,7 +14,12 @@ def _getDictFromDottedDict(data):
     for keys in keyslist:
         if len(keys) > 1:
             dottedkey = '.'.join(keys)
-            value = data[dottedkey]
+            if not data.has_key(dottedkey):
+                continue
+            if hasattr(data,'getall'):
+                value=data.getall(dottedkey)
+            else:
+                value = data[dottedkey]
             del data[dottedkey]
             _setDict(data, keys, value)
     return data

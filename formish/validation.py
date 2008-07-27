@@ -51,10 +51,10 @@ def convertRequestDataToData(formStructure, requestData, data=None, errors=None)
             if hasattr(field,'fields'):
                 convertRequestDataToData(field, requestData, data=data, errors=errors)
             else: 
+                # This needs to be cleverer... 
                 x = field.widget.convert(field.attr,requestData[field.name])
                 data[field.name] = x
         except (schemaish.Invalid, FieldValidationError), e:
-            print 'thoring wrerr', field.name, e
             errors[field.name] = e
     return data
 

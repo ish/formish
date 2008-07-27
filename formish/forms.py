@@ -55,7 +55,7 @@ class Field(object):
     
     @property
     def value(self):
-        """Convert the form.data to a value object for the form"""
+        """Convert the requestData to a value object for the form"""
         return self.form.requestData.get(self.name, None)
         
     @property

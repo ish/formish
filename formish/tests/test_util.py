@@ -171,12 +171,12 @@ class TestFormBuilding(unittest.TestCase):
             ])
         
         # Test failing validation
-        request =  Request({'one.a':'','one.b': '','one.c.x': '','one.c.y': ''})
+        request =  Request({'one.a':[''],'one.b': [''],'one.c.x': [''],'one.c.y': ['']})
         name = "Nested Form one"
         form = Form(name, schema_nested, request)
         
         self.assertEqual( convertRequestDataToData(form.structure, dottedDict(request.POST)) , {'one.a': '', 'one.b': '', 'one.c.x': '', 'one.c.y': ''})
-        self.assert_( convertDataToRequestData(form.structure, dottedDict( {'one': {'a': '', 'c': {'y': '', 'x': ''}, 'b': ''}} )) == {'one.a':'','one.b': '','one.c.x': '','one.c.y': ''})
+        self.assert_( convertDataToRequestData(form.structure, dottedDict( {'one': {'a': '', 'c': {'y': '', 'x': ''}, 'b': ''}} )) == {'one.a':[''],'one.b': [''],'one.c.x': [''],'one.c.y': ['']})
         
         self.assertRaises(validation.FormError, getattr, form, 'data')
 
@@ -196,7 +196,7 @@ class TestFormBuilding(unittest.TestCase):
              ),
             ])
         # Test passing validation
-        request =   Request({'one': {'a':'woot!','b':'', 'c': {'x':'','y':''}}})
+        request =   Request({'one': {'a':['woot!'],'b':[''], 'c': {'x':[''],'y':['']}}})
         name = "Nested Form two"
         form = Form(name, schema_nested, request)
         self.assert_(form.data == {'one': {'a':'woot!','b':'', 'c': {'x':'','y':''}}})
@@ -215,7 +215,7 @@ class TestFormBuilding(unittest.TestCase):
 
     def test_integer_type(self):
         schema_flat = Structure("One", attrs=[("a", Integer("A")), ("b", String("B"))])
-        request = Request({'a': '3', 'b': '4'})
+        request = Request({'a': ['3'], 'b': ['4']})
         name = "Integer Form"
         form = Form(name, schema_flat, request)
         self.assert_(form.structure.attr is schema_flat)
@@ -223,23 +223,24 @@ class TestFormBuilding(unittest.TestCase):
         form.data = fd
         self.assertEquals(form.data, {'a': 3, 'b': '4'})
         self.assertEqual( convertRequestDataToData(form.structure, dottedDict(request.POST)) , {'a': 3, 'b': '4'})
-        self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == {'a': '3', 'b': '4'})
+        self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == {'a': ['3'], 'b': ['4']})
          
     def test_incorrect_initial_data(self):
         """ TODO: This should raise an error when we get inbound checking which will rely on the schema having inbuilt schema checking!!! """
         schema_flat = Structure("One", attrs=[("a", Integer("A")), ("b", String("B"))])
-        request = Request({'a': '3', 'b': '4'})
+        r = {'a': ['3'], 'b': ['4']}
+        request = Request(r)
         name = "Integer Form"
         form = Form(name, schema_flat, request)
         fd = {'a': '1','b': 2}
         form.data = fd
         self.assertEquals(form.data, {'a': 3, 'b': '4'})
         self.assertEqual( convertRequestDataToData(form.structure, dottedDict(request.POST)) , {'a': 3, 'b': '4'})
-        self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == {'a': '3', 'b': '4'})
+        self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == r)
           
     def test_datetuple_type(self):
         schema_flat = Structure("One", attrs=[("a", Date("A")), ("b", String("B"))])
-        r = {'a': {'day':1,'month':3,'year':1966}, 'b': '4'}
+        r = {'a': {'day':[1],'month':[3],'year':[1966]}, 'b': ['4']}
         request = Request(r)
         name = "Date Form"
         form = Form(name, schema_flat, request)

@@ -1,0 +1,3 @@
+%for n, option in enumerate(options):
+<label for="${field.form.name}-${field.name}-widget-${n}">${option[0]}</label><input id="${field.form.name}-${field.name}-widget-${n}" name="${field.name}" type="checkbox" value="${option[1]}"${widget.checked(option,field.value)} />
+%endfor
