@@ -1,2 +1,6 @@
 *.pyc
 *.log
+.coverage
+formish.wpr
+export.sh
+

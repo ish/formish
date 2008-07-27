@@ -99,8 +99,31 @@ class SelectChoice(Widget):
             return ' selected="selected"'
     
     def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/select.html", {'widget': self, 'field': field, 'options': self.options, 'noneOption': self.noneOption}))
+        return literal(render(field.form.request, "formish/widgets/selectchoice.html", {'widget': self, 'field': field, 'options': self.options, 'noneOption': self.noneOption}))
 
+    
+class RadioChoice(Widget):
+
+    def __init__(self, options, noneOption=None):
+        self.options = options
+        self.noneOption = noneOption
+            
+    def pre_render(self, schemaType, data):
+        return [string_converter(schemaType).fromType(data)]
+    
+    def convert(self, schemaType, data):
+        if len(data) == 0:
+            return []
+        return string_converter(schemaType).toType(data[0])
+
+    def selected(self, option, value):
+        if option[1] == value:
+            return ' checked="checked"'
+    
+    def __call__(self, field):
+        return literal(render(field.form.request, "formish/widgets/radiochoice.html", {'widget': self, 'field': field, 'options': self.options, 'noneOption': self.noneOption}))
+    
+    
 class CheckboxMultiChoice(Widget):
 
     def __init__(self, options):
