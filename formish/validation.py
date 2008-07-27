@@ -1,5 +1,62 @@
 import re
+import schemaish
+from formish.validation import *
+from formish.dottedDict import dottedDict
 
+def validate(structure, requestData, errors=None, keyprefix=None):    
+    """ Take a schemaish structure and use it's validators to return any errors"""
+    if errors is None:
+        errors = dottedDict()
+    # Use formencode to validate each field in the schema, return 
+    # a dictionary of errors keyed by field name
+    for attr in structure.attrs:
+        if keyprefix is None:
+            newprefix = attr[0]
+        else:
+            newprefix = '%s.%s'%(keyprefix,attr[0])
+        try:
+            if hasattr(attr[1],'attrs'):
+                validate(attr[1], requestData, errors=errors, keyprefix=newprefix)
+            else: 
+                attr[1].validate(requestData.get(newprefix))
+        except (schemaish.Invalid, FieldValidationError), e:
+            errors[newprefix] = e
+    return errors
+
+def convertDataToRequestData(formStructure, data, requestData=None, errors=None):
+    """ Take a form structure and use it's widgets to convert data to request data """
+    if requestData is None:
+        requestData = dottedDict()
+    if errors is None:
+        errors = dottedDict()
+    for field in formStructure.fields:
+        try:
+            if hasattr(field,'fields'):
+                convertDataToRequestData(field, data, requestData=requestData, errors=errors)
+            else: 
+                requestData[field.name] = field.widget.pre_render(field.attr,data.get(field.name,None))
+        except schemaish.Invalid, e:
+            errors[field.name] = e
+            raise
+    return requestData
+        
+def convertRequestDataToData(formStructure, requestData, data=None, errors=None):
+    """ Take a form structure and use it's widgets to convert data to request data """
+    if data is None:
+        data = {}
+    if errors is None:
+        errors = {}
+    for field in formStructure.fields:
+        try:
+            if hasattr(field,'fields'):
+                convertRequestDataToData(field, requestData, data=data, errors=errors)
+            else: 
+                x = field.widget.convert(field.attr,requestData[field.name])
+                data[field.name] = x
+        except (schemaish.Invalid, FieldValidationError), e:
+            print 'thoring wrerr', field.name, e
+            errors[field.name] = e
+    return data
 
 class FormsError(Exception):
     """
@@ -148,10 +205,3 @@ class CallableValidator(object):
         return self.callable(field, value)
         
             
-    
-__all__ = [
-    'FormError', 'FieldError', 'FieldValidationError', 'FieldRequiredError',
-    'RequiredValidator', 'LengthValidator', 'RangeValidator', 'PatternValidator',
-    'CallableValidator',
-    ]
-

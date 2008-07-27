@@ -1,0 +1,10 @@
+<select id="${field.form.name}-${field.name}-widget" name="${field.name}">
+%if noneOption:
+${noneOption}
+  <option value="${noneOption[1]}">${noneOption[0]}</option>
+%endif
+%for option in options:
+  <option value="${option[1]}"${widget.selected(option,field.value)}>${option[0]}</option>
+%endfor
+</select>
+

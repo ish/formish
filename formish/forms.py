@@ -1,66 +1,11 @@
 from webhelpers.html import literal
 from restish.templating import render
 import schemaish
-from formish.converter import string_converter, datetuple_converter
-from formish import validation
 from formish.dottedDict import dottedDict
-from pprint import pprint
+from formish.converter import *
+from formish.validation import *
+from formish.widgets import *
 
-def validate(structure, requestData, errors=None, keyprefix=None):    
-    """ Take a schemaish structure and use it's validators to return any errors"""
-    if errors is None:
-        errors = dottedDict()
-    # Use formencode to validate each field in the schema, return 
-    # a dictionary of errors keyed by field name
-    for attr in structure.attrs:
-        if keyprefix is None:
-            newprefix = attr[0]
-        else:
-            newprefix = '%s.%s'%(keyprefix,attr[0])
-        try:
-            if hasattr(attr[1],'attrs'):
-                validate(attr[1], requestData, errors=errors, keyprefix=newprefix)
-            else: 
-                attr[1].validate(requestData.get(newprefix))
-        except schemaish.Invalid, e:
-            errors[newprefix] = e
-    return errors
-
-def convertDataToRequestData(formStructure, data, requestData=None, errors=None):
-    """ Take a form structure and use it's widgets to convert data to request data """
-    if requestData is None:
-        requestData = dottedDict()
-    if errors is None:
-        errors = dottedDict()
-    for field in formStructure.fields:
-        try:
-            if hasattr(field,'fields'):
-                convertDataToRequestData(field, data, requestData=requestData, errors=errors)
-            else: 
-                requestData[field.name] = field.widget.pre_render(field.attr,data.get(field.name,None))
-        except schemaish.Invalid, e:
-            errors[field.name] = e
-            raise
-    return requestData
-        
-
-
-def convertRequestDataToData(formStructure, requestData, data=None, errors=None):
-    """ Take a form structure and use it's widgets to convert data to request data """
-    if data is None:
-        data = {}
-    if errors is None:
-        errors = {}
-    for field in formStructure.fields:
-        try:
-            if hasattr(field,'fields'):
-                convertRequestDataToData(field, requestData, data=data, errors=errors)
-            else: 
-                x = field.widget.convert(field.attr,requestData[field.name])
-                data[field.name] = x
-        except schemaish.Invalid, e:
-            errors[field.name] = e
-    return data
 
 class Field(object):
     """
@@ -182,96 +127,7 @@ class Group(object):
     def __call__(self):
         return literal(render(self.form.request, "formish/structure.html", {'field': self, 'fields': self.fields}))
 
-        
-class BoundWidget(object):
-    
-    def __init__(self, widget, field):
-        self.widget = widget
-        self.field = field
-        
-    def __call__(self):
-        return self.widget(self.field)
-    
-    def pre_render(self, schemaType, data):
-        return self.widget.pre_render(schemaType, data)
-
-    def convert(self, schemaType, data):
-        return self.widget.convert(schemaType, data)
-        
-    def validate(self, data):
-        return self.widget.validate(data)
-
-
-class Widget(object):
-    
-    def pre_render(self, schemaType, data):
-        return string_converter(schemaType).fromType(data)
-
-    def validate(self, data):
-        errors = None
-        return data, errors
-
-    def convert(self, schemaType, data):
-        return string_converter(schemaType).toType(data)    
-    
-    def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/default.html", {'widget': self, 'field': field}))
-
-class Input(Widget):
-    
-    def pre_render(self, schemaType, data):
-        return string_converter(schemaType).fromType(data)
-
-    def validate(self, data):
-        errors = None
-        return data, errors
-    
-    def convert(self, schemaType, data):
-        return string_converter(schemaType).toType(data)
-    
-    def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/input.html", {'widget': self, 'field': field}))
-    
-    
-class DateParts(Widget):
-    
-    def pre_render(self, schemaType, data):
-        data = datetuple_converter(schemaType).fromType(data)
-        d = {}
-        d['year'] = data[0]
-        d['month'] = data[1]
-        d['day'] = data[2]
-        return d
-
-    # ??: Should the validate be here? Confused
-    def validate(self, data):
-        errors = None
-        return data, errors
-    
-    def convert(self, schemaType, data):
-        year = data.get('year', '')
-        month = data.get('month', '')
-        day = data.get('day', '')
-        return datetuple_converter(schemaType).toType((year, month, day))
-    
-    def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/dateparts.html", {'widget': self, 'field': field}))
-    
-    
-
-    
-    
-    
-class TextArea(Widget):
-    
-    def __init__(self, cols=None, rows=None):
-        if cols is not None:
-            self.cols = cols
-        if rows is not None:
-            self.rows = rows 
-            
-    def __call__(self, form, field):
-        return literal(render(form.request, "formish/widgets/textarea.html", {'widget': self, 'field': field}))
+       
     
     
 class Form(object):
@@ -336,11 +192,12 @@ class Form(object):
     def _getData(self):
         """ validate first and raise exceptions if necessary """
         requestData = dottedDict(self.request.POST)
-        data = convertRequestDataToData(self.structure, requestData) 
-        errors = validate(self.structure, data)
+        errors = dottedDict()
+        data = convertRequestDataToData(self.structure, requestData, errors=errors) 
+        errors = validate(self.structure, data, errors=errors)
         self.errors = errors
         if len(errors.keys()) > 0:
-            raise validation.FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(errors.keys()), errors.data))
+            raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(errors.keys()), errors.data))
         self._data = dottedDict(data)
         return self._data
     

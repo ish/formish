@@ -7,6 +7,7 @@ except ImportError:
     haveDecimal = False
 from formish import validation
 from datetime import date, time
+from formish.dottedDict import dottedDict
 
 class NullConverter(object):
     
@@ -259,3 +260,21 @@ def datetuple_converter(value):
 @when(datetuple_converter, (schemaish.Date,))
 def date_to_datetuple(value):
     return DateToDateTupleConverter()
+
+@abstract()
+def boolean_converter(value):
+    pass
+
+@when(boolean_converter, (schemaish.Boolean,))
+def boolean_to_boolean(value):
+    return NullConverter()
+
+@when(boolean_converter, (schemaish.String,))
+def boolean_to_string(value):
+    return BooleanToStringConverter()
+
+
+
+__all__ = [
+    'string_converter','datetuple_converter'
+    ]
