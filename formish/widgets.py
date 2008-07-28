@@ -145,6 +145,7 @@ class CheckboxMultiChoice(Widget):
         return literal(render(field.form.request, "formish/widgets/checkboxmultichoice.html", {'widget': self, 'field': field, 'options': self.options}))
 
     
+    
  
 class BoundWidget(object):
     

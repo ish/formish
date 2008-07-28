@@ -1,6 +1,5 @@
 import re
 import schemaish
-from formish.validation import *
 from formish.dottedDict import dottedDict
 
 def validate(structure, requestData, errors=None, keyprefix=None):    

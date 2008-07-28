@@ -2,8 +2,11 @@ from formish.forms import *
 from formish import validation
 import unittest
 from schemaish import *
-from formish.dottedDict import dottedDict, _getDictFromDottedDict
+from formish.dottedDict import dottedDict
 import wingdbstub
+
+class DummyObject():
+    pass
 
 class TestDictFromDottedDict(unittest.TestCase):
     """
@@ -22,14 +25,25 @@ class TestDictFromDottedDict(unittest.TestCase):
     ]
 
     def test_convert(self):
+        """ Just checking that converting results in assigning the right dict """
         for test in self.test_data:
             self.assertEqual(dottedDict(test[0]).data, test[1])
         for test in self.test_error:
             self.assertRaises(KeyError,dottedDict, test)
-    
+            
+    def test_comparing(self):
+        """ Using the special method __eq__ to compare a dotted dict with a normal dict """
+        for test in self.test_data:
+            self.assertEqual(dottedDict(test[0]), test[1])
+            
     def test_references(self):
-        d = {'a.a.a':1, 'a.b.a':3, 'b':2}
+        """ Does it refer to the same data if you convert an existing dottedDict or plain dict """
+        a = DummyObject()
+        d = {'a.a.a':1, 'a.b.a':3, 'b':a}
+        # Check dict single level keys don't lose reference
+        self.assertEqual( dottedDict(d).data['b'], d['b'] )
         self.assertEqual( dottedDict(d).data, dottedDict(dottedDict(d)).data )
+        
 
 
 class TestGetDataUsingDottedKey(unittest.TestCase):
@@ -48,12 +62,36 @@ class TestGetDataUsingDottedKey(unittest.TestCase):
     ]
 
     def test_get(self):
+        """ use get method and __getitem__ on dotted dict """
         for test in self.test_data:
             self.assertEqual(dottedDict(test[0]).get(test[1]), test[2])
+        for test in self.test_data:
+            self.assertEqual(dottedDict(test[0])[test[1]], test[2])
             
-    #def test_get_missingattr(self):
-        #self.assertRaises(AttributeError, getattr( dottedDict( {'a':{'a':1}, 'b':2} ), 'x.x.x'))
-        #self.assertRaises(KeyError, getattr(dottedDict(), 'missing'))
+    def test_set(self):
+        """ set a variable using normal and dotted notation """
+        for test in self.test_data:
+            dd = dottedDict(test[0])
+            do = DummyObject()
+            dd['x'] = do
+            self.assertEqual(dd['x'], do)
+            
+    def test_keys(self):
+        """ check that the .keys() method returns correctly """
+        for test in self.test_data:
+            self.assertEqual(dottedDict(test[0]).keys(), test[0].keys())
+       
+    def test_setdefault(self):
+        do = DummyObject()
+        for test in self.test_data:
+            self.assertEqual(dottedDict(test[0]).setdefault('X.Y.Z',7), 7)
+        
+            
+    def test_get_missingattr(self):
+        """ This should raise an AttributeError - not working """
+        d = dottedDict( {'a': {'a': 1}, 'b': 2} )
+        self.assertRaises(KeyError, getattr, d , 'Q.Q.Q')
+        self.assertRaises(KeyError, getattr, dottedDict(), 'missing')
         
 
     def test_missing(self):

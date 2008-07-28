@@ -1,3 +1,5 @@
+import copy
+from webob import MultiDict
 def _setDict(data, keys, value):
     if len(keys) == 1:
         if isinstance(data, dict):
@@ -8,7 +10,11 @@ def _setDict(data, keys, value):
         _setDict(data.setdefault(keys[0],{}), keys[1:], value)
 
 
-def _getDictFromDottedDict(data):
+def _getDictFromDottedKeyDict(d):
+    if isinstance(d, MultiDict):
+        data = copy.deepcopy(d)
+    else:
+        data = d
     keyslist=[key.split('.') for key in data.keys()]
     keyslist.sort(reverse=True)
     for keys in keyslist:
@@ -17,11 +23,14 @@ def _getDictFromDottedDict(data):
             if not data.has_key(dottedkey):
                 continue
             if hasattr(data,'getall'):
-                value=data.getall(dottedkey)
+                value= data.getall(dottedkey)
             else:
                 value = data[dottedkey]
             del data[dottedkey]
             _setDict(data, keys, value)
+        else:
+            if hasattr(data,'getall'):
+                data[keys[0]] = data.getall(keys[0])
     return data
 
 # Singleton used to represent no argument passed, for when None is a valid
@@ -39,7 +48,7 @@ class dottedDict(object):
             if isinstance(value, dottedDict):
                 self.data = value.data
             else:
-                self.data = _getDictFromDottedDict(value)
+                self.data = _getDictFromDottedKeyDict(value)
             
     def get(self, dottedkey, default=NOARG):
         keys = dottedkey.split('.')
@@ -74,20 +83,21 @@ class dottedDict(object):
     
 
     def setdefault(self, dottedkey, default=NOARG):
+        try:
+            return self[dottedkey]
+        except KeyError:
+            pass
         keys = dottedkey.split('.')
         d = self.data
-        try:
-            for key in keys:
-                d = d[key]
-        except KeyError, e:
-            if default is not NOARG:
-                d[dottedkey] = default
-                return d[dottedkey]
-            raise KeyError('Dotted key does not exist')
-        if isinstance(d, dict):
-            return dottedDict(d)
+
+        for n,key in enumerate(keys[:-1]):
+            d = d.setdefault(key,{})
+        if default is not NOARG:
+            d[keys[-1]] = default
         else:
-            return d
+            d[keys[-1]] = None
+        return self[dottedkey]
+                
         
     def __getattr__(self, key):
         try:
