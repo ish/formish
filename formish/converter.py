@@ -144,7 +144,11 @@ class TimeToStringConverter(object):
             
         return value
         
-        
+ 
+
+    
+    
+    
 class DateToDateTupleConverter(object):
     
     def fromType(self, value):
@@ -250,8 +254,13 @@ def date_to_string(value):
     return DateToStringConverter()
 
 @when(string_converter, (schemaish.Time,))
-def date_to_string(value):
+def time_to_string(value):
     return TimeToStringConverter()
+
+@when(string_converter, (schemaish.Sequence,))
+def sequence_to_string(value):
+    return SequenceToStringConverter()
+
 
 @abstract()
 def datetuple_converter(value):
@@ -275,7 +284,6 @@ def boolean_to_string(value):
 
 
 
-
 __all__ = [
-    'string_converter','datetuple_converter'
+    'string_converter','datetuple_converter','boolean_converter'
     ]
