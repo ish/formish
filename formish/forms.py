@@ -14,7 +14,7 @@ class Action(object):
     """
     def __init__(self, callback, name, label):
 
-        if not util.validIdentifier(name):
+        if not util.valid_identifier(name):
             raise FormError('Invalid action name %r.'%name)
 
         self.callback = callback

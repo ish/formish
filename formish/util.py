@@ -2,6 +2,11 @@
 General purpose utility module.
 """
 
+import re
+
+
+_IDENTIFIER_REGEX = re.compile('^[a-zA-Z_][a-zA-Z0-9_]*$')
+
 
 def title_from_name(name):
     """
@@ -26,4 +31,11 @@ def title_from_name(name):
                 yield ch
             last = ch
     return ''.join(_())
+
+
+def valid_identifier(name):
+    """
+    Test that name is a valid-ish Python identifier.
+    """
+    return _IDENTIFIER_REGEX.match(name) is not None
 
