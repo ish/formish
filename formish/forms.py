@@ -5,7 +5,23 @@ from formish.dottedDict import dottedDict
 from formish.converter import *
 from formish.validation import *
 from formish.widgets import *
+from formish import util
 
+
+class Action(object):
+    """Tracks an action that has been added to a form.
+    """
+    def __init__(self, callback, name, label):
+
+        if not util.validIdentifier(name):
+            raise FormError('Invalid action name %r.'%name)
+
+        self.callback = callback
+        self.name = name
+        if label is None:
+            self.label = util.titleFromName(name)
+        else:
+            self.label = label
 
 class Field(object):
     """
@@ -138,6 +154,7 @@ class Form(object):
         self.request = request
         self._data = dottedDict(data or {})
         self.errors = dottedDict(errors or {})
+        self.actions = None
         if requestData is None:
             self._requestData = None
         else:
@@ -156,12 +173,32 @@ class Form(object):
                 # Set the widget on this form item
                 form_item.widget = widget
 
+    def addAction(self, callback, name="submit", label=None):
+        print 'adding action'
+        if self.actions is None:
+            self.actions = []
+        if name in [action.name for action in self.actions]:
+            raise ValueError('Action with name %r already exists.' % name)
+        self.actions.append( Action(callback, name, label) )              
+        print 'action added',self.actions
+
+    def action(self):
+        if len(self.actions)==0:
+            raise NoActionError('The form does not have any actions')
+        for action in self.actions:
+            print 'trying to find %s in %r'%(action.name, self.requestData.keys())
+            if action.name in self.requestData.keys():
+                return action.callback(self)
+        return self.actions[0].callback(self)
+            
+            
+        
+        
     def __call__(self):
         return literal(render(self.request, "formish/form.html", {'form': self}))
 
     def __getattr__(self, name):
         return getattr( self.structure, name )
-
     
     #
     # Getting the requestData from the form converts self.data if necessary.
@@ -170,15 +207,15 @@ class Form(object):
         return convertDataToRequestData(self.structure, self._data)
 
     def _getRequestData(self):
-        """ if we have request data then use it, if not then convert the data to request data """
-        try:
-            if self._requestData is None:    
-                self._requestData = self.convertDataToRequestData()
+        """ if we have request data then use it, if not then convert the data to request data unless it's a POST """
+        if self._requestData is not None:
             return self._requestData
-        except Exception, e:
-            # TODO: This is currently blowing if we can't convert the data to request data (presuming we don't already have request data)
-            print '---->',e
-            raise
+        if self.request.method =='POST':
+            self.requestData = self.request.POST
+        else:
+            self._requestData = self.convertDataToRequestData()
+        return self._requestData
+
     
     def _setRequestData(self, requestData):
         """ assign data """
@@ -191,24 +228,29 @@ class Form(object):
     #
     def _getData(self):
         """ validate first and raise exceptions if necessary """
-        requestData = dottedDict(self.request.POST)
-        errors = dottedDict()
-        data = convertRequestDataToData(self.structure, requestData, errors=errors) 
-        errors = validate(self.structure, data, errors=errors)
-        self.errors = errors
-        if len(errors.keys()) > 0:
+        r = self._getRequestData()
+        data = convertRequestDataToData(self.structure, self._getRequestData(), errors=self.errors) 
+        if len(self.errors.keys()) > 0:
             raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(errors.keys()), errors.data))
-        self._data = dottedDict(data)
-        return self._data
+        return dottedDict(data)
     
-    def _setData(self, data):
+    def _getDefaults(self):
+        return self._defaults
+    
+    def _setDefaults(self, data):
         """ assign data """
-        ## Check that the data being set is correct for the structure on the form
-        ## self.structure.attr.validate(data)
+        self._defaults = data
         self._data = dottedDict(data)
         
-    data = property(_getData, _setData)
+    defaults = property(_getDefaults, _setDefaults)
 
+    def validate(self):
+        data = self._getData()
+        errors = validate(self.structure, data, errors=self.errors)
+        if len(self.errors.keys()) > 0:
+            raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(errors.keys()), errors.data))
+        return dottedDict(data)
+        
     
     @property
     def fields(self):

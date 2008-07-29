@@ -2,7 +2,7 @@ import re
 import schemaish
 from formish.dottedDict import dottedDict
 
-def validate(structure, requestData, errors=None, keyprefix=None):    
+def validate(structure, requestData, errors=None, keyprefix=None):   
     """ Take a schemaish structure and use it's validators to return any errors"""
     if errors is None:
         errors = dottedDict()
@@ -72,6 +72,13 @@ class FormsError(Exception):
 
 
 class FormError(FormsError):
+    """
+    Form validation error. Raise this, typically from a submit callback, to
+    signal that the form (not an individual field) failed to validate.
+    """
+    pass
+    
+class NoActionError(FormsError):
     """
     Form validation error. Raise this, typically from a submit callback, to
     signal that the form (not an individual field) failed to validate.

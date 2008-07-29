@@ -6,7 +6,13 @@
     ${field()}
     % endfor
     <div class="actions">
-      <input type="submit" />
+      %if form.actions == []:
+        <input type="submit" id="${form.name}-action-submit" name="submit" value="Submit" />
+      %else:
+        %for action in form.actions:
+        <input type="submit" id="${form.name}-action-${action.name}" name="${action.name}" value="${action.label}" />
+        %endfor
+      %endif
     </div>
   </div>
 </form>

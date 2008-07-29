@@ -54,12 +54,12 @@ class dottedDict(object):
         keys = dottedkey.split('.')
         d = self.data
         try:
-            for key in keys:
+            for n,key in enumerate(keys):
                 d = d[key]
         except KeyError, e:
             if default is not NOARG:
                 return default
-            raise KeyError('Dotted key does not exist')
+            raise KeyError('Error accessing dotted key %s on %r. Only got to %s'%(dottedkey,self.data,'.'.join(keys[:n])))
         if isinstance(d, dict):
             return dottedDict(d)
         else:
