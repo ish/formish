@@ -1,6 +1,7 @@
 from webhelpers.html import literal
 from restish.templating import render
 import schemaish
+from formish import util
 from formish.dottedDict import dottedDict
 from formish.converter import *
 from formish.validation import *
@@ -27,29 +28,31 @@ class Field(object):
     """
     A wrapper for a schema field type that includes form information. 
     
-    The Schema field does not have any bindings to the form libaray, it can be used on it's own. The Bound field.
+    The Schema field does not have any bindings to the form library, it can be
+    used on it's own. The Bound field.
     
     The _widget attribute is a base widget to which the real widget is bound 
-    
     """
 
     def __init__(self, name, attr, form):
         """
         @param name:            Fields dotted name
         @type name:             String
-        @param attr_name:       a name for the field
-        @type attr_name:        String
         @param attr:            a Schema attr to bind to the container
         @type attr:             Attribute object
+        @param form:            The form the field belongs to.
+        @type form:             Form instance.
         """
         self.name = name
         self.attr = attr
-        self._widget = Widget()
         self.form = form
-
-    @property
-    def title(self):
-        return self.attr.title
+        # Create a default widget for the field. XXX There is no such thing as
+        # a default widget, this needs to be some sort of adaption process.
+        self._widget = Widget()
+        # Construct a title
+        self.title = self.attr.title
+        if self.title is None:
+            self.title = util.title_from_name(self.name.split('.')[-1])
 
     @property
     def description(self):
@@ -101,13 +104,15 @@ class Group(object):
         """
         self.name = name
         self.attr = attr
-        self._widget = Widget()
         self.form = form
         self._fields = {}    
-
-    @property
-    def title(self):
-        return self.attr.title
+        # Create a default widget for the group. XXX Shouldn't this be some
+        # sort of GroupWidget?
+        self._widget = Widget()
+        # Construct a title
+        self.title = self.attr.title
+        if self.title is None and name is not None:
+            self.title = util.title_from_name(self.name.split('.')[-1])
 
     @property
     def description(self):

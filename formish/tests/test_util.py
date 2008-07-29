@@ -3,7 +3,11 @@ from formish import validation
 import unittest
 from schemaish import *
 from formish.dottedDict import dottedDict
-import wingdbstub
+try:
+    import wingdbstub
+except ImportError:
+    pass
+
 
 class DummyObject():
     pass
@@ -113,7 +117,7 @@ class TestFormBuilding(unittest.TestCase):
     the methods/properties are as expected
     """
     def test_form(self):
-        schema_empty = Structure("Empty")        
+        schema_empty = Structure()        
         request =  Request()
         name = "Empty Form"
         form = Form(name, schema_empty, request)
@@ -125,7 +129,7 @@ class TestFormBuilding(unittest.TestCase):
         self.assert_(form._data is fd)
         
     def test_empty_form(self):
-        schema_empty = Structure("Empty Attr List", attrs=[])        
+        schema_empty = Structure([])        
         request =  Request()
         name = "Empty Form"
         form = Form(name, schema_empty, request)
@@ -133,7 +137,7 @@ class TestFormBuilding(unittest.TestCase):
       
 
     def test_flat_form(self):
-        schema_flat = Structure("One", attrs=[("a", String("A")), ("b", String("B"))])
+        schema_flat = Structure([("a", String()), ("b", String())])
         request =  Request()
         name = "Flat Form"
         form = Form(name, schema_flat, request)
@@ -147,9 +151,9 @@ class TestFormBuilding(unittest.TestCase):
         self.assertEqual(form.a.title, 'A')
         self.assertEqual(form.b.title, 'B')
         
-    one = Structure("One", attrs=[("a", String("A")), ("b", String("B"))])
-    two = Structure("Two", attrs=[("a", String("A")), ("b", String("B"))])
-    schema_slightlynested = Structure("Structure", attrs=[("one", one), ("two", two)])
+    one = Structure([("a", String()), ("b", String())])
+    two = Structure([("a", String()), ("b", String())])
+    schema_slightlynested = Structure([("one", one), ("two", two)])
 
     def test_slightlynested_form(self):
         request =  Request()
@@ -169,12 +173,12 @@ class TestFormBuilding(unittest.TestCase):
 
 
     def test_nested_form(self):
-        schema_nested = Structure("Structure", attrs=[
-                ("one", Structure("One", attrs=[
-                    ("a", String("A", validator=NotEmpty, 
+        schema_nested = Structure([
+                ("one", Structure([
+                    ("a", String(validator=NotEmpty, 
                         description="This is a field with name a and title A and has a NotEmpty validator")),
-                    ("b", String("B")),
-                    ("c", Structure("C", attrs=[("x", String("X")),("y", String("Y"))])),
+                    ("b", String()),
+                    ("c", Structure([("x", String()),("y", String())])),
                     ])
                  ),
                 ])        
@@ -199,12 +203,12 @@ class TestFormBuilding(unittest.TestCase):
         
         
     def test_nested_form_validation(self):
-        schema_nested = Structure("Structure", attrs=[
-            ("one", Structure("One", attrs=[
-                ("a", String("A", validator=NotEmpty, 
+        schema_nested = Structure([
+            ("one", Structure([
+                ("a", String(validator=NotEmpty, 
                     description="This is a field with name a and title A and has a NotEmpty validator")),
-                ("b", String("B")),
-                ("c", Structure("C", attrs=[("x", String("X")),("y", String("Y"))])),
+                ("b", String()),
+                ("c", Structure([("x", String()),("y", String())])),
                 ])
              ),
             ])
@@ -225,12 +229,12 @@ class TestFormBuilding(unittest.TestCase):
         self.assertEqual( form.one.a.error.message, "Please enter a value" )
         
     def test_nested_form_typecheck(self):
-        schema_nested = Structure("Structure", attrs=[
-            ("one", Structure("One", attrs=[
-                ("a", String("A", validator=NotEmpty, 
+        schema_nested = Structure([
+            ("one", Structure([
+                ("a", String(validator=NotEmpty, 
                     description="This is a field with name a and title A and has a NotEmpty validator")),
-                ("b", String("B")),
-                ("c", Structure("C", attrs=[("x", String("X")),("y", String("Y"))])),
+                ("b", String()),
+                ("c", Structure([("x", String()),("y", String())])),
                 ])
              ),
             ])
@@ -253,7 +257,7 @@ class TestFormBuilding(unittest.TestCase):
         
 
     def test_integer_type(self):
-        schema_flat = Structure("One", attrs=[("a", Integer("A")), ("b", String("B"))])
+        schema_flat = Structure([("a", Integer()), ("b", String())])
         request = Request({'a': ['3'], 'b': ['4']})
         name = "Integer Form"
         form = Form(name, schema_flat, request)
@@ -266,7 +270,7 @@ class TestFormBuilding(unittest.TestCase):
          
     def test_incorrect_initial_data(self):
         """ TODO: This should raise an error when we get inbound checking which will rely on the schema having inbuilt schema checking!!! """
-        schema_flat = Structure("One", attrs=[("a", Integer("A")), ("b", String("B"))])
+        schema_flat = Structure([("a", Integer()), ("b", String())])
         r = {'a': ['3'], 'b': ['4']}
         request = Request(r)
         name = "Integer Form"
@@ -278,7 +282,7 @@ class TestFormBuilding(unittest.TestCase):
         self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == r)
           
     def test_datetuple_type(self):
-        schema_flat = Structure("One", attrs=[("a", Date("A")), ("b", String("B"))])
+        schema_flat = Structure([("a", Date()), ("b", String())])
         r = {'a': {'day':[1],'month':[3],'year':[1966]}, 'b': ['4']}
         request = Request(r)
         name = "Date Form"
