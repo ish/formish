@@ -1,13 +1,10 @@
-<%
-  xml_id = field.form.name + '-' + field.name
-%>
 
 % if field.error:
-<div id="${xml_id}" class="field error">
+<div id="${field.cssname}" class="field error">
 % else:
-<div id="${xml_id}" class="field">
+<div id="${field.cssname}" class="field">
 % endif
-  <label for="${xml_id}-widget">${field.title}</label>
+  <label for="${field.cssname}-widget">${field.title}</label>
   <div class="widget">
     ${field.widget()}
   </div>
