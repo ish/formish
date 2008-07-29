@@ -31,7 +31,18 @@ class Input(Widget):
     
     def __call__(self, field):
         return literal(render(field.form.request, "formish/widgets/input.html", {'widget': self, 'field': field}))
+   
+class Hidden(Widget):
     
+    def pre_render(self, schemaType, data):
+        return [string_converter(schemaType).fromType(data)]
+    
+    def convert(self, schemaType, data):
+        return string_converter(schemaType).toType(data[0])
+    
+    def __call__(self, field):
+        return literal(render(field.form.request, "formish/widgets/hidden.html", {'widget': self, 'field': field}))
+        
 class TextArea(Widget):
     
     def __init__(self, cols=None, rows=None):
