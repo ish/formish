@@ -159,7 +159,7 @@ class Form(object):
         self.request = request
         self._data = dottedDict(data or {})
         self.errors = dottedDict(errors or {})
-        self.actions = None
+        self.actions = []
         if requestData is None:
             self._requestData = None
         else:
@@ -180,8 +180,6 @@ class Form(object):
 
     def addAction(self, callback, name="submit", label=None):
         print 'adding action'
-        if self.actions is None:
-            self.actions = []
         if name in [action.name for action in self.actions]:
             raise ValueError('Action with name %r already exists.' % name)
         self.actions.append( Action(callback, name, label) )              
