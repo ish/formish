@@ -55,6 +55,11 @@ class Field(object):
             self.title = util.title_from_name(self.name.split('.')[-1])
 
     @property
+    def cssname(self):
+        return '%s-%s'%field.form.name, '-'.join(field.name.split('.'))
+    
+            
+    @property
     def description(self):
         return self.attr.description        
         
