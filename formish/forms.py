@@ -55,6 +55,11 @@ class Field(object):
             self.title = util.title_from_name(self.name.split('.')[-1])
 
     @property
+    def cssname(self):
+        return '%s-%s'%(self.form.name, '-'.join(self.name.split('.')))
+    
+            
+    @property
     def description(self):
         return self.attr.description        
         
@@ -179,23 +184,18 @@ class Form(object):
                 form_item.widget = widget
 
     def addAction(self, callback, name="submit", label=None):
-        print 'adding action'
         if name in [action.name for action in self.actions]:
             raise ValueError('Action with name %r already exists.' % name)
         self.actions.append( Action(callback, name, label) )              
-        print 'action added',self.actions
 
     def action(self):
         if len(self.actions)==0:
             raise NoActionError('The form does not have any actions')
         for action in self.actions:
-            print 'trying to find %s in %r'%(action.name, self.requestData.keys())
             if action.name in self.requestData.keys():
                 return action.callback(self)
         return self.actions[0].callback(self)
             
-            
-        
         
     def __call__(self):
         return literal(render(self.request, "formish/form.html", {'form': self}))
