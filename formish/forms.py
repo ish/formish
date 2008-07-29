@@ -58,6 +58,18 @@ class Field(object):
     def cssname(self):
         return '%s-%s'%(self.form.name, '-'.join(self.name.split('.')))
     
+    @property
+    def classes(self):
+        classes = [
+            'field',
+            self.attr.__class__.__name__.lower(),
+            self.widget.widget.__class__.__name__.lower(),
+            ]
+        if self.widget.cssClass:
+            classes.append(self.widget.cssClass)        
+        if self.error:
+            classes.append('error')
+        return ' '.join(classes)
             
     @property
     def description(self):

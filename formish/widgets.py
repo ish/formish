@@ -160,9 +160,10 @@ class CheckboxMultiChoice(Widget):
  
 class BoundWidget(object):
     
-    def __init__(self, widget, field):
+    def __init__(self, widget, field, cssClass=[]):
         self.widget = widget
         self.field = field
+        self.cssClass=cssClass
         
     def __call__(self):
         return self.widget(self.field)
