@@ -48,7 +48,7 @@ class Field(object):
         self.form = form
         # Create a default widget for the field. XXX There is no such thing as
         # a default widget, this needs to be some sort of adaption process.
-        self._widget = Widget()formish/widgets.py
+        self._widget = Widget()
         # Construct a title
         self.title = self.attr.title
         if self.title is None:
