@@ -65,12 +65,31 @@ class Field(object):
             self.attr.__class__.__name__.lower(),
             self.widget.widget.__class__.__name__.lower(),
             ]
+        if self.required:
+            classes.append('required')
         if self.widget.cssClass:
             classes.append(self.widget.cssClass)        
         if self.error:
             classes.append('error')
         return ' '.join(classes)
-            
+   
+    @property 
+    def required(self):
+        hasrequiredvalidator = self.isNotEmpty(self.attr.validator)
+        return hasrequiredvalidator
+    
+    def isNotEmpty(self,validator):
+        if validator is None:
+            return False
+        if isinstance(validator, schemaish.NotEmpty) or getattr(validator,'not_empty'):
+            return True
+        if hasattr(validator,'validators'):
+            for v in validator.validators:
+                self.isNotEmpty(v)
+        return False
+        
+        
+    
     @property
     def description(self):
         return self.attr.description        
@@ -142,12 +161,24 @@ class Group(object):
             self.attr.__class__.__name__.lower(),
             self.widget.widget.__class__.__name__.lower(),
             ]
+        if self.required:
+            classes.append('required')
         if self.widget.cssClass:
             classes.append(self.widget.cssClass)        
         if self.error:
             classes.append('error')
         return ' '.join(classes)            
             
+    @property 
+    def required(self):
+        validator = self.attr.validator
+        if validator is not None:
+            for v in validator:
+                if isinstance(v,schemaish.NotEmpty):
+                    return true
+        return False
+        
+        
     @property
     def description(self):
         return self.attr.description        
