@@ -48,7 +48,7 @@ class Field(object):
         self.form = form
         # Create a default widget for the field. XXX There is no such thing as
         # a default widget, this needs to be some sort of adaption process.
-        self._widget = Widget()
+        self._widget = Widget()formish/widgets.py
         # Construct a title
         self.title = self.attr.title
         if self.title is None:
@@ -284,7 +284,7 @@ class Form(object):
         """ if we have request data then use it, if not then convert the data to request data unless it's a POST """
         if self._requestData is not None:
             return self._requestData
-        if self.request.method =='POST':
+        if self.request.method =='POST' and self.request.POST.get('__formish_form__',[None])[0] == self.name:
             self.requestData = self.request.POST
         else:
             self._requestData = self.convertDataToRequestData()
