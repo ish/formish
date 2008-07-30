@@ -1,6 +1,7 @@
 from formish.converter import *
 from webhelpers.html import literal
 from restish.templating import render
+from formish.validation import *
 
 # Marker object for args that are not supplied
 _UNSET = object()
@@ -22,16 +23,32 @@ class Widget(object):
         return literal(render(field.form.request, "formish/widgets/default.html", {'widget': self, 'field': field}))
 
 class Input(Widget):
+
+    def __call__(self, field):
+        return literal(render(field.form.request, "formish/widgets/default.html", {'widget': self, 'field': field}))
+   
+class Password(Widget):
+    
+    def __call__(self, field):
+        return literal(render(field.form.request, "formish/widgets/password.html", {'widget': self, 'field': field}))
+   
+class CheckedPassword(Widget):
     
     def pre_render(self, schemaType, data):
         return [string_converter(schemaType).fromType(data)]
     
     def convert(self, schemaType, data):
-        return string_converter(schemaType).toType(data[0])
+        password = data.get('password',[None])[0]
+        confirm = data.get('confirm',[None])[0]
+        if password != confirm:
+            raise FieldValidationError('Password did not match')
+        return string_converter(schemaType).toType(password)
     
     def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/input.html", {'widget': self, 'field': field}))
-   
+        return literal(render(field.form.request, "formish/widgets/checkedpassword.html", {'widget': self, 'field': field}))
+       
+
+
 class Hidden(Widget):
     
     def pre_render(self, schemaType, data):
