@@ -17,7 +17,7 @@ def validate(structure, requestData, errors=None, keyprefix=None):
             if hasattr(attr[1],'attrs'):
                 validate(attr[1], requestData, errors=errors, keyprefix=newprefix)
             else: 
-                attr[1].validate(requestData.get(newprefix))
+                attr[1].validate(requestData.get(newprefix,None))
         except (schemaish.Invalid, FieldValidationError), e:
             errors[newprefix] = e
     return errors

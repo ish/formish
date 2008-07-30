@@ -132,6 +132,23 @@ class Group(object):
             self.title = util.title_from_name(self.name.split('.')[-1])
 
     @property
+    def cssname(self):
+        return '%s-%s'%(self.form.name, '-'.join(self.name.split('.')))
+    
+    @property
+    def classes(self):
+        classes = [
+            'field',
+            self.attr.__class__.__name__.lower(),
+            self.widget.widget.__class__.__name__.lower(),
+            ]
+        if self.widget.cssClass:
+            classes.append(self.widget.cssClass)        
+        if self.error:
+            classes.append('error')
+        return ' '.join(classes)            
+            
+    @property
     def description(self):
         return self.attr.description        
         
@@ -161,11 +178,22 @@ class Group(object):
                 bf = Field(keyprefix, attr, self.form)
             self._fields[attr_name] = bf
             return bf
+
+    @property
+    def error(self):
+        """ Lazily get the error from the form.errors when needed """
+        return self.form.errors.get(self.name, None)        
         
     def __call__(self):
-        return literal(render(self.form.request, "formish/structure.html", {'field': self, 'fields': self.fields}))
+        return literal(render(self.form.request, "formish/structure.html", {'group': self, 'fields': self.fields}))
 
-       
+    def _getWidget(self):
+        return BoundWidget(self._widget, self)
+    
+    def _setWidget(self, widget):
+        self._widget = widget
+        
+    widget = property(_getWidget, _setWidget)   
     
     
 class Form(object):
@@ -241,12 +269,13 @@ class Form(object):
     #
     # Getting the data from the form triggers a validation.
     #
-    def _getData(self):
+    def _getData(self, raiseErrors=True):
         """ validate first and raise exceptions if necessary """
         r = self._getRequestData()
         data = convertRequestDataToData(self.structure, self._getRequestData(), errors=self.errors) 
-        if len(self.errors.keys()) > 0:
-            raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(errors.keys()), errors.data))
+        if raiseErrors:
+            if len(self.errors.keys()) > 0:
+                raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(self.errors.keys()), self.errors.data))
         return dottedDict(data)
     
     def _getDefaults(self):
@@ -260,7 +289,7 @@ class Form(object):
     defaults = property(_getDefaults, _setDefaults)
 
     def validate(self):
-        data = self._getData()
+        data = self._getData(raiseErrors=False)
         errors = validate(self.structure, data, errors=self.errors)
         if len(self.errors.keys()) > 0:
             raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(errors.keys()), errors.data))

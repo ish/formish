@@ -1,4 +1,12 @@
+<fieldset class="group" id="${group.cssname}-field" class="${group.classes}">
+  % if group.title:
+  <legend>${group.title}</legend>
+  % endif
+  % if group.description:
+  <div class="description">${group.description}</div>
+  % endif
 % for field in fields:
 ${field()}
 % endfor
+</fieldset>
 
