@@ -284,7 +284,7 @@ class Form(object):
         """ if we have request data then use it, if not then convert the data to request data unless it's a POST """
         if self._requestData is not None:
             return self._requestData
-        if self.request.method =='POST' and self.request.POST.get('__formish_form__',[None])[0] == self.name:
+        if self.request.method =='POST' and self.request.POST.get('__formish_form__',None) == self.name:
             self.requestData = self.request.POST
         else:
             self._requestData = self.convertDataToRequestData()
