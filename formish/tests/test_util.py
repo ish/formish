@@ -3,10 +3,6 @@ from formish import validation
 import unittest
 from schemaish import *
 from formish.dottedDict import dottedDict
-try:
-    import wingdbstub
-except ImportError:
-    pass
 
 
 class DummyObject():
