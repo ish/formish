@@ -281,9 +281,10 @@ class Form(object):
         return convertDataToRequestData(self.structure, self._data)
 
     def _getRequestData(self):
-        """ if we have request data then use it, if not then convert the data to request data unless it's a POST """
+        """ if we have request data then use it, if not then convert the data to request data unless it's a POST from this form """
         if self._requestData is not None:
             return self._requestData
+        # If we have posted data and this is the form that has been posted then set the request data
         if self.request.method =='POST' and self.request.POST.get('__formish_form__',None) == self.name:
             self.requestData = self.request.POST
         else:
