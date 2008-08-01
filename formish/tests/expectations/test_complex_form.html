@@ -1,0 +1,121 @@
+<form id="form" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+  <div>
+    <input type="hidden" name="_charset_" />
+    <input type="hidden" name="__formish_form__" value="form" />
+    <fieldset class="group" id="form-one-field" class="field structure widget">
+  <legend>One</legend>
+
+<div id="form-one-a-field" class="field string widget required">
+  <label for="form-one-a">A</label>
+  <div class="inputs">
+    <input id="form-one-a" type="text" name="one.a" value="ooteenee" />
+
+  </div>
+</div>
+
+
+<div id="form-one-b-field" class="field string textarea">
+  <label for="form-one-b">B</label>
+  <div class="inputs">
+    <textarea id="form-one-b" name="one.b" ></textarea>
+  </div>
+</div>
+
+
+<div id="form-one-c-field" class="field sequence widget">
+  <label for="form-one-c">C</label>
+  <div class="inputs">
+    <input id="form-one-c" type="text" name="one.c" value="3,4,5" />
+
+  </div>
+</div>
+
+</fieldset>
+
+
+    <fieldset class="group" id="form-two-field" class="field structure widget">
+  <legend>Two</legend>
+
+<div id="form-two-a-field" class="field string selectchoice">
+  <label for="form-two-a">A</label>
+  <div class="inputs">
+    <select id="form-two-a" name="two.a">
+  <option value="">-select option-</option>
+  <option value="opt1">Option 1</option>
+  <option value="opt2">Option 2</option>
+</select>
+
+
+  </div>
+</div>
+
+
+<div id="form-two-b-field" class="field date dateparts">
+  <label for="form-two-b">B</label>
+  <div class="inputs">
+      <input id="form-two-b" type="text" name="two.b.day" value="3" size="2" /> /
+  <input id="form-two-b-month" type="text" name="two.b.month" value="1" size="2" /> /
+  <input id="form-two-b-year" type="text" name="two.b.year" value="1966" size="4" />
+  </div>
+</div>
+
+
+<div id="form-two-c-field" class="field sequence checkboxmultichoice">
+  <label for="form-two-c">C</label>
+  <div class="inputs">
+    <input id="form-two.c-0" name="two.c" type="checkbox" value="opt1" />
+<label for="form-two-c-0">Option 1</label>
+<br />
+<input id="form-two.c-1" name="two.c" type="checkbox" value="opt2" />
+<label for="form-two-c-1">Option 2</label>
+<br />
+
+  </div>
+</div>
+
+
+<div id="form-two-d-field" class="field string radiochoice">
+  <label for="form-two-d">D</label>
+  <div class="inputs">
+    <div class="radiobutton">
+  <input type="radio" name="two.d" id="form-two-d-widget-0" value="opt1" />
+  <label for="form-two.d-widget-0">Option 1</label>
+</div>
+<div class="radiobutton">
+  <input type="radio" name="two.d" id="form-two-d-widget-1" value="opt2" />
+  <label for="form-two.d-widget-1">Option 2</label>
+</div>
+
+  </div>
+</div>
+
+
+<div id="form-two-e-field" class="field integer widget required">
+  <label for="form-two-e">E</label>
+  <div class="inputs">
+    <input id="form-two-e" type="text" name="two.e" value="" />
+
+  </div>
+</div>
+
+
+<div id="form-two-f-field" class="field string checkedpassword required">
+  <label for="form-two-f">F</label>
+  <div class="inputs">
+    <input id="form-two-f" type="password" name="two.f.password" value="" />
+<br />
+<label for="form-two-f-confirm">Confirm</label>
+<input id="form-two-f-confirm" type="password" name="two.f.confirm" value="" />
+
+  </div>
+</div>
+
+</fieldset>
+
+
+    <div class="actions">
+        <input type="submit" id="form-action-submit" name="submit" value="Submit Me" />
+    </div>
+  </div>
+</form>
+
