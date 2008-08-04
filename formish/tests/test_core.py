@@ -110,8 +110,7 @@ class TestFormBuilding(unittest.TestCase):
         schema_empty = Structure()        
         name = "Empty Form"
         request =  Request(name)
-        form = Form(name, schema_empty, request)
-        self.assertEqual(form.request,request)
+        form = Form(name, schema_empty)
         self.assertEqual(form.structure.attr,schema_empty)
         self.assertEqual(form.name,name)
         fd = {'a':1,'b':2}
@@ -123,7 +122,7 @@ class TestFormBuilding(unittest.TestCase):
         schema_empty = Structure([])        
         name = "Empty Form"
         request =  Request(name)
-        form = Form(name, schema_empty, request)
+        form = Form(name, schema_empty)
         # this is really empty
         assert list(form.fields) == []
       
@@ -133,7 +132,7 @@ class TestFormBuilding(unittest.TestCase):
         schema_flat = Structure([("a", String()), ("b", String())])
         name = "Flat Form"
         request =  Request(name)
-        form = Form(name, schema_flat, request)
+        form = Form(name, schema_flat)
         # stored schema
         assert form.structure.attr is schema_flat
         # number of fields
@@ -157,7 +156,7 @@ class TestFormBuilding(unittest.TestCase):
         """Test a form with nested sections"""
         name = "Slightly Nested Form"
         request =  Request(name)
-        form = Form(name, self.schema_slightlynested, request)
+        form = Form(name, self.schema_slightlynested)
         fd = {'one': { 'a': 2, 'b': 3 },'two': { 'a': 2, 'b': 3 }}
         form.defaults = fd
         # stored schema
@@ -189,7 +188,7 @@ class TestFormBuilding(unittest.TestCase):
             ])        
         name = "Nested Form"
         request =  Request(name)
-        form = Form(name, schema_nested, request)
+        form = Form(name, schema_nested)
         # stored schema
         assert form.structure.attr is schema_nested
         # has only a single group
@@ -230,12 +229,12 @@ class TestFormBuilding(unittest.TestCase):
         request =  Request(name, r)
         R = copy.deepcopy(r)
         R.pop('__formish_form__')        
-        form = Form(name, schema_nested, request)
+        form = Form(name, schema_nested)
         
-        assert convertRequestDataToData(form.structure, dottedDict(request.POST)) == data
+        assert convertRequestDataToData(form.structure, dottedDict(copy.deepcopy(request.POST))) == data
         assert convertDataToRequestData(form.structure, dottedDict(data)) == R
         
-        self.assertRaises(validation.FormError, form.validate)
+        self.assertRaises(validation.FormError, form.validate, request)
 
         self.assert_( isinstance(form.errors['one']['a'], Invalid) )
         self.assertEqual( form.errors['one']['a'].message, "Please enter a value" )
@@ -254,9 +253,10 @@ class TestFormBuilding(unittest.TestCase):
             ])
         # Test passing validation
         name = "Nested Form two"
-        request =   Request(name, {'one': {'a':['woot!'],'b':[''], 'c': {'x':[''],'y':['']}}})
-        form = Form(name, schema_nested, request)
-        self.assert_(form.validate() == {'one': {'a':'woot!','b':'', 'c': {'x':'','y':''}}})
+        #request =   Request(name, {'one': {'a':['woot!'],'b':[''], 'c': {'x':[''],'y':['']}}})
+        request = Request(name, {'one.a': ['woot!'], 'one.b': [''], 'one.c.x': [''], 'one.c.y': ['']})
+        form = Form(name, schema_nested)
+        self.assert_(form.validate(request) == {'one': {'a':'woot!','b':'', 'c': {'x':'','y':''}}})
         self.assertEquals(form.errors , {})
         self.assert_( isinstance(form.one.a.widget, BoundWidget) )
         self.assert_( isinstance(form.one.a.widget.widget, Widget) )
@@ -264,7 +264,7 @@ class TestFormBuilding(unittest.TestCase):
         form.one.a.widget = TextArea()
         self.assert_( isinstance(form.one.a.widget.widget, TextArea) )
         widgets = {'one': {'a': TextArea()}}
-        form = Form(name, schema_nested, request, widgets=widgets)
+        form = Form(name, schema_nested, widgets=widgets)
         self.assert_( isinstance(form.one.a.widget, BoundWidget) )
         self.assert_( isinstance(form.one.a.widget.widget, TextArea) )
 
@@ -277,11 +277,11 @@ class TestFormBuilding(unittest.TestCase):
         request = Request(name, r)
         R = copy.deepcopy(r)
         R.pop('__formish_form__')
-        form = Form(name, schema_flat, request)
+        form = Form(name, schema_flat)
         self.assert_(form.structure.attr is schema_flat)
         fd = {'a': 1,'b': '2'}
         form.defaults = fd
-        self.assertEquals(form.validate(), {'a': 3, 'b': '4'})
+        self.assertEquals(form.validate(request), {'a': 3, 'b': '4'})
         self.assertEqual( convertRequestDataToData(form.structure, dottedDict(request.POST)) , {'a': 3, 'b': '4'})
         self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == R)
         
@@ -293,13 +293,13 @@ class TestFormBuilding(unittest.TestCase):
         request = Request(name, r)
         R = copy.deepcopy(r)
         R.pop('__formish_form__')
-        form = Form(name, schema_flat, request)
+        form = Form(name, schema_flat)
         form.a.widget = DateParts()
         from datetime import date
         d = date(1966,3,1)
         fd = {'a': d,'b': '2'}
         form.defaults = fd
-        self.assertEquals(form.validate(), {'a': d, 'b': '4'})
+        self.assertEquals(form.validate(request), {'a': d, 'b': '4'})
         self.assertEqual( convertRequestDataToData(form.structure, dottedDict(request.POST)) , dottedDict({'a': d, 'b': '4'}))
         self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': d, 'b': '4'} )) == R)
                

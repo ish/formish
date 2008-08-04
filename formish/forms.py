@@ -1,5 +1,6 @@
+import copy
 from webhelpers.html import literal
-from restish.templating import render
+from restish import templating
 import schemaish
 
 from formish import util
@@ -127,7 +128,7 @@ class Field(object):
     @property
     def value(self):
         """Convert the requestData to a value object for the form or None."""
-        return self.form.requestData.get(self.name, [None])
+        return self.form._requestData.get(self.name, [None])
         
     @property
     def error(self):
@@ -146,7 +147,7 @@ class Field(object):
  
     def __call__(self):
         """Default template renderer for the field (not the widget itself) """
-        return literal(render(self.form.request, "formish/field.html", {'field': self}))
+        return literal(templating.render(self.form._request, "formish/field.html", {'field': self}))
         
 
 class Group(object):
@@ -260,7 +261,7 @@ class Group(object):
     
     def __call__(self):
         """ Default template renderer for the group """
-        return literal(render(self.form.request, "formish/structure.html", {'group': self, 'fields': self.fields}))
+        return literal(templating.render(self.form._request, "formish/structure.html", {'group': self, 'fields': self.fields}))
     
     
 class Form(object):
@@ -269,7 +270,10 @@ class Form(object):
     render and validate data.
     """    
 
-    def __init__(self, name, structure, request, defaults=None, widgets=None, errors=None, requestData=None):
+    _request = None
+    _requestData = None
+
+    def __init__(self, name, structure, defaults=None, widgets=None, errors=None):
         """
         The form can be initiated with a set of data defaults (using defaults) or with some requestData. The requestData
         can be instantiated in order to set up a partially completed form with data that was persisted in some fashion.
@@ -278,8 +282,6 @@ class Form(object):
         @type name:             String
         @param structure:       a Schema Structure attribute to bind to the the form
         @type structure:        Schema Structure Attribute object
-        @param request:         The webob request object
-        @type request:          webob.Request        
         @param defaults:        Defaults to override the standard form widget defaults
         @type defaults:         Dictionary (dotted or nested)
         @param widgets:         Widgets to use for form fields
@@ -291,14 +293,9 @@ class Form(object):
         """
         self.name = name
         self.structure = Group(None, structure, self)
-        self.request = request
         self._data = dottedDict(defaults or {})
         self.errors = dottedDict(errors or {})
         self.actions = []
-        if requestData is None:
-            self._requestData = None
-        else:
-            self._requestData = dottedDict(requestData)
         self.set_widgets(self.structure, widgets)
         
     def set_widgets(self, structure, widgets):
@@ -329,26 +326,35 @@ class Form(object):
             raise ValueError('Action with name %r already exists.' % name)
         self.actions.append( Action(callback, name, label) )              
 
-    def action(self):
+    def action(self, request):
         """ Find and call the action callback for the action used """
         if len(self.actions)==0:
             raise NoActionError('The form does not have any actions')
         for action in self.actions:
-            if action.name in self.requestData.keys():
-                return action.callback(self)
-        return self.actions[0].callback(self)
+            if action.name in request.POST.keys():
+                return action.callback(request, self)
+        return self.actions[0].callback(request, self)
             
-    def __call__(self):
+    def __call__(self, request):
         """ Render the form """
-        return literal(render(self.request, "formish/form.html", {'form': self}))
+        # XXX Set the request and "request" data on the form while we're
+        # rendering. This is just a nasty hack to make them available to the
+        # groups and fields. Really, they should be passed in explicitly or by
+        # using some sort of request-bound object (hint there's one in
+        # restish.page already).
+        self._request = request
+        if request.method =='POST' and request.POST.get('__formish_form__') == self.name:
+            self._requestData = dottedDict(request.POST)
+        else:
+            self._requestData = convertDataToRequestData(self.structure, self._data)
+        result = literal(templating.render(request, "formish/form.html", {'form': self}))
+        self._request = None
+        self._requestData = None
+        return result
 
     def __getattr__(self, name):
         return getattr( self.structure, name )
     
-    def convertDataToRequestData(self):
-        """ Getting the requestData from the form converts self.data if necessary. """
-        return convertDataToRequestData(self.structure, self._data)
-
     def _getRequestData(self):
         """ if we have request data then use it, if not then convert the data to request data unless it's a POST from this form """
         if self._requestData is not None:
@@ -368,19 +374,16 @@ class Form(object):
         @type requestData:      Dictionary (dotted or nested or dottedDict or MultiDict)
         """
         self._requestData = dottedDict(requestData)
-        
-    requestData = property(_getRequestData, _setRequestData)
     
-    #
-    # Getting the data from the form triggers a validation.
-    #
-    def _getData(self, raiseErrors=True):
-        """ validate first and raise exceptions if necessary """
-        r = self._getRequestData()
-        data = convertRequestDataToData(self.structure, self._getRequestData(), errors=self.errors) 
-        if raiseErrors:
-            if len(self.errors.keys()) > 0:
-                raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(self.errors.keys()), self.errors.data))
+    def get_unvalidated_data(self, request_data, raiseErrors=True):
+        """
+        Convert the request object into a nested dict in the correct structure
+        of the schema but without applying the schema's validation.
+        """
+        dotted_request_data = dottedDict(copy.deepcopy(request_data))
+        data = convertRequestDataToData(self.structure, dotted_request_data, errors=self.errors) 
+        if raiseErrors and len(self.errors.keys()):
+            raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(self.errors.keys()), self.errors.data))
         return dottedDict(data)
     
     def _getDefaults(self):
@@ -394,12 +397,15 @@ class Form(object):
         
     defaults = property(_getDefaults, _setDefaults)
 
-    def validate(self):
+    def validate(self, request):
         """ 
         Get the data without raising exception and then validate the data. If
         there are errors, raise them; otherwise return the data
         """
-        data = self._getData(raiseErrors=False)
+        # Check this request was POSTed by this form.
+        if not request.method =='POST' and request.POST.get('__formish_form__',None) == self.name:
+            raise Exception("request does not match form name")
+        data = self.get_unvalidated_data(request.POST, raiseErrors=False)
         errors = validate(self.structure, data, errors=self.errors)
         if len(self.errors.keys()) > 0:
             raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(errors.keys()), errors.data))
@@ -408,6 +414,4 @@ class Form(object):
     @property
     def fields(self):
         return self.structure.fields
-            
-            
 

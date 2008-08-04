@@ -20,17 +20,17 @@ class Widget(object):
         return string_converter(schemaType).toType(data[0])    
     
     def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/default.html", {'widget': self, 'field': field}))
+        return literal(render(field.form._request, "formish/widgets/default.html", {'widget': self, 'field': field}))
 
 class Input(Widget):
 
     def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/default.html", {'widget': self, 'field': field}))
+        return literal(render(field.form._request, "formish/widgets/default.html", {'widget': self, 'field': field}))
    
 class Password(Widget):
     
     def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/password.html", {'widget': self, 'field': field}))
+        return literal(render(field.form._request, "formish/widgets/password.html", {'widget': self, 'field': field}))
    
 class CheckedPassword(Widget):
     
@@ -45,7 +45,7 @@ class CheckedPassword(Widget):
         return string_converter(schemaType).toType(password)
     
     def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/checkedpassword.html", {'widget': self, 'field': field}))
+        return literal(render(field.form._request, "formish/widgets/checkedpassword.html", {'widget': self, 'field': field}))
        
 
 
@@ -58,7 +58,7 @@ class Hidden(Widget):
         return string_converter(schemaType).toType(data[0])
     
     def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/hidden.html", {'widget': self, 'field': field}))
+        return literal(render(field.form._request, "formish/widgets/hidden.html", {'widget': self, 'field': field}))
         
 class TextArea(Widget):
     
@@ -75,7 +75,7 @@ class TextArea(Widget):
         return string_converter(schemaType).toType(data[0])
     
     def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/textarea.html", {'widget': self, 'field': field}))
+        return literal(render(field.form._request, "formish/widgets/textarea.html", {'widget': self, 'field': field}))
     
 class Checkbox(Widget):
 
@@ -88,7 +88,7 @@ class Checkbox(Widget):
     def __call__(self, form, field):
         if field.value is True:
             checked = 'checked="checked"'
-        return literal(render(form.request, "formish/widgets/checkbox.html", {'widget': self, 'field': field, 'checked': checked}))    
+        return literal(render(form._request, "formish/widgets/checkbox.html", {'widget': self, 'field': field, 'checked': checked}))    
     
 class DateParts(Widget):
     
@@ -107,7 +107,7 @@ class DateParts(Widget):
         return datetuple_converter(schemaType).toType((year, month, day))
     
     def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/dateparts.html", {'widget': self, 'field': field}))
+        return literal(render(field.form._request, "formish/widgets/dateparts.html", {'widget': self, 'field': field}))
     
     
 class SelectChoice(Widget):
@@ -127,7 +127,7 @@ class SelectChoice(Widget):
             return ' selected="selected"'
     
     def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/selectchoice.html", {'widget': self, 'field': field, 'options': self.options, 'noneOption': self.noneOption}))
+        return literal(render(field.form._request, "formish/widgets/selectchoice.html", {'widget': self, 'field': field, 'options': self.options, 'noneOption': self.noneOption}))
 
     
 class RadioChoice(Widget):
@@ -149,7 +149,7 @@ class RadioChoice(Widget):
             return ' checked="checked"'
     
     def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/radiochoice.html", {'widget': self, 'field': field, 'options': self.options, 'noneOption': self.noneOption}))
+        return literal(render(field.form._request, "formish/widgets/radiochoice.html", {'widget': self, 'field': field, 'options': self.options, 'noneOption': self.noneOption}))
     
     
 class CheckboxMultiChoice(Widget):
@@ -170,7 +170,7 @@ class CheckboxMultiChoice(Widget):
             return ' checked="checked"'
     
     def __call__(self, field):
-        return literal(render(field.form.request, "formish/widgets/checkboxmultichoice.html", {'widget': self, 'field': field, 'options': self.options}))
+        return literal(render(field.form._request, "formish/widgets/checkboxmultichoice.html", {'widget': self, 'field': field, 'options': self.options}))
 
     
     
