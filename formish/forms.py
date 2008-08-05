@@ -288,8 +288,6 @@ class Form(object):
         @type widgets:          Dictionary (dotted or nested)
         @param errors:          Errors to store on the form for redisplay
         @type errors:           Dictionary of validation error objects
-        @param requestData:     Request post data to override the default data
-        @type requestData:      Dictionary (dotted or nested)
         """
         self.name = name
         self.structure = Group(None, structure, self)
