@@ -273,7 +273,7 @@ class Form(object):
     _request = None
     _requestData = None
 
-    def __init__(self, name, structure, defaults=None, widgets=None, errors=None):
+    def __init__(self, name, structure, defaults=None, widgets=None, errors=None, action=''):
         """
         The form can be initiated with a set of data defaults (using defaults) or with some requestData. The requestData
         can be instantiated in order to set up a partially completed form with data that was persisted in some fashion.
@@ -294,6 +294,7 @@ class Form(object):
         self._data = dottedDict(defaults or {})
         self.errors = dottedDict(errors or {})
         self.actions = []
+        self._action = action
         self.set_widgets(self.structure, widgets)
         
     def set_widgets(self, structure, widgets):
