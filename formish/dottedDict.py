@@ -112,4 +112,4 @@ class dottedDict(object):
     
     def __repr__(self):
         return '<dottedDict> %s'%self.data
-        
+
