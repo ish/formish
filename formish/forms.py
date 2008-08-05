@@ -269,7 +269,7 @@ class Form(object):
     render and validate data.
     """    
 
-    def __init__(self, name, structure, request, defaults=None, widgets=None, errors=None, requestData=None):
+    def __init__(self, name, structure, request, defaults=None, widgets=None, errors=None, requestData=None, action=''):
         """
         The form can be initiated with a set of data defaults (using defaults) or with some requestData. The requestData
         can be instantiated in order to set up a partially completed form with data that was persisted in some fashion.
@@ -295,6 +295,8 @@ class Form(object):
         self._data = dottedDict(defaults or {})
         self.errors = dottedDict(errors or {})
         self.actions = []
+        print 'ACTION = ',action
+        self._action = action
         if requestData is None:
             self._requestData = None
         else:
