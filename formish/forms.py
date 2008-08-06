@@ -146,7 +146,11 @@ class Field(object):
  
     def __call__(self):
         """Default template renderer for the field (not the widget itself) """
-        return literal(render(self.form.request, "formish/field.html", {'field': self}))
+        if self.widget.widget.__class__.__name__ == 'Hidden':
+            return literal(render(self.form.request, "formish/hidden.html", {'field': self}))
+        else:
+            return literal(render(self.form.request, "formish/field.html", {'field': self}))
+            
         
 
 class Group(object):
