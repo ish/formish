@@ -273,13 +273,11 @@ class Form(object):
     _request = None
     _requestData = None
 
-    def __init__(self, name, structure, defaults=None, widgets=None, errors=None, action=''):
+    def __init__(self, structure, defaults=None, widgets=None, errors=None, action=''):
         """
         The form can be initiated with a set of data defaults (using defaults) or with some requestData. The requestData
         can be instantiated in order to set up a partially completed form with data that was persisted in some fashion.
         
-        @param name:            Form name to be used in namespacing the form css and names
-        @type name:             String
         @param structure:       a Schema Structure attribute to bind to the the form
         @type structure:        Schema Structure Attribute object
         @param defaults:        Defaults to override the standard form widget defaults
@@ -289,13 +287,14 @@ class Form(object):
         @param errors:          Errors to store on the form for redisplay
         @type errors:           Dictionary of validation error objects
         """
-        self.name = name
         self.structure = Group(None, structure, self)
         self._data = dottedDict(defaults or {})
         self.errors = dottedDict(errors or {})
         self.actions = []
         self._action = action
         self.set_widgets(self.structure, widgets)
+
+    name = property(lambda self: self.element_name)
         
     def set_widgets(self, structure, widgets):
         if not widgets: 
