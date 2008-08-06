@@ -285,7 +285,6 @@ class Form(object):
         self._data = dottedDict(defaults or {})
         self.errors = dottedDict(errors or {})
         self.actions = []
-        print 'ACTION = ',action
         self._action = action
         if requestData is None:
             self._requestData = None
