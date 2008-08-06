@@ -1,5 +1,3 @@
-from webhelpers.html import literal
-from restish.templating import render
 import schemaish
 
 from formish import util
@@ -143,10 +141,6 @@ class Field(object):
         self._widget = widget
         
     widget = property(_getWidget, _setWidget)
- 
-    def __call__(self):
-        """Default template renderer for the field (not the widget itself) """
-        return literal(render(self.form.request, "formish/field.html", {'field': self}))
         
 
 class Group(object):
@@ -258,10 +252,6 @@ class Group(object):
         
     widget = property(_getWidget, _setWidget)   
     
-    def __call__(self):
-        """ Default template renderer for the group """
-        return literal(render(self.form.request, "formish/structure.html", {'group': self, 'fields': self.fields}))
-    
     
 class Form(object):
     """
@@ -340,10 +330,6 @@ class Form(object):
                 return action.callback(self)
         return self.actions[0].callback(self)
             
-    def __call__(self):
-        """ Render the form """
-        return literal(render(self.request, "formish/form.html", {'form': self}))
-
     def __getattr__(self, name):
         return getattr( self.structure, name )
     

@@ -1,0 +1,6 @@
+<%page args="field" />
+%for n, option in enumerate(field.widget.widget.options):
+<input id="${field.cssname}-${n}" name="${field.name}" type="checkbox" value="${option[1]}"${field.widget.widget.checked(option,field.value)} />
+<label for="${field.cssname}-${n}">${option[0]}</label>
+<br />
+%endfor

@@ -1,8 +1,8 @@
-
+<%def name="field(field)">
 <div id="${field.cssname}-field" class="${field.classes}">
   <label for="${field.cssname}">${field.title}</label>
   <div class="inputs">
-    ${field.widget()}
+    ${widget(field)}
   </div>
   % if field.error:
   <span class="error">${field.error}</span>
@@ -11,3 +11,9 @@
   <span class="description">${field.description}</span>
   % endif
 </div>
+</%def>
+
+<%def name="widget(field)">
+<%include file="widgets/${field.widget.widget.__class__.__name__}.html" args="field=field"/>
+</%def>
+
