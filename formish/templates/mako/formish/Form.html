@@ -1,9 +1,17 @@
+<%namespace name="group" file="Group.html" />
+<%namespace name="field" file="Field.html" />
+
+<%def name="form(form)">
 <form id="${form.name}" action="${form._action}" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">
   <div>
     <input type="hidden" name="_charset_" />
     <input type="hidden" name="__formish_form__" value="${form.name}" />
-    % for field in form.fields:
-    ${field()}
+    % for f in form.fields:
+    %if 'Group' in f.__class__.__name__:
+      ${group.group(f)}
+    %else:
+      ${field.field(f)}
+    %endif
     % endfor
     <div class="actions">
       %if form.actions == []:
@@ -16,4 +24,5 @@
     </div>
   </div>
 </form>
+</%def>
 

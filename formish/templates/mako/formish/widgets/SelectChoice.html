@@ -1,0 +1,10 @@
+<%page args="field" />
+<select id="${field.cssname}" name="${field.name}">
+%if field.widget.widget.noneOption:
+  <option value="${field.widget.widget.noneOption[1]}">${field.widget.widget.noneOption[0]}</option>
+%endif
+%for option in field.widget.widget.options:
+  <option value="${option[1]}"${field.widget.widget.selected(option,field.value[0])}>${option[0]}</option>
+%endfor
+</select>
+

@@ -1,0 +1,23 @@
+<%def name="field(field)">
+<div id="${field.cssname}-field" class="${field.classes}">
+  %if field.widget.widget.__class__.__name__ != 'Hidden':
+  <label for="${field.cssname}">${field.title}</label>
+  %endif
+  <div class="inputs">
+    ${widget(field)}
+  </div>
+  %if field.widget.widget.__class__.__name__ != 'Hidden':
+  % if field.error:
+  <span class="error">${field.error}</span>
+  % endif
+  % if field.description:
+  <span class="description">${field.description}</span>
+  % endif
+  % endif
+</div>
+</%def>
+
+<%def name="widget(field)">
+<%include file="widgets/${field.widget.widget.__class__.__name__}.html" args="field=field"/>
+</%def>
+

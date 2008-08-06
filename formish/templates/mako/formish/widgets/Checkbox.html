@@ -1,0 +1,8 @@
+<%page args="field" />
+<%
+  if field.value is True:
+    checked  = 'checked="checked"'
+  else:
+    checked = ''
+%>
+<input id="${field.cssname}" type="checkbox" name="${field.name}" value="True" ${checked} />

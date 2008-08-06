@@ -14,7 +14,7 @@ class TestHTML(unittest.TestCase):
     def test_default_title(self):
         r = webob.Request.blank('http://localhost/')
         schema = schemaish.Structure([('one', schemaish.String())])
-        f = Form("form", schema)
+        f = Form(schema)
         assert f.one.title == "One", "test default title"
         soup = BeautifulSoup(f(r))
         assert len(soup.findAll(id='form-one')) == 1 , "test that the form field is being created"
@@ -22,7 +22,7 @@ class TestHTML(unittest.TestCase):
     def test_error_html(self):
         r = webob.Request.blank('http://localhost/')
         schema = schemaish.Structure([('one', schemaish.String(validator=NotEmpty))])
-        f = Form("form", schema)
+        f = Form(schema)
         try:
             data = f.validate(r)
         except fv.FormError, e:
@@ -35,7 +35,7 @@ class TestHTML(unittest.TestCase):
         one = Structure([("a", String(validator=v.Email(not_empty=True))), ("b", String()), ("c", Sequence(Integer()))])
         two = Structure([("a", String()), ("b", Date()), ('c', Sequence(String())), ("d", String()), ("e", Integer(validator=v.NotEmpty())), ("f", String(validator=v.NotEmpty())) ])
         schema = Structure([("one", one), ("two", two)])
-        form = Form("form", schema)
+        form = Form(schema)
         form.one.b.widget = TextArea()
         form.two.a.widget = SelectChoice([('Option 1','opt1'),('Option 2','opt2')], noneOption=('-select option-',None))
         form.two.b.widget = DateParts()

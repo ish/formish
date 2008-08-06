@@ -144,11 +144,7 @@ class Field(object):
         self._widget = widget
         
     widget = property(_getWidget, _setWidget)
- 
-    def __call__(self):
-        """Default template renderer for the field (not the widget itself) """
-        return literal(templating.render(self.form._request, "formish/field.html", {'field': self}))
-        
+
 
 class Group(object):
     """
@@ -259,10 +255,6 @@ class Group(object):
         
     widget = property(_getWidget, _setWidget)   
     
-    def __call__(self):
-        """ Default template renderer for the group """
-        return literal(templating.render(self.form._request, "formish/structure.html", {'group': self, 'fields': self.fields}))
-    
     
 class Form(object):
     """
@@ -270,16 +262,18 @@ class Form(object):
     render and validate data.
     """    
 
-    _request = None
-    _requestData = None
+    element_name = None
+    __requestData = None
 
-    def __init__(self, structure, defaults=None, widgets=None, errors=None, action=''):
+    def __init__(self, structure, name=None, defaults=None, widgets=None, errors=None, action=''):
         """
         The form can be initiated with a set of data defaults (using defaults) or with some requestData. The requestData
         can be instantiated in order to set up a partially completed form with data that was persisted in some fashion.
         
         @param structure:       a Schema Structure attribute to bind to the the form
         @type structure:        Schema Structure Attribute object
+        @param name:            Optional form name used to identify multiple forms on the same page.
+        @type name:             String
         @param defaults:        Defaults to override the standard form widget defaults
         @type defaults:         Dictionary (dotted or nested)
         @param widgets:         Widgets to use for form fields
@@ -288,13 +282,19 @@ class Form(object):
         @type errors:           Dictionary of validation error objects
         """
         self.structure = Group(None, structure, self)
-        self._data = dottedDict(defaults or {})
+        self._name = name
+        self.defaults = defaults
         self.errors = dottedDict(errors or {})
         self.actions = []
         self._action = action
         self.set_widgets(self.structure, widgets)
 
-    name = property(lambda self: self.element_name)
+    def _get_name(self):
+        parts = [self.element_name, self._name]
+        parts = [p for p in parts if p is not None]
+        return '.'.join(parts)
+
+    name = property(_get_name)
         
     def set_widgets(self, structure, widgets):
         if not widgets: 
@@ -333,36 +333,14 @@ class Form(object):
                 return action.callback(request, self)
         return self.actions[0].callback(request, self)
             
-    def __call__(self, request):
-        """ Render the form """
-        # XXX Set the request and "request" data on the form while we're
-        # rendering. This is just a nasty hack to make them available to the
-        # groups and fields. Really, they should be passed in explicitly or by
-        # using some sort of request-bound object (hint there's one in
-        # restish.page already).
-        self._request = request
-        if request.method =='POST' and request.POST.get('__formish_form__') == self.name:
-            self._requestData = dottedDict(request.POST)
-        else:
-            self._requestData = convertDataToRequestData(self.structure, self._data)
-        result = literal(templating.render(request, "formish/form.html", {'form': self}))
-        self._request = None
-        self._requestData = None
-        return result
-
     def __getattr__(self, name):
         return getattr( self.structure, name )
-    
+
     def _getRequestData(self):
-        """ if we have request data then use it, if not then convert the data to request data unless it's a POST from this form """
-        if self._requestData is not None:
-            return self._requestData
-        # If we have posted data and this is the form that has been posted then set the request data
-        if self.request.method =='POST' and self.request.POST.get('__formish_form__',None) == self.name:
-            self.requestData = self.request.POST
-        else:
-            self._requestData = self.convertDataToRequestData()
-        return self._requestData
+        if self.__requestData is not None:
+            return self.__requestData
+        self.__requestData = convertDataToRequestData(self.structure, dottedDict(self.defaults))
+        return self.__requestData
     
     def _setRequestData(self, requestData):
         """ 
@@ -371,7 +349,9 @@ class Form(object):
         @param requestData:     raw request data (e.g. request.POST)
         @type requestData:      Dictionary (dotted or nested or dottedDict or MultiDict)
         """
-        self._requestData = dottedDict(requestData)
+        self.__requestData = dottedDict(requestData)
+
+    _requestData = property(_getRequestData, _setRequestData)
     
     def get_unvalidated_data(self, request_data, raiseErrors=True):
         """
@@ -391,7 +371,7 @@ class Form(object):
     def _setDefaults(self, data):
         """ assign data """
         self._defaults = data
-        self._data = dottedDict(data)
+        self.__requestData = None
         
     defaults = property(_getDefaults, _setDefaults)
 
@@ -403,9 +383,11 @@ class Form(object):
         # Check this request was POSTed by this form.
         if not request.method =='POST' and request.POST.get('__formish_form__',None) == self.name:
             raise Exception("request does not match form name")
+        request_data = dottedDict(request.POST)
         data = self.get_unvalidated_data(request.POST, raiseErrors=False)
         errors = validate(self.structure, data, errors=self.errors)
         if len(self.errors.keys()) > 0:
+            self._requestData = request_data
             raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(errors.keys()), errors.data))
         return dottedDict(data)
         

@@ -106,11 +106,12 @@ class Request(object):
             
 class TestFormBuilding(unittest.TestCase):
     """Build a Form and test that it doesn't raise exceptions on build and that the methods/properties are as expected"""
+
     def test_form(self):
         schema_empty = Structure()        
         name = "Empty Form"
         request =  Request(name)
-        form = Form(name, schema_empty)
+        form = Form(schema_empty, name)
         self.assertEqual(form.structure.attr,schema_empty)
         self.assertEqual(form.name,name)
         fd = {'a':1,'b':2}
@@ -122,7 +123,7 @@ class TestFormBuilding(unittest.TestCase):
         schema_empty = Structure([])        
         name = "Empty Form"
         request =  Request(name)
-        form = Form(name, schema_empty)
+        form = Form(schema_empty, name)
         # this is really empty
         assert list(form.fields) == []
       
@@ -132,7 +133,7 @@ class TestFormBuilding(unittest.TestCase):
         schema_flat = Structure([("a", String()), ("b", String())])
         name = "Flat Form"
         request =  Request(name)
-        form = Form(name, schema_flat)
+        form = Form(schema_flat, name)
         # stored schema
         assert form.structure.attr is schema_flat
         # number of fields
@@ -156,7 +157,7 @@ class TestFormBuilding(unittest.TestCase):
         """Test a form with nested sections"""
         name = "Slightly Nested Form"
         request =  Request(name)
-        form = Form(name, self.schema_slightlynested)
+        form = Form(self.schema_slightlynested, name)
         fd = {'one': { 'a': 2, 'b': 3 },'two': { 'a': 2, 'b': 3 }}
         form.defaults = fd
         # stored schema
@@ -164,10 +165,10 @@ class TestFormBuilding(unittest.TestCase):
         # number of fields reflects first level
         assert len(list(form.fields)) == 2
         # stored defaults
-        assert form._data == fd
+        assert form.defaults == fd
         # accessing field data
-        assert form.one.a._data == 2
-        assert form.two.b._data == 3
+        assert form.one.a.value == [2]
+        assert form.two.b.value == [3]
         # accessing group titles
         assert form.one.title == 'One'
         assert form.two.title == 'Two'
@@ -188,7 +189,7 @@ class TestFormBuilding(unittest.TestCase):
             ])        
         name = "Nested Form"
         request =  Request(name)
-        form = Form(name, schema_nested)
+        form = Form(schema_nested, name)
         # stored schema
         assert form.structure.attr is schema_nested
         # has only a single group
@@ -196,9 +197,9 @@ class TestFormBuilding(unittest.TestCase):
         fd = {'one': {'a': 3, 'b':9, 'c': {'x':3, 'y':5}}}
         form.defaults = fd
         # stored defaults
-        assert form._data == fd
+        assert form.defaults == fd
         # field data
-        assert form.one.a._data == 3
+        assert form.one.a.value == [3]
         # field titles
         assert form.one.a.title == "A"
         assert form.one.b.title == "B"
@@ -229,7 +230,7 @@ class TestFormBuilding(unittest.TestCase):
         request =  Request(name, r)
         R = copy.deepcopy(r)
         R.pop('__formish_form__')        
-        form = Form(name, schema_nested)
+        form = Form(schema_nested, name)
         
         assert convertRequestDataToData(form.structure, dottedDict(copy.deepcopy(request.POST))) == data
         assert convertDataToRequestData(form.structure, dottedDict(data)) == R
@@ -255,7 +256,7 @@ class TestFormBuilding(unittest.TestCase):
         name = "Nested Form two"
         #request =   Request(name, {'one': {'a':['woot!'],'b':[''], 'c': {'x':[''],'y':['']}}})
         request = Request(name, {'one.a': ['woot!'], 'one.b': [''], 'one.c.x': [''], 'one.c.y': ['']})
-        form = Form(name, schema_nested)
+        form = Form(schema_nested, name)
         self.assert_(form.validate(request) == {'one': {'a':'woot!','b':'', 'c': {'x':'','y':''}}})
         self.assertEquals(form.errors , {})
         self.assert_( isinstance(form.one.a.widget, BoundWidget) )
@@ -264,7 +265,7 @@ class TestFormBuilding(unittest.TestCase):
         form.one.a.widget = TextArea()
         self.assert_( isinstance(form.one.a.widget.widget, TextArea) )
         widgets = {'one': {'a': TextArea()}}
-        form = Form(name, schema_nested, widgets=widgets)
+        form = Form(schema_nested, name, widgets=widgets)
         self.assert_( isinstance(form.one.a.widget, BoundWidget) )
         self.assert_( isinstance(form.one.a.widget.widget, TextArea) )
 
@@ -277,7 +278,7 @@ class TestFormBuilding(unittest.TestCase):
         request = Request(name, r)
         R = copy.deepcopy(r)
         R.pop('__formish_form__')
-        form = Form(name, schema_flat)
+        form = Form(schema_flat, name)
         self.assert_(form.structure.attr is schema_flat)
         fd = {'a': 1,'b': '2'}
         form.defaults = fd
@@ -293,7 +294,7 @@ class TestFormBuilding(unittest.TestCase):
         request = Request(name, r)
         R = copy.deepcopy(r)
         R.pop('__formish_form__')
-        form = Form(name, schema_flat)
+        form = Form(schema_flat, name)
         form.a.widget = DateParts()
         from datetime import date
         d = date(1966,3,1)
