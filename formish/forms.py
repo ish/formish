@@ -1,6 +1,4 @@
 import copy
-from webhelpers.html import literal
-from restish import templating
 import schemaish
 
 from formish import util
