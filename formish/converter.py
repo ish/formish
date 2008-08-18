@@ -58,6 +58,8 @@ if haveDecimal:
         cast = decimal.Decimal
 
 
+
+    
 class BooleanToStringConverter(object):
     
     def fromType(self, value):
@@ -75,15 +77,6 @@ class BooleanToStringConverter(object):
         if value not in ('True', 'False'):
             raise validation.FieldValidationError('%r should be either True or False'%value)
         return value == 'True'
-    
-class StringToBooleanConverter(object):
-    
-    def fromType(self, value):
-        return BooleanToStringConverter().toType(value)
-
-    def toType(self, value):
-        return BooleanToStringConverter().fromType(value)
-    
     
 class DateToStringConverter(object):
     
@@ -289,9 +282,7 @@ def boolean_converter(value):
 def boolean_to_boolean(value):
     return NullConverter()
 
-@when(boolean_converter, (schemaish.String,))
-def string_to_boolean(value):
-    return StringToBooleanConverter()
+
 
 
 

@@ -66,14 +66,14 @@ class TextArea(Widget):
 class Checkbox(Widget):
 
     def pre_render(self, schemaType, data):
-        return [boolean_converter(schemaType).fromType(data)]
+        return [string_converter(schemaType).fromType(data)]
     
     def convert(self, schemaType, data):
         if len(data) == 0:
-            out=False
+            out='False'
         else:
-            out=True
-        return boolean_converter(schemaType).toType(out)            
+            out='True'
+        return string_converter(schemaType).toType(out)            
 
     
 class DateParts(Widget):
