@@ -76,6 +76,14 @@ class BooleanToStringConverter(object):
             raise validation.FieldValidationError('%r should be either True or False'%value)
         return value == 'True'
     
+class StringToBooleanConverter(object):
+    
+    def fromType(self, value):
+        return BooleanToStringConverter().toType(value)
+
+    def toType(self, value):
+        return BooleanToStringConverter().fromType(value)
+    
     
 class DateToStringConverter(object):
     
@@ -261,6 +269,9 @@ def time_to_string(value):
 def sequence_to_string(value):
     return SequenceToStringConverter()
 
+@when(string_converter, (schemaish.Boolean,))
+def boolean_to_string(value):
+    return BooleanToStringConverter()
 
 @abstract()
 def datetuple_converter(value):
@@ -279,8 +290,8 @@ def boolean_to_boolean(value):
     return NullConverter()
 
 @when(boolean_converter, (schemaish.String,))
-def boolean_to_string(value):
-    return BooleanToStringConverter()
+def string_to_boolean(value):
+    return StringToBooleanConverter()
 
 
 

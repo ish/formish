@@ -283,6 +283,7 @@ class Form(object):
         self._name = name
         self.defaults = defaults
         self.errors = dottedDict(errors or {})
+        self.error = None
         self.actions = []
         self._action = action
         self.set_widgets(self.structure, widgets)
@@ -332,6 +333,11 @@ class Form(object):
         return self.actions[0].callback(request, self)
             
     def __getattr__(self, name):
+        # If it's a property
+        if name == '_requestData':
+            return self._getRequestData()
+        if name == 'defaults':
+            return self._getDefaults()
         return getattr( self.structure, name )
 
     def _getRequestData(self):

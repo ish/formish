@@ -6,6 +6,11 @@
   <div>
     <input type="hidden" name="_charset_" />
     <input type="hidden" name="__formish_form__" value="${form.name}" />
+
+    %if form.error is not None:
+      <p class="error">${form.error}</p>    
+    %endif
+    
     % for f in form.fields:
     %if 'Group' in f.__class__.__name__:
       ${group.group(f)}

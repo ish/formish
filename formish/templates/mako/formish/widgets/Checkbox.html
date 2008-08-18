@@ -1,6 +1,6 @@
 <%page args="field" />
 <%
-  if field.value is True:
+  if len(field.value) > 0 and field.value[0] == 'True':
     checked  = 'checked="checked"'
   else:
     checked = ''

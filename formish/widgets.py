@@ -69,7 +69,11 @@ class Checkbox(Widget):
         return [boolean_converter(schemaType).fromType(data)]
     
     def convert(self, schemaType, data):
-        return boolean_converter(schemaType).toType(data[0])            
+        if len(data) == 0:
+            out=False
+        else:
+            out=True
+        return boolean_converter(schemaType).toType(out)            
 
     
 class DateParts(Widget):
