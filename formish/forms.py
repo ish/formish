@@ -362,8 +362,7 @@ class Form(object):
         Convert the request object into a nested dict in the correct structure
         of the schema but without applying the schema's validation.
         """
-        dotted_request_data = dottedDict(copy.deepcopy(request_data))
-        data = convertRequestDataToData(self.structure, dotted_request_data, errors=self.errors) 
+        data = convertRequestDataToData(self.structure, request_data, errors=self.errors) 
         if raiseErrors and len(self.errors.keys()):
             raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(self.errors.keys()), self.errors.data))
         return dottedDict(data)
@@ -387,8 +386,8 @@ class Form(object):
         # Check this request was POSTed by this form.
         if not request.method =='POST' and request.POST.get('__formish_form__',None) == self.name:
             raise Exception("request does not match form name")
-        request_data = dottedDict(request.POST)
-        data = self.get_unvalidated_data(request.POST, raiseErrors=False)
+        request_data = preParseRequestData(self.structure,dottedDict(request.POST))
+        data = self.get_unvalidated_data(request_data, raiseErrors=False)
         errors = validate(self.structure, data, errors=self.errors)
         if len(self.errors.keys()) > 0:
             self.__requestData = request_data

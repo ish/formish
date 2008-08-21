@@ -9,10 +9,15 @@ def _setDict(data, keys, value):
     else:
         _setDict(data.setdefault(keys[0],{}), keys[1:], value)
 
+def copyMultiDict(original):
+    copy = {}
+    for key in original.keys():
+        copy[key] = original.getall(key)
+    return copy
 
 def _getDictFromDottedKeyDict(d):
     if isinstance(d, MultiDict):
-        data = copy.deepcopy(d)
+        data = copyMultiDict(d)
     else:
         data = d
     keyslist=[key.split('.') for key in data.keys()]

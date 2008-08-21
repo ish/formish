@@ -58,6 +58,19 @@ def convertRequestDataToData(formStructure, requestData, data=None, errors=None)
             errors[field.name] = e
     return data
 
+def preParseRequestData(formStructure, requestData):
+    data = {}
+    for field in formStructure.fields:
+        if hasattr(field,'fields'):
+            preParseRequestData(field, requestData, data=data)
+        else: 
+            # This needs to be cleverer...
+            d = requestData.get(field.name,[])
+            x = field.widget.pre_parse_request(field.attr,d)
+            data[field.name] = x
+    return data
+    
+
 class FormsError(Exception):
     """
     Base class for all Forms errors. A single string, message, is accepted and

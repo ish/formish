@@ -1,3 +1,4 @@
+import cgi
 from formish.converter import *
 from formish.validation import *
 
@@ -92,6 +93,28 @@ class DateParts(Widget):
         day = data.get('day', [''])[0]
         return datetuple_converter(schemaType).toType((year, month, day))
     
+class FileUpload(Widget):
+    
+    def __init__(self, fileHandler, showImagePreview=False, allowClear=True):
+        self.fileHandler = fileHandler
+        self.showImagePreview = showImagePreview
+        self.allowClear = allowClear
+    
+    def pre_render(self, schemaType, data):
+        data = string_converter(schemaType).fromType(data)
+        return {'name': ['']}
+    
+    def pre_parse_request(self, schemaType, data):
+        fs = data.get('file',[''])[0]
+        if data.get('remove',[None])[0] is not None:
+            data['name'] = ['']
+        elif fs is not '':
+            data['name'] = [self.fileHandler.storeFile(fs)]
+        data['file'] = ['']
+        return data
+    
+    def convert(self, schemaType, data):
+        return string_converter(schemaType).toType(data['name'][0])
     
 class SelectChoice(Widget):
 
@@ -157,6 +180,12 @@ class BoundWidget(object):
     def pre_render(self, schemaType, data):
         return self.widget.pre_render(schemaType, data)
 
+    def pre_parse_request(self, schemaType, data):
+        if hasattr(self.widget,'pre_parse_request'):
+            return self.widget.pre_parse_request(schemaType, data)
+        else:
+            return data
+    
     def convert(self, schemaType, data):
         return self.widget.convert(schemaType, data)
         
