@@ -58,8 +58,9 @@ def convertRequestDataToData(formStructure, requestData, data=None, errors=None)
             errors[field.name] = e
     return data
 
-def preParseRequestData(formStructure, requestData):
-    data = {}
+def preParseRequestData(formStructure, requestData, data=None):
+    if data is None:
+        data = {}
     for field in formStructure.fields:
         if hasattr(field,'fields'):
             preParseRequestData(field, requestData, data=data)
