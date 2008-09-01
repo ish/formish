@@ -11,6 +11,9 @@ from formish.converter import *
 from formish.validation import *
 
 
+UNSET = object()
+
+
 class Widget(object):
     
     def pre_render(self, schemaType, data):
@@ -126,9 +129,12 @@ class FileUpload(Widget):
     
 class SelectChoice(Widget):
 
-    def __init__(self, options, noneOption=None):
+    noneOption = ('', '- choose -')
+
+    def __init__(self, options, noneOption=UNSET):
         self.options = options
-        self.noneOption = noneOption
+        if noneOption is not UNSET:
+            self.noneOption = noneOption
             
     def pre_render(self, schemaType, data):
         return [string_converter(schemaType).fromType(data)]
@@ -143,9 +149,12 @@ class SelectChoice(Widget):
     
 class RadioChoice(Widget):
 
-    def __init__(self, options, noneOption=None):
+    noneOption = ('', '- choose -')
+
+    def __init__(self, options, noneOption=UNSET):
         self.options = options
-        self.noneOption = noneOption
+        if noneOption is not UNSET:
+            self.noneOption = noneOption
             
     def pre_render(self, schemaType, data):
         return [string_converter(schemaType).fromType(data)]
