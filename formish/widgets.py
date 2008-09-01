@@ -1,9 +1,18 @@
+"""
+Commonly needed form widgets.
+"""
+
+__all__ = ['Input', 'Password', 'CheckedPassword', 'Hidden', 'TextArea',
+        'Checkbox', 'DateParts', 'FileUpload', 'SelectChoice', 'RadioChoice',
+        'CheckboxMultiChoice']
+
 import cgi
 from formish.converter import *
 from formish.validation import *
 
-# Marker object for args that are not supplied
-_UNSET = object()
+
+UNSET = object()
+
 
 class Widget(object):
     
@@ -93,6 +102,7 @@ class DateParts(Widget):
         day = data.get('day', [''])[0]
         return datetuple_converter(schemaType).toType((year, month, day))
     
+
 class FileUpload(Widget):
     
     def __init__(self, fileHandler, showImagePreview=False, allowClear=True):
@@ -115,12 +125,16 @@ class FileUpload(Widget):
     
     def convert(self, schemaType, data):
         return string_converter(schemaType).toType(data['name'][0])
+
     
 class SelectChoice(Widget):
 
-    def __init__(self, options, noneOption=None):
+    noneOption = ('', '- choose -')
+
+    def __init__(self, options, noneOption=UNSET):
         self.options = options
-        self.noneOption = noneOption
+        if noneOption is not UNSET:
+            self.noneOption = noneOption
             
     def pre_render(self, schemaType, data):
         return [string_converter(schemaType).fromType(data)]
@@ -129,15 +143,18 @@ class SelectChoice(Widget):
         return string_converter(schemaType).toType(data[0])
 
     def selected(self, option, value):
-        if option[1] == value:
+        if option[0] == value:
             return ' selected="selected"'
 
     
 class RadioChoice(Widget):
 
-    def __init__(self, options, noneOption=None):
+    noneOption = ('', '- choose -')
+
+    def __init__(self, options, noneOption=UNSET):
         self.options = options
-        self.noneOption = noneOption
+        if noneOption is not UNSET:
+            self.noneOption = noneOption
             
     def pre_render(self, schemaType, data):
         return [string_converter(schemaType).fromType(data)]
@@ -148,7 +165,7 @@ class RadioChoice(Widget):
         return string_converter(schemaType).toType(data[0])
 
     def selected(self, option, value):
-        if option[1] == value:
+        if option[0] == value:
             return ' checked="checked"'
     
     
@@ -166,29 +183,6 @@ class CheckboxMultiChoice(Widget):
         return [string_converter(schemaType.attr).toType(d) for d in data]
 
     def checked(self, option, value):
-        if value is not None and option[1] in value:
+        if value is not None and option[0] in value:
             return ' checked="checked"'
-    
- 
-class BoundWidget(object):
-    
-    def __init__(self, widget, field, cssClass=[]):
-        self.widget = widget
-        self.field = field
-        self.cssClass=cssClass
-        
-    def pre_render(self, schemaType, data):
-        return self.widget.pre_render(schemaType, data)
-
-    def pre_parse_request(self, schemaType, data):
-        if hasattr(self.widget,'pre_parse_request'):
-            return self.widget.pre_parse_request(schemaType, data)
-        else:
-            return data
-    
-    def convert(self, schemaType, data):
-        return self.widget.convert(schemaType, data)
-        
-    def validate(self, data):
-        return self.widget.validate(data)
 

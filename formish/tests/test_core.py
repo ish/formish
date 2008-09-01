@@ -260,7 +260,7 @@ class TestFormBuilding(unittest.TestCase):
         self.assert_(form.validate(request) == {'one': {'a':'woot!','b':'', 'c': {'x':'','y':''}}})
         self.assertEquals(form.errors , {})
         self.assert_( isinstance(form.one.a.widget, BoundWidget) )
-        self.assert_( isinstance(form.one.a.widget.widget, Widget) )
+        self.assert_( isinstance(form.one.a.widget.widget, Input) )
         self.assert_( isinstance(form.one.a.widget.field, Field) )
         form.one.a.widget = TextArea()
         self.assert_( isinstance(form.one.a.widget.widget, TextArea) )

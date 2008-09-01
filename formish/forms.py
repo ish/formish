@@ -87,7 +87,7 @@ class Field(object):
         self.form = form
         # Create a default widget for the field. XXX There is no such thing as
         # a default widget, this needs to be some sort of adaption process.
-        self._widget = Widget()
+        self._widget = Input()
         # Construct a title
         self.title = self.attr.title
         if self.title is None:
@@ -168,8 +168,8 @@ class Group(object):
         self.form = form
         self._fields = {}    
         # Create a default widget for the group. XXX Shouldn't this be some
-        # sort of GroupWidget?
-        self._widget = Widget()
+        # sort of GroupWidget? It doesn't seem to be used anyway.
+        self._widget = None
         # Construct a title
         self.title = self.attr.title
         if self.title is None and name is not None:
@@ -254,6 +254,29 @@ class Group(object):
     widget = property(_getWidget, _setWidget)   
     
     
+class BoundWidget(object):
+    
+    def __init__(self, widget, field, cssClass=[]):
+        self.widget = widget
+        self.field = field
+        self.cssClass=cssClass
+        
+    def pre_render(self, schemaType, data):
+        return self.widget.pre_render(schemaType, data)
+
+    def pre_parse_request(self, schemaType, data):
+        if hasattr(self.widget,'pre_parse_request'):
+            return self.widget.pre_parse_request(schemaType, data)
+        else:
+            return data
+    
+    def convert(self, schemaType, data):
+        return self.widget.convert(schemaType, data)
+        
+    def validate(self, data):
+        return self.widget.validate(data)
+
+
 class Form(object):
     """
     The Form type is the container for all the information a form needs to

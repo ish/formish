@@ -1,13 +1,13 @@
 <%page args="field" />
 %if field.widget.widget.noneOption:
 <div class="radiobutton">
-  <input type="radio" id="${field.cssname}-noneoption" value="${field.widget.widget.noneOption[1]}" />
-  <label for="${field.cssname}-noneoption">${field.widget.widget.noneOption[0]}</label>
+  <input type="radio" id="${field.cssname}-noneoption" value="${field.widget.widget.noneOption[0]}" />
+  <label for="${field.cssname}-noneoption">${field.widget.widget.noneOption[1]}</label>
 </div>
 %endif
 %for n, option in enumerate(field.widget.widget.options):
 <div class="radiobutton">
-  <input type="radio" name="${field.name}" id="${field.cssname}-${n}" value="${option[1]}"${field.widget.widget.selected(option,field.value[0])} />
-  <label for="${field.cssname}-${n}">${option[0]}</label>
+  <input type="radio" name="${field.name}" id="${field.cssname}-${n}" value="${option[0]}"${field.widget.widget.selected(option,field.value[0])} />
+  <label for="${field.cssname}-${n}">${option[1]}</label>
 </div>
 %endfor

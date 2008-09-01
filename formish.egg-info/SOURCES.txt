@@ -1,6 +1,13 @@
+README
 setup.cfg
 setup.py
 formish/__init__.py
+formish/converter.py
+formish/dottedDict.py
+formish/forms.py
+formish/util.py
+formish/validation.py
+formish/widgets.py
 formish.egg-info/PKG-INFO
 formish.egg-info/SOURCES.txt
 formish.egg-info/dependency_links.txt
