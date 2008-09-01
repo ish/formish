@@ -137,7 +137,7 @@ class SelectChoice(Widget):
         return string_converter(schemaType).toType(data[0])
 
     def selected(self, option, value):
-        if option[1] == value:
+        if option[0] == value:
             return ' selected="selected"'
 
     
@@ -156,7 +156,7 @@ class RadioChoice(Widget):
         return string_converter(schemaType).toType(data[0])
 
     def selected(self, option, value):
-        if option[1] == value:
+        if option[0] == value:
             return ' checked="checked"'
     
     
@@ -174,6 +174,6 @@ class CheckboxMultiChoice(Widget):
         return [string_converter(schemaType.attr).toType(d) for d in data]
 
     def checked(self, option, value):
-        if value is not None and option[1] in value:
+        if value is not None and option[0] in value:
             return ' checked="checked"'
 
