@@ -188,7 +188,7 @@ class RangeValidator(object):
         if self.max is not None and value > self.max:
             raise FieldValidationError, self.validationErrorMessage(field)
 
-            
+      
 class PatternValidator(object):
     """Validate the value is a certain pattern.
     
@@ -213,12 +213,10 @@ class PatternValidator(object):
 class CallableValidator(object):
     """
     A validator that delegates the validation of non-None values to a callable
-    with the same signature as IValidator.validate.
     """
 
     def __init__(self, callable):
         self.callable = callable
-
 
     def validate(self, field, value):
         if value is None:
