@@ -8,10 +8,10 @@
 
     
       
-<fieldset class="group" id="form-one-field" class="field structure widget">
+<fieldset class="group" id="form-one-field" class="field structure nonetype">
   <legend>One</legend>
       
-<div id="form-one-a-field" class="field string widget required">
+<div id="form-one-a-field" class="field string input required">
   <label for="form-one-a">A</label>
   <div class="inputs">
     
@@ -35,7 +35,7 @@
 </div>
 
       
-<div id="form-one-c-field" class="field sequence widget">
+<div id="form-one-c-field" class="field sequence input">
   <label for="form-one-c">C</label>
   <div class="inputs">
     
@@ -49,7 +49,7 @@
 </fieldset>
 
       
-<fieldset class="group" id="form-two-field" class="field structure widget">
+<fieldset class="group" id="form-two-field" class="field structure nonetype">
   <legend>Two</legend>
       
 <div id="form-two-a-field" class="field string selectchoice">
@@ -58,9 +58,9 @@
     
 
 <select id="form-two-a" name="two.a">
-  <option value="None">-select option-</option>
-  <option value="Options 1"None>opt1</option>
-  <option value="Option 2"None>opt2</option>
+  <option value="-select option-">None</option>
+  <option value="opt1"None>Options 1</option>
+  <option value="opt2"None>Option 2</option>
 </select>
 
 
@@ -88,11 +88,11 @@
   <div class="inputs">
     
 
-<input id="form-two-c-0" name="two.c" type="checkbox" value="Options 1"None />
-<label for="form-two-c-0">opt1</label>
+<input id="form-two-c-0" name="two.c" type="checkbox" value="opt1"None />
+<label for="form-two-c-0">Options 1</label>
 <br />
-<input id="form-two-c-1" name="two.c" type="checkbox" value="Option 2"None />
-<label for="form-two-c-1">opt2</label>
+<input id="form-two-c-1" name="two.c" type="checkbox" value="opt2"None />
+<label for="form-two-c-1">Option 2</label>
 <br />
 
 
@@ -106,12 +106,16 @@
     
 
 <div class="radiobutton">
-  <input type="radio" name="two.d" id="form-two-d-0" value="Options 1"None />
-  <label for="form-two-d-0">opt1</label>
+  <input type="radio" id="form-two-d-noneoption" value="" />
+  <label for="form-two-d-noneoption">- choose -</label>
 </div>
 <div class="radiobutton">
-  <input type="radio" name="two.d" id="form-two-d-1" value="Option 2"None />
-  <label for="form-two-d-1">opt2</label>
+  <input type="radio" name="two.d" id="form-two-d-0" value="opt1"None />
+  <label for="form-two-d-0">Options 1</label>
+</div>
+<div class="radiobutton">
+  <input type="radio" name="two.d" id="form-two-d-1" value="opt2"None />
+  <label for="form-two-d-1">Option 2</label>
 </div>
 
 
@@ -119,7 +123,7 @@
 </div>
 
       
-<div id="form-two-e-field" class="field integer widget required">
+<div id="form-two-e-field" class="field integer input required">
   <label for="form-two-e">E</label>
   <div class="inputs">
     
