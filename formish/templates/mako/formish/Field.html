@@ -1,20 +1,34 @@
-<%def name="field(field)">
-<div id="${field.cssname}-field" class="${field.classes}">
-  %if field.widget.widget.__class__.__name__ != 'Hidden':
-  <label for="${field.cssname}">${field.title}</label>
+<%def name="field(f)">
+%if 'Field' in f.__class__.__name__:
+<div id="${f.cssname}-field" class="${f.classes}">
+  %if f.widget.widget.__class__.__name__ != 'Hidden':
+  <label for="${f.cssname}">${f.title}</label>
   %endif
   <div class="inputs">
-    ${widget(field)}
+    ${widget(f)}
   </div>
-  %if field.widget.widget.__class__.__name__ != 'Hidden':
-  % if field.error:
-  <span class="error">${field.error}</span>
+  %if f.widget.widget.__class__.__name__ != 'Hidden':
+  % if f.error:
+  <span class="error">${f.error}</span>
   % endif
-  % if field.description:
-  <span class="description">${field.description}</span>
+  % if f.description:
+  <span class="description">${f.description}</span>
   % endif
   % endif
 </div>
+%else:
+<fieldset class="group" id="${f.cssname}-field" class="${f.classes}">
+  % if f.title:
+  <legend>${f.title}</legend>
+  % endif
+  % if f.description:
+  <div class="description">${f.description}</div>
+  % endif
+  % for ff in f.fields:
+      ${field(ff)}
+  % endfor
+</fieldset>
+%endif
 </%def>
 
 <%def name="widget(field)">

@@ -1,23 +1,34 @@
-<%namespace name="group" file="Group.html" />
-<%namespace name="field" file="Field.html" />
+<%namespace name="fieldmodule" file="Field.html" />
 
 <%def name="form(form)">
+<%call expr="header(form)" />
+<%call expr="errors(form)" />
+<%call expr="body(form)" />
+<%call expr="actions(form)" />
+<%call expr="footer(form)" />
+</%def>
+
+
+<%def name="header(form)">
 <form id="${form.name}" action="${form._action}" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">
   <div>
     <input type="hidden" name="_charset_" />
     <input type="hidden" name="__formish_form__" value="${form.name}" />
+</%def>
 
+<%def name="errors(form)">
     %if form.error is not None:
-      <p class="error">${form.error}</p>    
+      <p class="error">${form.error}</p>
     %endif
-    
+</%def>
+
+<%def name="body(form)">
     % for f in form.fields:
-    %if 'Group' in f.__class__.__name__:
-      ${group.group(f)}
-    %else:
-      ${field.field(f)}
-    %endif
+      ${fieldmodule.field(f)}
     % endfor
+</%def>    
+    
+<%def name="actions(form)">
     <div class="actions">
       %if form.actions == []:
         <input type="submit" id="${form.name}-action-submit" name="submit" value="Submit" />
@@ -27,7 +38,13 @@
         %endfor
       %endif
     </div>
+</%def>
+
+<%def name="footer(form)">
   </div>
 </form>
 </%def>
 
+<%def name="field(form)">
+ ${fieldmodule.field(form)}
+</%def>
