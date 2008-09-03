@@ -20,6 +20,8 @@ ${formish.form(f)}
 lookup = TemplateLookup(directories=['formish/templates/mako'])
 
 class TestHTML(unittest.TestCase):
+    """ Basic tests - we need lots more to make this robust
+    """
 
     def test_default_title(self):
         r = webob.Request.blank('http://localhost/')

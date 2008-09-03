@@ -112,7 +112,9 @@ class FileUpload(Widget):
     
     def pre_render(self, schemaType, data):
         data = string_converter(schemaType).fromType(data)
-        return {'name': ['']}
+        if data is None:
+            return {'name': ['']}
+        return {'name': [data['uid']]}
     
     def pre_parse_request(self, schemaType, data):
         fs = data.get('file',[''])[0]
@@ -142,8 +144,8 @@ class SelectChoice(Widget):
     def convert(self, schemaType, data):
         return string_converter(schemaType).toType(data[0])
 
-    def selected(self, option, value):
-        if option[0] == value:
+    def selected(self, option, value, schemaType):
+        if option[0] == self.convert(schemaType,[value]):
             return ' selected="selected"'
 
     
@@ -164,8 +166,8 @@ class RadioChoice(Widget):
             return []
         return string_converter(schemaType).toType(data[0])
 
-    def selected(self, option, value):
-        if option[0] == value:
+    def selected(self, option, value, schemaType):
+        if option[0] == self.convert(schemaType,[value]):
             return ' checked="checked"'
     
     
@@ -182,7 +184,9 @@ class CheckboxMultiChoice(Widget):
     def convert(self, schemaType, data):
         return [string_converter(schemaType.attr).toType(d) for d in data]
 
-    def checked(self, option, value):
-        if value is not None and option[0] in value:
+    def checked(self, option, values, schemaType):
+        if values is not None:
+            typed_values = [self.convert(schemaType,v) for v in values]
+        if values is not None and option[0] in typed_values:
             return ' checked="checked"'
 
