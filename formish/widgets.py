@@ -104,6 +104,19 @@ class DateParts(Widget):
     
 
 class FileUpload(Widget):
+    """
+    File upload widget.
+
+    fileHandler is any object with the following methods:
+
+        storeFile(self, f)
+            where f is a file instance
+
+        getUrlForFile(self, data)
+            where data is the form item data or a path to a temporary file and
+            is expected to return a URL to access the persisted or temporary
+            data.
+    """
     
     def __init__(self, fileHandler, showImagePreview=False, allowClear=True):
         self.fileHandler = fileHandler
