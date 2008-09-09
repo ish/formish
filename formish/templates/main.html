@@ -1,0 +1,62 @@
+<%namespace name="formish" file="formish/Form.html" />
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+  <meta name="description" value="" />
+  <meta name="keywords" value="" />
+  <title>${self.title()}</title>
+  <link href="http://yui.yahooapis.com/2.5.2/build/reset-fonts-grids/reset-fonts-grids.css" type="text/css" rel="stylesheet" />
+  <link href="/css/screen.css" type="text/css" rel="stylesheet" />
+  <link href="/css/formish.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body class="">
+
+  
+<div id="main" class="body-gallery">
+  <div id="header">
+    <h1><a href="/">Infomy - Info You Own</a></h1>
+    <ul>
+      <li class=" first-child item-1"><a href="/">Home</a></li>
+      <li class="item-2"><a href="/profiles">Profiles</a></li>
+      <li class="item-3"><a href="/organisations">Organisations</a></li>
+      <li class="item-3"><a href="/admin">Administation</a></li>
+      <li class="item-4"><a href="/login">Login</a></li>
+    </ul>
+  </div>
+  <div id="body" class="clearfix">
+    <div class="container">
+      <div class="leftcolumn">
+        <div id="subnav">
+          <h3>Misc Stuff</h3>
+          <!--<ul><li class=" first-child item-1"><a href="workshops/whitby.html">Whitby</a></li><li class=" last-child item-2"><a href="http://joecornishphotographer.com/workshops/northumberland">Northumberland</a></li></ul>-->
+        </div>
+      </div>
+      <div class="main">
+        % if hasattr(self, 'page_title'):
+        <h2>${self.page_title()}</h2>
+        % endif
+        ${self.body()}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="footer">
+  <div id="footercontent">
+    &copy; <strong class="infomy">Info<em>my</em></strong> - Report Abuse - Bookmark with site - Privacy Policy - Terms of Use - Contact Us
+  </div>
+</div>
+
+</body>
+</html>
+
+<%def name="title()">
+% if hasattr(self, 'page_title'):
+  ${self.page_title()} @ infomy
+% else:
+  infomy
+% endif
+</%def>
+

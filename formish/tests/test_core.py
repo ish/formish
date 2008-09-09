@@ -86,8 +86,8 @@ class TestGetDataUsingDottedKey(unittest.TestCase):
     def test_get_missingattr(self):
         """This should raise an AttributeError - not working """
         d = dottedDict( {'a': {'a': 1}, 'b': 2} )
-        self.assertRaises(KeyError, getattr, d , 'Q.Q.Q')
-        self.assertRaises(KeyError, getattr, dottedDict(), 'missing')
+        self.assertRaises(KeyError, d.__getitem__, 'Q.Q.Q')
+        self.assertRaises(KeyError, d.__getitem__, 'missing')
         
 
     def test_missing(self):
@@ -143,11 +143,11 @@ class TestFormBuilding(unittest.TestCase):
         # defaults have been stored properly 
         assert form._data == fd
         # data can be accessed by field
-        assert form.a._data == 1
-        assert form.b._data == 2
+        assert form['a']._data == 1
+        assert form['b']._data == 2
         # field's title attribute
-        assert form.a.title == 'A'
-        assert form.b.title == 'B'
+        assert form['a'].title == 'A'
+        assert form['b'].title == 'B'
         
     one = Structure([("a", String()), ("b", String())])
     two = Structure([("a", String()), ("b", String())])
@@ -167,13 +167,13 @@ class TestFormBuilding(unittest.TestCase):
         # stored defaults
         assert form.defaults == fd
         # accessing field data
-        assert form.one.a.value == [2]
-        assert form.two.b.value == [3]
+        assert form['one']['a'].value == [2]
+        assert form['two']['b'].value == [3]
         # accessing group titles
-        assert form.one.title == 'One'
-        assert form.two.title == 'Two'
+        assert form['one'].title == 'One'
+        assert form['two'].title == 'Two'
         # accessing field title
-        assert form.two.b.title == 'B'
+        assert form['two']['b'].title == 'B'
         
 
 
@@ -199,15 +199,15 @@ class TestFormBuilding(unittest.TestCase):
         # stored defaults
         assert form.defaults == fd
         # field data
-        assert form.one.a.value == [3]
+        assert form['one']['a'].value == [3]
         # field titles
-        assert form.one.a.title == "A"
-        assert form.one.b.title == "B"
-        assert form.one.c.x.title == "X"
+        assert form['one']['a'].title == "A"
+        assert form['one']['b'].title == "B"
+        assert form['one']['c']['x'].title == "X"
         # description
-        assert form.one.a.description == "This is a field with name a and title A and has a NotEmpty validator"
+        assert form['one']['a'].description == "This is a field with name a and title A and has a NotEmpty validator"
         # length of sub section
-        assert len(list(form.one.fields)) == 3
+        assert len(list(form['one'].fields)) == 3
     
        
         
@@ -239,8 +239,8 @@ class TestFormBuilding(unittest.TestCase):
 
         self.assert_( isinstance(form.errors['one']['a'], Invalid) )
         self.assertEqual( form.errors['one']['a'].message, "Please enter a value" )
-        self.assert_( isinstance(form.one.a.error, Invalid) )
-        self.assertEqual( form.one.a.error.message, "Please enter a value" )
+        self.assert_( isinstance(form['one']['a'].error, Invalid) )
+        self.assertEqual( form['one']['a'].error.message, "Please enter a value" )
         
     def test_nested_form_typecheck(self):
         schema_nested = Structure([
@@ -259,15 +259,15 @@ class TestFormBuilding(unittest.TestCase):
         form = Form(schema_nested, name)
         self.assert_(form.validate(request) == {'one': {'a':'woot!','b':'', 'c': {'x':'','y':''}}})
         self.assertEquals(form.errors , {})
-        self.assert_( isinstance(form.one.a.widget, BoundWidget) )
-        self.assert_( isinstance(form.one.a.widget.widget, Input) )
-        self.assert_( isinstance(form.one.a.widget.field, Field) )
-        form.one.a.widget = TextArea()
-        self.assert_( isinstance(form.one.a.widget.widget, TextArea) )
+        self.assert_( isinstance(form['one']['a'].widget, BoundWidget) )
+        self.assert_( isinstance(form['one']['a'].widget.widget, Input) )
+        self.assert_( isinstance(form['one']['a'].widget.field, Field) )
+        form['one']['a'].widget = TextArea()
+        self.assert_( isinstance(form['one']['a'].widget.widget, TextArea) )
         widgets = {'one': {'a': TextArea()}}
         form = Form(schema_nested, name, widgets=widgets)
-        self.assert_( isinstance(form.one.a.widget, BoundWidget) )
-        self.assert_( isinstance(form.one.a.widget.widget, TextArea) )
+        self.assert_( isinstance(form['one']['a'].widget, BoundWidget) )
+        self.assert_( isinstance(form['one']['a'].widget.widget, TextArea) )
 
         
 
@@ -295,7 +295,7 @@ class TestFormBuilding(unittest.TestCase):
         R = copy.deepcopy(r)
         R.pop('__formish_form__')
         form = Form(schema_flat, name)
-        form.a.widget = DateParts()
+        form['a'].widget = DateParts()
         from datetime import date
         d = date(1966,3,1)
         fd = {'a': d,'b': '2'}

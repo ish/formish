@@ -25,7 +25,7 @@ class Widget(object):
         return data, errors
 
     def convert(self, schemaType, data):
-        return string_converter(schemaType).toType(data[0])    
+        return string_converter(schemaType).toType(data[0])
 
 
 class Input(Widget):
@@ -88,6 +88,9 @@ class Checkbox(Widget):
     
 class DateParts(Widget):
     
+    def __init__(self, dayFirst=False):
+        self.dayFirst = dayFirst
+        
     def pre_render(self, schemaType, data):
         data = datetuple_converter(schemaType).fromType(data)
         d = {}
@@ -134,6 +137,9 @@ class SelectChoice(Widget):
     noneOption = ('', '- choose -')
 
     def __init__(self, options, noneOption=UNSET):
+        if not isinstance(options[0], tuple):
+            for i, o in enumerate(options):
+                options[i] = (o,o)
         self.options = options
         if noneOption is not UNSET:
             self.noneOption = noneOption
@@ -147,6 +153,8 @@ class SelectChoice(Widget):
     def selected(self, option, value, schemaType):
         if option[0] == self.convert(schemaType,[value]):
             return ' selected="selected"'
+        else:
+            return ''
 
     
 class RadioChoice(Widget):
@@ -154,6 +162,9 @@ class RadioChoice(Widget):
     noneOption = ('', '- choose -')
 
     def __init__(self, options, noneOption=UNSET):
+        if not isinstance(options[0], tuple):
+            for i, o in enumerate(options):
+                options[i] = (o,o)
         self.options = options
         if noneOption is not UNSET:
             self.noneOption = noneOption
@@ -169,11 +180,16 @@ class RadioChoice(Widget):
     def selected(self, option, value, schemaType):
         if option[0] == self.convert(schemaType,[value]):
             return ' checked="checked"'
+        else:
+            return ''
     
     
 class CheckboxMultiChoice(Widget):
 
     def __init__(self, options):
+        if not isinstance(options[0], tuple):
+            for i, o in enumerate(options):
+                options[i] = (o,o)
         self.options = options
             
     def pre_render(self, schemaType, data):
@@ -189,4 +205,6 @@ class CheckboxMultiChoice(Widget):
             typed_values = [self.convert(schemaType,v) for v in values]
         if values is not None and option[0] in typed_values:
             return ' checked="checked"'
+        else:
+            return ''
 

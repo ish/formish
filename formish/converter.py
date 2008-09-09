@@ -226,7 +226,7 @@ class SequenceToStringConverter(object):
         csvReader = csv.reader(sf)
         sf.write(value)
         sf.seek(0,0)
-        return csvReader.next()    
+        return csvReader.next()
 
 
 @abstract()

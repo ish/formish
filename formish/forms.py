@@ -72,7 +72,7 @@ class Field(object):
     
     The _widget attribute is a base widget to which the real widget is bound 
     """
-
+    type = 'field'
     def __init__(self, name, attr, form):
         """
         @param name:            Fields dotted name
@@ -144,7 +144,8 @@ class Field(object):
     widget = property(_getWidget, _setWidget)
 
 
-class Group(object):
+
+class Collection(object):
     """
     A wrapper for a schema group type that includes form information.
     
@@ -207,13 +208,6 @@ class Group(object):
         for attr in self.attr.attrs:
             yield self.bind(attr[0], attr[1])        
     
-    def __getattr__(self, name):
-        """
-        When we try to get a child field, lazily bind the child to the schema
-        for that child.
-        """
-        return self.bind( name, self.attr.get(name) )
-
     def bind(self, attr_name, attr):
         """ 
         return cached bound schema as a field; Otherwise bind the attr to a
@@ -231,7 +225,10 @@ class Group(object):
                 keyprefix = attr_name
             else:
                 keyprefix = '%s.%s'%(self.name,attr_name)
-            if isinstance( attr, schemaish.Structure ):
+                
+            if isinstance(attr, schemaish.Sequence):
+                bf = Sequence(keyprefix, attr, self.form)
+            elif isinstance(attr, schemaish.Structure):
                 bf = Group(keyprefix, attr, self.form)
             else:
                 bf = Field(keyprefix, attr, self.form)
@@ -241,7 +238,7 @@ class Group(object):
     @property
     def error(self):
         """ Lazily get the error from the form.errors when needed """
-        return self.form.errors.get(self.name, None)        
+        return self.form.errors.get(self.name, None)
         
     def _getWidget(self):
         """ return the fields widget bound with extra params. """        
@@ -251,8 +248,37 @@ class Group(object):
         """ Set the field widget. """        
         self._widget = widget
         
-    widget = property(_getWidget, _setWidget)   
+    widget = property(_getWidget, _setWidget)
     
+    def __getitem__(self, name):
+        return self.bind( name, self.attr.get(name) )
+
+    def keys(self):
+        return [k for k,v in self.attr.attrs]
+    
+
+class Group(Collection):
+    type = 'group'
+
+class Sequence(Collection):
+    type = 'sequence'
+    @property
+    def fields(self):
+        """ 
+        For sequences we check to see if the name is numeric. As names cannot be numeric normally, the first iteration loops 
+        on a fields values and spits out a 
+        """
+        for n in xrange(3):
+            bf = self.bind(n, self.attr.attr)
+            yield bf
+            
+    def __getitem__(self, key):
+        if str(key) == '0':
+            return self.bind( key, self.attr.attr )
+
+    def keys(self):
+        return ['0']
+
     
 class BoundWidget(object):
     
@@ -318,11 +344,11 @@ class Form(object):
 
     name = property(_get_name)
         
-    def set_widgets(self, structure, widgets):
+    def set_widgets(self, form, widgets):
         if not widgets: 
             return
         for name, widget in widgets.iteritems():
-            form_item = getattr(structure, name)
+            form_item = form[name]
             if isinstance(widget, dict):
                 # We have a dict of widgets presumably desitined for form_item that *should* be a bound structure.
                 self.set_widgets( form_item, widget )
@@ -355,13 +381,6 @@ class Form(object):
                 return action.callback(request, self)
         return self.actions[0].callback(request, self)
             
-    def __getattr__(self, name):
-        # If it's a property
-        if name == '_requestData':
-            return self._getRequestData()
-        if name == 'defaults':
-            return self._getDefaults()
-        return getattr( self.structure, name )
 
     def _getRequestData(self):
         if self.__requestData is not None:
@@ -406,17 +425,21 @@ class Form(object):
         Get the data without raising exception and then validate the data. If
         there are errors, raise them; otherwise return the data
         """
+        self.errors = dottedDict({})
         # Check this request was POSTed by this form.
         if not request.method =='POST' and request.POST.get('__formish_form__',None) == self.name:
             raise Exception("request does not match form name")
         request_data = preParseRequestData(self.structure,dottedDict(request.POST))
         data = self.get_unvalidated_data(request_data, raiseErrors=False)
-        errors = validate(self.structure, data, errors=self.errors)
+        validate(self.structure, data, errors=self.errors)
         if len(self.errors.keys()) > 0:
             self.__requestData = request_data
-            raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(errors.keys()), errors.data))
+            raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(self.errors.keys()), self.errors.data))
         return dottedDict(data)
-        
+
+    def __getitem__(self, key):
+        return self.structure[key]
+    
     @property
     def fields(self):
         return self.structure.fields

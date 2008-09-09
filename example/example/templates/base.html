@@ -1,0 +1,37 @@
+<%namespace name="formish" file="formish/Form.html" />
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+  <meta name="description" value="" />
+  <meta name="keywords" value="" />
+  <title>${self.title()}</title>
+  <link href="/css/forms.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body class="">
+<div id="header">
+  <h1>Formish</h1>
+</div>
+<div id="body">
+  ${self.body()}
+</div>
+
+
+<div id="footer">
+  &copy; <strong class="infomy">Tim and Matt</strong> 
+</div>
+
+</body>
+</html>
+
+<%def name="title()">
+% if hasattr(self, 'page_title'):
+  ${self.page_title()} @ infomy
+% else:
+  infomy
+% endif
+</%def>
+
+
+

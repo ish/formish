@@ -1,0 +1,12 @@
+<%inherit file="base.html"/>
+
+<p>Formish Examples</p>
+
+<p>Some interactive form examples:</p>
+
+<ul>
+%for m in menu:
+  <li><a href="/${m}">${forms[m][0]}</a> -- ${forms[m][1]}</li>
+%endfor
+</ul>
+
