@@ -85,13 +85,6 @@ class Field(object):
         self.name = name
         self.attr = attr
         self.form = form
-        # Create a default widget for the field. XXX There is no such thing as
-        # a default widget, this needs to be some sort of adaption process.
-        self._widget = Input()
-        # Construct a title
-        self.title = self.attr.title
-        if self.title is None:
-            self.title = util.title_from_name(self.name.split('.')[-1])
 
     @property
     def cssname(self):
@@ -133,16 +126,26 @@ class Field(object):
         """ Lazily get the error from the form.errors when needed """
         return self.form.errors.get(self.name, None)
     
-    def _getWidget(self):
+    @property
+    def widget(self):
         """ return the fields widget bound with extra params. """
-        return BoundWidget(self._widget, self)
-    
-    def _setWidget(self, widget):
-        """ Set the field widget. """
-        self._widget = widget
+        try:
+            w = self.form[self.name].widget
+        except KeyError:
+            w = Input()
+        return BoundWidget(w, self)
         
-    widget = property(_getWidget, _setWidget)
-
+    @property
+    def title(self):
+        try:
+            t = self.form[self.name].title
+        except KeyError:
+            if self.attr.title is not None:
+                return self.attr.title
+            else:
+                return util.title_from_name(self.name.split('.')[-1])
+            
+    
 
 class Group(object):
     """
@@ -243,15 +246,10 @@ class Group(object):
         """ Lazily get the error from the form.errors when needed """
         return self.form.errors.get(self.name, None)        
         
-    def _getWidget(self):
-        """ return the fields widget bound with extra params. """        
+    @property
+    def widget(self):
+        """ return the fields widget bound with extra params. """
         return BoundWidget(self._widget, self)
-    
-    def _setWidget(self, widget):
-        """ Set the field widget. """        
-        self._widget = widget
-        
-    widget = property(_getWidget, _setWidget)   
     
     
 class BoundWidget(object):
@@ -286,7 +284,7 @@ class Form(object):
     element_name = None
     __requestData = None
 
-    def __init__(self, structure, name=None, defaults=None, widgets=None, errors=None, action=''):
+    def __init__(self, structure, name=None, defaults=None, errors=None, action=''):
         """
         The form can be initiated with a set of data defaults (using defaults) or with some requestData. The requestData
         can be instantiated in order to set up a partially completed form with data that was persisted in some fashion.
@@ -303,32 +301,20 @@ class Form(object):
         @type errors:           Dictionary of validation error objects
         """
         self.structure = Group(None, structure, self)
+        self.item_data = {}
         self._name = name
-        self.defaults = defaults
+        self.defaults = defaults or {}
         self.errors = dottedDict(errors or {})
         self.error = None
         self.actions = []
         self._action = action
-        self.set_widgets(self.structure, widgets)
+        # Stuff on item_data
 
-    def _get_name(self):
+    @property
+    def name(self):
         parts = [self.element_name, self._name]
         parts = [p for p in parts if p is not None]
         return '.'.join(parts)
-
-    name = property(_get_name)
-        
-    def set_widgets(self, structure, widgets):
-        if not widgets: 
-            return
-        for name, widget in widgets.iteritems():
-            form_item = getattr(structure, name)
-            if isinstance(widget, dict):
-                # We have a dict of widgets presumably desitined for form_item that *should* be a bound structure.
-                self.set_widgets( form_item, widget )
-            else:
-                # Set the widget on this form item
-                form_item.widget = widget
 
     def addAction(self, callback, name="submit", label=None):
         """ 
@@ -355,13 +341,37 @@ class Form(object):
                 return action.callback(request, self)
         return self.actions[0].callback(request, self)
             
-    def __getattr__(self, name):
-        # If it's a property
-        if name == '_requestData':
-            return self._getRequestData()
-        if name == 'defaults':
-            return self._getDefaults()
-        return getattr( self.structure, name )
+
+    def get_unvalidated_data(self, request_data, raiseErrors=True):
+        """
+        Convert the request object into a nested dict in the correct structure
+        of the schema but without applying the schema's validation.
+        """
+        data = convertRequestDataToData(self.structure, request_data, errors=self.errors) 
+        if raiseErrors and len(self.errors.keys()):
+            raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(self.errors.keys()), self.errors.data))
+        return dottedDict(data)
+    
+    def validate(self, request):
+        """ 
+        Get the data without raising exception and then validate the data. If
+        there are errors, raise them; otherwise return the data
+        """
+        # Check this request was POSTed by this form.
+        if not request.method =='POST' and request.POST.get('__formish_form__',None) == self.name:
+            raise Exception("request does not match form name")
+        request_data = preParseRequestData(self.structure,dottedDict(request.POST))
+        data = self.get_unvalidated_data(request_data, raiseErrors=False)
+        errors = validate(self.structure, data, errors=self.errors)
+        if len(self.errors.keys()) > 0:
+            self.__requestData = request_data
+            print '###############',request_data
+            raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(errors.keys()), errors.data))
+        return dottedDict(data)
+
+    ## 
+    #  request_data
+    #
 
     def _getRequestData(self):
         if self.__requestData is not None:
@@ -380,15 +390,10 @@ class Form(object):
 
     _requestData = property(_getRequestData, _setRequestData)
     
-    def get_unvalidated_data(self, request_data, raiseErrors=True):
-        """
-        Convert the request object into a nested dict in the correct structure
-        of the schema but without applying the schema's validation.
-        """
-        data = convertRequestDataToData(self.structure, request_data, errors=self.errors) 
-        if raiseErrors and len(self.errors.keys()):
-            raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(self.errors.keys()), self.errors.data))
-        return dottedDict(data)
+    
+    ##
+    # defaults
+    #
     
     def _getDefaults(self):
         """ Get the raw default data """
@@ -400,27 +405,64 @@ class Form(object):
         self.__requestData = None
         
     defaults = property(_getDefaults, _setDefaults)
+    
 
-    def validate(self, request):
-        """ 
-        Get the data without raising exception and then validate the data. If
-        there are errors, raise them; otherwise return the data
-        """
-        # Check this request was POSTed by this form.
-        if not request.method =='POST' and request.POST.get('__formish_form__',None) == self.name:
-            raise Exception("request does not match form name")
-        request_data = preParseRequestData(self.structure,dottedDict(request.POST))
-        data = self.get_unvalidated_data(request_data, raiseErrors=False)
-        errors = validate(self.structure, data, errors=self.errors)
-        if len(self.errors.keys()) > 0:
-            self.__requestData = request_data
-            raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(errors.keys()), errors.data))
-        return dottedDict(data)
-        
+
+    ##
+    # The handler for item_data
+    #
+    
+    def set_item_data(self, key, name, value):
+        print 'setting key "%s" and name "%s" to value "%s"'%(key,name,value)
+        self.item_data.setdefault(key, {})[name] = value
+
+    def get_item_data(self, key, name):
+        print 'getting key "%s" and name "%s"'%(key,name)
+        return self.item_data.setdefault(key, {})[name]
+
+    def get_item_data_values(self, name):
+        d = dottedDict({})
+        for k,v in self.item_data:
+            if v.has_key(name):
+                d[k] = v[name]
+        return d
+    
+    def __getitem__(self, key):
+        return FormAccessor(self, key)
+    
     @property
     def fields(self):
         return self.structure.fields
     
+    
+class FormAccessor(object):
+
+    def __init__(self, form, key, prefix=None):
+        self.__dict__['form'] = form
+        if prefix is not None:
+            self.__dict__['key'] = '%s.%s'%(prefix,key)
+        else:
+            self.__dict__['key'] = key
+
+    def __setattr__(self, name, value):
+        self.form.set_item_data(self.key, name, value)
+
+    def __getattr__(self, name):
+        return self.form.get_item_data(self.key, name)
+    
+    def __getitem__(self, key):
+        return FormAccessor(self.form, key, prefix=self.key)
+        
+NOVALUE = object()
+def recursiveDottedGet(o, key):
+    if key == '':
+        if o == NOVALUE:
+            raise KeyError
+        else:
+            return o
+    ks = key.split('.')
+    first = ks[0]
+    remaining = '.'.join(ks[1:])
+    return recursiveDottedGet( o.get(first, NOVALUE), remaining )
 
         
-

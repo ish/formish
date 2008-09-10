@@ -83,6 +83,38 @@ class dottedDict(object):
     def keys(self):
         return self.data.keys()
     
+    def items(self):
+        return self.data.items()
+    
+    def dotteditems(self, value=None, store=[], prefix=None):
+        if value is None:
+            value = self.data
+        if not hasattr(value,'items'):
+            store.append((prefix, value))
+            return store
+        for k, v in value.items():
+            if prefix:
+                dkey = '%s.%s'%(prefix,k)
+            else:
+                dkey = k
+            self.dotteditems(value=v, store=store, prefix=dkey)
+        return store
+    
+    def dottedkeys(self, value=None, store=[], prefix=None):
+        if value is None:
+            value = self.data
+        if not hasattr(value,'items'):
+            store.append(prefix)
+            return store
+        for k, v in value.items():
+            if prefix:
+                dkey = '%s.%s'%(prefix,k)
+            else:
+                dkey = k
+            self.dottedkeys(value=v, store=store, prefix=dkey)
+        return store
+            
+    
     def __eq__(self, other):
         return self.data == dottedDict(other).data
     
@@ -108,13 +140,21 @@ class dottedDict(object):
         try:
             value = self.get(key.split('.')[0], NOVALUE)
             if value is NOVALUE:
-                raise KeyError('Dotted key does not exist')
+                raise KeyError('Dotted key \'%s\' does not exist'%key)
         except AttributeError, e:
             raise KeyError(e.message)
         
     def has_key(self, key):
         return key in self.keys()
+
+    def has_dottedkey(self, dottedkey):
+        try:
+            temp = self[dottedkey]
+        except KeyError:
+            return False
+        return True
     
     def __repr__(self):
         return '<dottedDict> %s'%self.data
+    
 
