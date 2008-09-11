@@ -208,3 +208,14 @@ class CheckboxMultiChoice(Widget):
         else:
             return ''
 
+#class Sequence(Widget):
+
+    #def pre_render(self, schemaType, data):
+        #if data is None: 
+            #return []
+        #return [string_converter(schemaType.attr).fromType(d) for d in data]
+    
+    #def convert(self, schemaType, data):
+        #print data
+        #return [string_converter(schemaType.attr).toType(d) for d in data]
+

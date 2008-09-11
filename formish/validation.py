@@ -2,6 +2,56 @@ import re
 import schemaish
 from formish.dottedDict import dottedDict
 
+def convert_sequences(d):
+    if not hasattr(d,'keys'):
+        return d
+    try:
+        k = int(d.keys()[0])
+    except ValueError:
+        return d
+    intkeys = []
+    for key in d.keys():
+        intkeys.append(int(key))
+    intkeys.sort()
+    out = []
+    for key in intkeys:
+        out.append(d[str(key)])
+    return out
+
+def recursive_convert_sequences(d):
+    if not hasattr(d,'keys'):
+        return d
+    try:
+        k = int(d.keys()[0])
+    except ValueError:
+        tmp = {}
+        for k, v in d.items():
+            tmp[k] = recursive_convert_sequences(v)
+        return tmp
+    intkeys = []
+    for key in d.keys():
+        intkeys.append(int(key))
+    intkeys.sort()
+    out = []
+    for key in intkeys:
+        out.append(recursive_convert_sequences(d[str(key)]))
+    return out
+
+def getNestedProperty(d,dottedkey):
+    if dottedkey == '':
+        return d
+    keys = dottedkey.split('.')
+    firstkey = keys[0]
+    remaining_dottedkey = '.'.join(keys[1:])
+    try:
+        firstkey = int(firstkey)
+    except:
+        pass
+    try:
+        return getNestedProperty(d[firstkey],remaining_dottedkey)
+    except (KeyError, IndexError):
+        return None
+
 def validate(structure, requestData, errors=None, keyprefix=None):   
     """ Take a schemaish structure and use it's validators to return any errors"""
     if errors is None:
@@ -17,7 +67,8 @@ def validate(structure, requestData, errors=None, keyprefix=None):
             if hasattr(attr[1],'attrs'):
                 validate(attr[1], requestData, errors=errors, keyprefix=newprefix)
             else: 
-                attr[1].validate(requestData.get(newprefix,None))
+                c = convert_sequences(requestData.get(newprefix,None))
+                attr[1].validate(c)
         except (schemaish.Invalid, FieldValidationError), e:
             errors[newprefix] = e
     return errors
@@ -30,10 +81,11 @@ def convertDataToRequestData(formStructure, data, requestData=None, errors=None)
         errors = dottedDict()
     for field in formStructure.fields:
         try:
-            if hasattr(field,'fields'):
+            if field.type is 'group' or (field.type is 'sequence' and field.widget is None):
                 convertDataToRequestData(field, data, requestData=requestData, errors=errors)
-            else: 
-                requestData[field.name] = field.widget.pre_render(field.attr,data.get(field.name,None))
+            else:
+                d = getNestedProperty(data, field.name)
+                requestData[field.name] = field.widget.pre_render(field.attr,d)
         except schemaish.Invalid, e:
             errors[field.name] = e
             raise
@@ -48,29 +100,29 @@ def convertRequestDataToData(formStructure, requestData, data=None, errors=None)
 
     for field in formStructure.fields:
         try:
-            if hasattr(field,'fields'):
+            if field.type is 'group' or (field.type == 'sequence' and field.widget is None):
                 convertRequestDataToData(field, requestData, data=data, errors=errors)
             else: 
                 # This needs to be cleverer... 
-                x = field.widget.convert(field.attr,requestData.get(field.name,[]))
-                data[field.name] = x
+                data[field.name] = field.widget.convert(field.attr,requestData.get(field.name,[]))
         except (schemaish.Invalid, FieldValidationError), e:
             errors[field.name] = e
+            
+    data = recursive_convert_sequences(dottedDict(data))
     return data
 
 def preParseRequestData(formStructure, requestData, data=None):
     if data is None:
         data = {}
     for field in formStructure.fields:
-        if hasattr(field,'fields'):
+        if field.type is 'group' or (field.type == 'sequence' and field.widget is None):
             preParseRequestData(field, requestData, data=data)
         else: 
             # This needs to be cleverer...
             d = requestData.get(field.name,[])
-            x = field.widget.pre_parse_request(field.attr,d)
-            data[field.name] = x
+            data[field.name] = field.widget.pre_parse_request(field.attr,d)
     return data
-    
+
 
 class FormsError(Exception):
     """

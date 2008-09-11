@@ -27,7 +27,7 @@ class TestHTML(unittest.TestCase):
         r = webob.Request.blank('http://localhost/')
         schema = schemaish.Structure([('one', schemaish.String())])
         f = Form(schema,name='form')
-        assert f['one'].title == "One", "test default title"
+
         html= Template(template, lookup=lookup).render(f=f)
         soup = BeautifulSoup(html)
         assert len(soup.findAll(id='form-one')) == 1 , "test that the form field is being created"
@@ -51,12 +51,14 @@ class TestHTML(unittest.TestCase):
         two = Structure([("a", String()), ("b", Date()), ('c', Sequence(String())), ("d", String()), ("e", Integer(validator=v.NotEmpty())), ("f", String(validator=v.NotEmpty())) ])
         schema = Structure([("one", one), ("two", two)])
         f = Form(schema,name="form")
-        f['one']['b'].widget = TextArea()
-        f['two']['a'].widget = SelectChoice([('opt1',"Options 1"),('opt2',"Option 2")], noneOption=('-select option-',None))
-        f['two']['b'].widget = DateParts()
-        f['two']['c'].widget = CheckboxMultiChoice([('opt1',"Options 1"),('opt2',"Option 2")])
-        f['two']['d'].widget = RadioChoice([('opt1',"Options 1"),('opt2',"Option 2")])
-        f['two']['f'].widget = CheckedPassword()
+
+        f['one.b'].widget = TextArea()
+        f['two.a'].widget = SelectChoice([('opt1',"Options 1"),('opt2',"Option 2")], noneOption=('-select option-',None))
+        f['two.b'].widget = DateParts()
+        f['two.c'].widget = CheckboxMultiChoice([('opt1',"Options 1"),('opt2',"Option 2")])
+        f['two.d'].widget = RadioChoice([('opt1',"Options 1"),('opt2',"Option 2")])
+        f['two.f'].widget = CheckedPassword()
+
         f.addAction(lambda x: x, 'submit', label="Submit Me")
         f.defaults = {'one': {'a' : 'ooteenee','c':['3','4','5']}, 'two': {'b': date(1966,1,3)} }
         html = Template(template, lookup=lookup).render(f=f)

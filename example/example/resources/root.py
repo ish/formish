@@ -5,6 +5,8 @@ from restish import http, resource, page, templating
 from restish.url import URL
 
 forms = {}
+#import wingdbstub
+
 
 def getForms():
     ##
@@ -29,18 +31,30 @@ def getForms():
     
     
     form = formish.Form(schema)
+    form.defaults = {'list': ['1','2','3']}
     forms['sequence'] = ('Sequence', "A Sequence of String Fields", form)
-    
+
     ##
-    # Sequence Struct
+    # Sequence Text Area
     
     schema = schemaish.Structure()
-    schema.add('a',schemaish.Sequence(schemaish.String()))
+    schema.add('list',schemaish.Sequence(schemaish.String()))
     
     
     form = formish.Form(schema)
-    form['a'][0].widget = formish.TextArea()
-    forms['sequencestruct'] = ('Sequence of Structs', "Sequence of Strings", form)
+    form.defaults = {'list': ['1','2','3']}
+    form['list'].widget = formish.TextArea()
+    forms['sequence'] = ('Sequence', "A Sequence of String Fields", form)
+    ##
+    # Sequence Struct
+    
+    #schema = schemaish.Structure()
+    #schema.add('a',schemaish.Sequence(schemaish.String()))
+    
+    
+    #form = formish.Form(schema)
+    #form['a'][0].widget = formish.TextArea()
+    #forms['sequencestruct'] = ('Sequence of Structs', "Sequence of Strings", form)
     
     ###
     return forms
@@ -48,7 +62,7 @@ def getForms():
 menu = [
     'simple',
     'sequence',
-    'sequencestruct',
+    #'sequencestruct',
     ]
 
 
@@ -60,10 +74,11 @@ class RootResource(resource.Resource):
     @resource.GET()
     @templating.page('root.html')
     def root(self, request):
-        return {'menu':menu,'forms':self.forms}
+        return {'menu':menu,'forms':self.forms()}
     
     def resource_child(self, request, segments):
-        return FormResource(self.forms()[segments[0]]), segments[1:]
+        forms = self.forms()
+        return FormResource(forms[segments[0]]), segments[1:]
 
 
 class FormResource(resource.Resource):

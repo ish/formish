@@ -3,7 +3,7 @@ UNDEFINED = runtime.UNDEFINED
 __M_dict_builtin = dict
 __M_locals_builtin = locals
 _magic_number = 4
-_modified_time = 1220950031.230186
+_modified_time = 1221139548.4390399
 _template_filename='/home/tim/git/formish/formish/templates/mako/formish/Field.html'
 _template_uri='/formish/Field.html'
 _template_cache=cache.Cache(__name__, _modified_time)
@@ -37,7 +37,7 @@ def render_field(context,f):
         # SOURCE LINE 1
         __M_writer(u'\n')
         # SOURCE LINE 2
-        if 'Field' in f.__class__.__name__:
+        if f.type is 'field' or (f.type is 'sequence' and f.widget is not None):
             # SOURCE LINE 3
             __M_writer(u'<div id="')
             __M_writer(escape(f.cssname))

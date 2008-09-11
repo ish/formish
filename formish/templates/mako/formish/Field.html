@@ -1,5 +1,5 @@
 <%def name="field(f)">
-%if 'Field' in f.__class__.__name__:
+%if f.type is 'field' or (f.type is 'sequence' and f.widget is not None):
 <div id="${f.cssname}-field" class="${f.classes}">
   %if f.widget.widget.__class__.__name__ != 'Hidden':
   <label for="${f.cssname}">${f.title}</label>
