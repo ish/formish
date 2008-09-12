@@ -431,16 +431,19 @@ class Form(object):
         Get the data without raising exception and then validate the data. If
         there are errors, raise them; otherwise return the data
         """
-        self.errors = dottedDict({})
+        self.errors = {}
         # Check this request was POSTed by this form.
         if not request.method =='POST' and request.POST.get('__formish_form__',None) == self.name:
             raise Exception("request does not match form name")
         request_data = preParseRequestData(self.structure,dottedDict(request.POST))
         data = self.get_unvalidated_data(request_data, raiseErrors=False)
-        validate(self.structure, data, errors=self.errors)
+        try:
+            self.structure.attr.validate(data)
+        except schemaish.Invalid, e:
+            self.errors = e.error_dict
         if len(self.errors.keys()) > 0:
             self.__requestData = request_data
-            raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(self.errors.keys()), self.errors.data))
+            raise FormError('Tried to access data but conversion from request failed with %s errors'%(len(self.errors.keys())))
         return dottedDict(data)
 
 

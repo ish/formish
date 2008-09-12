@@ -5,6 +5,7 @@ from schemaish import *
 from formish.dottedDict import dottedDict
 import copy
 
+
 class DummyObject():
     pass
 
@@ -215,8 +216,8 @@ class TestFormBuilding(unittest.TestCase):
         
         self.assertRaises(validation.FormError, form.validate, request)
 
-        self.assert_( isinstance(form.errors['one']['a'], Invalid) )
-        self.assertEqual( form.errors['one']['a'].message, "Please enter a value" )
+        self.assert_( isinstance(form.errors['one.a'], Invalid) )
+        self.assertEqual( form.errors['one.a'].message, "Please enter a value" )
 
         
     def test_nested_form_typecheck(self):

@@ -64,7 +64,7 @@ class TestHTML(unittest.TestCase):
         html = Template(template, lookup=lookup).render(f=f)
         soup = BeautifulSoup(html)
         ## Latch the results for acceptance tests
-        #open('formish/tests/expectations/test_complex_form.html','w').write(html)
+        open('formish/tests/expectations/test_complex_form-actual.html','w').write(html)
         expectedSoup = BeautifulSoup( open('formish/tests/expectations/test_complex_form.html').read())
         
         assert soup == expectedSoup

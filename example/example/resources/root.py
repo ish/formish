@@ -63,7 +63,7 @@ def getForms():
     ##
     # Complex for from test_html
     
-    one = Structure([("a", String(validator=v.Email(not_empty=True))), ("b", String()), ("c", Sequence(Integer()))])
+    one = Structure([("a", String(validator=v.Email(not_empty=True))), ("b", String()), ("c", Sequence(Integer(validator=v.NotEmpty())))])
     two = Structure([("a", String()), ("b", Date()), ('c', Sequence(String())), ("d", String()), ("e", Integer(validator=v.NotEmpty())), ("f", String(validator=v.NotEmpty())) ])
     schema = Structure([("one", one), ("two", two)])
     f = Form(schema,name="form")
@@ -138,7 +138,7 @@ class FormResource(resource.Resource):
         form = self.form
         try:
             data = form.validate(request)
-        except formish.FormError, e:
+        except FormError, e:
             return self.render_form(request, form)
         else:
             print 'Success! : ',data
