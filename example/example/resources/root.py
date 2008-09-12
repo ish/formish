@@ -1,50 +1,84 @@
 from restish import http, resource, templating
-import formish
-import schemaish
+from formish import *
+from schemaish import *
 from restish import http, resource, page, templating
 from restish.url import URL
-
+from schemaish import validators as v
+from datetime import date
 forms = {}
-#import wingdbstub
 
 
 def getForms():
     ##
     # Simple Form
     
-    schema = schemaish.Structure()
-    schema.add('email', schemaish.String(validator=schemaish.All(schemaish.NotEmpty, schemaish.Email)))
-    schema.add('first_names', schemaish.String(validator=schemaish.NotEmpty))
-    schema.add('last_name', schemaish.String(validator=schemaish.NotEmpty))
-    schema.add('description', schemaish.String())
+    schema = Structure()
+    schema.add('email', String(validator=All(NotEmpty, Email)))
+    schema.add('first_names', String(validator=NotEmpty))
+    schema.add('last_name', String(validator=NotEmpty))
+    schema.add('description', String())
     
-    form = formish.Form(schema)
-    form.description = formish.TextArea()
+    form = Form(schema)
+    form.description = TextArea()
     
     forms['simple'] = ('Simple Form',"Some simple form fields", form)
     
     ##
     # Sequence
     
-    schema = schemaish.Structure()
-    schema.add('list',schemaish.Sequence(schemaish.String()))
+    schema = Structure()
+    schema.add('list',Sequence(String()))
     
     
-    form = formish.Form(schema)
+    form = Form(schema)
     form.defaults = {'list': ['1','2','3']}
     forms['sequence'] = ('Sequence', "A Sequence of String Fields", form)
 
     ##
     # Sequence Text Area
     
-    schema = schemaish.Structure()
-    schema.add('list',schemaish.Sequence(schemaish.String()))
+    schema = Structure()
+    schema.add('list',Sequence(String()))
     
     
-    form = formish.Form(schema)
+    form = Form(schema)
     form.defaults = {'list': ['1','2','3']}
-    form['list'].widget = formish.TextArea()
-    forms['sequence'] = ('Sequence', "A Sequence of String Fields", form)
+    form['list'].widget = TextArea()
+    forms['sequencetextarea'] = ('Sequence TextArea', "A Sequence of String Fields using TextArea widget", form)
+    
+    ##
+    # Sequence of Structures
+    
+    schema = Structure()
+    strings = Structure()
+    strings.add('a',String(validator=NotEmpty))
+    strings.add('b',String())
+    schema.add('list',Sequence(strings))
+    
+    form = Form(schema)
+    form.defaults = {'list': [{'a':1,'b':2},{'a':3,'b':4}]}
+    forms['sequencestructurestrings'] = ('Sequence of Structures', "A Sequence of Structures each containing two string fields", form)
+    
+    
+    ##
+    # Complex for from test_html
+    
+    one = Structure([("a", String(validator=v.Email(not_empty=True))), ("b", String()), ("c", Sequence(Integer()))])
+    two = Structure([("a", String()), ("b", Date()), ('c', Sequence(String())), ("d", String()), ("e", Integer(validator=v.NotEmpty())), ("f", String(validator=v.NotEmpty())) ])
+    schema = Structure([("one", one), ("two", two)])
+    f = Form(schema,name="form")
+
+    f['one.b'].widget = TextArea()
+    f['two.a'].widget = SelectChoice([('opt1',"Options 1"),('opt2',"Option 2")], noneOption=('-select option-',None))
+    f['two.b'].widget = DateParts()
+    f['two.c'].widget = CheckboxMultiChoice([('opt1',"Options 1"),('opt2',"Option 2")])
+    f['two.d'].widget = RadioChoice([('opt1',"Options 1"),('opt2',"Option 2")])
+    f['two.f'].widget = CheckedPassword()
+
+    f.addAction(lambda x: x, 'submit', label="Submit Me")
+    f.defaults = {'one': {'a' : 'ooteenee','c':['3','4','5']}, 'two': {'b': date(1966,1,3),'c':['opt2'],'d':'opt2'} }    
+    forms['complexform'] = ('Complex Form','The complex form taken from the tests',f)
+    
     ##
     # Sequence Struct
     
@@ -62,6 +96,9 @@ def getForms():
 menu = [
     'simple',
     'sequence',
+    'sequencetextarea',
+    'sequencestructurestrings',
+    'complexform',
     #'sequencestruct',
     ]
 

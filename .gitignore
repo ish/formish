@@ -6,4 +6,5 @@ dist
 formish.wpr
 export.sh
 *figleaf_sections
+*.html.py
 

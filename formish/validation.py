@@ -8,7 +8,7 @@ def convert_sequences(d):
     try:
         k = int(d.keys()[0])
     except ValueError:
-        return d
+        return dottedDict(d)
     intkeys = []
     for key in d.keys():
         intkeys.append(int(key))
@@ -27,7 +27,7 @@ def recursive_convert_sequences(d):
         tmp = {}
         for k, v in d.items():
             tmp[k] = recursive_convert_sequences(v)
-        return tmp
+        return dottedDict(tmp)
     intkeys = []
     for key in d.keys():
         intkeys.append(int(key))
@@ -35,7 +35,7 @@ def recursive_convert_sequences(d):
     out = []
     for key in intkeys:
         out.append(recursive_convert_sequences(d[str(key)]))
-    return out
+    return dottedDict(out)
 
 def getNestedProperty(d,dottedkey):
     if dottedkey == '':
@@ -121,7 +121,7 @@ def preParseRequestData(formStructure, requestData, data=None):
             # This needs to be cleverer...
             d = requestData.get(field.name,[])
             data[field.name] = field.widget.pre_parse_request(field.attr,d)
-    return data
+    return dottedDict(data)
 
 
 class FormsError(Exception):

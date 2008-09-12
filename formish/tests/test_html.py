@@ -60,7 +60,7 @@ class TestHTML(unittest.TestCase):
         f['two.f'].widget = CheckedPassword()
 
         f.addAction(lambda x: x, 'submit', label="Submit Me")
-        f.defaults = {'one': {'a' : 'ooteenee','c':['3','4','5']}, 'two': {'b': date(1966,1,3)} }
+        f.defaults = {'one': {'a' : 'ooteenee','c':['3','4','5']}, 'two': {'a': 'opt1','b': date(1966,1,3),'c':['opt2'],'d':'opt2'} } 
         html = Template(template, lookup=lookup).render(f=f)
         soup = BeautifulSoup(html)
         ## Latch the results for acceptance tests

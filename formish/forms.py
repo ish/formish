@@ -35,7 +35,7 @@ def _classes(self):
         self.attr.__class__.__name__.lower(),
         ]
     if self.widget is not None:
-        self.widget.widget.__class__.__name__.lower(),
+        classes.append(self.widget.widget.__class__.__name__.lower())
     if self.required:
         classes.append('required')
     if self.widget is not None and self.widget.cssClass:
@@ -415,7 +415,7 @@ class Form(object):
     
     def _getDefaults(self):
         """ Get the raw default data """
-        return self._defaults
+        return dottedDict(self._defaults)
     
     def _setDefaults(self, data):
         """ assign data """

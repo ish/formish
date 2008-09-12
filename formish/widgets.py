@@ -202,20 +202,10 @@ class CheckboxMultiChoice(Widget):
 
     def checked(self, option, values, schemaType):
         if values is not None:
-            typed_values = [self.convert(schemaType,v) for v in values]
+            typed_values = self.convert(schemaType,values)
         if values is not None and option[0] in typed_values:
             return ' checked="checked"'
         else:
             return ''
 
-#class Sequence(Widget):
-
-    #def pre_render(self, schemaType, data):
-        #if data is None: 
-            #return []
-        #return [string_converter(schemaType.attr).fromType(d) for d in data]
-    
-    #def convert(self, schemaType, data):
-        #print data
-        #return [string_converter(schemaType.attr).toType(d) for d in data]
 
