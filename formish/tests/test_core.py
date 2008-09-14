@@ -9,40 +9,6 @@ import copy
 class DummyObject():
     pass
 
-class TestDictFromDottedDict(unittest.TestCase):
-    """Testing conversion from dotted notation dictionary to nested dictionary"""
-    test_data = [
-        ( {'a':1, 'b':2}, {'a':1, 'b':2} ),
-        ( {'a.a':1, 'b':2}, {'a':{'a':1}, 'b':2} ),
-        ( {'a.a':1, 'a.b':3, 'b':2}, {'a':{'a':1, 'b':3}, 'b':2} ),
-        ( {'a.a':1, 'a.b':3, 'a.c': 5, 'b':2}, {'a':{'a':1, 'b':3, 'c':5}, 'b':2} ),
-        ( {'a.a.a':1, 'a.b.a':3, 'b':2}, {'a':{'a':{'a':1}, 'b':{'a':3}}, 'b':2} ),
-   
-    ]
-    test_error = [
-        {'a.a':1, 'b':2, 'a':7},
-    ]
-
-    def test_convert(self):
-        """Just checking that converting results in assigning the right dict """
-        for test in self.test_data:
-            self.assertEqual(dottedDict(test[0]).data, test[1])
-        for test in self.test_error:
-            self.assertRaises(KeyError,dottedDict, test)
-            
-    def test_comparing(self):
-        """Using the special method __eq__ to compare a dotted dict with a normal dict """
-        for test in self.test_data:
-            self.assertEqual(dottedDict(test[0]), test[1])
-            
-    def test_references(self):
-        """Does it refer to the same data if you convert an existing dottedDict or plain dict """
-        a = DummyObject()
-        d = {'a.a.a':1, 'a.b.a':3, 'b':a}
-        # Check dict single level keys don't lose reference
-        self.assertEqual( dottedDict(d).data['b'], d['b'] )
-        self.assertEqual( dottedDict(d).data, dottedDict(dottedDict(d)).data )
-        
 
 
 class TestGetDataUsingDottedKey(unittest.TestCase):
