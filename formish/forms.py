@@ -110,6 +110,8 @@ class Field(object):
     @property
     def value(self):
         """Convert the requestData to a value object for the form or None."""
+        if '*' in self.name:
+            return [None]
         return self.form._requestData.get(self.name, [None])
 
     @property
@@ -275,12 +277,16 @@ class Sequence(Collection):
         on a fields values and spits out a 
         """
         if self.defaults is None:
-            num_fields = 1
+            num_fields = 0
         else:
-            num_fields = len(self.defaults)+1
+            num_fields = len(self.defaults)
         for n in xrange(num_fields):
             bf = self.bind(n, self.attr.attr)
             yield bf
+            
+    @property
+    def template(self):
+        return self.bind('*',self.attr.attr)
             
 
 
@@ -431,10 +437,15 @@ class Form(object):
         Get the data without raising exception and then validate the data. If
         there are errors, raise them; otherwise return the data
         """
+        import wingdbstub
         self.errors = {}
         # Check this request was POSTed by this form.
         if not request.method =='POST' and request.POST.get('__formish_form__',None) == self.name:
             raise Exception("request does not match form name")
+        P = request.POST
+        for k in P.keys():
+            if '*' in k:
+                P.pop(k)
         request_data = preParseRequestData(self.structure,dottedDict(request.POST))
         data = self.get_unvalidated_data(request_data, raiseErrors=False)
         try:

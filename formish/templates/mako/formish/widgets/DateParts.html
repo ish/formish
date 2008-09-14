@@ -1,4 +1,12 @@
 <%page args="field" />
-<input id="${field.cssname}" type="text" name="${field.name}.day" value="${field.value['day'][0]}" size="2" /> /
-<input id="${field.cssname}-month" type="text" name="${field.name}.month" value="${field.value['month'][0]}" size="2" /> /
-<input id="${field.cssname}-year" type="text" name="${field.name}.year" value="${field.value['year'][0]}" size="4" />
+<%
+if field.value == [None]:
+    day, month, year = ('','','')
+else:
+    day = field.value['day'][0]
+    month = field.value['month'][0]
+    year = field.value['year'][0]
+%>
+<input id="${field.cssname}" type="text" name="${field.name}.day" value="${day}" size="2" /> /
+<input id="${field.cssname}-month" type="text" name="${field.name}.month" value="${month}" size="2" /> /
+<input id="${field.cssname}-year" type="text" name="${field.name}.year" value="${year}" size="4" />

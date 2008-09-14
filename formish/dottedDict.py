@@ -16,14 +16,44 @@ def tryInt(v):
     except ValueError:
         return v
     
+## 
+# Given a dottedDict, sets a new value based on a list of keys
 def _setDict(data, keys, value):
     if len(keys) == 1:
-        if isinstance(data, dict):
-            data[keys[0]] = value
+        key = tryInt(keys[0])
+        if isInt(key):
+            if isinstance(data, dict) and len(data.keys()) == 0 and key == 0:
+                data = [value]
+            elif isinstance(data, list) and key == len(data):
+                data.append(value)
+            else:
+                raise KeyError('Can\'t set using an integer key here')
         else:
-            raise KeyError('Already assigned data key %s value %s'%(keys[0], data))
+            if isinstance(data, dict):
+                data[keys[0]] = value
+            else:
+                raise KeyError('Already assigned data key %s value %s'%(keys[0], data))
     else:
-        _setDict(data.setdefault(keys[0],{}), keys[1:], value)
+        if isInt(keys[0]):
+            if isinstance(data, list) or (isinstance(data, dict) and len(data.keys()) == 0):
+                if tryInt(keys[0]) == 0:
+                    if len(data) == 0:
+                        data = [{}]
+                    d = _setDict(data[tryInt(keys[0])], keys[1:], value) 
+                if len(data)>tryInt(keys[0]):
+                    d = _setDict(data[tryInt(keys[0])], keys[1:], value) 
+                elif len(data) == tryInt(keys[0]):
+                    o = _setDict({}, keys[1:], value)
+                    data.append( o )
+                    d = o
+                else:
+                    raise KeyError
+            else:
+                raise KeyError
+        else:
+            d = _setDict(_setdefault(data,keys[0],{}), keys[1:], value)
+        data[tryInt(keys[0])] = d
+    return data
 
 def copyMultiDict(original):
     copy = {}
@@ -31,6 +61,13 @@ def copyMultiDict(original):
         copy[key] = original.getall(key)
     return copy
 
+def keysort(a,b):
+    if len(a) != len(b):
+        return cmp(len(a),len(b))
+    return cmp(a[-1], b[-1])
+
+##
+# Given a dictionary - creates a dotteddict
 def _getDictFromDottedKeyDict(d):
     if isinstance(d, MultiDict):
         data = copyMultiDict(d)
@@ -39,7 +76,7 @@ def _getDictFromDottedKeyDict(d):
     if isinstance(d,list):
         return d
     keyslist=[key.split('.') for key in data.keys()]
-    keyslist.sort(reverse=True)
+    keyslist.sort(keysort)
     for keys in keyslist:
         if len(keys) > 1:
             dottedkey = '.'.join(keys)
@@ -50,7 +87,7 @@ def _getDictFromDottedKeyDict(d):
             else:
                 value = data[dottedkey]
             del data[dottedkey]
-            _setDict(data, keys, value)
+            data = _setDict(data, keys, value)
         else:
             if hasattr(data,'getall'):
                 data[keys[0]] = data.getall(keys[0])
@@ -61,28 +98,66 @@ def _getDictFromDottedKeyDict(d):
 NOARG = object()
 NOVALUE = object()
 
-def setdefault(self, dottedkey, default=NOARG):
-    try:
-        return self[dottedkey]
-    except KeyError:
-        pass
-    keys = dottedkey.split('.')
-    d = self.data
 
+##
+# sets a value on a dict  based on a dottedKey - generates keys if not there already
+def _setdefault(data, dottedkey, default=NOARG):
+    try:
+        return _get(data,dottedkey)
+    except:
+        pass
+    keys = str(dottedkey).split('.')
+    d = data
+
+    K = None
     for n,key in enumerate(keys[:-1]):
-        if isinstance(d, list):
-            l = len(d)
-            if not isInt(key) or (isInt(key) and int(key) > l):
-                raise ValueError
-            d = d[int(key)]
-        else:
-            d = d.setdefault(key,{})
-    if default is not NOARG:
-        d[tryInt(keys[-1])] = default
+        K = '.'.join(keys[0:n+1])
+        if _has_key(d, K):
+            d = _get(d, K)
+            if not ( isinstance(d, dict) or isinstance(d, list)):
+                continue
+        break
+
+    if K is None:
+        data = _setDict(data, keys, default)
     else:
-        d[tryInt(keys[-1])] = None
-    return self[dottedkey]
-                
+        if isinstance(d, list) and tryInt(K) == len(d):
+            d.append(_setDict({}, keys[n+1:], default))
+            data = d
+        else:
+            data = _set(data, K,_setDict(d, keys[n+1:], default))
+
+            
+    return _get(data, dottedkey)
+   
+## 
+# given a real dictionary, recursively sets a value based on a dottedkey
+def _set(data, dottedkey, value):
+    keys = str(dottedkey).split('.')
+    d = data
+    try:
+        for n,key in enumerate(keys[:-1]):
+            d = d[tryInt(key)]
+    except KeyError, e:
+        raise KeyError('Error accessing dotted key %s on %r. Only got to %s'%(dottedkey,data,'.'.join(keys[:n])))
+    d[tryInt(keys[-1])] = value
+    return data
+
+def _get(d, dottedkey):
+    keys = str(dottedkey).split('.')
+    try:
+        for n,key in enumerate(keys):
+            d = d[tryInt(key)]
+    except KeyError, e:
+        raise KeyError('Error accessing dotted key %s - key %s does not exist'%(dottedkey, key))
+    return d
+    
+def _has_key(d, dottedkey):
+    try:
+        out = _get(d, dottedkey)
+        return True
+    except:
+        return False
 
 class dottedDict(object):
     """A dictionary that can be accessed and written to in dotted notation"""
@@ -97,33 +172,25 @@ class dottedDict(object):
                 self.data = _getDictFromDottedKeyDict(value)
             
     def get(self, dottedkey, default=NOARG):
-        keys = str(dottedkey).split('.')
-        d = self.data
         try:
-            for n,key in enumerate(keys):
-                try:
-                    d = d[key]
-                except TypeError:
-                    d = d[tryInt(key)]
+            d = _get(self.data, dottedkey)
         except KeyError, e:
             if default is not NOARG:
                 return default
-            raise KeyError('Error accessing dotted key %s on %r. Only got to %s'%(dottedkey,self.data,'.'.join(keys[:n])))
+            raise KeyError(e.message)
         if isinstance(d, dict):
             return dottedDict(d)
         else:
             return d
         
+
+        
+        
     def __getitem__(self, item):
         return self.get(item)
         
     def __setitem__(self,dottedkey, value):
-        keys = dottedkey.split('.')
-        d = self
-        for key in keys[:-1]:
-            key = tryInt(key)
-            d = setdefault(d, key, {})
-        d.data[keys[-1]] = value
+        _setdefault(self.data, dottedkey, value)
         
     def keys(self):
         keys = []
@@ -178,7 +245,8 @@ class dottedDict(object):
     
 
     def setdefault(self, dottedkey, default=NOARG):
-        return setdefault(self, dottedkey, default=default)
+        # Check return value for list or dict - if dict, wrap in ddict
+        return _setdefault(self.data, dottedkey, default=default)
             
     def __getattr__(self, key):
         try:
@@ -202,18 +270,7 @@ class dottedDict(object):
         return '<dottedDict> %s'%self.data
     
 
-if __name__ == '__main__':
-    d = {'a': [1,2,3], 'b': [ {'a':2, 'b':3 }, {'a':4, 'b':5 }, {'a':6, 'b':7 } ]}
-    D = dottedDict(d)
-    print  D
-    print "D['a.0'] -> ", D['a.0']
-    print "D['b.1.a'] -> ",  D['b.1.a']
-    print "setting D['b.1.a'] = 7"
-    D['b.1.a'] = 7
-    print "D['b.1.a'] -> ",  D['b.1.a']
-    print "D.keys()", D.keys()
-    print "D.dottedkeys()", D.dottedkeys()
-    print "D.items()",D.items()
-    print "D.dotteditems()", D.dotteditems()
+
     
+
     

@@ -27,11 +27,18 @@
   % for ff in f.fields:
       ${field(ff)}
   % endfor
+  % if f.type is 'sequence':
+     <input type="hidden" name="${f.template.name}" value="${fieldtemplate(f.template)}" />
+  % endif
 </fieldset>
 %endif
 </%def>
 
 <%def name="widget(field)">
 <%include file="widgets/${field.widget.widget.__class__.__name__}.html" args="field=field"/>
+</%def>
+
+<%def name="fieldtemplate(f)" filter="h,trim">
+    ${field(f)}
 </%def>
 
