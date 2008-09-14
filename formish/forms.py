@@ -437,7 +437,6 @@ class Form(object):
         Get the data without raising exception and then validate the data. If
         there are errors, raise them; otherwise return the data
         """
-        import wingdbstub
         self.errors = {}
         # Check this request was POSTed by this form.
         if not request.method =='POST' and request.POST.get('__formish_form__',None) == self.name:

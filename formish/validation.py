@@ -27,7 +27,7 @@ def recursive_convert_sequences(d):
         tmp = {}
         for k, v in d.items():
             tmp[k] = recursive_convert_sequences(v)
-        return dottedDict(tmp)
+        return tmp
     intkeys = []
     for key in d.keys():
         intkeys.append(int(key))
@@ -35,7 +35,7 @@ def recursive_convert_sequences(d):
     out = []
     for key in intkeys:
         out.append(recursive_convert_sequences(d[str(key)]))
-    return dottedDict(out)
+    return out
 
 def getNestedProperty(d,dottedkey):
     if dottedkey == '':

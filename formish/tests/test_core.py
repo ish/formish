@@ -174,11 +174,12 @@ class TestFormBuilding(unittest.TestCase):
         name = "Nested Form one"
         request =  Request(name, r)
         R = copy.deepcopy(r)
-        R.pop('__formish_form__')        
+        R.pop('__formish_form__')
         form = Form(schema_nested, name)
-        
-        assert convertRequestDataToData(form.structure, dottedDict(copy.deepcopy(request.POST))) == data
-        assert convertDataToRequestData(form.structure, dottedDict(data)) == R
+        rdtd = convertRequestDataToData(form.structure, dottedDict(copy.deepcopy(request.POST)))
+        assert rdtd == dottedDict(data)
+        dtrd = convertDataToRequestData(form.structure, dottedDict(data))
+        assert dtrd == R
         
         self.assertRaises(validation.FormError, form.validate, request)
 

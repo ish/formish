@@ -102,30 +102,42 @@ NOVALUE = object()
 ##
 # sets a value on a dict  based on a dottedKey - generates keys if not there already
 def _setdefault(data, dottedkey, default=NOARG):
+    # First of all check if we aleady have a value for this key and return it if so...
     try:
         return _get(data,dottedkey)
     except:
         pass
+    # We don't have the value so lets build a list of keys that we need to work on
     keys = str(dottedkey).split('.')
-    d = data
-
+    lastleaf = data
     K = None
+    # Loop on the list of keys up to the next to last one (we already checked the last one at the start of the run)
     for n,key in enumerate(keys[:-1]):
         K = '.'.join(keys[0:n+1])
-        if _has_key(d, K):
-            d = _get(d, K)
-            if not ( isinstance(d, dict) or isinstance(d, list)):
-                continue
-        break
+        # Check to see if the data has this key, if it doesn't then break; if it does then loop again
+        if not _has_key(data, K):
+            break
+        lastkey ='.'.join(keys[0:n+1])
+        restofkeys = keys[n+1:]
+        lastleaf = _get(data, lastkey) 
 
+    # We've drilled in as far as we can go.. 
+    
     if K is None:
+        # if we didn't find a K then we have a new var to set
         data = _setDict(data, keys, default)
     else:
-        if isinstance(d, list) and tryInt(K) == len(d):
-            d.append(_setDict({}, keys[n+1:], default))
-            data = d
+        # We should have a K for which the last segment doesn't exist
+        if isinstance(lastleaf, dict) and len(lastleaf.keys()) == 0 and isInt(keys[n]):
+            _set(data,lastkey,[])
+            lastleaf = _get(data, lastkey)
+        if isinstance(lastleaf, list) and tryInt(keys[n]) == len(lastleaf):
+            lastleaf.append(_setDict({}, keys[n+1:], default))
         else:
-            data = _set(data, K,_setDict(d, keys[n+1:], default))
+            if lastleaf == data:
+                data = _setDict(data, keys, default)
+            else:
+                _setDict(lastleaf, restofkeys, default)
 
             
     return _get(data, dottedkey)

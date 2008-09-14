@@ -38,7 +38,6 @@ class TestDottedDict(unittest.TestCase):
             self.assertRaises(KeyError,dottedDict, test)
             
     def test_convert_dictlist(self):
-        import wingdbstub
         for test in self.test_dictlist_data:
             self.assertEqual(dottedDict(test[0]).data, test[1])
             
@@ -56,7 +55,6 @@ class TestDottedDict(unittest.TestCase):
         self.assertEqual( dottedDict(d).data, dottedDict(dottedDict(d)).data )
         
     def test_setDict(self):
-        import wingdbstub
         # Set dict should return a list if the key is a '0'
         testval = 'test'
         tests = [
@@ -125,7 +123,6 @@ class TestDottedDict(unittest.TestCase):
                 self.assertRaises(KeyError,dd.get, k)
 
     def test_dict_dottedset(self):
-        import wingdbstub
         tests = [
         ( {'list': {}}, ( ('list.0.a',7, {'list':[{'a':7}]}), ) ),
         ( {'list': {'x':{}}}, ( ('list.x.0.a',7, {'list':{'x':[{'a':7}]}}), ) ),
@@ -150,14 +147,19 @@ class TestDottedDict(unittest.TestCase):
 
                 
     def test_setdefault(self):
+        testval = 'test'
         tests = [
-            ( {}, 'list.0.a', 7 ),
-            ( [{'a': 1}],  '1.a', 7 ),
-            ( {'list':[{'a': 1}]},  'list.1.a', 7 ),
+            ( {}, 'one.a', {'one': {'a':testval}} ),
+            ( {}, 'list.0.a', {'list': [ {'a':testval} ] }),
+            ( [{'a': 1}],  '1.a', [{'a':1},{'a':testval}] ),
+            ( {'list':[{'a': 1}]}, 'list.1.a',  {'list': [{'a':1},{'a':testval}] }),
+            ( {'list': {'x':{}}}, 'list.x.0.a', {'list':{'x':[{'a':testval}]}} ), 
+            ( {'one':{'a':1}}, 'one.b', {'one': {'a':1,'b':testval}}),
+            ( {'one': {'a': [''], 'b': ['']}}, 'one.c.x', {'one': {'a': [''], 'b': [''], 'c':{'x':testval}}} ),
             ]
         for data, dottedkey, value in tests:
-            _setdefault(data, dottedkey, value)
-            self.assertEquals(_get(data, dottedkey), value)
+            _setdefault(data, dottedkey, testval)
+            self.assertEquals(data, value)
         
             
 if __name__ == "__main__":
