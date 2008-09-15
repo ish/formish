@@ -1,13 +1,13 @@
 <%def name="field(f)">
 %if f.type is 'field' or (f.type is 'sequence' and f.widget is not None):
 <div id="${f.cssname}-field" class="${f.classes}">
-  %if f.widget.widget.__class__.__name__ != 'Hidden':
+  % if f.widget.widget.__class__.__name__ != 'Hidden':
   <label for="${f.cssname}">${f.title}</label>
   %endif
   <div class="inputs">
     ${widget(f)}
   </div>
-  %if f.widget.widget.__class__.__name__ != 'Hidden':
+  % if f.widget.widget.__class__.__name__ != 'Hidden':
   % if f.error:
   <span class="error">${f.error}</span>
   % endif
@@ -28,7 +28,7 @@
       ${field(ff)}
   % endfor
   % if f.type is 'sequence':
-     <input type="hidden" name="${f.template.name}" value="${fieldtemplate(f.template)}" />
+     <input type="hidden" name="${f.template.name}" class="adder" value="${fieldtemplate(f.template)}" />
   % endif
 </fieldset>
 %endif
@@ -38,7 +38,14 @@
 <%include file="widgets/${field.widget.widget.__class__.__name__}.html" args="field=field"/>
 </%def>
 
-<%def name="fieldtemplate(f)" filter="h,trim">
+<%!
+def b64(text):
+    import base64
+    return base64.b64encode(text)
+%>
+
+
+<%def name="fieldtemplate(f)" filter="b64, trim">
     ${field(f)}
 </%def>
 

@@ -2,7 +2,7 @@ import copy
 import schemaish
 
 from formish import util
-from formish.dottedDict import dottedDict
+from formish.dottedDict import dottedDict, isInt
 from formish.converter import *
 from formish.validation import *
 from formish.widgets import *
@@ -62,6 +62,15 @@ def _isNotEmpty(self,validator):
             self._isNotEmpty(v)
     return False
 
+def starify(name):
+    newname = []
+    for key in name.split('.'):
+        if isInt(key):
+            newname.append('*')
+        else:
+            newname.append(key)
+    name = '.'.join(newname)
+    return name
 
 class Field(object):
     """
@@ -132,8 +141,9 @@ class Field(object):
     @property
     def widget(self):
         """ return the fields widget bound with extra params. """
+        # Loop on the name to work out if any '*' widgets are used
         try:
-            w = self.form[self.name].widget
+            w = self.form[starify(self.name)].widget
         except KeyError:
             w = Input()
         return BoundWidget(w, self)

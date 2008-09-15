@@ -82,13 +82,35 @@ def getForms():
     ##
     # Sequence Struct
     
-    #schema = schemaish.Structure()
-    #schema.add('a',schemaish.Sequence(schemaish.String()))
+    schema = Structure()
+    schema.add('a',Sequence(String()))
     
     
-    #form = formish.Form(schema)
-    #form['a'][0].widget = formish.TextArea()
-    #forms['sequencestruct'] = ('Sequence of Structs', "Sequence of Strings", form)
+    f = Form(schema, 'foo')
+    f.defaults = {'a': ['one','two','three']}
+    f['a.*'].widget = TextArea()
+    forms['sequencestrings'] = ('Sequence of Strings', "Sequence of Strings", f)
+    
+    ##
+    # Sequence of Structs with Sequences
+
+    subschema = Structure()
+    subschema.add('email', String(validator=All(NotEmpty, Email)))
+    subschema.add('first_names', String(validator=NotEmpty))
+    subschema.add('last_name', String(validator=NotEmpty))
+    subschema.add('description', Sequence(String()))
+        
+    
+    schema = Structure()
+    schema.add('a',Sequence(subschema))
+    
+    
+    f = Form(schema, 'foo')
+    f.defaults = {'a': [{'email':'tim@jdi.net','first_names':'Tim','last_name':'Parkin','description':['a']},{}]}
+    forms['sequenceofstructs'] = ('Sequence of Structs', "Sequence of Structs", f)
+        
+
+    
     
     ###
     return forms
@@ -99,7 +121,8 @@ menu = [
     'sequencetextarea',
     'sequencestructurestrings',
     'complexform',
-    #'sequencestruct',
+    'sequencestrings',
+    'sequenceofstructs',
     ]
 
 
