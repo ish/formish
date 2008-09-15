@@ -26,6 +26,17 @@ def _setDict(data, keys, value):
                 data = [value]
             elif isinstance(data, list) and key == len(data):
                 data.append(value)
+            elif isinstance(data, list) and key > len(data):
+                for i in xrange(len(data), key):
+                    if isinstance(value, dict):
+                        data.append({})
+                    elif isinstance(value, list):
+                        data.append([])
+                    else:
+                        data.append(None)
+                data.append(value)
+            elif isinstance(data, list) and key < len(data):
+                data[key] = value
             else:
                 raise KeyError('Can\'t set using an integer key here')
         else:
@@ -36,7 +47,11 @@ def _setDict(data, keys, value):
     else:
         if isInt(keys[0]):
             if isinstance(data, list) or (isinstance(data, dict) and len(data.keys()) == 0):
+                if (isinstance(data, dict) and len(data.keys()) == 0):
+                    # if we're trying to set using an integer key and we currently have an empty dict then make it a list. 
+                    data = []
                 if tryInt(keys[0]) == 0:
+                    # if we have a 0 as the first key, we need to make the data a list...
                     if len(data) == 0:
                         data = [{}]
                     d = _setDict(data[tryInt(keys[0])], keys[1:], value) 
@@ -64,7 +79,15 @@ def copyMultiDict(original):
 def keysort(a,b):
     if len(a) != len(b):
         return cmp(len(a),len(b))
-    return cmp(a[-1], b[-1])
+    for i in xrange(len(a)-1,-1,-1):
+        if a[i] == b[i]:
+            continue
+        if isInt(a[i]):
+            return cmp(int(a[i]), tryInt(b[i]))
+        else:
+            return cmp(a[i], b[i])
+    return 0
+                    
 
 ##
 # Given a dictionary - creates a dotteddict
@@ -160,7 +183,7 @@ def _get(d, dottedkey):
     try:
         for n,key in enumerate(keys):
             d = d[tryInt(key)]
-    except KeyError, e:
+    except (KeyError, TypeError), e:
         raise KeyError('Error accessing dotted key %s - key %s does not exist'%(dottedkey, key))
     return d
     
