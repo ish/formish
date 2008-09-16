@@ -72,7 +72,7 @@ def preParseRequestData(formStructure, requestData, data=None):
     return data
     
 
-class FormsError(Exception):
+class FormishError(Exception):
     """
     Base class for all Forms errors. A single string, message, is accepted and
     stored as an attribute.
@@ -85,14 +85,14 @@ class FormsError(Exception):
         self.message = message
 
 
-class FormError(FormsError):
+class FormError(FormishError):
     """
     Form validation error. Raise this, typically from a submit callback, to
     signal that the form (not an individual field) failed to validate.
     """
     pass
     
-class NoActionError(FormsError):
+class NoActionError(FormishError):
     """
     Form validation error. Raise this, typically from a submit callback, to
     signal that the form (not an individual field) failed to validate.
@@ -100,13 +100,13 @@ class NoActionError(FormsError):
     pass
     
     
-class FieldError(FormsError):
+class FieldError(FormishError):
     """
     Base class for field-related exceptions. The failure message and the failing
     field name are stored as attributes.
     """
     def __init__(self, message, fieldName=None):
-        FormsError.__init__(self, message)
+        FormishError.__init__(self, message)
         self.fieldName = fieldName
 
 class ConversionError(FieldError):
