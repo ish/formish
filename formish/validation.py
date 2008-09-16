@@ -104,9 +104,13 @@ def convertRequestDataToData(formStructure, requestData, data=None, errors=None)
     for field in formStructure.fields:
         try:
             if field.type is 'group' or (field.type == 'sequence' and field.widget is None):
+                if field.type == 'sequence':
+                    # Make sure we have an empty field at least. If we don't do this and there are no items in the list then this key wouldn't appear.
+                    data[field.name] = []
                 convertRequestDataToData(field, requestData, data=data, errors=errors)
             else: 
                 # This needs to be cleverer... 
+                print 'converting ',field.name
                 data[field.name] = field.widget.convert(field.attr,requestData.get(field.name,[]))
         except (schemaish.Invalid, FieldValidationError), e:
             errors[field.name] = e
