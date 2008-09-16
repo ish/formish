@@ -110,7 +110,33 @@ def getForms():
     forms['sequenceofstructs'] = ('Sequence of Structs', "Sequence of Structs", f)
         
 
+    ##
+    # FormBuilder form
     
+    field = Structure()
+    field.add('label',String(validator=NotEmpty))
+    field.add('type',String())
+    field.add('display',String())
+    field.add('required',Boolean())
+    field.add('options', Sequence(String()))
+    field.add('description',String())
+    field.add('name',String())
+    
+    schema = Structure()
+    schema.add('name',String(validator=NotEmpty))
+    schema.add('fields',Sequence(field))
+    
+    f = Form(schema, 'formbuilder')
+    f['fields.*.options'].widget = TextArea()
+    f['fields.*.description'].widget = TextArea()
+    f['fields.*.required'].widget = Checkbox()
+    f['fields.*.type'].widget = SelectChoice(options=[('text','Text'),('date','Date'),('bool','Yes/No')])
+    f['fields.*.display'].widget = SelectChoice(options=[('input','Input'),('textarea','Text Block')])
+    
+    forms['formbuilder'] = ('FormBuilder', "A form to create forms", f)
+       
+    
+
     
     ###
     return forms
@@ -123,6 +149,7 @@ menu = [
     'complexform',
     'sequencestrings',
     'sequenceofstructs',
+    'formbuilder',
     ]
 
 

@@ -9,6 +9,7 @@
   <link href="/css/forms.css" type="text/css" rel="stylesheet" />
   <script src="/js/jquery-1.2.6.min.js" type="text/javascript"></script>
   <script src="/js/jquery.base64.js" type="text/javascript"></script>
+  <script src="/js/jquery-sortable.js" type="text/javascript"></script>
   <script type="text/javascript">
    //<![CDATA[
 
@@ -68,7 +69,11 @@ function construct(start_segments, n, remainder, divider, strip) {
     }
   }
   result.push(n);
-  var out = result.join(divider)+divider+remainder;
+  if (remainder != '') {
+      var out = result.join(divider)+divider+remainder;
+  } else {
+      var out = result.join(divider);
+  }
   return out
 };
 
@@ -195,6 +200,7 @@ function add_mousedown_to_addlinks(o) {
     h.find("legend:contains('*')").text(l);
 
     $(this).before(h);
+    add_sortables($('form'));
     add_remove_buttons($(this).parent().parent());
   });
 };
@@ -207,6 +213,7 @@ function add_remove_buttons(o) {
       x.mousedown(function () {
         $(this).parent().remove();
         renumber_sequences($('form'));
+        add_sortables($('form'));
       });
     };
   });
@@ -217,16 +224,29 @@ function add_remove_buttons(o) {
       x.mousedown(function () {
         $(this).parent().remove();
         renumber_sequences($('form'));
+        add_sortables($('form'));
+
       });
     };
   });
 }
 
+function order_changed(e,ui) {
+  renumber_sequences($('form'));
+}
+
+function add_sortables(o) {
+  //o.find('.sequence > div > label').after('<span class="handle">handle</span>');
+  //o.find('.sequence > fieldset > legend').after('<span class="handle">handle</span>');
+  o.find('.sequence').sortable({'items':'> div','stop':order_changed});
+  
+}
    
 $(document).ready(function() {
     create_addlinks($('form'));
     add_mousedown_to_addlinks($('form'));
     add_remove_buttons($('form'));
+    add_sortables($('form'));
 })
    //]]>
   </script>
