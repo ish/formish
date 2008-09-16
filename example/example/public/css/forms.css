@@ -33,7 +33,7 @@
   color: #555;
 }
 
-.formish-form .error label {
+.formish-form .error > label, .formish-form .error > legend {
   color: #900;
 }
 
@@ -135,6 +135,10 @@
 .formish-form .resttextarea .preview-frame {
   height: 500px;
   width: 80%;
+}
+
+.formish-form fieldset.error {
+  border-color: #900;
 }
 
 /*--- CLEARFIX  ----------------------------------------------------------*/
