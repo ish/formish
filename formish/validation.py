@@ -21,6 +21,8 @@ def convert_sequences(d):
 def recursive_convert_sequences(d):
     if not hasattr(d,'keys'):
         return d
+    if len(d.keys()) == 0:
+        return d
     try:
         k = int(d.keys()[0])
     except ValueError:
@@ -93,6 +95,7 @@ def convertDataToRequestData(formStructure, data, requestData=None, errors=None)
         
 def convertRequestDataToData(formStructure, requestData, data=None, errors=None):
     """ Take a form structure and use it's widgets to convert data to request data """
+    
     if data is None:
         data = {}
     if errors is None:

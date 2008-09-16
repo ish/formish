@@ -265,8 +265,9 @@ class Collection(object):
     @property
     def widget(self):
         """ return the fields widget bound with extra params. """
+        
         try:
-            return BoundWidget(self.form[self.name].widget, self)
+            return BoundWidget(self.form[starify(self.name)].widget, self)
         except KeyError:
             return None
     
@@ -274,6 +275,9 @@ class Collection(object):
     def value(self):
         """Convert the requestData to a value object for the form or None."""
         return self.form._requestData.get(self.name, [None])
+    
+    def __repr__(self):
+        return '<formish %s name="%s">'%(self.type, self.name)
     
 class Group(Collection):
     type = 'group'
@@ -286,10 +290,15 @@ class Sequence(Collection):
         For sequences we check to see if the name is numeric. As names cannot be numeric normally, the first iteration loops 
         on a fields values and spits out a 
         """
-        if self.defaults is None:
+        
+        if self.form._POST is None:
+            v = self.defaults
+        else:
+            v = dottedDict(self.form._POST).get(self.name,[])
+        if v is None:
             num_fields = 0
         else:
-            num_fields = len(self.defaults)
+            num_fields = len(v)
         for n in xrange(num_fields):
             bf = self.bind(n, self.attr.attr)
             yield bf
@@ -332,6 +341,7 @@ class Form(object):
 
     element_name = None
     __requestData = None
+    _POST = None
 
     def __init__(self, structure, name=None, defaults=None, errors=None, action=''):
         """
@@ -437,6 +447,7 @@ class Form(object):
         """ assign data """
         self._defaults = data
         self.__requestData = None
+        self._POST = None
         
     defaults = property(_getDefaults, _setDefaults)
     
@@ -452,6 +463,7 @@ class Form(object):
         if not request.method =='POST' and request.POST.get('__formish_form__',None) == self.name:
             raise Exception("request does not match form name")
         P = request.POST
+        self._POST = request.POST
         for k in P.keys():
             if '*' in k:
                 P.pop(k)
