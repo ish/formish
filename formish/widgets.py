@@ -39,7 +39,8 @@ class Password(Widget):
 class CheckedPassword(Widget):
     
     def pre_render(self, schemaType, data):
-        return [string_converter(schemaType).fromType(data)]
+        password = string_converter(schemaType).fromType(data)
+        return {'password': [password], 'confirm': [password]}
     
     def convert(self, schemaType, data):
         password = data.get('password',[None])[0]
