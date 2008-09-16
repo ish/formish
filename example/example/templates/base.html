@@ -37,31 +37,118 @@ function get_sequence_numbers(segments, l) {
     }
   }
   result.push(l);
-  console.log('built seqnums '+result);
   return result
 }
 
 function replace_stars(original, nums, divider) {
   var result = Array();
-  console.log('original '+original+' ; seqnums = '+seqnums);
   var segments = original.split(divider);
-  console.log('segments '+segments);
-  n = 0;
+  var n = 0;
 
   for each (segment in segments) {
-    console.log('checking '+segment);
-    if (segment == '*' && n < nums.length)   {
-      //console.log('pushing num '+segment);
+    if ((segment == '*' || isNaN(parseInt(segment)) == false) && n < nums.length)   {
+      // If the segment is a * or a number then we check replace it with the right number (the target number is probably right anyway)
       result.push(nums[n]);
       n=n+1;
     } else {
-      //console.log('pushing segment '+segment);
+      // If not then we just push the segment
       result.push(segment);
     }
   }
   return result.join(divider);
 }
 
+function construct(start_segments, n, remainder, divider, strip) {
+  var remainder_bits = remainder.split(divider);
+  var remainder = remainder_bits.slice(1,remainder_bits.length-strip).join(divider);
+  var result = Array();
+  for each (segment in start_segments) {
+    if (segment != '') {
+      result.push(segment);
+    }
+  }
+  result.push(n);
+  var out = result.join(divider)+divider+remainder;
+  return out
+};
+
+function convert_id_to_name(s) {
+  var segments=s.split('-');
+  var out = segments.slice(1,segments.length).join('.');
+  return out
+}
+
+function renumber_sequences(o) {
+  var n = 0;
+  var previous_seqid_prefix = '';
+  o.find('.sequence > div').each( function () {
+    var seqid = $(this).parent().attr('id');
+    var seqid_prefix = seqid.substr(0,seqid.length-5);
+    if (seqid_prefix != previous_seqid_prefix) {
+      n = 0;
+    } else {
+      n=n+1;
+    }    
+    // replace id occurences
+    var thisid = $(this).attr('id');
+    var newid = seqid_prefix + n + '-field';
+    $(this).attr('id',newid);
+    // Replace 'for' occurences
+    $(this).find("[for^='"+seqid_prefix+"']").each( function () {
+      var name = $(this).attr('for');
+      $(this).text(n);
+      var name_remainder = name.substring(seqid_prefix.length, name.length);
+      $(this).attr('for', construct(seqid_prefix.split('-'),n,name_remainder,'-', 1));
+    });
+    // Replace 'id' occurences
+    $(this).find("[id^='"+seqid_prefix+"']").each( function () {
+      var name = $(this).attr('id');
+      var name_remainder = name.substring(seqid_prefix.length, name.length);
+      $(this).attr('id', construct(seqid_prefix.split('-'),n,name_remainder,'-', 1));
+    });
+    // replace 'name' occurences
+    $(this).find("[name^='"+convert_id_to_name(seqid_prefix)+"']").each( function () {
+      var name = $(this).attr('name');
+      var name_remainder = name.substring(convert_id_to_name(seqid_prefix).length, name.length);
+      $(this).attr('name', construct(convert_id_to_name(seqid_prefix).split('.'),n,name_remainder,'.', 1));
+    });
+    previous_seqid_prefix = seqid_prefix;
+  });
+  o.find('.sequence > fieldset').each( function () {
+    var seqid = $(this).parent().attr('id');
+    var seqid_prefix = seqid.substr(0,seqid.length-5);
+    if (seqid_prefix != previous_seqid_prefix) {
+      n = 0;
+    } else {
+      n=n+1;
+    }    
+    // replace id occurences
+    var thisid = $(this).attr('id');
+    $(this).find('> legend').text(n);
+    var newid = seqid_prefix + n + '-field';
+    $(this).attr('id',newid);
+    // Replace 'for' occurences
+    $(this).find("[for^='"+seqid_prefix+"']").each( function () {
+      var name = $(this).attr('for');
+      var name_remainder = name.substring(seqid_prefix.length, name.length);
+      $(this).attr('for', construct(seqid_prefix.split('-'),n,name_remainder,'-', 0));
+    });
+    // Replace 'id' occurences
+    $(this).find("[id^='"+seqid_prefix+"']").each( function () {
+      var name = $(this).attr('id');
+      var name_remainder = name.substring(seqid_prefix.length, name.length);
+      $(this).attr('id', construct(seqid_prefix.split('-'),n,name_remainder,'-', 0));
+    });
+    // replace 'name' occurences
+    $(this).find("[name^='"+convert_id_to_name(seqid_prefix)+"']").each( function () {
+      var name = $(this).attr('name');
+      var name_remainder = name.substring(convert_id_to_name(seqid_prefix).length, name.length);
+      $(this).attr('name', construct(convert_id_to_name(seqid_prefix).split('.'),n,name_remainder,'.',0));
+    });
+    previous_seqid_prefix = seqid_prefix;
+  });
+
+}
 
 function add_mousedown_to_addlinks(o) {
   o.find('.adderlink').mousedown( function() {
@@ -78,7 +165,6 @@ function add_mousedown_to_addlinks(o) {
     segments[ segments.length -1 ] = l;
     var name = segments.join('.');
     var id = $(o).attr('id')+'-'+segments.join('-');
-    //console.log('id = '+id+' ; name = '+name);
     // Decode the base64
     var html = $.base64Decode(code);
     // Add the links and mousedowns to this generated code
@@ -87,21 +173,15 @@ function add_mousedown_to_addlinks(o) {
     add_mousedown_to_addlinks(h);
 
     h.find("[name]").each( function () {
-      console.log('tan '+$(this).attr('name'));
       var newname = replace_stars($(this).attr('name'), seqnums, '.');
       $(this).attr('name', newname );
     });
     
-    //h.find("[name^='"+originalname+"']").each( function () {
-    //  var newname = $(this).attr('name').replace(originalname, name);
-    //  $(this).attr('name', newname );
-    //});
     var newid = replace_stars(h.attr('id'),seqnums,'-')
 
     h.attr('id',newid);
     h.find("[id]").each( function () {
       var newid = replace_stars($(this).attr('id'),seqnums, '-');
-      console.log('###',$(this).attr('id'), newid)
       $(this).attr('id', newid );
     });
     h.find("[for]").each( function () {
@@ -115,13 +195,38 @@ function add_mousedown_to_addlinks(o) {
     h.find("legend:contains('*')").text(l);
 
     $(this).before(h);
+    add_remove_buttons($(this).parent().parent());
   });
 };
+
+function add_remove_buttons(o) {
+  o.find('.sequence > div > label').each( function() {
+    if ($(this).next().text() != 'x') {
+      var x = $('<span class="remove">x</span>');
+      $(this).after(x);
+      x.mousedown(function () {
+        $(this).parent().remove();
+        renumber_sequences($('form'));
+      });
+    };
+  });
+  o.find('.sequence > fieldset > legend').each( function() {
+    if ($(this).next().text() != 'x') {
+      var x = $('<span class="remove">x</span>');
+      $(this).after(x);
+      x.mousedown(function () {
+        $(this).parent().remove();
+        renumber_sequences($('form'));
+      });
+    };
+  });
+}
 
    
 $(document).ready(function() {
     create_addlinks($('form'));
     add_mousedown_to_addlinks($('form'));
+    add_remove_buttons($('form'));
 })
    //]]>
   </script>
