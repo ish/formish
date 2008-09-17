@@ -1,2 +1,6 @@
 <%page args="field" />
-<textarea id="${field.cssname}" name="${field.name}" >${field.value[0]}</textarea>
+<%
+cols = 'cols="%s"'%field.widget.widget.cols
+rows = 'rows="%s"'%field.widget.widget.rows
+%>
+<textarea id="${field.cssname}" name="${field.name}"${cols|n}${rows|n}>${field.value[0]}</textarea>

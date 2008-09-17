@@ -9,28 +9,36 @@ from formish import validation
 from datetime import date, time
 from formish.dottedDict import dottedDict
 
-class NullConverter(object):
+
+class Converter(object):
     
-    def fromType(self, value):
+    def __init__(self, schemaType, **k):
+        self.schemaType = schemaType
+        self.converter_options = k.pop('converter_options', {})
+        
+    def fromType(self, value, converter_options={}):
         if value is None:
             return None
         return value
     
-    def toType(self, value):
+    def toType(self, value, converter_options={}):
         if value is None:
             return None
         return value
 
+class NullConverter(Converter):
+    pass
 
-class NumberToStringConverter(object):
+
+class NumberToStringConverter(Converter):
     cast = None
     
-    def fromType(self, value):
+    def fromType(self, value, converter_options={}):
         if value is None:
             return None
         return str(value)
     
-    def toType(self, value):
+    def toType(self, value, converter_options={}):
         if value is not None:
             value = value.strip()
         if not value:
@@ -60,16 +68,16 @@ if haveDecimal:
 
 
     
-class BooleanToStringConverter(object):
+class BooleanToStringConverter(Converter):
     
-    def fromType(self, value):
+    def fromType(self, value, converter_options={}):
         if value is None:
             return None
         if value:
             return 'True'
         return 'False'
         
-    def toType(self, value):
+    def toType(self, value, converter_options={}):
         if value is not None:
             value = value.strip()
         if not value:
@@ -78,14 +86,14 @@ class BooleanToStringConverter(object):
             raise validation.FieldValidationError('%r should be either True or False'%value)
         return value == 'True'
     
-class DateToStringConverter(object):
+class DateToStringConverter(Converter):
     
-    def fromType(self, value):
+    def fromType(self, value, converter_options={}):
         if value is None:
             return None
         return value.isoformat()
     
-    def toType(self, value):
+    def toType(self, value, converter_options={}):
         if value is not None:
             value = value.strip()
         if not value:
@@ -104,14 +112,14 @@ class DateToStringConverter(object):
         return value
 
 
-class TimeToStringConverter(object):
+class TimeToStringConverter(Converter):
     
-    def fromType(self, value):
+    def fromType(self, value, converter_options={}):
         if value is None:
             return None
         return value.isoformat()
     
-    def toType(self, value):
+    def toType(self, value, converter_options={}):
         if value is not None:
             value = value.strip()
         if not value:
@@ -150,14 +158,14 @@ class TimeToStringConverter(object):
     
     
     
-class DateToDateTupleConverter(object):
+class DateToDateTupleConverter(Converter):
     
-    def fromType(self, value):
+    def fromType(self, value, converter_options={}):
         if value is None:
             return None, None, None
         return value.year, value.month, value.day
         
-    def toType(self, value):
+    def toType(self, value, converter_options={}):
         if value is None:
             return None
         try:
@@ -168,119 +176,173 @@ class DateToDateTupleConverter(object):
         
 
 
-class TupleToStringConverter(object):
-
-    def __init__(self, type):
-        self.type = type
-
-    def fromType(self, value):
-        if value is None:
-            return ""
-        row = [iformal.IStringConvertible(t).fromType(v) for (t,v) in
-                zip(self.type.fields, value)]
-        row = [(i or "").encode("utf-8") for i in row]
-        out = StringIO()
-        csv.writer(out, delimiter=self.type.delimiter).writerow(row)
-        # Return the first line only (the CSV module adds "\r\n").
-        return out.getvalue().decode("utf-8").splitlines()[0]
-
-    def toType(self, value):
-        if value is not None:
-            value = value.strip()
-        if not value:
-            return None
-        value = value.encode("utf-8")
-        row = csv.reader(StringIO(value), delimiter=self.type.delimiter).next()
-        row = [i.strip() for i in row]
-        row = [i.decode("utf-8") for i in row]
-        if len(row) != len(self.type.fields):
-            raise validation.FieldValidationError("Please enter %d values, separated by a %s" % (len(self.type.fields), self.type.delimiter))
-        value = [iformal.IStringConvertible(t).toType(v) for (t,v) in
-                zip(self.type.fields, row)]
-        return tuple(value)
 
 
+def getDialect(delimiter=','):
+    import csv
+    class Dialect(csv.excel):
+        def __init__(self, *a, **k):
+            self.delimiter = k.pop('delimiter',',')
+            csv.excel.__init__(self,*a, **k)
+    return Dialect(delimiter=delimiter)
 
-class SequenceToStringConverter(object):
+def convert_csvrow_to_list(row, converter_options={}):
+    import cStringIO as StringIO
+    import csv
+    dialect = getDialect(delimiter=converter_options.get('delimiter',','))
+    sf = StringIO.StringIO()
+    csvReader = csv.reader(sf, dialect=dialect)
+    sf.write(row)
+    sf.seek(0,0)
+    return csvReader.next()
     
-    def fromType(self, value):
+def convert_list_to_csvrow(l, converter_options={}):
+    import cStringIO as StringIO
+    import csv
+    dialect = getDialect(delimiter=converter_options.get('delimiter',','))
+    sf = StringIO.StringIO()
+    writer = csv.writer(sf, dialect=dialect)
+    writer.writerow(l)
+    sf.seek(0,0)
+    return sf.read().strip()
+
+
+        
+class SequenceToStringConverter(Converter):
+    """ I'd really like to have the converter options on the init but ruledispatch won't let me pass keyword arguments
+    """
+    
+    def __init__(self, schemaType, **k):
+        Converter.__init__(self, schemaType, **k)
+        
+    def fromType(self, value, converter_options={}):
         if value is None:
             return None
-        import cStringIO as StringIO
-        import csv
-
-        sf = StringIO.StringIO()
-        writer = csv.writer(sf)
-        writer.writerow(value)
-        sf.seek(0,0)
-        return sf.read().strip()
+        if isinstance(self.schemaType.attr, schemaish.Sequence):
+            out = []
+            for line in value:
+                lineitems =  [string_converter(self.schemaType.attr.attr).fromType(item) for item in line]
+                linestring = convert_list_to_csvrow(lineitems, converter_options=converter_options)
+                out.append(linestring)
+            return '\n'.join(out)
+        elif isinstance(self.schemaType.attr, schemaish.Tuple):
+            out = []
+            for line in value:
+                lineitems =  [string_converter(self.schemaType.attr.attrs[n]).fromType(item) for n,item in enumerate(line)]
+                linestring = convert_list_to_csvrow(lineitems, converter_options=converter_options)
+                out.append(linestring)
+            return '\n'.join(out)
+ 
+        else:
+            value =  [string_converter(self.schemaType.attr).fromType(v) for v in value]
+            return convert_list_to_csvrow(value, converter_options=converter_options)
         
     
-    def toType(self, value):
+    def toType(self, value, converter_options={}):
         if not value:
             return None
-        import cStringIO as StringIO
-        import csv
+        if isinstance(self.schemaType.attr, schemaish.Sequence):
+            out = []
+            for line in value.split('\n'):
+                l = convert_csvrow_to_list(line, converter_options=converter_options)
+                convl = [string_converter(self.schemaType.attr.attr).toType(v) for v in l]
+                out.append( convl )
+            return out
+        if isinstance(self.schemaType.attr, schemaish.Tuple):
+            out = []
+            for line in value.split('\n'):
+                l = convert_csvrow_to_list(line, converter_options=converter_options)
+                convl = [string_converter(self.schemaType.attr.attrs[n]).toType(v) for n,v in enumerate(l)]
+                out.append( convl )
+            return out
+        else:
+            out = convert_csvrow_to_list(value, converter_options=converter_options)
+            return [string_converter(self.schemaType.attr).toType(v) for v in out]
     
-        sf = StringIO.StringIO()
-        csvReader = csv.reader(sf)
-        sf.write(value)
-        sf.seek(0,0)
-        return csvReader.next()
 
-
+class TupleToStringConverter(Converter):
+    """ I'd really like to have the converter options on the init but ruledispatch won't let me pass keyword arguments
+    """
+    
+    def __init__(self, schemaType, **k):
+        Converter.__init__(self, schemaType, **k)
+        
+    def fromType(self, value, converter_options={}):
+        if value is None:
+            return None
+        lineitems =  [string_converter(self.schemaType.attrs[n]).fromType(item) for n,item in enumerate(value)]
+        linestring = convert_list_to_csvrow(lineitems, converter_options=converter_options)
+        return linestring
+        
+    
+    def toType(self, value, converter_options={}):
+        if not value:
+            return None
+        l = convert_csvrow_to_list(value, converter_options=converter_options)
+        convl = [string_converter(self.schemaType.attrs[n]).toType(v) for n,v in enumerate(l)]
+        return tuple(convl)
+    
+    
 @abstract()
-def string_converter(value):
+def string_converter(schemaType):
     pass
 
 
 @when(string_converter, (schemaish.String,))
-def string_to_string(value):
-    return NullConverter()
+def string_to_string(schemaType):
+    return NullConverter(schemaType)
 
 @when(string_converter, (schemaish.Integer,))
-def int_to_string(value):
-    return IntegerToStringConverter()
+def int_to_string(schemaType):
+    return IntegerToStringConverter(schemaType)
 
 @when(string_converter, (schemaish.Float,))
-def int_to_string(value):
-    return IntegerToStringConverter()
+def int_to_string(schemaType):
+    return IntegerToStringConverter(schemaType)
 
 @when(string_converter, (schemaish.Decimal,))
-def decimal_to_string(value):
-    return DecimalToStringConverter()
+def decimal_to_string(schemaType):
+    return DecimalToStringConverter(schemaType)
 
 @when(string_converter, (schemaish.Date,))
-def date_to_string(value):
-    return DateToStringConverter()
+def date_to_string(schemaType):
+    return DateToStringConverter(schemaType)
 
 @when(string_converter, (schemaish.Time,))
-def time_to_string(value):
-    return TimeToStringConverter()
+def time_to_string(schemaType):
+    return TimeToStringConverter(schemaType)
 
 @when(string_converter, (schemaish.Sequence,))
-def sequence_to_string(value):
-    return SequenceToStringConverter()
+def sequence_to_string(schemaType):
+    return SequenceToStringConverter(schemaType)
+
+@when(string_converter, (schemaish.Tuple,))
+def tuple_to_string(schemaType):
+    return TupleToStringConverter(schemaType)
 
 @when(string_converter, (schemaish.Boolean,))
-def boolean_to_string(value):
-    return BooleanToStringConverter()
+def boolean_to_string(schemaType):
+    return BooleanToStringConverter(schemaType)
+
+
 
 @abstract()
-def datetuple_converter(value):
+def datetuple_converter(schemaType):
     pass
 
 @when(datetuple_converter, (schemaish.Date,))
-def date_to_datetuple(value):
-    return DateToDateTupleConverter()
+def date_to_datetuple(schemaType):
+    return DateToDateTupleConverter(schemaType)
+
+
 
 @abstract()
-def boolean_converter(value):
+def boolean_converter(schemaType):
     pass
 
 @when(boolean_converter, (schemaish.Boolean,))
-def boolean_to_boolean(value):
-    return NullConverter()
+def boolean_to_boolean(schemaType):
+    return NullConverter(schemaType)
 
 
 

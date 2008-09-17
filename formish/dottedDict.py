@@ -226,6 +226,7 @@ class dottedDict(object):
         
     def __setitem__(self,dottedkey, value):
         _setdefault(self.data, dottedkey, value)
+        _set(self.data, dottedkey, value)
         
     def keys(self):
         keys = []

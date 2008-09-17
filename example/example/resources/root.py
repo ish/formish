@@ -80,7 +80,7 @@ def getForms():
     forms['complexform'] = ('Complex Form','The complex form taken from the tests',f)
     
     ##
-    # Sequence Struct
+    # Sequence in Text Boxes
     
     schema = Structure()
     schema.add('a',Sequence(String()))
@@ -89,7 +89,38 @@ def getForms():
     f = Form(schema, 'foo')
     f.defaults = {'a': ['one','two','three']}
     f['a.*'].widget = TextArea()
-    forms['sequencestrings'] = ('Sequence of Strings', "Sequence of Strings", f)
+    forms['textareasequence'] = ('Sequence of Strings', "Sequence of Strings", f)
+
+    ##
+    # Sequence of sequences in Text Boxes
+    schema = Structure()
+    schema.add('a', Sequence(Sequence(Integer())))
+    
+    f= Form(schema, 'foo')
+    f.defaults = {'a': [[1, 2, 3], [4, 5, 6]]}
+    f['a'].widget = TextArea()
+    forms['textareasequencesequence'] = ('TextArea Sequence Sequence','A TextArea containing a sequence of sequences',f)
+
+    ##
+    # Sequence of tuples in Text Boxes
+    schema = Structure()
+    schema.add('a', Sequence(Tuple( (Integer(),String()) )))
+    
+    f= Form(schema, 'foo')
+    f.defaults = {'a': [(1,'a'),(2,'b')]}
+    f['a'].widget = TextArea()
+    forms['textareasequencetuple'] = ('TextArea Sequence Tuple','A TextArea containing a sequence of Tuples',f)
+
+    ##
+    # Tuple in an Input field
+    schema = Structure()
+    schema.add('a', Tuple( (Integer(),String()) ))
+    
+    f= Form(schema, 'foo')
+    f.defaults = {'a': (1,'a')}
+    f['a'].widget = Input()
+    forms['inputtuple'] = ('Input Tuple','A tuple in a basic input field',f)
+        
     
     ##
     # Sequence of Structs with Sequences
@@ -112,29 +143,48 @@ def getForms():
 
     ##
     # FormBuilder form
-    
     field = Structure()
-    field.add('label',String(validator=NotEmpty))
+    field.add('name',String(validator=NotEmpty))
     field.add('type',String())
     field.add('display',String())
     field.add('required',Boolean())
     field.add('options', Sequence(String()))
     field.add('description',String())
-    field.add('name',String())
+    field.add('label',String())
     
     schema = Structure()
     schema.add('name',String(validator=NotEmpty))
     schema.add('fields',Sequence(field))
     
     f = Form(schema, 'formbuilder')
+    display_options = [
+        ('text-input','Input'),
+        ('text-area','Text Block'),
+        ('checkbox','Tick Box'),
+        ('date-parts','Y-M-D'),
+        ('select-choice','Select'),
+        ('radio-choice','Radio Buttons'),
+        ('checkbox-multi-choice','Tick Boxes'),
+        ('text-area-list','Text Box List'),
+    ]
+    field_type_options = [
+        ('string','Text'),
+        ('date','Date'),
+        ('int','Integer'),
+        ('float','Float'),
+        ('bool','Yes/No'),
+        ('list/string','Multiple Strings'),
+        ('list/int','Multiple Integers'),
+    ]
     f['fields.*.options'].widget = TextArea()
     f['fields.*.description'].widget = TextArea()
     f['fields.*.required'].widget = Checkbox()
-    f['fields.*.type'].widget = SelectChoice(options=[('text','Text'),('date','Date'),('bool','Yes/No')])
-    f['fields.*.display'].widget = SelectChoice(options=[('input','Input'),('textarea','Text Block')])
+    f['fields.*.type'].widget = SelectChoice(options=field_type_options)
+    f['fields.*.display'].widget = SelectChoice(options=display_options)
     
     forms['formbuilder'] = ('FormBuilder', "A form to create forms", f)
        
+    
     
 
     
@@ -147,9 +197,12 @@ menu = [
     'sequencetextarea',
     'sequencestructurestrings',
     'complexform',
-    'sequencestrings',
     'sequenceofstructs',
     'formbuilder',
+    'textareasequence',
+    'textareasequencesequence',
+    'textareasequencetuple',
+    'inputtuple',
     ]
 
 
@@ -163,9 +216,14 @@ class RootResource(resource.Resource):
     def root(self, request):
         return {'menu':menu,'forms':self.forms()}
     
+    
     def resource_child(self, request, segments):
+        # Formish builder example code..
+        if segments[0] == 'formishbuilder':
+            return FormishBuilderResource(), segments[1:]
         forms = self.forms()
         return FormResource(forms[segments[0]]), segments[1:]
+    
 
 
 class FormResource(resource.Resource):
@@ -194,4 +252,59 @@ class FormResource(resource.Resource):
             print 'Success! : ',data
         return http.see_other( URL.fromString(request.environ['PATH_INFO']) )
 
+class FormishBuilderResource(resource.Resource):
 
+    def __init__(self):
+        forms = getForms()
+        self.header = 'Formish Builder'
+        self.description = 'Create your Own Form'
+        self.form = forms['formbuilder'][2]
+    
+    @resource.GET()
+    def GET(self, request):
+        return self.render_form(request, self.form)
+
+    @templating.page('formishbuilder.html')
+    def render_form(self, request, form, data={}, fbf=None, fdata={}):
+        return {'header': self.header, 'description': self.description, 'form': form, 'data': data,'fbf':fbf,'fdata':fdata}
+
+    def getFormbuildForm(self, data):
+        from formishbuilder import builder
+        fd = builder.process_formishbuilder_form_definition(data)
+        f = builder.build(fd, name="myform")
+        return f
+    
+    @resource.POST()
+    def POST(self, request):
+        fdata = {}
+        if request.POST['__formish_form__'] == 'myform':
+            import simplejson
+            data = simplejson.loads(request.POST['data'])
+            f = self.getFormbuildForm(data)
+            try:
+                fdata = f.validate(request)
+            except:
+                pass
+            else:
+                f.defaults = {'data':simplejson.dumps(data)}
+
+            form = self.form
+            form.defaults = data
+            data['fields'] = data['fields'][:-1]
+            
+            return self.render_form(request, form, data=data, fbf=f, fdata=fdata)
+            
+        form = self.form
+        try:
+            data = form.validate(request)
+        except FormError, e:
+            return self.render_form(request, form)
+        else:
+            data['fields'].append( {'name':'data','type':'string', 'display':'hidden', 'label':'', 'options':'', 'description':'', 'required':False} )
+            f = self.getFormbuildForm(data)
+            import simplejson
+            f.defaults = {'data':simplejson.dumps(data.data)}
+            data['fields'] = data['fields'][:-1]
+            form.defaults = data
+            return self.render_form(request, form, data=data.data, fbf=f)
+            

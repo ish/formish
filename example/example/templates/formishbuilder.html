@@ -1,0 +1,52 @@
+<%namespace name="formish" file="/formish/Form.html" />
+<%inherit file="base.html"/>
+
+<a href="#formishbuilderform">Jump to built form</a>
+
+<h2>${header}</h2>
+<p>${description}</p>
+
+${formish.form(form)}
+
+% if fbf is not None:
+
+<ul>
+%   for field in data['fields']:
+<li>
+<h3>
+${field['name']} 
+%     if field['label'] is not None:
+( ${field['label']} )
+%     endif
+</h3>
+<dl>
+%     for key, value in field.items():
+%       if key != 'name' and key != 'label':
+  <dt>${key}</dt>
+  <dd>${value}</dd>
+%       endif
+%     endfor
+</dl>
+</li>
+%   endfor
+</ul>
+
+
+
+<div id="formishbuilderform">
+${formish.form(fbf)}
+</div>
+
+% if fdata is not {}:
+% for k,v in fdata.items():
+% if k != 'data':
+  <strong>${k}</strong>: ${v}
+% endif
+% endfor
+% endif
+
+
+% endif
+
+
+<%def name="title()">${header}</%def>

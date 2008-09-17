@@ -7,7 +7,7 @@
 %endif
 %for n, option in enumerate(field.widget.widget.options):
 <div class="radiobutton">
-  <input type="radio" name="${field.name}" id="${field.cssname}-${n}" value="${option[0]}"${field.widget.widget.selected(option,field.value[0],field.attr)} />
+  <input type="radio" name="${field.name}" id="${field.cssname}-${n}" value="${option[0]}"${field.widget.widget.selected(option,field.value[0],field.attr)|n} />
   <label for="${field.cssname}-${n}">${option[1]}</label>
 </div>
 %endfor

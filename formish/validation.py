@@ -110,7 +110,6 @@ def convertRequestDataToData(formStructure, requestData, data=None, errors=None)
                 convertRequestDataToData(field, requestData, data=data, errors=errors)
             else: 
                 # This needs to be cleverer... 
-                print 'converting ',field.name
                 data[field.name] = field.widget.convert(field.attr,requestData.get(field.name,[]))
         except (schemaish.Invalid, FieldValidationError), e:
             errors[field.name] = e

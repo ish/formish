@@ -16,6 +16,9 @@ UNSET = object()
 
 class Widget(object):
     
+    def __init__(self,**k):
+        self.converter_options = k.get('converter_options',{})
+    
     def pre_render(self, schemaType, data):
         return [string_converter(schemaType).fromType(data)]
 
@@ -60,17 +63,18 @@ class Hidden(Widget):
         
 class TextArea(Widget):
     
-    def __init__(self, cols=None, rows=None):
-        if cols is not None:
-            self.cols = cols
-        if rows is not None:
-            self.rows = rows 
-                
+    def __init__(self, **k):
+        self.cols = k.pop('cols', None)
+        self.rows = k.pop('rows', None)
+        Widget.__init__(self, **k)
+        if not self.converter_options.has_key('delimiter'):
+            self.converter_options['delimiter'] = ','
+    
     def pre_render(self, schemaType, data):
-        return [string_converter(schemaType).fromType(data)]
+        return [string_converter(schemaType).fromType(data, converter_options=self.converter_options)]
     
     def convert(self, schemaType, data):
-        return string_converter(schemaType).toType(data[0])
+        return string_converter(schemaType).toType(data[0], converter_options=self.converter_options)
 
     
 class Checkbox(Widget):
@@ -83,7 +87,7 @@ class Checkbox(Widget):
             out='False'
         else:
             out='True'
-        return string_converter(schemaType).toType(out)            
+        return string_converter(schemaType).toType(out)
 
     
 class DateParts(Widget):
