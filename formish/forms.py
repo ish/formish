@@ -1,4 +1,3 @@
-import copy
 import schemaish
 
 from formish import util

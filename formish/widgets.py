@@ -6,7 +6,6 @@ __all__ = ['Input', 'Password', 'CheckedPassword', 'Hidden', 'TextArea',
         'Checkbox', 'DateParts', 'FileUpload', 'SelectChoice', 'RadioChoice',
         'CheckboxMultiChoice']
 
-import cgi
 from formish.converter import *
 from formish.validation import *
 

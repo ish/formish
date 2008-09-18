@@ -1,9 +1,7 @@
 from formish.forms import *
-from formish import validation
 import unittest
 from schemaish import *
-from formish.dottedDict import dottedDict, _setDict, _get, _set, _setdefault
-import copy
+from formish.dottedDict import dottedDict, _setDict, _get, _setdefault
 
 
 class DummyObject():
@@ -169,4 +167,4 @@ class TestDottedDict(unittest.TestCase):
             
 if __name__ == "__main__":
     unittest.main()
- 
+

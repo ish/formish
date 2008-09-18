@@ -7,7 +7,6 @@ except ImportError:
     haveDecimal = False
 from formish import validation
 from datetime import date, time
-from formish.dottedDict import dottedDict
 
 
 class Converter(object):
