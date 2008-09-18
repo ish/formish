@@ -279,6 +279,17 @@ class Collection(object):
     def __repr__(self):
         return '<formish %s name="%s">'%(self.type, self.name)
     
+    def get_field(self, segments):
+        for field in self.fields:
+            if field.name.split('.')[-1] == segments[0]:
+                if isinstance(field, Field):
+                    return field
+                else:
+                    return field.get_field(segments[1:])
+                
+    def __getitem__(self, key):
+        return FormAccessor(self.form, '%s.%s'%(self.name,key))
+    
 class Group(Collection):
     type = 'group'
 
@@ -504,6 +515,15 @@ class Form(object):
     def fields(self):
         return self.structure.fields
     
+    def get_field(self, name):
+        segments = name.split('.')
+        for field in self.fields:
+            if field.name.split('.')[-1] == segments[0]:
+                if isinstance(field, Field):
+                    return field
+                else:
+                    return field.get_field(segments[1:])
+    
     
 class FormAccessor(object):
 
@@ -518,7 +538,10 @@ class FormAccessor(object):
         self.form.set_item_data(self.key, name, value)
 
     def __getattr__(self, name):
-        return self.form.get_item_data(self.key, name)
+        if name == 'field':
+            return self.form.get_field(self.key)
+        else:
+            return self.form.get_item_data(self.key, name)
     
     def __getitem__(self, key):
         return FormAccessor(self.form, key, prefix=self.key)
