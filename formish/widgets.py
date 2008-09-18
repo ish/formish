@@ -42,7 +42,8 @@ class Password(Widget):
 class CheckedPassword(Widget):
     
     def pre_render(self, schemaType, data):
-        return [string_converter(schemaType).fromType(data)]
+        password = string_converter(schemaType).fromType(data)
+        return {'password': [password], 'confirm': [password]}
     
     def convert(self, schemaType, data):
         password = data.get('password',[None])[0]
@@ -111,6 +112,19 @@ class DateParts(Widget):
     
 
 class FileUpload(Widget):
+    """
+    File upload widget.
+
+    fileHandler is any object with the following methods:
+
+        storeFile(self, f)
+            where f is a file instance
+
+        getUrlForFile(self, data)
+            where data is the form item data or a path to a temporary file and
+            is expected to return a URL to access the persisted or temporary
+            data.
+    """
     
     def __init__(self, fileHandler, showImagePreview=False, allowClear=True):
         self.fileHandler = fileHandler
