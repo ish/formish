@@ -141,7 +141,8 @@ class SelectChoice(Widget):
     noneOption = ('', '- choose -')
 
     def __init__(self, options, noneOption=UNSET):
-        if not isinstance(options[0], tuple):
+        options = list(options)
+        if options and not isinstance(options[0], tuple):
             for i, o in enumerate(options):
                 options[i] = (o,o)
         self.options = options
