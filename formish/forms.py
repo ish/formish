@@ -150,6 +150,7 @@ class Field(object):
     @property
     def title(self):
         try:
+            print self.form[self.name].title
             t = self.form[self.name].title
         except KeyError:
             if self.attr.title is not None:
@@ -294,6 +295,7 @@ class Group(Collection):
 
 class Sequence(Collection):
     type = 'sequence'
+    
     @property
     def fields(self):
         """ 

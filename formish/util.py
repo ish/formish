@@ -13,6 +13,11 @@ def title_from_name(name):
     Create a title from an attribute name.
     """
     def _():
+        try:
+            int(name)
+            yield 'Item #%s'%name
+        except ValueError:
+            pass
 
         it = iter(name)
         last = None
