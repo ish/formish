@@ -154,11 +154,7 @@ class SelectChoice(Widget):
     noneOption = ('', '- choose -')
 
     def __init__(self, options, noneOption=UNSET):
-        options = list(options)
-        if options and not isinstance(options[0], tuple):
-            for i, o in enumerate(options):
-                options[i] = (o,o)
-        self.options = options
+        self.options = _normalise_options(options)
         if noneOption is not UNSET:
             self.noneOption = noneOption
             
@@ -180,10 +176,7 @@ class RadioChoice(Widget):
     noneOption = ('', '- choose -')
 
     def __init__(self, options, noneOption=UNSET):
-        if not isinstance(options[0], tuple):
-            for i, o in enumerate(options):
-                options[i] = (o,o)
-        self.options = options
+        self.options = _normalise_options(options)
         if noneOption is not UNSET:
             self.noneOption = noneOption
             
@@ -205,10 +198,7 @@ class RadioChoice(Widget):
 class CheckboxMultiChoice(Widget):
 
     def __init__(self, options):
-        if not isinstance(options[0], tuple):
-            for i, o in enumerate(options):
-                options[i] = (o,o)
-        self.options = options
+        self.options = _normalise_options(options)
             
     def pre_render(self, schemaType, data):
         if data is None: 
@@ -226,4 +216,15 @@ class CheckboxMultiChoice(Widget):
         else:
             return ''
 
+
+def _normalise_options(options):
+    """
+    Return a sequence of (value, label) pairs for all options where each option
+    can be a scalar value or a (value, label) tuple.
+    """
+    for option in options:
+        if isinstance(option, tuple):
+            yield option
+        else:
+            yield (option, option)
 
