@@ -44,3 +44,10 @@ def valid_identifier(name):
     """
     return _IDENTIFIER_REGEX.match(name) is not None
 
+
+def form_in_request(request):
+    """
+    Return the name of the form for the request or None.
+    """
+    return request.POST.get('__formish_form__')
+
