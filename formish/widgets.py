@@ -44,6 +44,8 @@ class Input(Widget):
             d = data[0].strip()
         else:
             d = data[0]
+        if not d:
+            d = None
         return string_converter(schemaType).toType(d)            
 
 class Password(Widget):
@@ -58,6 +60,8 @@ class Password(Widget):
             d = data[0].strip()
         else:
             d = data[0]
+        if not d:
+            d = None
         return string_converter(schemaType).toType(d)
 
    
@@ -78,7 +82,11 @@ class CheckedPassword(Widget):
         confirm = data.get('confirm',[None])[0]
         if self.strip is True:
             password = password.strip()
+            if not password:
+                password = None
             confirm = confirm.strip()
+            if not confirm:
+                confirm = None
         if password != confirm:
             raise FieldValidationError('Password did not match')
         return string_converter(schemaType).toType(password)
@@ -111,6 +119,8 @@ class TextArea(Widget):
             d = data[0].strip()
         else:
             d = data[0]
+        if not d:
+            d = None
         return string_converter(schemaType).toType(d, converter_options=self.converter_options)
 
     

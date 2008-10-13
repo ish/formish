@@ -38,10 +38,9 @@ class NumberToStringConverter(Converter):
         return str(value)
     
     def toType(self, value, converter_options={}):
-        if value is not None:
-            value = value.strip()
-        if not value:
+        if value is None:
             return None
+        value = value.strip()
         # "Cast" the value to the correct type. For some strange reason,
         # Python's decimal.Decimal type raises an ArithmeticError when it's
         # given a dodgy value.
@@ -77,10 +76,9 @@ class BooleanToStringConverter(Converter):
         return 'False'
         
     def toType(self, value, converter_options={}):
-        if value is not None:
-            value = value.strip()
-        if not value:
+        if value is None:
             return None
+        value = value.strip()
         if value not in ('True', 'False'):
             raise validation.FieldValidationError('%r should be either True or False'%value)
         return value == 'True'
@@ -93,10 +91,9 @@ class DateToStringConverter(Converter):
         return value.isoformat()
     
     def toType(self, value, converter_options={}):
-        if value is not None:
-            value = value.strip()
-        if not value:
+        if value is None:
             return None
+        value = value.strip()
         return self.parseDate(value)
         
     def parseDate(self, value):
@@ -119,10 +116,9 @@ class TimeToStringConverter(Converter):
         return value.isoformat()
     
     def toType(self, value, converter_options={}):
-        if value is not None:
-            value = value.strip()
-        if not value:
+        if value is None:
             return None
+        value = value.strip()
         return self.parseTime(value)
         
     def parseTime(self, value):
