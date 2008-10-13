@@ -185,20 +185,20 @@ def getDialect(delimiter=','):
             csv.excel.__init__(self,*a, **k)
     return Dialect(delimiter=delimiter)
 
-def convert_csvrow_to_list(row, converter_options={}):
+def convert_csvrow_to_list(row, delimiter=','):
     import cStringIO as StringIO
     import csv
-    dialect = getDialect(delimiter=converter_options.get('delimiter',','))
+    dialect = getDialect(delimiter=delimiter)
     sf = StringIO.StringIO()
     csvReader = csv.reader(sf, dialect=dialect)
     sf.write(row)
     sf.seek(0,0)
     return csvReader.next()
     
-def convert_list_to_csvrow(l, converter_options={}):
+def convert_list_to_csvrow(l, delimiter=','):
     import cStringIO as StringIO
     import csv
-    dialect = getDialect(delimiter=converter_options.get('delimiter',','))
+    dialect = getDialect(delimiter=delimiter)
     sf = StringIO.StringIO()
     writer = csv.writer(sf, dialect=dialect)
     writer.writerow(l)
@@ -217,47 +217,56 @@ class SequenceToStringConverter(Converter):
     def fromType(self, value, converter_options={}):
         if value is None:
             return None
+        delimiter = converter_options.get('delimiter',',')
         if isinstance(self.schemaType.attr, schemaish.Sequence):
             out = []
             for line in value:
                 lineitems =  [string_converter(self.schemaType.attr.attr).fromType(item) for item in line]
-                linestring = convert_list_to_csvrow(lineitems, converter_options=converter_options)
+                linestring = convert_list_to_csvrow(lineitems, delimiter=delimiter)
                 out.append(linestring)
             return '\n'.join(out)
         elif isinstance(self.schemaType.attr, schemaish.Tuple):
             out = []
             for line in value:
                 lineitems =  [string_converter(self.schemaType.attr.attrs[n]).fromType(item) for n,item in enumerate(line)]
-                linestring = convert_list_to_csvrow(lineitems, converter_options=converter_options)
+                linestring = convert_list_to_csvrow(lineitems, delimiter=delimiter)
                 out.append(linestring)
             return '\n'.join(out)
  
         else:
             value =  [string_converter(self.schemaType.attr).fromType(v) for v in value]
-            return convert_list_to_csvrow(value, converter_options=converter_options)
+            return convert_list_to_csvrow(value, delimiter=delimiter)
         
     
     def toType(self, value, converter_options={}):
         if not value:
             return None
+        delimiter = converter_options.get('delimiter',',')
         if isinstance(self.schemaType.attr, schemaish.Sequence):
             out = []
             for line in value.split('\n'):
-                l = convert_csvrow_to_list(line, converter_options=converter_options)
+                l = convert_csvrow_to_list(line, delimiter=delimiter)
                 convl = [string_converter(self.schemaType.attr.attr).toType(v) for v in l]
                 out.append( convl )
             return out
         if isinstance(self.schemaType.attr, schemaish.Tuple):
             out = []
             for line in value.split('\n'):
-                l = convert_csvrow_to_list(line, converter_options=converter_options)
+                l = convert_csvrow_to_list(line, delimiter=delimiter)
                 convl = [string_converter(self.schemaType.attr.attrs[n]).toType(v) for n,v in enumerate(l)]
                 out.append( convl )
             return out
         else:
-            out = convert_csvrow_to_list(value, converter_options=converter_options)
+            if delimiter != '\n' and len(value.split('\n')) > 1:
+                raise validation.FieldValidationError("More than one line found for csv with delimiter=\'%s\'"%delimiter)
+            if delimiter == '\n':
+                out = value.splitlines()
+            else:
+                out = convert_csvrow_to_list(value, delimiter=delimiter)
+                
             return [string_converter(self.schemaType.attr).toType(v) for v in out]
-    
+
+
 
 class TupleToStringConverter(Converter):
     """ I'd really like to have the converter options on the init but ruledispatch won't let me pass keyword arguments

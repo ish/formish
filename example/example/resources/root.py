@@ -43,7 +43,7 @@ def getForms():
     
     form = Form(schema)
     form.defaults = {'list': ['1','2','3']}
-    form['list'].widget = TextArea()
+    form['list'].widget = TextArea(converter_options={'delimiter':'\n'})
     forms['sequencetextarea'] = ('Sequence TextArea', "A Sequence of String Fields using TextArea widget", form)
     
     ##
@@ -250,7 +250,7 @@ class FormResource(resource.Resource):
             return self.render_form(request, form)
         else:
             print 'Success! : ',data
-        return http.see_other( URL.fromString(request.environ['PATH_INFO']) )
+        return http.see_other( URL(request.environ['PATH_INFO']) )
 
 class FormishBuilderResource(resource.Resource):
 

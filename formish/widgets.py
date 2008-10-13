@@ -17,6 +17,8 @@ class Widget(object):
     
     def __init__(self,**k):
         self.converter_options = k.get('converter_options',{})
+        if not self.converter_options.has_key('delimiter'):
+            self.converter_options['delimiter'] = ','
     
     def pre_render(self, schemaType, data):
         return [string_converter(schemaType).fromType(data)]
@@ -31,7 +33,10 @@ class Widget(object):
 
 
 class Input(Widget):
-    pass
+    def __init__(self,**k):
+        Widget.__init__(self, **k)
+        if not self.converter_options.has_key('delimiter'):
+            self.converter_options['delimiter'] = ','
    
 
 class Password(Widget):
@@ -68,7 +73,7 @@ class TextArea(Widget):
         self.rows = k.pop('rows', None)
         Widget.__init__(self, **k)
         if not self.converter_options.has_key('delimiter'):
-            self.converter_options['delimiter'] = ','
+            self.converter_options['delimiter'] = '\n'
     
     def pre_render(self, schemaType, data):
         return [string_converter(schemaType).fromType(data, converter_options=self.converter_options)]
