@@ -362,7 +362,7 @@ class Form(object):
         
         @param structure:       a Schema Structure attribute to bind to the the form
         @type structure:        Schema Structure Attribute object
-        @param name:            Optional form name used to identify multiple forms on the same page.
+        @param name:            Optional form name used to identify multiple forms on the same page (defaults to 'formish'; can't be empty).
         @type name:             String
         @param defaults:        Defaults to override the standard form widget defaults
         @type defaults:         Dictionary (dotted or nested)
@@ -373,6 +373,8 @@ class Form(object):
         """
         self.structure = Group(None, structure, self)
         self.item_data = {}
+        if not name:
+            name = 'formish'
         self._name = name
         self.defaults = defaults or {}
         self.errors = dottedDict(errors or {})
