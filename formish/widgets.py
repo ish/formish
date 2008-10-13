@@ -34,17 +34,41 @@ class Widget(object):
 
 class Input(Widget):
     def __init__(self,**k):
+        self.strip = k.pop('strip', True)
         Widget.__init__(self, **k)
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
-   
+            
+    def convert(self, schemaType, data):
+        if self.strip is True:
+            d = data[0].strip()
+        else:
+            d = data[0]
+        return string_converter(schemaType).toType(d)            
 
 class Password(Widget):
-    pass
+    def __init__(self,**k):
+        self.strip = k.pop('strip', True)
+        Widget.__init__(self, **k)
+        if not self.converter_options.has_key('delimiter'):
+            self.converter_options['delimiter'] = ','
+            
+    def convert(self, schemaType, data):
+        if self.strip is True:
+            d = data[0].strip()
+        else:
+            d = data[0]
+        return string_converter(schemaType).toType(d)
 
    
 class CheckedPassword(Widget):
-    
+
+    def __init__(self,**k):
+        self.strip = k.pop('strip', True)
+        Widget.__init__(self, **k)
+        if not self.converter_options.has_key('delimiter'):
+            self.converter_options['delimiter'] = ','
+            
     def pre_render(self, schemaType, data):
         password = string_converter(schemaType).fromType(data)
         return {'password': [password], 'confirm': [password]}
@@ -52,6 +76,9 @@ class CheckedPassword(Widget):
     def convert(self, schemaType, data):
         password = data.get('password',[None])[0]
         confirm = data.get('confirm',[None])[0]
+        if self.strip is True:
+            password = password.strip()
+            confirm = confirm.strip()
         if password != confirm:
             raise FieldValidationError('Password did not match')
         return string_converter(schemaType).toType(password)
@@ -71,6 +98,7 @@ class TextArea(Widget):
     def __init__(self, **k):
         self.cols = k.pop('cols', None)
         self.rows = k.pop('rows', None)
+        self.strip = k.pop('strip', True)
         Widget.__init__(self, **k)
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = '\n'
@@ -79,7 +107,11 @@ class TextArea(Widget):
         return [string_converter(schemaType).fromType(data, converter_options=self.converter_options)]
     
     def convert(self, schemaType, data):
-        return string_converter(schemaType).toType(data[0], converter_options=self.converter_options)
+        if self.strip is True:
+            d = data[0].strip()
+        else:
+            d = data[0]
+        return string_converter(schemaType).toType(d, converter_options=self.converter_options)
 
     
 class Checkbox(Widget):
