@@ -70,7 +70,7 @@ function convert_id_to_name(s) {
 function renumber_sequences(o) {
   var n = 0;
   var previous_seqid_prefix = '';
-  o.find('.sequence > div').each( function () {
+  o.find('.sequence.defaultwidget > div').each( function () {
     var seqid = $(this).parent().attr('id');
     var seqid_prefix = seqid.substr(0,seqid.length-5);
     if (seqid_prefix != previous_seqid_prefix) {
@@ -103,7 +103,7 @@ function renumber_sequences(o) {
     });
     previous_seqid_prefix = seqid_prefix;
   });
-  o.find('.sequence > fieldset').each( function () {
+  o.find('.sequence.defaultwidget > fieldset').each( function () {
     var seqid = $(this).parent().attr('id');
     var seqid_prefix = seqid.substr(0,seqid.length-5);
     if (seqid_prefix != previous_seqid_prefix) {
@@ -190,7 +190,7 @@ function add_mousedown_to_addlinks(o) {
 };
 
 function add_remove_buttons(o) {
-  o.find('.sequence > div > label').each( function() {
+  o.find('.sequence.defaultwidget > div > label').each( function() {
     if ($(this).next().text() != 'x') {
       var x = $('<span class="remove">x</span>');
       $(this).after(x);
@@ -201,7 +201,7 @@ function add_remove_buttons(o) {
       });
     };
   });
-  o.find('.sequence > fieldset > legend').each( function() {
+  o.find('.sequence.defaultwidget > fieldset > legend').each( function() {
     if ($(this).next().text() != 'x') {
       var x = $('<span class="remove">x</span>');
       $(this).after(x);
@@ -220,9 +220,9 @@ function order_changed(e,ui) {
 }
 
 function add_sortables(o) {
-  //o.find('.sequence > div > label').after('<span class="handle">handle</span>');
-  //o.find('.sequence > fieldset > legend').after('<span class="handle">handle</span>');
-  o.find('.sequence').sortable({'items':'> div','stop':order_changed});
+  //o.find('.sequence.defaultwidget > div > label').after('<span class="handle">handle</span>');
+  //o.find('.sequence.defaultwidget > fieldset > legend').after('<span class="handle">handle</span>');
+  o.find('.sequence.defaultwidget').sortable({'items':'> div','stop':order_changed});
   
 }
 

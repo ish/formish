@@ -46,7 +46,7 @@ class Input(Widget):
             d = data[0]
         if not d:
             d = None
-        return string_converter(schemaType).toType(d)            
+        return string_converter(schemaType).toType(d)
 
 class Password(Widget):
     def __init__(self,**k):

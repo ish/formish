@@ -37,10 +37,12 @@ def _classes(self):
         ]
     if self.widget is not None:
         classes.append(self.widget.widget.__class__.__name__.lower())
+    else:
+        classes.append('defaultwidget')
     if self.required:
         classes.append('required')
     if self.widget is not None and self.widget.cssClass:
-        classes.append(self.widget.cssClass)        
+        classes.append(self.widget.cssClass)
     if self.error:
         classes.append('error')
     return ' '.join(classes)
@@ -506,7 +508,9 @@ class Form(object):
         try:
             self.structure.attr.validate(data)
         except schemaish.Invalid, e:
-            self.errors = e.error_dict
+            for key, value in e.error_dict.items():
+                if not self.errors.has_key(key):
+                    self.errors[key] = value
         if len(self.errors.keys()) > 0:
             self.__requestData = request_data
             raise FormError('Tried to access data but conversion from request failed with %s errors'%(len(self.errors.keys())))
