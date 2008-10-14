@@ -4,7 +4,7 @@ import unittest
 from schemaish import *
 from formish.dottedDict import dottedDict
 import copy
-
+from webob import MultiDict
 
 class DummyObject():
     pass
@@ -63,13 +63,15 @@ class TestGetDataUsingDottedKey(unittest.TestCase):
 
 
 class Request(object):
+    headers = {'content-type':'text/html'}
     
     def __init__(self, form_name='form', POST=None):
         if POST is None:
             POST = {}
-        self.POST = POST
+        self.POST = MultiDict(POST)
         self.POST['__formish_form__'] = form_name
         self.method = 'POST'
+        
             
 class TestFormBuilding(unittest.TestCase):
     """Build a Form and test that it doesn't raise exceptions on build and that the methods/properties are as expected"""
@@ -169,17 +171,18 @@ class TestFormBuilding(unittest.TestCase):
              ),
             ])
         # Test failing validation
-        r = {'one.a':[''],'one.b': [''],'one.c.x': [''],'one.c.y': ['']}
+        r = {'one.a':'','one.b': '','one.c.x': '','one.c.y': ''}
+        reqr = {'one.a':None,'one.b': None,'one.c.x': None,'one.c.y': None}
+        reqrdata = {'one.a':[''],'one.b': [''],'one.c.x': [''],'one.c.y': ['']}
         data = {'one.a': '', 'one.b': '', 'one.c.x': '', 'one.c.y': ''}
+        
         name = "Nested Form one"
         request =  Request(name, r)
-        R = copy.deepcopy(r)
-        R.pop('__formish_form__')
         form = Form(schema_nested, name)
         rdtd = convertRequestDataToData(form.structure, dottedDict(copy.deepcopy(request.POST)))
-        assert rdtd == dottedDict(data)
+        assert rdtd == dottedDict(reqr)
         dtrd = convertDataToRequestData(form.structure, dottedDict(data))
-        assert dtrd == R
+        assert dtrd == reqrdata
         
         self.assertRaises(validation.FormError, form.validate, request)
 
@@ -199,9 +202,10 @@ class TestFormBuilding(unittest.TestCase):
             ])
         # Test passing validation
         name = "Nested Form two"
-        request = Request(name, {'one.a': ['woot!'], 'one.b': [''], 'one.c.x': [''], 'one.c.y': ['']})
+        request = Request(name, {'one.a': 'woot!', 'one.b': '', 'one.c.x': '', 'one.c.y': ''})
+        reqr = Request(name, {'one.a': ['woot!'], 'one.b': [''], 'one.c.x': [''], 'one.c.y': ['']})
         form = Form(schema_nested, name)
-        self.assert_(form.validate(request) == {'one': {'a':'woot!','b':'', 'c': {'x':'','y':''}}})
+        self.assert_(form.validate(request) == {'one': {'a':u'woot!','b':None, 'c': {'x':None,'y':None}}})
         self.assertEquals(form.errors , {})
 
 
@@ -209,27 +213,26 @@ class TestFormBuilding(unittest.TestCase):
 
     def test_integer_type(self):
         schema_flat = Structure([("a", Integer()), ("b", String())])
-        r = {'a': ['3'], 'b': ['4']}
+        r = {'a': '3', 'b': '4'}
+        reqr = {'a': ['3'], 'b': ['4']}
         name = "Integer Form"
         request = Request(name, r)
         R = copy.deepcopy(r)
-        R.pop('__formish_form__')
         form = Form(schema_flat, name)
         self.assert_(form.structure.attr is schema_flat)
         fd = {'a': 1,'b': '2'}
         form.defaults = fd
         self.assertEquals(form.validate(request), {'a': 3, 'b': '4'})
         self.assertEqual( convertRequestDataToData(form.structure, dottedDict(request.POST)) , {'a': 3, 'b': '4'})
-        self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == R)
+        self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == reqr)
         
           
     def test_datetuple_type(self):
         schema_flat = Structure([("a", Date()), ("b", String())])
-        r = {'a': {'day':[1],'month':[3],'year':[1966]}, 'b': ['4']}
+        r = {'a.day':1,'a.month':3,'a.year':1966, 'b': '4'}
         name = "Date Form"
         request = Request(name, r)
         R = copy.deepcopy(r)
-        R.pop('__formish_form__')
         form = Form(schema_flat, name)
         form['a'].widget = DateParts()
         from datetime import date
@@ -238,7 +241,7 @@ class TestFormBuilding(unittest.TestCase):
         form.defaults = fd
         self.assertEquals(form.validate(request), {'a': d, 'b': '4'})
         self.assertEqual( convertRequestDataToData(form.structure, dottedDict(request.POST)) , dottedDict({'a': d, 'b': '4'}))
-        self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': d, 'b': '4'} )) == R)
+        self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': d, 'b': '4'} )) == dottedDict({'a': {'month': [3], 'day': [1], 'year': [1966]}, 'b': ['4']}))
                
 if __name__ == "__main__":
     unittest.main()

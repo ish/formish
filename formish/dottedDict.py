@@ -1,4 +1,4 @@
-from webob import MultiDict
+from webob import MultiDict, UnicodeMultiDict
 
 
 def isInt(v):
@@ -91,7 +91,7 @@ def keysort(a,b):
 ##
 # Given a dictionary - creates a dotteddict
 def _getDictFromDottedKeyDict(d):
-    if isinstance(d, MultiDict):
+    if isinstance(d, MultiDict) or isinstance(d, UnicodeMultiDict):
         data = copyMultiDict(d)
     else:
         data = d

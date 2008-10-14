@@ -51,3 +51,32 @@ def form_in_request(request):
     """
     return request.POST.get('__formish_form__')
 
+def getPOSTCharset(request):
+    """Locate the unicode encoding of the POST'ed form data.
+
+    To work reliably you must do the following:
+
+      - set the form's enctype attribute to 'multipart/form-data'
+      - set the form's accept-charset attribute, probably to 'utf-8'
+      - add a hidden form field called '_charset_'
+
+    For instance::
+
+      <form action="foo" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+        <input type="hidden" name="_charset_" />
+        ...     
+      </form> 
+    """     
+    # Try the magic '_charset_' field, Mozilla and IE set this.
+    charset = request.POST.get('_charset_',None)
+    if charset:
+        return charset
+
+    # Look in the 'content-type' request header
+    contentType = request.headers.get('content-type')
+    if contentType:
+        charset = dict([ s.strip().split('=') for s in contentType.split(';')[1:] ]).get('charset')
+        if charset:
+            return charset
+
+    return 'utf-8'

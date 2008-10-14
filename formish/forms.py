@@ -1,5 +1,7 @@
 import schemaish
 
+from webob import UnicodeMultiDict
+
 from formish import util
 from formish.dottedDict import dottedDict, isInt
 from formish.converter import *
@@ -150,7 +152,6 @@ class Field(object):
     @property
     def title(self):
         try:
-            print self.form[self.name].title
             t = self.form[self.name].title
         except KeyError:
             if self.attr.title is not None:
@@ -467,21 +468,23 @@ class Form(object):
     
 
 
-    def validate(self, request):
+    def validate(self, raw_request):
         """ 
         Get the data without raising exception and then validate the data. If
         there are errors, raise them; otherwise return the data
         """
         self.errors = {}
         # Check this request was POSTed by this form.
-        if not request.method =='POST' and request.POST.get('__formish_form__',None) == self.name:
+        if not raw_request.method =='POST' and raw_request.POST.get('__formish_form__',None) == self.name:
             raise Exception("request does not match form name")
-        P = request.POST
-        self._POST = request.POST
-        for k in P.keys():
+        P = raw_request.POST
+        self._POST = raw_request.POST
+        
+        requestPOST = UnicodeMultiDict(raw_request.POST, encoding=util.getPOSTCharset(raw_request))
+        for k in requestPOST.keys():
             if '*' in k:
-                P.pop(k)
-        request_data = preParseRequestData(self.structure,dottedDict(request.POST))
+                requestPOST.pop(k)
+        request_data = preParseRequestData(self.structure,dottedDict(requestPOST))
         data = self.get_unvalidated_data(request_data, raiseErrors=False)
         try:
             self.structure.attr.validate(data)
