@@ -187,7 +187,7 @@ class FileUpload(Widget):
         fs = data.get('file',[''])[0]
         if data.get('remove',[None])[0] is not None:
             data['name'] = ['']
-        elif fs is not '':
+        elif fs is not u'':
             data['name'] = [self.fileHandler.storeFile(fs)]
         data['file'] = ['']
         return data

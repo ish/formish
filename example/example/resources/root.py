@@ -6,6 +6,30 @@ from restish.url import URL
 from schemaish import validators as v
 from datetime import date
 forms = {}
+import tempfile, os
+
+class FileHandler(object):
+    """
+    File handler for formish file upload support.
+    """
+
+    def __init__(self, originalurl=None):
+        self.originalurl = originalurl
+
+    def storeFile(self, fs):
+        print fs
+        fileno, filename = tempfile.mkstemp(suffix=fs.filename)
+        fp = os.fdopen(fileno, 'wb')
+        fp.write(fs.value)
+        fp.close()
+        return filename
+
+    def getUrlForFile(self, data):
+        if data is None:
+            return self.originalurl
+        else:
+            return '/filehandler/%s'%data
+
 
 def getForms():
     ##
@@ -22,6 +46,19 @@ def getForms():
     form.description = TextArea()
     
     forms['simple'] = ('Simple Form',"Some simple form fields", form)
+    
+    ##
+    # File Upload
+    
+    schema = Structure()
+    schema.add('file', String())
+    
+    
+    form = Form(schema)
+    form['file'].widget = FileUpload(FileHandler(originalurl='http://localhost'))
+    
+    forms['fileupload'] = ('File Upload',"Simple File Upload example", form)
+        
     
     ##
     # Sequence
@@ -198,6 +235,7 @@ def getForms():
     
 menu = [
     'simple',
+    'fileupload',
     'sequence',
     'sequencetextarea',
     'sequencestructurestrings',
