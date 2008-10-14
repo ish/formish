@@ -352,7 +352,9 @@ class Form(object):
     render and validate data.
     """    
 
-    element_name = None
+    _element_name = None
+    _name = None
+
     __requestData = None
     _POST = None
 
@@ -374,21 +376,36 @@ class Form(object):
         """
         self.structure = Group(None, structure, self)
         self.item_data = {}
-        if not name:
-            name = 'formish'
-        self._name = name
+        self.name = name
         self.defaults = defaults or {}
         self.errors = dottedDict(errors or {})
         self.error = None
         self.actions = []
         self._action = action
-        # Stuff on item_data
 
-    @property
-    def name(self):
-        parts = [self.element_name, self._name]
-        parts = [p for p in parts if p is not None]
-        return '.'.join(parts)
+    def element_name():
+        def get(self):
+            return self._element_name
+        def set(self, name):
+            if self._name is not None:
+                raise Exception("Named forms cannot be used as elements.")
+            self._element_name = name
+        return property(get, set)
+    element_name = element_name()
+
+    def name():
+        def get(self):
+            if self._element_name is not None:
+                return self._element_name
+            if self._name is not None:
+                return self._name
+            return 'formish'
+        def set(self, name):
+            if self._element_name is not None:
+                raise Exception("Named forms cannot be used as elements.")
+            self._name = name
+        return property(get, set)
+    name = name()
 
     def addAction(self, callback, name="submit", label=None):
         """ 
