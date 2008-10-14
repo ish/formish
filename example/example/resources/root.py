@@ -7,7 +7,6 @@ from schemaish import validators as v
 from datetime import date
 forms = {}
 
-
 def getForms():
     ##
     # Simple Form
@@ -16,6 +15,7 @@ def getForms():
     schema.add('email', String(validator=All(NotEmpty, Email)))
     schema.add('first_names', String(validator=NotEmpty))
     schema.add('last_name', String(validator=NotEmpty))
+    schema.add('age', Integer(validator=NotEmpty))
     schema.add('description', String())
     
     form = Form(schema)

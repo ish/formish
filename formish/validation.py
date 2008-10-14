@@ -69,8 +69,9 @@ def validate(structure, requestData, errors=None, keyprefix=None):
             if hasattr(attr[1],'attrs'):
                 validate(attr[1], requestData, errors=errors, keyprefix=newprefix)
             else: 
-                c = convert_sequences(requestData.get(newprefix,None))
-                attr[1].validate(c)
+                if requestData.has_key(newprefix):
+                    c = convert_sequences(requestData[newprefix])
+                    attr[1].validate(c)
         except (schemaish.Invalid, FieldValidationError), e:
             errors[newprefix] = e
     return errors
