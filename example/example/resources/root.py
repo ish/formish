@@ -28,10 +28,15 @@ def getForms():
     
     schema = Structure()
     schema.add('list',Sequence(String()))
+    schema.add('checkboxlist',Sequence(String()))
     
     
     form = Form(schema)
     form.defaults = {'list': ['1','2','3']}
+    
+    form['checkboxlist'].widget = CheckboxMultiChoice([('opt1',"Options 1"),('opt2',"Option 2")])
+    #sd
+    
     forms['sequence'] = ('Sequence', "A Sequence of String Fields", form)
 
     ##

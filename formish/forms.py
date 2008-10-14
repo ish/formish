@@ -37,10 +37,12 @@ def _classes(self):
         ]
     if self.widget is not None:
         classes.append(self.widget.widget.__class__.__name__.lower())
+    else:
+        classes.append('defaultwidget')
     if self.required:
         classes.append('required')
     if self.widget is not None and self.widget.cssClass:
-        classes.append(self.widget.cssClass)        
+        classes.append(self.widget.cssClass)
     if self.error:
         classes.append('error')
     return ' '.join(classes)

@@ -30,11 +30,6 @@ class TestDottedDict(unittest.TestCase):
         """Just checking that converting results in assigning the right dict """
         for test in self.test_dict_data:
             self.assertEqual(dottedDict(test[0]).data, test[1])
-            
-            
-    #def test_complicated(self):
-        #data = {'a.0.last_name': ['Parkin'], 'a.0.email': ['tim@jdi.net'], 'a.2.description.0': [''], 'a.2.description.1': [''], 'a.3.description.2': [''], 'a.3.description.1': [''], 'a.3.description.0': [''], '_charset_': ['UTF-8'], 'a.3.last_name': [''], 'a.3.email': [''], 'a.2.email': [''], 'a.3.first_names': [''], 'a.2.first_names': [''], 'submit': ['Submit'], 'a.2.description.2': [''], 'a.2.last_name': [''], '__formish_form__': ['foo'], 'a.0.description.0': ['a'], 'a.0.first_names': ['Tim'], 'a.1.first_names': [''], 'a.1.last_name': [''], 'a.1.email': ['']}
-        #print dottedDict(data)
         
     def test_convert_error(self):
         for test in self.test_error:
