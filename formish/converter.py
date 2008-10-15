@@ -164,7 +164,11 @@ class DateToDateTupleConverter(Converter):
         if value is None:
             return None
         try:
-            value = date(*[int(v) for v in value])
+            try:
+                V = [int(v) for v in value]
+            except ValueError:
+                raise validation.FieldValidationError('Invalid Number')
+            value = date(*V)
         except (TypeError, ValueError), e:
             raise validation.FieldValidationError('Invalid date: '+str(e))
         return value
