@@ -16,6 +16,7 @@ def title_from_name(name):
         try:
             int(name)
             yield 'Item #%s'%name
+            return
         except ValueError:
             pass
 

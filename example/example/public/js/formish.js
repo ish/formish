@@ -85,7 +85,7 @@ function renumber_sequences(o) {
     // Replace 'for' occurences
     $(this).find("[for^='"+seqid_prefix+"']").each( function () {
       var name = $(this).attr('for');
-      $(this).text(n);
+      //$(this).text(n);
       var name_remainder = name.substring(seqid_prefix.length, name.length);
       $(this).attr('for', construct(seqid_prefix.split('-'),n,name_remainder,'-', 1));
     });
@@ -113,7 +113,7 @@ function renumber_sequences(o) {
     }    
     // replace id occurences
     var thisid = $(this).attr('id');
-    $(this).find('> legend').text(n);
+    //$(this).find('> legend').text(n);
     var newid = seqid_prefix + n + '-field';
     $(this).attr('id',newid);
     // Replace 'for' occurences
@@ -222,7 +222,7 @@ function order_changed(e,ui) {
 function add_sortables(o) {
   //o.find('.sequence.defaultwidget > div > label').after('<span class="handle">handle</span>');
   //o.find('.sequence.defaultwidget > fieldset > legend').after('<span class="handle">handle</span>');
-  o.find('.sequence.defaultwidget').sortable({'items':'> div','stop':order_changed});
+  o.find('.sequence.defaultwidget').sortable({'items':'> .field','stop':order_changed});
   
 }
 
