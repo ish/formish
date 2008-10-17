@@ -327,10 +327,10 @@ class Sequence(Collection):
     
 class BoundWidget(object):
     
-    def __init__(self, widget, field, cssClass=[]):
+    def __init__(self, widget, field):
         self.widget = widget
         self.field = field
-        self.cssClass=cssClass
+        self.cssClass=widget.cssClass
         
     def pre_render(self, schemaType, data):
         return self.widget.pre_render(schemaType, data)

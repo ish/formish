@@ -17,6 +17,7 @@ class Widget(object):
     
     def __init__(self,**k):
         self.converter_options = k.get('converter_options',{})
+        self.cssClass = k.get('cssClass', None)
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
     
@@ -69,6 +70,7 @@ class CheckedPassword(Widget):
 
     def __init__(self,**k):
         self.strip = k.pop('strip', True)
+        self.cssClass = k.pop('cssClass', None)
         Widget.__init__(self, **k)
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
@@ -139,7 +141,8 @@ class Checkbox(Widget):
     
 class DateParts(Widget):
     
-    def __init__(self, dayFirst=False):
+    def __init__(self, dayFirst=False, cssClass=None):
+        self.cssClass = cssClass
         self.dayFirst = dayFirst
         
     def pre_render(self, schemaType, data):
@@ -172,7 +175,8 @@ class FileUpload(Widget):
             data.
     """
     
-    def __init__(self, fileHandler, showImagePreview=False, allowClear=True):
+    def __init__(self, fileHandler, showImagePreview=False, allowClear=True, cssClass=None):
+        self.cssClass = cssClass
         self.fileHandler = fileHandler
         self.showImagePreview = showImagePreview
         self.allowClear = allowClear
@@ -200,7 +204,8 @@ class SelectChoice(Widget):
 
     noneOption = ('', '- choose -')
 
-    def __init__(self, options, noneOption=UNSET):
+    def __init__(self, options, noneOption=UNSET, cssClass=None):
+        self.cssClass = cssClass
         self.options = _normalise_options(options)
         if noneOption is not UNSET:
             self.noneOption = noneOption
@@ -222,7 +227,8 @@ class RadioChoice(Widget):
 
     noneOption = ('', '- choose -')
 
-    def __init__(self, options, noneOption=UNSET):
+    def __init__(self, options, noneOption=UNSET, cssClass=None):
+        self.cssClass = cssClass
         self.options = _normalise_options(options)
         if noneOption is not UNSET:
             self.noneOption = noneOption
@@ -244,7 +250,8 @@ class RadioChoice(Widget):
     
 class CheckboxMultiChoice(Widget):
 
-    def __init__(self, options):
+    def __init__(self, options, cssClass=None):
+        self.cssClass = cssClass
         self.options = _normalise_options(options)
             
     def pre_render(self, schemaType, data):

@@ -43,9 +43,27 @@ def getForms():
     schema.add('description', String())
     
     form = Form(schema)
-    form.description = TextArea()
+    form['description'].widget = TextArea()
     
     forms['simple'] = ('Simple Form',"Some simple form fields", form)
+    
+    
+    ##
+    # Customisations
+    
+    schema = Structure()
+    schema.add('email', String(validator=All(NotEmpty, Email)))
+    schema.add('first_names', String(validator=NotEmpty))
+    schema.add('last_name', String(validator=NotEmpty))
+    schema.add('age', Integer(validator=NotEmpty))
+    schema.add('description', String())
+    
+    form = Form(schema)
+    form['description'].widget = TextArea(cssClass='textytexty')
+    form['age'].widget = Input(cssClass='mycssclass')
+    print form['description'].widget
+    print form['description'].widget.cssClass    
+    forms['customisation'] = ('Customising',"Changing the widgets, adding classes, etc.", form)
     
     ##
     # File Upload
@@ -235,6 +253,7 @@ def getForms():
     
 menu = [
     'simple',
+    'customisation',
     'fileupload',
     'sequence',
     'sequencetextarea',
