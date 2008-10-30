@@ -211,7 +211,7 @@ class dottedDict(object):
         except KeyError, e:
             if default is not NOARG:
                 return default
-            raise KeyError(e.message)
+            return None
         if isinstance(d, dict):
             return dottedDict(d)
         else:
@@ -220,8 +220,12 @@ class dottedDict(object):
 
         
         
-    def __getitem__(self, item):
-        return self.get(item)
+    def __getitem__(self, dottedkey):
+        d = _get(self.data, dottedkey)
+        if isinstance(d, dict):
+            return dottedDict(d)
+        else:
+            return d
         
     def __setitem__(self,dottedkey, value):
         _setdefault(self.data, dottedkey, value)
@@ -249,10 +253,10 @@ class dottedDict(object):
             store.append((key, self[key]))
         return store
     
-    def dottedkeys(self, value=None, store=None, prefix=None):
-        if store is None:
+    def dottedkeys(self, value=NOARG, store=NOARG, prefix=None):
+        if store is NOARG:
             store = []
-        if value is None:
+        if value is NOARG:
             value = self.data
         if not isinstance(value, list) and not isinstance(value,dict):
             store.append(prefix)
