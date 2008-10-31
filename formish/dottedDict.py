@@ -205,20 +205,15 @@ class dottedDict(object):
             else:
                 self.data = _getDictFromDottedKeyDict(value)
             
-    def get(self, dottedkey, default=NOARG):
+    def get(self, dottedkey, default=None):
         try:
             d = _get(self.data, dottedkey)
         except KeyError, e:
-            if default is not NOARG:
-                return default
-            return None
+            return default
         if isinstance(d, dict):
             return dottedDict(d)
         else:
             return d
-        
-
-        
         
     def __getitem__(self, dottedkey):
         d = _get(self.data, dottedkey)

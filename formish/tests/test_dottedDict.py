@@ -113,12 +113,19 @@ class TestDottedDict(unittest.TestCase):
 
         error_tests = [
         ( {'list': {}}, ( ('list.0.a',None), ) ),
+        ( {'list': {}}, ( ('list.0.a', 'foo'), ) ),
         
         ]
+        # Check None's come out
         for d, checkers  in error_tests:
             dd = dottedDict(d)
             for k, v in checkers:
-                self.assertRaises(KeyError,dd.get, k)
+                self.assertEquals(dd.get(k), None)
+        # Check the default comes out
+        for d, checkers  in error_tests:
+            dd = dottedDict(d)
+            for k, v in checkers:
+                self.assertEquals(dd.get(k, v), v)
 
     def test_dict_dottedset(self):
         tests = [
