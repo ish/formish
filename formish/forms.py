@@ -360,7 +360,7 @@ class Form(object):
     __requestData = None
     _POST = None
 
-    def __init__(self, structure, name=None, defaults=None, errors=None, action=''):
+    def __init__(self, structure, name=None, defaults=None, errors=None, action_url=None):
         """
         The form can be initiated with a set of data defaults (using defaults) or with some requestData. The requestData
         can be instantiated in order to set up a partially completed form with data that was persisted in some fashion.
@@ -383,7 +383,7 @@ class Form(object):
         self.errors = dottedDict(errors or {})
         self.error = None
         self.actions = []
-        self._action = action
+        self.action_url = action_url
 
     def element_name():
         def get(self):
