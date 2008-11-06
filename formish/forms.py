@@ -310,10 +310,20 @@ class Sequence(Collection):
             v = self.defaults
         else:
             v = dottedDict(self.form._POST).get(self.name,[])
+            
         if v is None:
             num_fields = 0
         else:
             num_fields = len(v)
+            
+        min = getattr(self.widget.widget, 'min', None)
+        max = getattr(self.widget.widget, 'max', None)
+        if min is not None and num_fields < min:
+            num_fields = min
+        elif max is not None and num_fields > max:
+            num_fields = max
+
+
         for n in xrange(num_fields):
             bf = self.bind(n, self.attr.attr)
             yield bf
@@ -331,6 +341,7 @@ class BoundWidget(object):
         self.widget = widget
         self.field = field
         self.cssClass=widget.cssClass
+        self.converttostring = widget.converttostring
         
     def pre_render(self, schemaType, data):
         return self.widget.pre_render(schemaType, data)
@@ -360,7 +371,7 @@ class Form(object):
     __requestData = None
     _POST = None
 
-    def __init__(self, structure, name=None, defaults=None, errors=None, action_url=None):
+    def __init__(self, structure, name=None, defaults=None, errors=None, action_url=None, embed_schema=False):
         """
         The form can be initiated with a set of data defaults (using defaults) or with some requestData. The requestData
         can be instantiated in order to set up a partially completed form with data that was persisted in some fashion.
@@ -384,7 +395,15 @@ class Form(object):
         self.error = None
         self.actions = []
         self.action_url = action_url
+        self.embed_schema = embed_schema
 
+    # This hasn't been implemented yet but this is roughly how it should be.. if we can implement the formish builder function - most of the rest is done
+    ##def schema_json(self):
+        ##schema = self.structure.attrs[0]
+        ##import formishbuilder
+        ##return formishbuilder.convert_schema_to_fb_json(schema)
+        
+        
     def element_name():
         def get(self):
             return self._element_name

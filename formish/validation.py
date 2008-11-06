@@ -54,13 +54,14 @@ def getNestedProperty(d,dottedkey):
     except (KeyError, IndexError):
         return None
 
-def validate(structure, requestData, errors=None, keyprefix=None):   
+def validate(structure, requestData, errors=None, keyprefix=None):
     """ Take a schemaish structure and use it's validators to return any errors"""
     if errors is None:
         errors = dottedDict()
     # Use formencode to validate each field in the schema, return 
     # a dictionary of errors keyed by field name
     for attr in structure.attrs:
+        # function is recursive so we have to build up a full key
         if keyprefix is None:
             newprefix = attr[0]
         else:
@@ -84,7 +85,7 @@ def convertDataToRequestData(formStructure, data, requestData=None, errors=None)
         errors = dottedDict()
     for field in formStructure.fields:
         try:
-            if field.type is 'group' or (field.type is 'sequence' and field.widget is None):
+            if field.type is 'group' or (field.type is 'sequence' and (field.widget is None or field.widget.converttostring is False)):
                 convertDataToRequestData(field, data, requestData=requestData, errors=errors)
             else:
                 d = getNestedProperty(data, field.name)
@@ -104,7 +105,7 @@ def convertRequestDataToData(formStructure, requestData, data=None, errors=None)
 
     for field in formStructure.fields:
         try:
-            if field.type is 'group' or (field.type == 'sequence' and field.widget is None):
+            if field.type is 'group' or (field.type == 'sequence' and (field.widget is None or field.widget.converttostring is False)):
                 if field.type == 'sequence':
                     # Make sure we have an empty field at least. If we don't do this and there are no items in the list then this key wouldn't appear.
                     data[field.name] = []
