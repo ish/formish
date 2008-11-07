@@ -292,6 +292,9 @@ class dottedDict(object):
         
     def has_key(self, key):
         return key in self.keys()
+    
+    def __contains__(self, key):
+        return key in self.keys()
 
     def has_dottedkey(self, dottedkey):
         try:
