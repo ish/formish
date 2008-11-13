@@ -315,8 +315,11 @@ class Sequence(Collection):
         else:
             num_fields = len(v)
             
-        min = getattr(self.widget.widget, 'min', None)
-        max = getattr(self.widget.widget, 'max', None)
+        min=None
+        max=None
+        if self.widget is not None:
+            min = getattr(self.widget.widget, 'min', None)
+            max = getattr(self.widget.widget, 'max', None)
         if min is not None and num_fields < min:
             num_fields = min
         elif max is not None and num_fields > max:
