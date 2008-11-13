@@ -11,15 +11,14 @@ from formish.widgets import *
 
 class Action(object):
     """ Tracks an action that has been added to a form. """
-    def __init__(self, callback, name, label):
+    def __init__(self, name, label):
 
         if not util.valid_identifier(name):
             raise FormError('Invalid action name %r.'%name)
 
-        self.callback = callback
         self.name = name
         if label is None:
-            self.label = util.titleFromName(name)
+            self.label = util.title_from_name(name)
         else:
             self.label = label
 
@@ -428,12 +427,11 @@ class Form(object):
         return property(get, set)
     name = name()
 
-    def addAction(self, callback, name="submit", label=None):
+    def addAction(self, name, label=None):
         """ 
         Add an action object to the form
         
-        @param callback:       A function to call if this action is triggered
-        @type callback:        Function or Method
+
         @param name:           The identifier for this action
         @type name:            Python identifier string
         @param label:          Use this label instead of the name for the value (label) of the action
@@ -442,17 +440,7 @@ class Form(object):
         """
         if name in [action.name for action in self.actions]:
             raise ValueError('Action with name %r already exists.' % name)
-        self.actions.append( Action(callback, name, label) )              
-
-    def action(self, request):
-        """ Find and call the action callback for the action used """
-        if len(self.actions)==0:
-            raise NoActionError('The form does not have any actions')
-        for action in self.actions:
-            if action.name in request.POST.keys():
-                return action.callback(request, self)
-        return self.actions[0].callback(request, self)
-            
+        self.actions.append( Action(name, label) )              
 
 
     def get_unvalidated_data(self, request_data, raiseErrors=True):
