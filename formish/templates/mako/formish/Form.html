@@ -10,8 +10,15 @@
 
 
 <%def name="header(form)">
-
-<form id="${form.name}" action="${form.action_url or url.abs}" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+<%
+if form.action_url:
+    action_url = form_action_url
+elif hasattr(url,'abs'):
+    action_url = url.abs
+else:
+    action_url = ''
+%>
+<form id="${form.name}" action="${action_url}" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">
   <div>
     <input type="hidden" name="_charset_" />
     <input type="hidden" name="__formish_form__" value="${form.name}" />

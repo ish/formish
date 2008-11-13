@@ -11,11 +11,11 @@ from formish.widgets import *
 
 class Action(object):
     """ Tracks an action that has been added to a form. """
-    def __init__(self, name, label):
+    def __init__(self, callback, name, label):
 
         if not util.valid_identifier(name):
             raise FormError('Invalid action name %r.'%name)
-
+        self.callback = callback
         self.name = name
         if label is None:
             self.label = util.title_from_name(name)
