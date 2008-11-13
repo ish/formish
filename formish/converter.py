@@ -157,7 +157,7 @@ class DateToDateTupleConverter(Converter):
     
     def fromType(self, value, converter_options={}):
         if value is None:
-            return None, None, None
+            return None
         return value.year, value.month, value.day
         
     def toType(self, value, converter_options={}):
