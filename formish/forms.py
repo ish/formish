@@ -430,11 +430,12 @@ class Form(object):
         return property(get, set)
     name = name()
 
-    def addAction(self, name, label=None):
+    def addAction(self, callback, name="submit", label=None):
         """ 
         Add an action object to the form
         
-
+        @param callback:       A function to call if this action is triggered
+        @type callback:        Function or Method
         @param name:           The identifier for this action
         @type name:            Python identifier string
         @param label:          Use this label instead of the name for the value (label) of the action
@@ -443,7 +444,16 @@ class Form(object):
         """
         if name in [action.name for action in self.actions]:
             raise ValueError('Action with name %r already exists.' % name)
-        self.actions.append( Action(name, label) )              
+        self.actions.append( Action(callback, name, label) )              
+
+    def action(self, request):
+        """ Find and call the action callback for the action used """
+        if len(self.actions)==0:
+            raise NoActionError('The form does not have any actions')
+        for action in self.actions:
+            if action.name in request.POST.keys():
+                return action.callback(request, self)
+        return self.actions[0].callback(request, self)
 
 
     def get_unvalidated_data(self, request_data, raiseErrors=True):
