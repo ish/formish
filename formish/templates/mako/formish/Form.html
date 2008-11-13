@@ -12,7 +12,7 @@
 <%def name="header(form)">
 <%
 if form.action_url:
-    action_url = form_action_url
+    action_url = form.action_url
 elif hasattr(url,'abs'):
     action_url = url.abs
 else:
