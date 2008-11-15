@@ -446,13 +446,13 @@ class Form(object):
             raise ValueError('Action with name %r already exists.' % name)
         self.actions.append( Action(callback, name, label) )              
 
-    def action(self, request):
+    def action(self, request, *args):
         """ Find and call the action callback for the action used """
         if len(self.actions)==0:
             raise NoActionError('The form does not have any actions')
         for action in self.actions:
             if action.name in request.POST.keys():
-                return action.callback(request, self)
+                return action.callback(request,self)
         return self.actions[0].callback(request, self)
 
 

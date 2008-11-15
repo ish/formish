@@ -234,11 +234,19 @@ class SelectChoice(Widget):
         return string_converter(schemaType).toType(data[0])
 
     def selected(self, option, value, schemaType):
-        if option[0] == self.convert(schemaType,[value]):
+        if option[0] == value:
             return ' selected="selected"'
         else:
             return ''
 
+    def get_options(self, schemaType):
+        options = []
+        for value, label in self.options:
+            options.append( (string_converter(schemaType).fromType(value),label) )
+        return options
+    
+    def get_noneOption(self, schemaType):
+        return (string_converter(schemaType).fromType(self.noneOption[0]), self.noneOption[1])
     
 class RadioChoice(Widget):
 
@@ -294,6 +302,8 @@ def _normalise_options(options):
     Return a sequence of (value, label) pairs for all options where each option
     can be a scalar value or a (value, label) tuple.
     """
+    if hasattr(options, '__call__'):
+        options = options()
     for option in options:
         if isinstance(option, tuple):
             yield option

@@ -60,9 +60,7 @@ def getForms():
     
     form = Form(schema)
     form['description'].widget = TextArea(cssClass='textytexty')
-    form['age'].widget = Input(cssClass='mycssclass')
-    print form['description'].widget
-    print form['description'].widget.cssClass    
+    form['age'].widget = Input(cssClass='mycssclass') 
     forms['customisation'] = ('Customising',"Changing the widgets, adding classes, etc.", form)
     
     ##
@@ -181,6 +179,29 @@ def getForms():
     f['a'].widget = Input()
     forms['inputtuple'] = ('Input Tuple','A tuple in a basic input field',f)
         
+
+    ##
+    # Tuple in an Select Choice field
+    schema = Structure()
+    schema.add('a', Tuple( (Integer(),String()) ))
+    
+    f= Form(schema, 'foo')
+    f.defaults = {'a': (1,'a')}
+    f['a'].widget = SelectChoice(options=[((1,'a'),'ONEA'),((2,'b'),'TWOB')])
+    forms['selecttuple'] = ('Select Tuple','A tuple in a select choice',f)
+        
+
+    ##
+    # Tuple in an Select Choice field
+    schema = Structure()
+    schema.add('a', Tuple( (Integer(),String()) ))
+    schema.add('b', String(validator=NotEmpty))
+    
+    f= Form(schema, 'foo')
+    f.defaults = {'a': (1,'a')}
+    f['a'].widget = SelectChoice(options=[((1,'a'),'ONEA'),((2,'b'),'TWOB')],noneOption=((0,'x'),'None'))
+    forms['selecttuplenoneoption'] = ('Select Tuple','A tuple in a select choice with none option',f)
+            
     
     ##
     # Sequence of Structs with Sequences
@@ -265,6 +286,8 @@ menu = [
     'textareasequencesequence',
     'textareasequencetuple',
     'inputtuple',
+    'selecttuple',
+    'selecttuplenoneoption',
     ]
 
 
