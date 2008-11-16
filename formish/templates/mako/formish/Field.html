@@ -9,7 +9,7 @@
   </div>
   % if f.widget.widget.__class__.__name__ != 'Hidden':
   % if f.error:
-  <span class="error">${f.error}</span>
+  <span class="error">${unicode(f.error)}</span>
   % endif
   % if f.description:
   <span class="description">${f.description}</span>

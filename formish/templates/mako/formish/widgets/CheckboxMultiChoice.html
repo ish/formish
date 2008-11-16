@@ -15,7 +15,7 @@
   </div>
   % if field.widget.widget.__class__.__name__ != 'Hidden':
   % if field.error:
-  <span class="error">${field.error}</span>
+  <span class="error">${unicode(field.error)}</span>
   % endif
   % if field.description:
   <span class="description">${field.description}</span>

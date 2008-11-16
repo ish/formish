@@ -23,7 +23,10 @@ class Widget(object):
             self.converter_options['delimiter'] = ','
     
     def pre_render(self, schemaType, data):
-        return [string_converter(schemaType).fromType(data)]
+        data = string_converter(schemaType).fromType(data)
+        if data is None:
+            return ['']
+        return [data]
 
     # ??: Should the validate be here? Confused
     def validate(self, data):
@@ -77,12 +80,14 @@ class CheckedPassword(Widget):
             self.converter_options['delimiter'] = ','
             
     def pre_render(self, schemaType, data):
-        password = string_converter(schemaType).fromType(data)
+        data = string_converter(schemaType).fromType(data)
+        if data is None:
+            return {'password': [''], 'confirm': ['']}
         return {'password': [password], 'confirm': [password]}
     
     def convert(self, schemaType, data):
-        password = data.get('password',[None])[0]
-        confirm = data.get('confirm',[None])[0]
+        password = data['password'][0]
+        confirm = data['confirm'][0]
         if self.strip is True:
             password = password.strip()
             if not password:
@@ -96,12 +101,8 @@ class CheckedPassword(Widget):
 
 
 class Hidden(Widget):
-    
-    def pre_render(self, schemaType, data):
-        return [string_converter(schemaType).fromType(data)]
-    
-    def convert(self, schemaType, data):
-        return string_converter(schemaType).toType(data[0])
+    pass
+
 
 class SequenceDefault(Widget):
 
@@ -127,7 +128,10 @@ class TextArea(Widget):
             self.converter_options['delimiter'] = '\n'
     
     def pre_render(self, schemaType, data):
-        return [string_converter(schemaType).fromType(data, converter_options=self.converter_options)]
+        data = string_converter(schemaType).fromType(data, converter_options=self.converter_options)
+        if data is None:
+            return ['']
+        return [data]
     
     def convert(self, schemaType, data):
         if self.strip is True:
@@ -141,9 +145,6 @@ class TextArea(Widget):
     
 class Checkbox(Widget):
 
-    def pre_render(self, schemaType, data):
-        return [string_converter(schemaType).fromType(data)]
-    
     def convert(self, schemaType, data):
         if len(data) == 0:
             out='False'
@@ -161,11 +162,9 @@ class DateParts(Widget):
         
     def pre_render(self, schemaType, data):
         data = datetuple_converter(schemaType).fromType(data)
-        d = {}
-        d['year'] = [data[0]]
-        d['month'] = [data[1]]
-        d['day'] = [data[2]]
-        return d
+        if data is None:
+            return {'year': [''], 'month': [''], 'day': ['']}
+        return {'year': [data[0]], 'month': [data[1]], 'day': [data[2]]}
     
     def convert(self, schemaType, data):
         year = data.get('year', [''])[0]
@@ -226,13 +225,6 @@ class SelectChoice(Widget):
         if noneOption is not UNSET:
             self.noneOption = noneOption
             
-            
-    def pre_render(self, schemaType, data):
-        return [string_converter(schemaType).fromType(data)]
-    
-    def convert(self, schemaType, data):
-        return string_converter(schemaType).toType(data[0])
-
     def selected(self, option, value, schemaType):
         if option[0] == value:
             return ' selected="selected"'
@@ -259,13 +251,10 @@ class RadioChoice(Widget):
         if noneOption is not UNSET:
             self.noneOption = noneOption
             
-    def pre_render(self, schemaType, data):
-        return [string_converter(schemaType).fromType(data)]
-    
     def convert(self, schemaType, data):
-        if len(data) == 0:
-            return []
-        return string_converter(schemaType).toType(data[0])
+        if not data:
+            data = ['']
+        return super(RadioChoice, self).convert(schemaType, data)
 
     def selected(self, option, value, schemaType):
         if option[0] == self.convert(schemaType,[value]):
