@@ -157,7 +157,7 @@ class DateToDateTupleConverter(Converter):
     
     def fromType(self, value, converter_options={}):
         if value is None:
-            return None, None, None
+            return None
         return value.year, value.month, value.day
         
     def toType(self, value, converter_options={}):
@@ -276,17 +276,20 @@ class TupleToStringConverter(Converter):
         Converter.__init__(self, schemaType, **k)
         
     def fromType(self, value, converter_options={}):
+        delimiter = converter_options.get('delimiter',',')
         if value is None:
             return None
         lineitems =  [string_converter(self.schemaType.attrs[n]).fromType(item) for n,item in enumerate(value)]
-        linestring = convert_list_to_csvrow(lineitems, converter_options=converter_options)
+        linestring = convert_list_to_csvrow(lineitems, delimiter=delimiter)
+
         return linestring
         
     
     def toType(self, value, converter_options={}):
+        delimiter = converter_options.get('delimiter',',')
         if not value:
             return None
-        l = convert_csvrow_to_list(value, converter_options=converter_options)
+        l = convert_csvrow_to_list(value, delimiter=delimiter)
         convl = [string_converter(self.schemaType.attrs[n]).toType(v) for n,v in enumerate(l)]
         return tuple(convl)
     

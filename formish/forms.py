@@ -123,7 +123,7 @@ class Field(object):
         """Convert the requestData to a value object for the form or None."""
         if '*' in self.name:
             return [None]
-        return self.form._requestData.get(self.name, [None])
+        return self.form._requestData[self.name]
 
     @property
     def defaults(self):
@@ -133,7 +133,6 @@ class Field(object):
             return defaults
         except KeyError:
             return None
-            
     
     @property
     def error(self):
@@ -276,7 +275,7 @@ class Collection(object):
     @property
     def value(self):
         """Convert the requestData to a value object for the form or None."""
-        return self.form._requestData.get(self.name, [None])
+        return self.form._requestData[self.name]
     
     def __repr__(self):
         return '<formish %s name="%s">'%(self.type, self.name)
@@ -446,13 +445,13 @@ class Form(object):
             raise ValueError('Action with name %r already exists.' % name)
         self.actions.append( Action(callback, name, label) )              
 
-    def action(self, request):
+    def action(self, request, *args):
         """ Find and call the action callback for the action used """
         if len(self.actions)==0:
             raise NoActionError('The form does not have any actions')
         for action in self.actions:
             if action.name in request.POST.keys():
-                return action.callback(request, self)
+                return action.callback(request,self)
         return self.actions[0].callback(request, self)
 
 

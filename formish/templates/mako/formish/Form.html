@@ -30,7 +30,7 @@ else:
 
 <%def name="errors(form)">
     %if form.error is not None:
-      <p class="error">${form.error}</p>
+      <p class="error">${unicode(form.error)}</p>
     %endif
 </%def>
 
