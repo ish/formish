@@ -2,7 +2,6 @@
 import os
 import pkg_resources
 
-from mako.lookup import TemplateLookup
 from pylons import config
 
 import example.lib.app_globals as app_globals

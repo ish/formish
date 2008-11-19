@@ -83,11 +83,13 @@
   margin-right: 0.5em;
 }
 
+.formish-form .checkboxmultichoicetree .inputs,
 .formish-form .checkboxmultichoice .inputs {
   clear: both;
 }
 
-.formish-form .checkboxmultichoice .inputs label {
+.formish-form .checkboxmultichoice .inputs label,
+.formish-form .checkboxmultichoicetree .inputs label {
   margin-left:10px;
   font-size:80%;
   font-style:italic;

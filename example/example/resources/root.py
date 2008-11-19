@@ -8,6 +8,11 @@ from datetime import date
 forms = {}
 import tempfile, os
 
+def make_form(request, *args, **kwargs):
+    kwargs['renderer'] = request.environ['restish.templating.renderer']
+    return Form(*args, **kwargs)
+
+
 class FileHandler(object):
     """
     File handler for formish file upload support.
@@ -31,7 +36,7 @@ class FileHandler(object):
             return '/filehandler/%s'%data
 
 
-def getForms():
+def getForms(request):
     ##
     # Simple Form
     
@@ -42,7 +47,7 @@ def getForms():
     schema.add('age', Integer(validator=NotEmpty))
     schema.add('description', String())
     
-    form = Form(schema)
+    form = make_form(request,schema)
     form['description'].widget = TextArea()
     
     forms['simple'] = ('Simple Form',"Some simple form fields", form)
@@ -58,7 +63,7 @@ def getForms():
     schema.add('age', Integer(validator=NotEmpty))
     schema.add('description', String())
     
-    form = Form(schema)
+    form = make_form(request,schema)
     form['description'].widget = TextArea(cssClass='textytexty')
     form['age'].widget = Input(cssClass='mycssclass') 
     forms['customisation'] = ('Customising',"Changing the widgets, adding classes, etc.", form)
@@ -70,7 +75,7 @@ def getForms():
     schema.add('file', String())
     
     
-    form = Form(schema)
+    form = make_form(request,schema)
     form['file'].widget = FileUpload(FileHandler(originalurl='http://localhost'))
     
     forms['fileupload'] = ('File Upload',"Simple File Upload example", form)
@@ -84,7 +89,7 @@ def getForms():
     schema.add('checkboxlist',Sequence(String()))
     
     
-    form = Form(schema)
+    form = make_form(request,schema)
     form.defaults = {'list': ['1','2','3']}
     
     form['checkboxlist'].widget = CheckboxMultiChoice([('opt1',"Options 1"),('opt2',"Option 2")])
@@ -99,7 +104,7 @@ def getForms():
     schema.add('list',Sequence(String()))
     
     
-    form = Form(schema)
+    form = make_form(request,schema)
     form.defaults = {'list': ['1','2','3']}
     form['list'].widget = TextArea(converter_options={'delimiter':'\n'})
     forms['sequencetextarea'] = ('Sequence TextArea', "A Sequence of String Fields using TextArea widget", form)
@@ -113,7 +118,7 @@ def getForms():
     strings.add('b',String())
     schema.add('list',Sequence(strings))
     
-    form = Form(schema)
+    form = make_form(request,schema)
     form.defaults = {'list': [{'a':1,'b':2},{'a':3,'b':4}]}
     forms['sequencestructurestrings'] = ('Sequence of Structures', "A Sequence of Structures each containing two string fields", form)
     
@@ -124,7 +129,7 @@ def getForms():
     one = Structure([("a", String(validator=v.Email(not_empty=True))), ("b", String()), ("c", Sequence(Integer(validator=v.NotEmpty())))])
     two = Structure([("a", String()), ("b", Date()), ('c', Sequence(String())), ("d", String()), ("e", Integer(validator=v.NotEmpty())), ("f", String(validator=v.NotEmpty())) ])
     schema = Structure([("one", one), ("two", two)])
-    f = Form(schema,name="form")
+    f = make_form(request,schema,name="form")
 
     f['one.b'].widget = TextArea()
     f['two.a'].widget = SelectChoice([('opt1',"Options 1"),('opt2',"Option 2")], noneOption=('-select option-',None))
@@ -144,7 +149,7 @@ def getForms():
     schema.add('a',Sequence(String()))
     
     
-    f = Form(schema, 'foo')
+    f = make_form(request,schema, 'foo')
     f.defaults = {'a': ['one','two','three']}
     f['a.*'].widget = TextArea()
     forms['textareasequence'] = ('Sequence of Strings', "Sequence of Strings", f)
@@ -154,7 +159,7 @@ def getForms():
     schema = Structure()
     schema.add('a', Sequence(Sequence(Integer())))
     
-    f= Form(schema, 'foo')
+    f= make_form(request,schema, 'foo')
     f.defaults = {'a': [[1, 2, 3], [4, 5, 6]]}
     f['a'].widget = TextArea()
     forms['textareasequencesequence'] = ('TextArea Sequence Sequence','A TextArea containing a sequence of sequences',f)
@@ -164,7 +169,7 @@ def getForms():
     schema = Structure()
     schema.add('a', Sequence(Tuple( (Integer(),String()) )))
     
-    f= Form(schema, 'foo')
+    f= make_form(request,schema, 'foo')
     f.defaults = {'a': [(1,'a'),(2,'b')]}
     f['a'].widget = TextArea()
     forms['textareasequencetuple'] = ('TextArea Sequence Tuple','A TextArea containing a sequence of Tuples',f)
@@ -174,7 +179,7 @@ def getForms():
     schema = Structure()
     schema.add('a', Tuple( (Integer(),String()) ))
     
-    f= Form(schema, 'foo')
+    f= make_form(request,schema, 'foo')
     f.defaults = {'a': (1,'a')}
     f['a'].widget = Input()
     forms['inputtuple'] = ('Input Tuple','A tuple in a basic input field',f)
@@ -185,7 +190,7 @@ def getForms():
     schema = Structure()
     schema.add('a', Tuple( (Integer(),String()) ))
     
-    f= Form(schema, 'foo')
+    f= make_form(request,schema, 'foo')
     f.defaults = {'a': (1,'a')}
     f['a'].widget = SelectChoice(options=[((1,'a'),'ONEA'),((2,'b'),'TWOB')])
     forms['selecttuple'] = ('Select Tuple','A tuple in a select choice',f)
@@ -197,7 +202,7 @@ def getForms():
     schema.add('a', Tuple( (Integer(),String()) ))
     schema.add('b', String(validator=NotEmpty))
     
-    f= Form(schema, 'foo')
+    f= make_form(request,schema, 'foo')
     f.defaults = {'a': (1,'a')}
     f['a'].widget = SelectChoice(options=[((1,'a'),'ONEA'),((2,'b'),'TWOB')],noneOption=((0,'x'),'None'))
     forms['selecttuplenoneoption'] = ('Select Tuple','A tuple in a select choice with none option',f)
@@ -217,7 +222,7 @@ def getForms():
     schema.add('a',Sequence(subschema))
     
     
-    f = Form(schema, 'foo')
+    f = make_form(request,schema, 'foo')
     f.defaults = {'a': [{'email':'tim@jdi.net','first_names':'Tim','last_name':'Parkin','description':['a']},{}]}
     forms['sequenceofstructs'] = ('Sequence of Structs', "Sequence of Structs", f)
         
@@ -237,7 +242,7 @@ def getForms():
     schema.add('name',String(validator=NotEmpty))
     schema.add('fields',Sequence(field))
     
-    f = Form(schema, 'formbuilder')
+    f = make_form(request,schema, 'formbuilder')
     display_options = [
         ('text-input','Input'),
         ('text-area','Text Block'),
@@ -266,8 +271,24 @@ def getForms():
     forms['formbuilder'] = ('FormBuilder', "A form to create forms", f)
        
     
+    ##
+    # Category Picker form    
+    schema = Structure()
+    schema.add('a',Sequence(String()))
     
-
+    
+    f = make_form(request,schema, 'foo')
+    f.defaults = {'a': ['location','location.uk.dorset']}
+    options = [
+        ('location','Location'),
+        ('location.uk','UK'),
+        ('location.uk.dorset','Dorset'),
+        ('location.uk.dorset','Cornwall'),
+        ('location.foreign','Foreign'),
+        ]
+    f['a'].widget = CheckboxMultiChoiceTree(options)
+    forms['checkboxmultichoice'] = ('CheckboxMultiChoiceTree', "Tree of checkboxes for a multichoice sequence", f)
+    
     
     ###
     return forms
@@ -288,6 +309,7 @@ menu = [
     'inputtuple',
     'selecttuple',
     'selecttuplenoneoption',
+    'checkboxmultichoice'
     ]
 
 
@@ -299,7 +321,7 @@ class RootResource(resource.Resource):
     @resource.GET()
     @templating.page('root.html')
     def root(self, request):
-        return {'menu':menu,'forms':self.forms()}
+        return {'menu':menu,'forms':self.forms(request)}
     
     
     def resource_child(self, request, segments):
@@ -308,7 +330,7 @@ class RootResource(resource.Resource):
             return FormishBuilderResource(), segments[1:]
         elif segments[0] == 'callable':
             return CallableFormResource(), segments[1:]
-        forms = self.forms()
+        forms = self.forms(request)
         return FormResource(forms[segments[0]]), segments[1:]
     
 class CallableFormResource(resource.Resource):
@@ -321,7 +343,7 @@ class CallableFormResource(resource.Resource):
         schema.add('age', Integer(validator=NotEmpty))
         schema.add('description', String())
         
-        form = Form(schema, renderer=request.environ['restish.templating.renderer'])
+        form = make_form(request,schema, renderer=request.environ['restish.templating.renderer'])
         form['description'].widget = TextArea()
         return form
             
@@ -360,7 +382,7 @@ class FormResource(resource.Resource):
 class FormishBuilderResource(resource.Resource):
 
     def __init__(self):
-        forms = getForms()
+        forms = getForms(request)
         self.header = 'Formish Builder'
         self.description = 'Create your Own Form'
         self.form = forms['formbuilder'][2]
