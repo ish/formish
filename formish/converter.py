@@ -308,8 +308,8 @@ def int_to_string(schemaType):
     return IntegerToStringConverter(schemaType)
 
 @when(string_converter, (schemaish.Float,))
-def int_to_string(schemaType):
-    return IntegerToStringConverter(schemaType)
+def float_to_string(schemaType):
+    return FloatToStringConverter(schemaType)
 
 @when(string_converter, (schemaish.Decimal,))
 def decimal_to_string(schemaType):

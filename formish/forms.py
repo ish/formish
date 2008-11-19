@@ -533,7 +533,7 @@ class Form(object):
         if len(self.errors.keys()) > 0:
             self.__requestData = request_data
             raise FormError('Tried to access data but conversion from request failed with %s errors'%(len(self.errors.keys())))
-        return dottedDict(data)
+        return data
 
 
 

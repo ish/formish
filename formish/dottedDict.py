@@ -17,7 +17,7 @@ def tryInt(v):
     
 ## 
 # Given a dottedDict, sets a new value based on a list of keys
-def _setDict(data, keys, value):
+def _setDict(data, keys, value, overwrite=False):
     if len(keys) == 1:
         key = tryInt(keys[0])
         if isInt(key):
@@ -42,7 +42,10 @@ def _setDict(data, keys, value):
             if isinstance(data, dict):
                 data[keys[0]] = value
             else:
-                raise KeyError('Already assigned data key %s value %s'%(keys[0], data))
+                if overwrite is True:
+                    data = {keys[0]: value}
+                else:
+                    raise KeyError('Already assigned data key %s value %s'%(keys[0], data))
     else:
         if isInt(keys[0]):
             if isinstance(data, list) or (isinstance(data, dict) and len(data.keys()) == 0):
@@ -53,11 +56,11 @@ def _setDict(data, keys, value):
                     # if we have a 0 as the first key, we need to make the data a list...
                     if len(data) == 0:
                         data = [{}]
-                    d = _setDict(data[tryInt(keys[0])], keys[1:], value) 
+                    d = _setDict(data[tryInt(keys[0])], keys[1:], value, overwrite=overwrite) 
                 if len(data)>tryInt(keys[0]):
-                    d = _setDict(data[tryInt(keys[0])], keys[1:], value) 
+                    d = _setDict(data[tryInt(keys[0])], keys[1:], value, overwrite=overwrite) 
                 elif len(data) == tryInt(keys[0]):
-                    o = _setDict({}, keys[1:], value)
+                    o = _setDict({}, keys[1:], value, overwrite=overwrite)
                     data.append( o )
                     d = o
                 else:
@@ -65,7 +68,9 @@ def _setDict(data, keys, value):
             else:
                 raise KeyError
         else:
-            d = _setDict(_setdefault(data,keys[0],{}), keys[1:], value)
+            if isinstance(data,dict) and data.has_key(keys[0]) and not isinstance(data[keys[0]],dict) and overwrite is True:
+                data[keys[0]] = {}
+            d = _setDict(_setdefault(data,keys[0],{}), keys[1:], value,overwrite=overwrite)
         data[tryInt(keys[0])] = d
     return data
 
@@ -90,7 +95,7 @@ def keysort(a,b):
 
 ##
 # Given a dictionary - creates a dotteddict
-def _getDictFromDottedKeyDict(d):
+def _getDictFromDottedKeyDict(d, noexcept=False):
     if isinstance(d, MultiDict) or isinstance(d, UnicodeMultiDict):
         data = copyMultiDict(d)
     else:
@@ -109,7 +114,13 @@ def _getDictFromDottedKeyDict(d):
             else:
                 value = data[dottedkey]
             del data[dottedkey]
-            data = _setDict(data, keys, value)
+            try:
+                data = _setDict(data, keys, value,overwrite=noexcept)
+            except KeyError:
+                if noexcept is True:
+                    pass
+                else:
+                    raise
         else:
             if hasattr(data,'getall'):
                 data[keys[0]] = data.getall(keys[0])
@@ -305,4 +316,3 @@ class dottedDict(object):
     
     def __repr__(self):
         return '<dottedDict> %s'%self.data
-
