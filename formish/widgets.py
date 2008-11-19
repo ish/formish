@@ -14,6 +14,8 @@ UNSET = object()
 
 
 class Widget(object):
+
+    _template = None
     
     def __init__(self,**k):
         self.converter_options = k.get('converter_options',{})
@@ -38,6 +40,9 @@ class Widget(object):
 
 
 class Input(Widget):
+
+    _template = 'Input'
+
     def __init__(self,**k):
         self.strip = k.pop('strip', True)
         Widget.__init__(self, **k)
@@ -54,6 +59,9 @@ class Input(Widget):
         return string_converter(schemaType).toType(d)
 
 class Password(Widget):
+
+    _template = 'Password'
+
     def __init__(self,**k):
         self.strip = k.pop('strip', True)
         Widget.__init__(self, **k)
@@ -71,6 +79,8 @@ class Password(Widget):
 
    
 class CheckedPassword(Widget):
+
+    _template = 'CheckedPassword'
 
     def __init__(self,**k):
         self.strip = k.pop('strip', True)
@@ -101,10 +111,12 @@ class CheckedPassword(Widget):
 
 
 class Hidden(Widget):
-    pass
+    _template= 'Hidden'
 
 
 class SequenceDefault(Widget):
+
+    _template = 'SequenceDefault'
 
     def __init__(self,**k):
         Widget.__init__(self,**k)
@@ -115,8 +127,11 @@ class SequenceDefault(Widget):
 
     def pre_render(self, schemaType, data):
         return data
+
         
 class TextArea(Widget):
+
+    _template = 'TextArea'
     
     def __init__(self, **k):
         Widget.__init__(self,**k)
@@ -145,6 +160,8 @@ class TextArea(Widget):
     
 class Checkbox(Widget):
 
+    _template = 'Checkbox'
+
     def convert(self, schemaType, data):
         if len(data) == 0:
             out='False'
@@ -154,6 +171,8 @@ class Checkbox(Widget):
 
     
 class DateParts(Widget):
+
+    _template = 'DateParts'
     
     def __init__(self, dayFirst=False, cssClass=None):
         Widget.__init__(self)
@@ -187,6 +206,8 @@ class FileUpload(Widget):
             is expected to return a URL to access the persisted or temporary
             data.
     """
+
+    _template = 'FileUpload'
     
     def __init__(self, fileHandler, showImagePreview=False, allowClear=True, cssClass=None):
         Widget.__init__(self)
@@ -216,6 +237,8 @@ class FileUpload(Widget):
     
 class SelectChoice(Widget):
 
+    _template = 'SelectChoice'
+
     noneOption = ('', '- choose -')
 
     def __init__(self, options, noneOption=UNSET, cssClass=None):
@@ -240,7 +263,10 @@ class SelectChoice(Widget):
     def get_noneOption(self, schemaType):
         return (string_converter(schemaType).fromType(self.noneOption[0]), self.noneOption[1])
     
+
 class RadioChoice(Widget):
+
+    _template = 'RadioChoice'
 
     noneOption = ('', '- choose -')
 
@@ -264,6 +290,8 @@ class RadioChoice(Widget):
     
     
 class CheckboxMultiChoice(Widget):
+
+    _template = 'CheckboxMultiChoice'
 
     def __init__(self, options, cssClass=None):
         self.options = _normalise_options(options)
