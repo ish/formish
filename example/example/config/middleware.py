@@ -1,4 +1,6 @@
 """Pylons middleware initialization"""
+import os
+import pkg_resources
 from beaker.middleware import CacheMiddleware, SessionMiddleware
 from paste.cascade import Cascade
 from paste.registry import RegistryManager
@@ -7,10 +9,17 @@ from paste.deploy.converters import asbool
 from pylons import config
 from pylons.middleware import ErrorHandler, StaticJavascripts, \
     StatusCodeRedirect
-from restish.app import PylonsRestishApp
+from restish.app import RestishApp
+from restish.contrib.makorenderer import MakoRenderer
 
 from example.config.environment import load_environment
 from example.resources.root import RootResource
+
+def environ_setup_app(app, environ_extras):
+    def f(environ, start_response):
+        environ.update(environ_extras)
+        return app(environ, start_response)
+    return f
 
 def make_app(global_conf, full_stack=True, **app_conf):
     """Create a Pylons WSGI application and return it
@@ -34,7 +43,18 @@ def make_app(global_conf, full_stack=True, **app_conf):
     load_environment(global_conf, app_conf)
 
     # The Pylons WSGI app
-    app = PylonsRestishApp(RootResource())
+    app = RestishApp(RootResource())
+    
+    renderer = MakoRenderer(
+            directories=[
+                pkg_resources.resource_filename('example', 'templates'),
+                pkg_resources.resource_filename('formish', 'templates/mako')],
+            module_directory=os.path.join(app_conf['cache_dir'], 'templates'),
+            input_encoding='utf-8', output_encoding='utf-8',
+            default_filters=['unicode', 'h'])
+
+    # Add infomy keys to the environ.
+    app = environ_setup_app(app, {'restish.templating.renderer': renderer})
     
     # CUSTOM MIDDLEWARE HERE (filtered by error handling middlewares)
     

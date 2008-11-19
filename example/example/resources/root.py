@@ -306,10 +306,30 @@ class RootResource(resource.Resource):
         # Formish builder example code..
         if segments[0] == 'formishbuilder':
             return FormishBuilderResource(), segments[1:]
+        elif segments[0] == 'callable':
+            return CallableFormResource(), segments[1:]
         forms = self.forms()
         return FormResource(forms[segments[0]]), segments[1:]
     
-
+class CallableFormResource(resource.Resource):
+   
+    def f(self, request):
+        schema = Structure()
+        schema.add('email', String(validator=All(NotEmpty, Email)))
+        schema.add('first_names', String(validator=NotEmpty))
+        schema.add('last_name', String(validator=NotEmpty))
+        schema.add('age', Integer(validator=NotEmpty))
+        schema.add('description', String())
+        
+        form = Form(schema, renderer=request.environ['restish.templating.renderer'])
+        form['description'].widget = TextArea()
+        return form
+            
+    
+    @resource.GET()
+    @templating.page('callable.html')
+    def GET(self, request):
+        return {'header':'yeah wahetvcer','description':'desc','form':self.f(request)}
 
 class FormResource(resource.Resource):
 

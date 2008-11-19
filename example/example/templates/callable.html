@@ -1,0 +1,9 @@
+<%namespace name="formish" file="/formish/Form.html" />
+<%inherit file="base.html"/>
+
+<h2>Callable</h2>
+<p>${description}</p>
+
+${ form['email'].field() |n }
+
+<%def name="title()">${header}</%def>

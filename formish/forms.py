@@ -159,6 +159,12 @@ class Field(object):
             else:
                 return util.title_from_name(self.name.split('.')[-1])
             
+
+    def __call__(self):
+        if self.form.renderer is None:
+            raise Exception('No Renderer Set')
+        return self.form.renderer('/formish/Field.html',{'f':self})
+            
     
 
 
@@ -372,7 +378,7 @@ class Form(object):
     __requestData = None
     _POST = None
 
-    def __init__(self, structure, name=None, defaults=None, errors=None, action_url=None, embed_schema=False):
+    def __init__(self, structure, name=None, defaults=None, errors=None, action_url=None, embed_schema=False, renderer=None):
         """
         The form can be initiated with a set of data defaults (using defaults) or with some requestData. The requestData
         can be instantiated in order to set up a partially completed form with data that was persisted in some fashion.
@@ -397,6 +403,7 @@ class Form(object):
         self.actions = []
         self.action_url = action_url
         self.embed_schema = embed_schema
+        self.renderer=renderer
 
     # This hasn't been implemented yet but this is roughly how it should be.. if we can implement the formish builder function - most of the rest is done
     ##def schema_json(self):
@@ -569,6 +576,12 @@ class Form(object):
                     return field
                 else:
                     return field.get_field(segments[1:])
+                
+    def __call__(self):
+        if self.renderer is None:
+            raise Exception('No Renderer Set')
+        return self.renderer('/formish/Form.html',{'form':self})
+        
     
     
 class FormAccessor(object):
@@ -591,6 +604,9 @@ class FormAccessor(object):
     
     def __getitem__(self, key):
         return FormAccessor(self.form, key, prefix=self.key)
+    
+        
+        
         
 NOVALUE = object()
 def recursiveDottedGet(o, key):

@@ -28,13 +28,5 @@ def load_environment(global_conf, app_conf):
     config['pylons.app_globals'] = app_globals.Globals()
     config['pylons.h'] = example.lib.helpers
 
-    # Create the Mako TemplateLookup, with the default auto-escaping
-    config['pylons.app_globals'].mako_lookup = TemplateLookup(
-        directories=paths['templates'],
-        module_directory=os.path.join(app_conf['cache_dir'], 'templates'),
-        input_encoding='utf-8', output_encoding='utf-8',
-        imports=['from webhelpers.html import escape'],
-        default_filters=['escape'])
-        
     # CONFIGURATION OPTIONS HERE (note: all config options will override
     # any Pylons config options)

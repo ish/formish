@@ -1,12 +1,10 @@
 <%namespace name="fieldmodule" file="Field.html" />
 
-<%def name="form(form)">
 <%call expr="header(form)" />
 <%call expr="errors(form)" />
-<%call expr="body(form)" />
+<%call expr="fields(form)" />
 <%call expr="actions(form)" />
 <%call expr="footer(form)" />
-</%def>
 
 
 <%def name="header(form)">
@@ -32,9 +30,9 @@ else:
     %endif
 </%def>
 
-<%def name="body(form)">
+<%def name="fields(form)">
     % for f in form.fields:
-      ${fieldmodule.field(f)}
+      ${f()|n}
     % endfor
 </%def>    
     
