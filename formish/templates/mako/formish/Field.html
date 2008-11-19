@@ -1,3 +1,4 @@
+<%def name="field(f)">
 %if f.type is 'field' or (f.type is 'sequence' and f.widget is not None and f.widget.widget.__class__.__name__ in ['TextArea','CheckboxMultiChoice']):
 <div id="${f.cssname}-field" class="${f.classes}">
   % if f.widget.widget.__class__.__name__ != 'Hidden':
@@ -26,13 +27,15 @@ ${widget(f)}
   <div class="description">${f.description}</div>
   % endif
   % for ff in f.fields:
-      ${ff()}
+      ${ff()|n}
   % endfor
   % if f.type is 'sequence':
      <input type="hidden" name="${f.template.name}" class="adder" value="${fieldtemplate(f.template)}" />
   % endif
 </fieldset>
 %endif
+</%def>
+
 
 <%def name="widget(field)">
 <%include file="/formish/widgets/${field.widget.widget.__class__.__name__}.html" args="field=field"/>
@@ -46,6 +49,7 @@ def b64(text):
 %>
 
 <%def name="fieldtemplate(f)" filter="b64, trim">
-    ${f()}
+    ${f()|n}
 </%def>
 
+${field(f)}
