@@ -296,6 +296,11 @@ class Collection(object):
                 
     def __getitem__(self, key):
         return FormAccessor(self.form, '%s.%s'%(self.name,key))
+
+    def __call__(self):
+        if self.form.renderer is None:
+            raise Exception('No Renderer Set')
+        return self.form.renderer('/formish/Field.html',{'f':self})
     
 class Group(Collection):
     type = 'group'
