@@ -122,7 +122,7 @@ class Field(object):
     def value(self):
         """Convert the requestData to a value object for the form or None."""
         if '*' in self.name:
-            return [None]
+            return ['']
         return self.form._requestData[self.name]
 
     @property
@@ -281,7 +281,7 @@ class Collection(object):
     @property
     def value(self):
         """Convert the requestData to a value object for the form or None."""
-        return self.form._requestData.get(self.name,[None])
+        return self.form._requestData.get(self.name,[''])
     
     def __repr__(self):
         return '<formish %s name="%s">'%(self.type, self.name)
