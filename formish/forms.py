@@ -410,7 +410,11 @@ class Form(object):
         self.embed_schema = embed_schema
         self.renderer=renderer
 
-    # This hasn't been implemented yet but this is roughly how it should be.. if we can implement the formish builder function - most of the rest is done
+    # This hasn't been implemented yet but this is roughly how it should be..
+    # if we can implement the formish builder function - most of the rest is
+    # done
+    # XXX I know it's only an idea but you *really* don't want to introduce a
+    # formish -> formishbuilder -> formish dependency !!! -- mg
     ##def schema_json(self):
         ##schema = self.structure.attrs[0]
         ##import formishbuilder
