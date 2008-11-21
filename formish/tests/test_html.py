@@ -8,17 +8,6 @@ from formish.widgets import *
 from BeautifulSoup import BeautifulSoup
 from formish import validation as fv
 from datetime import date
-from mako.template import Template
-from mako.lookup import TemplateLookup
-
-
-template = """
-BEFORE${form()}AFTER
-"""
-lookup = TemplateLookup(directories=['formish/templates/mako'])
-
-def renderer(template, data):
-    return lookup.get_template(template).render(**data)
 
 
 class TestHTML(unittest.TestCase):
@@ -28,7 +17,7 @@ class TestHTML(unittest.TestCase):
     def test_default_title(self):
         r = webob.Request.blank('http://localhost/')
         schema = schemaish.Structure([('one', schemaish.String())])
-        f = Form(schema,name='form',renderer=renderer)
+        f = Form(schema,name='form')
         soup = BeautifulSoup(f())
         assert len(soup.findAll(id='form-one')) == 1 , "test that the form field is being created"
         
@@ -36,7 +25,7 @@ class TestHTML(unittest.TestCase):
         r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
         r.POST['one'] = ''
         schema = schemaish.Structure([('one', schemaish.String(validator=NotEmpty))])
-        f = Form(schema,name="form",renderer=renderer)
+        f = Form(schema,name="form")
         try:
             data = f.validate(r)
         except fv.FormError, e:
@@ -49,7 +38,7 @@ class TestHTML(unittest.TestCase):
         one = Structure([("a", String(validator=v.Email(not_empty=True))), ("b", String()), ("c", Sequence(Integer()))])
         two = Structure([("a", String()), ("b", Date()), ('c', Sequence(String())), ("d", String()), ("e", Integer(validator=v.NotEmpty())), ("f", String(validator=v.NotEmpty())) ])
         schema = Structure([("one", one), ("two", two)])
-        f = Form(schema,name="form",renderer=renderer)
+        f = Form(schema,name="form")
 
         f['one.b'].widget = TextArea()
         f['two.a'].widget = SelectChoice([('opt1',"Options 1"),('opt2',"Option 2")], noneOption=('-select option-',None))
