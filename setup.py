@@ -19,6 +19,8 @@ setup(name='formish',
       zip_safe=False,
       install_requires=[
           # -*- Extra requirements: -*-
+          'PEAK-Rules',
+          'schemaish',
       ],
       entry_points="""
       # -*- Entry points: -*-
