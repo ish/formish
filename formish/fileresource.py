@@ -44,10 +44,10 @@ class FileResource(resource.Resource):
             return
         # If it's a temp file, just return it... 
         # XXX This it wrong... it should still cache and resize
-        filename = '/'.join(segments)
-        splits = filename.split('.')
+        filepath = '/'.join(segments)
+        splits = filepath.split('.')
         filename, suffix = ''.join(splits[:-1]), splits[-1]
-        self.tempfile = filehandler.get_path_for_file(urllib.unquote_plus(filename))
+        self.tempfile = filehandler.get_path_for_file(urllib.unquote_plus(filepath))
         if os.path.exists(self.tempfile):
             return 
         # Otherwise it must be a resource so check if it needs cacheing
