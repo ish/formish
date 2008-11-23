@@ -6,7 +6,6 @@ import subprocess
 import urllib
 from restish import http, resource
 
-import logging as log
 
 from formish.filehandler import TempFileHandler
 
@@ -45,16 +44,17 @@ class FileResource(resource.Resource):
             return
         # If it's a temp file, just return it... 
         # XXX This it wrong... it should still cache and resize
-        filename = urllib.unquote_plus('/'.join(segments))
-        self.tempfile = filehandler.get_path_for_file(filename)
-        log.debug('trying to get %s'%self.tempfile)
+        filename = '/'.join(segments)
+        splits = filename.split('.')
+        filename, suffix = ''.join(splits[:-1]), splits[-1]
+        self.tempfile = filehandler.get_path_for_file(urllib.unquote_plus(filename))
         if os.path.exists(self.tempfile):
-            return
+            return 
         # Otherwise it must be a resource so check if it needs cacheing
-        self.tempfile =  'cache/%s'%(segments[0])
+        self.tempfile =  'cache/%s'%(filename.replace('/','-'))
         if segments[0] != '':
             if os.path.exists(self.tempfile):
-                mtime = self.fileaccessor.get_mtime(segments[0])
+                mtime = self.fileaccessor.get_mtime(filename)
                 cache_mtime = datetime.utcfromtimestamp(os.path.getmtime(self.tempfile))
                 if mtime is None or mtime > cache_mtime:
                     rebuild_cache = True
@@ -63,9 +63,9 @@ class FileResource(resource.Resource):
             else:
                 rebuild_cache = True
             if rebuild_cache:
-                stored_fp = self.fileaccessor.get_file(segments[0])
+                data = self.fileaccessor.get_file(filename)
                 cache_fp = file(self.tempfile,'w')
-                cache_fp.write(base64.b64decode(stored_fp.read()))
+                cache_fp.write(data)
                 cache_fp.close()
 
     def resource_child(self, request, segments):

@@ -191,7 +191,17 @@ class DateParts(Widget):
         month = data.get('month', [''])[0]
         day = data.get('day', [''])[0]
         return datetuple_converter(schemaType).toType((year, month, day))
-    
+   
+
+class File(object):
+
+    def __init__(self, file, filename, mimetype):
+        self.file = file
+        self.filename=filename
+        self.mimetype=mimetype
+        
+
+        
 
 class FileUpload(Widget):
     """
@@ -218,22 +228,39 @@ class FileUpload(Widget):
         self.allowClear = allowClear
     
     def pre_render(self, schemaType, data):
-        data = string_converter(schemaType).fromType(data)
-        if data is None:
-            return {'name': ['']}
-        return {'name': [data['uid']]}
+        if isinstance(data, File):
+            self.default = self.fileHandler.urlfactory(data)
+        elif data is not None:
+            self.default = data
+        else:
+            self.default = ''
+        return {'name': [self.default], 'default':[self.default]}
     
     def pre_parse_request(self, schemaType, data):
-        fs = data.get('file',[''])[0]
         if data.get('remove',[None])[0] is not None:
+            # Removing the file
             data['name'] = ['']
-        elif fs is not u'':
-            data['name'] = [self.fileHandler.store_file(fs)]
-        data['file'] = ['']
+            return data
+
+        fs = data.get('file',[''])[0]
+        if fs is not u'':
+            # Storing an uploaded file
+            name = self.fileHandler.store_file(fs)
+            data['name'] = [name]
         return data
     
     def convert(self, schemaType, data):
-        return string_converter(schemaType).toType(data['name'][0])
+        # XXX We could add a file converter that converts this to a string data?
+        if data['name'] == [''] or data['name'] == data['default']:
+            return None
+        else:
+            filename = data['name'][0]
+            f = open(self.fileHandler.get_path_for_file(filename))
+            mimetype = self.fileHandler.get_mimetype(filename)
+            fs = File(f, filename, mimetype)
+            return fs
+
+
 
     
 class SelectChoice(Widget):

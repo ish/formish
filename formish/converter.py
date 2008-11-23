@@ -360,8 +360,18 @@ def boolean_to_boolean(schemaType):
 
 
 
+@abstract()
+def file_converter(schemaType):
+    pass
+
+@when(file_converter, (schemaish.File,))
+def file_to_file(schemaType):
+    return NullConverter(schemaType)
+
+
+
 
 
 __all__ = [
-    'string_converter','datetuple_converter','boolean_converter'
+    'string_converter','datetuple_converter','boolean_converter','file_converter'
     ]
