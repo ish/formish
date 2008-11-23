@@ -17,9 +17,9 @@ class TempFileHandler(object):
         fp = os.fdopen(fileno, 'wb')
         fp.write(fs.value)
         fp.close()
-        prefix = tempfile.gettempdir()
+        prefix = tempfile.gettempprefix()
         tempdir = tempfile.gettempdir()
-        filename = ''.join( filename[(len(tempdir)+len(prefix)):] )
+        filename = ''.join( filename[(len(tempdir)+len(prefix)+1):] )
         return filename
 
     def get_url_for_file(self, data):

@@ -6,6 +6,10 @@ import subprocess
 import urllib
 from restish import http, resource
 
+import logging as log
+
+from formish.filehandler import TempFileHandler
+
 
 # Binaries
 IDENTIFY = '/usr/bin/identify'
@@ -32,15 +36,18 @@ class FileResource(resource.Resource):
     Resource for serving files from the database or temporary upload area.
     """
 
-    def __init__(self, fileaccessor=FileAccessor(), segments=None):
+    def __init__(self, fileaccessor=FileAccessor(),
+                 filehandler=TempFileHandler(), segments=None):
         resource.Resource.__init__(self)
+        self.fileaccessor = fileaccessor
+        self.filehandler = filehandler
         if segments is None:
             return
-        self.fileaccessor = fileaccessor
         # If it's a temp file, just return it... 
         # XXX This it wrong... it should still cache and resize
         filename = urllib.unquote_plus('/'.join(segments))
-        self.tempfile = FileHandler().get_path_for_file(filename)
+        self.tempfile = filehandler.get_path_for_file(filename)
+        log.debug('trying to get %s'%self.tempfile)
         if os.path.exists(self.tempfile):
             return
         # Otherwise it must be a resource so check if it needs cacheing
@@ -62,7 +69,7 @@ class FileResource(resource.Resource):
                 cache_fp.close()
 
     def resource_child(self, request, segments):
-        return FilesResource(self.fileaccessor, segments), ()
+        return FileResource(self.fileaccessor, self.filehandler, segments), ()
 
     def make_response(self, filename, request):
         width, height = getSizeFromDict(request.GET)

@@ -50,10 +50,12 @@ def getForms(request):
     
     schema = Structure()
     schema.add('file', File())
+    schema.add('string', String(validator=NotEmpty, description='Leave empty to check file upload round tripping'))
     
     
     form = make_form(request,schema)
-    form['file'].widget = FileUpload(TempFileHandler(resource_root='/filehandler'))
+    form['file'].widget = FileUpload(TempFileHandler(resource_root='/filehandler'),
+               showImagePreview=True)
     
     forms['fileupload'] = ('File Upload',"Simple File Upload example", form)
         
