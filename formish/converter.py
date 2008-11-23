@@ -335,6 +335,9 @@ def tuple_to_string(schemaType):
 def boolean_to_string(schemaType):
     return BooleanToStringConverter(schemaType)
 
+@when(string_converter, (schemaish.File,))
+def file_to_string(schemaType):
+    return NullConverter(schemaType)
 
 
 @abstract()
