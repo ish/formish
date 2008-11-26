@@ -8,7 +8,7 @@ __all__ = ['Input', 'Password', 'CheckedPassword', 'Hidden', 'TextArea',
 
 from formish.converter import *
 from formish.validation import *
-from formish import dottedDict
+from formish import dottedDict, file
 
 
 UNSET = object()
@@ -191,7 +191,9 @@ class DateParts(Widget):
         month = data.get('month', [''])[0]
         day = data.get('day', [''])[0]
         return datetuple_converter(schemaType).toType((year, month, day))
-    
+   
+
+        
 
 class FileUpload(Widget):
     """
@@ -210,30 +212,50 @@ class FileUpload(Widget):
 
     _template = 'FileUpload'
     
-    def __init__(self, fileHandler, showImagePreview=False, allowClear=True, cssClass=None):
+    def __init__(self, fileHandler, showImagePreview=False, allowClear=True, cssClass=None,originalurl=None):
         Widget.__init__(self)
         self.cssClass = cssClass
         self.fileHandler = fileHandler
         self.showImagePreview = showImagePreview
         self.allowClear = allowClear
+        self.originalurl = originalurl
     
     def pre_render(self, schemaType, data):
-        data = string_converter(schemaType).fromType(data)
-        if data is None:
-            return {'name': ['']}
-        return {'name': [data['uid']]}
+        if isinstance(data, file.File):
+            self.default = self.fileHandler.urlfactory(data)
+        elif data is not None:
+            self.default = data
+        else:
+            self.default = ''
+        print 'inbound', self.default
+        return {'name': [self.default], 'default':[self.default]}
     
     def pre_parse_request(self, schemaType, data):
-        fs = data.get('file',[''])[0]
         if data.get('remove',[None])[0] is not None:
+            # Removing the file
             data['name'] = ['']
-        elif fs is not u'':
-            data['name'] = [self.fileHandler.store_file(fs)]
-        data['file'] = ['']
+            return data
+
+        fs = data.get('file',[''])[0]
+        if fs is not u'':
+            # Storing an uploaded file
+            name = self.fileHandler.store_file(fs)
+            data['name'] = [name]
         return data
     
     def convert(self, schemaType, data):
-        return string_converter(schemaType).toType(data['name'][0])
+        # XXX We could add a file converter that converts this to a string data?
+        if data['name'] == [''] or data['name'] == data['default']:
+            return None
+        else:
+            filename = data['name'][0]
+            path_for_file = self.fileHandler.get_path_for_file(filename)
+            f = open(path_for_file)
+            mimetype = self.fileHandler.get_mimetype(filename)
+            fs = file.File(f, filename, mimetype)
+            return fs
+
+
 
     
 class SelectChoice(Widget):

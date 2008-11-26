@@ -13,29 +13,6 @@ def make_form(request, *args, **kwargs):
     return Form(*args, **kwargs)
 
 
-class FileHandler(object):
-    """
-    File handler for formish file upload support.
-    """
-
-    def __init__(self, originalurl=None):
-        self.originalurl = originalurl
-
-    def storeFile(self, fs):
-        print fs
-        fileno, filename = tempfile.mkstemp(suffix=fs.filename)
-        fp = os.fdopen(fileno, 'wb')
-        fp.write(fs.value)
-        fp.close()
-        return filename
-
-    def getUrlForFile(self, data):
-        if data is None:
-            return self.originalurl
-        else:
-            return '/filehandler/%s'%data
-
-
 def getForms(request):
     ##
     # Simple Form
@@ -72,11 +49,13 @@ def getForms(request):
     # File Upload
     
     schema = Structure()
-    schema.add('file', String())
+    schema.add('file', File())
+    schema.add('string', String(validator=NotEmpty, description='Leave empty to check file upload round tripping'))
     
     
     form = make_form(request,schema)
-    form['file'].widget = FileUpload(FileHandler(originalurl='http://localhost'))
+    form['file'].widget = FileUpload(TempFileHandler(resource_root='/filehandler'),
+               showImagePreview=True)
     
     forms['fileupload'] = ('File Upload',"Simple File Upload example", form)
         
@@ -326,7 +305,9 @@ class RootResource(resource.Resource):
     
     def resource_child(self, request, segments):
         # Formish builder example code..
-        if segments[0] == 'formishbuilder':
+        if segments[0] == 'filehandler':
+            return FileResource(), segments[1:]
+        elif segments[0] == 'formishbuilder':
             return FormishBuilderResource(), segments[1:]
         elif segments[0] == 'callable':
             return CallableFormResource(), segments[1:]
