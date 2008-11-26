@@ -20,9 +20,9 @@ class FileAccessor(object):
     build caches, etc
     """
 
-    def get_mimetype(self, id):
+    def get_mtime(self, id):
         """
-        Get the mime type of the file with this id
+        Get the last modified time
         """
 
     def get_file(self, id):
@@ -45,8 +45,12 @@ class FileResource(resource.Resource):
         # If it's a temp file, just return it... 
         # XXX This it wrong... it should still cache and resize
         filepath = '/'.join(segments)
-        splits = filepath.split('.')
-        filename, suffix = ''.join(splits[:-1]), splits[-1]
+        if '.' in filepath:
+            splits = filepath.split('.')
+            filename, suffix = ''.join(splits[:-1]), splits[-1]
+        else:
+            filename = filepath
+            suffix = ''
         self.tempfile = filehandler.get_path_for_file(urllib.unquote_plus(filepath))
         if os.path.exists(self.tempfile):
             return 
