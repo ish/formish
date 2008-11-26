@@ -8,7 +8,7 @@ __all__ = ['Input', 'Password', 'CheckedPassword', 'Hidden', 'TextArea',
 
 from formish.converter import *
 from formish.validation import *
-from formish import dottedDict
+from formish import dottedDict, file
 
 
 UNSET = object()
@@ -193,14 +193,6 @@ class DateParts(Widget):
         return datetuple_converter(schemaType).toType((year, month, day))
    
 
-class File(object):
-
-    def __init__(self, file, filename, mimetype):
-        self.file = file
-        self.filename=filename
-        self.mimetype=mimetype
-        
-
         
 
 class FileUpload(Widget):
@@ -220,20 +212,22 @@ class FileUpload(Widget):
 
     _template = 'FileUpload'
     
-    def __init__(self, fileHandler, showImagePreview=False, allowClear=True, cssClass=None):
+    def __init__(self, fileHandler, showImagePreview=False, allowClear=True, cssClass=None,originalurl=None):
         Widget.__init__(self)
         self.cssClass = cssClass
         self.fileHandler = fileHandler
         self.showImagePreview = showImagePreview
         self.allowClear = allowClear
+        self.originalurl = originalurl
     
     def pre_render(self, schemaType, data):
-        if isinstance(data, File):
+        if isinstance(data, file.File):
             self.default = self.fileHandler.urlfactory(data)
         elif data is not None:
             self.default = data
         else:
             self.default = ''
+        print 'inbound', self.default
         return {'name': [self.default], 'default':[self.default]}
     
     def pre_parse_request(self, schemaType, data):
@@ -255,9 +249,10 @@ class FileUpload(Widget):
             return None
         else:
             filename = data['name'][0]
-            f = open(self.fileHandler.get_path_for_file(filename))
+            path_for_file = self.fileHandler.get_path_for_file(filename)
+            f = open(path_for_file)
             mimetype = self.fileHandler.get_mimetype(filename)
-            fs = File(f, filename, mimetype)
+            fs = file.File(f, filename, mimetype)
             return fs
 
 

@@ -5,7 +5,7 @@ try:
     haveDecimal = True
 except ImportError:
     haveDecimal = False
-from formish import validation
+from formish import validation, file
 from datetime import date, time
 
 
@@ -65,6 +65,17 @@ if haveDecimal:
 
 
 
+class FileToStringConverter(Converter):
+    
+    def fromType(self, value, converter_options={}):
+        if value is None:
+            return None
+        return value.filename
+        
+    def toType(self, value, converter_options={}):
+        if value is None or value == '':
+            return None
+        return file.File(None,value,None)
     
 class BooleanToStringConverter(Converter):
     
@@ -337,7 +348,7 @@ def boolean_to_string(schemaType):
 
 @when(string_converter, (schemaish.File,))
 def file_to_string(schemaType):
-    return NullConverter(schemaType)
+    return FileToStringConverter(schemaType)
 
 
 @abstract()

@@ -1,6 +1,10 @@
 <%page args="field" />
-% if field.widget.widget.showImagePreview is True and field.value['name'][0] != '':
+% if field.widget.widget.showImagePreview is True:
+%   if field.value['name'][0] != '':
 <img src="${field.widget.widget.fileHandler.resource_root}/${field.value['name'][0]}" />
+%   else:
+<img src="${field.widget.widget.originalurl}" />
+%   endif
 % endif
 % if field.widget.widget.allowClear is True:
 <input id="${field.cssname}.remove" type="checkbox" name="${field.name}.remove" value="true" />
