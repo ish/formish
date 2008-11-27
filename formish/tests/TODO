@@ -1,0 +1,8 @@
+- add a test for each widget type (see test_widgets for pattern)
+- add a selenium test to check the sequence functionality
+- add a selenium test for file uploads
+- add a test for the error messages (both the existence of and that they appear in created form)
+- 
+- 
+
+- 

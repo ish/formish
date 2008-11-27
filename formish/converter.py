@@ -265,7 +265,7 @@ class SequenceToStringConverter(Converter):
             for line in value.split('\n'):
                 l = convert_csvrow_to_list(line, delimiter=delimiter)
                 convl = [string_converter(self.schemaType.attr.attrs[n]).toType(v) for n,v in enumerate(l)]
-                out.append( convl )
+                out.append( tuple(convl) )
             return out
         else:
             if delimiter != '\n' and len(value.split('\n')) > 1:
