@@ -52,9 +52,28 @@ class TestFormData(unittest.TestCase):
 
 
 
+class TestSequenceFormData(unittest.TestCase):
+
+    schema = Structure()
+    schema.add('a',Sequence(String(title='bee')))
 
 
+    def test_widgets(self):
+        form = Form(self.schema, 'sequences')
+        form.defaults = {'a': ['1','2']}
+        assert isinstance(form['a.0'].widget.widget,Input)
+        form['a.*'].widget = TextArea()
+        assert isinstance(form['a.0'].widget.widget,TextArea)
         
+
+    def test_widgets_before_data(self):
+        form = Form(self.schema, 'sequences')
+        form['a.*'].widget = TextArea()
+        form.defaults = {'a': ['1','2']}
+        assert isinstance(form['a.0'].widget.widget,TextArea)
+
+
+
         
         
 if __name__ == '__main__':
