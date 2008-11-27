@@ -117,7 +117,10 @@ class Field(object):
     @property
     def description(self):
         """ Description attribute """
-        return self.attr.description        
+        try:
+            return self.form.item_data[self.name]['description']
+        except KeyError:
+            return self.attr.description        
         
     @property
     def value(self):
@@ -126,15 +129,6 @@ class Field(object):
             return ['']
         return self.form._requestData[self.name]
 
-    @property
-    def defaults(self):
-        """Get the defaults from the form."""
-        try:
-            defaults = self.form[self.name].defaults
-            return defaults
-        except KeyError:
-            return None
-    
     @property
     def error(self):
         """ Lazily get the error from the form.errors when needed """
@@ -145,7 +139,7 @@ class Field(object):
         """ return the fields widget bound with extra params. """
         # Loop on the name to work out if any '*' widgets are used
         try:
-            w = self.form[starify(self.name)].widget
+            w = self.form.item_data[starify(self.name)]['widget']
         except KeyError:
             w = Input()
         return BoundWidget(w, self)
@@ -153,7 +147,7 @@ class Field(object):
     @property
     def title(self):
         try:
-            t = self.form[self.name].title
+            return self.form.item_data[self.name]['title']
         except KeyError:
             if self.attr.title is not None:
                 return self.attr.title
@@ -273,7 +267,7 @@ class Collection(object):
         """ return the fields widget bound with extra params. """
         
         try:
-            return BoundWidget(self.form[starify(self.name)].widget, self)
+            return BoundWidget(self.form.item_data[starify(self.name)]['widget'], self)
         except KeyError:
             return None
     
@@ -366,6 +360,15 @@ class BoundWidget(object):
         
     def validate(self, data):
         return self.widget.validate(data)
+
+    def __repr__(self):
+        attrclassstr = str(self.field.attr.__class__)
+        if attrclassstr[8:22] == 'schemaish.attr':
+            attrname = attrclassstr[23:-2]
+        else:
+            attrname = attrclassstr[8:-2]
+        return '<bound widget name="%s", widget="%s", type="%s">'%(self.field.name, self.widget._template, attrname)
+
 
 
 class Form(object):
@@ -559,7 +562,11 @@ class Form(object):
     #
     
     def set_item_data(self, key, name, value):
-        self.item_data.setdefault(key, {})[name] = value
+        allowed = ['title','widget','description']
+        if name in allowed:
+            self.item_data.setdefault(key, {})[name] = value
+        else:
+            raise KeyError('Cannot set data onto this attribute')
 
     def get_item_data(self, key, name):
         return self.item_data.setdefault(key, {})[name]
@@ -605,10 +612,11 @@ class FormAccessor(object):
         self.form.set_item_data(self.key, name, value)
 
     def __getattr__(self, name):
+        field = self.form.get_field(self.key)
         if name == 'field':
-            return self.form.get_field(self.key)
+            return field
         else:
-            return self.form.get_item_data(self.key, name)
+            return getattr(field, name)
     
     def __getitem__(self, key):
         return FormAccessor(self.form, key, prefix=self.key)
