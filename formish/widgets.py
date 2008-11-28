@@ -31,11 +31,6 @@ class Widget(object):
             return ['']
         return [data]
 
-    # ??: Should the validate be here? Confused
-    def validate(self, data):
-        errors = None
-        return data, errors
-
     def convert(self, schemaType, data):
         return string_converter(schemaType).toType(data[0])
 
