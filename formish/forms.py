@@ -58,7 +58,7 @@ def _isNotEmpty(self,validator):
     """ parses through validators to work out if there is a not empty validator """
     if validator is None:
         return False
-    if isinstance(validator, schemaish.NotEmpty) or getattr(validator,'not_empty'):
+    if isinstance(validator, schemaish.NotEmpty) or getattr(validator, 'not_empty', None):
         return True
     if hasattr(validator,'validators'):
         for v in validator.validators:
