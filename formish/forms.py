@@ -83,7 +83,6 @@ class Field(object):
     used on it's own. We bind the Schema Attribute to a Field in order to include form
     related information.
     
-    The _widget attribute is a base widget to which the real widget is bound 
     """
     type = 'field'
     def __init__(self, name, attr, form):
@@ -118,7 +117,7 @@ class Field(object):
     def description(self):
         """ Description attribute """
         try:
-            return self.form.item_data[self.name]['description']
+            return self.form.get_item_data(self.name,'description')
         except KeyError:
             return self.attr.description        
         
@@ -139,7 +138,7 @@ class Field(object):
         """ return the fields widget bound with extra params. """
         # Loop on the name to work out if any '*' widgets are used
         try:
-            w = self.form.item_data[starify(self.name)]['widget']
+            w = self.form.get_item_data(starify(self.name),'widget')
         except KeyError:
             w = Input()
         return BoundWidget(w, self)
@@ -147,7 +146,7 @@ class Field(object):
     @property
     def title(self):
         try:
-            return self.form.item_data[self.name]['title']
+            return self.form.get_item_data(self.name,'title')
         except KeyError:
             if self.attr.title is not None:
                 return self.attr.title
@@ -168,7 +167,6 @@ class Collection(object):
     The Schema structure does not have any bindings to the form library, it can be
     used on it's own. We bind the schema Structure Attribute to a Group which includes form information.
     
-    The _widget attribute is a base widget to which the real widget is bound 
     """    
 
     def __init__(self, name, attr, form):
@@ -184,9 +182,6 @@ class Collection(object):
         self.attr = attr
         self.form = form
         self._fields = {}    
-        # Create a default widget for the group. XXX Shouldn't this be some
-        # sort of GroupWidget? It doesn't seem to be used anyway.
-        self._widget = None
         # Construct a title
         self.title = self.attr.title
         if self.title is None and name is not None:
@@ -267,7 +262,7 @@ class Collection(object):
         """ return the fields widget bound with extra params. """
         
         try:
-            return BoundWidget(self.form.item_data[starify(self.name)]['widget'], self)
+            return BoundWidget(self.form.get_item_data(starify(self.name),'widget'), self)
         except KeyError:
             return None
     
@@ -358,9 +353,6 @@ class BoundWidget(object):
     def convert(self, schemaType, data):
         return self.widget.convert(schemaType, data)
         
-    def validate(self, data):
-        return self.widget.validate(data)
-
     def __repr__(self):
         attrclassstr = str(self.field.attr.__class__)
         if attrclassstr[8:22] == 'schemaish.attr':
@@ -569,7 +561,7 @@ class Form(object):
             raise KeyError('Cannot set data onto this attribute')
 
     def get_item_data(self, key, name):
-        return self.item_data.setdefault(key, {})[name]
+        return self.item_data.get(key, {})[name]
 
     def get_item_data_values(self, name):
         d = dottedDict({})
