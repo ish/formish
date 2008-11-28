@@ -1,24 +1,115 @@
+import pdb
+import base
 import unittest
-
 import formish
+import schemaish
+from BeautifulSoup import BeautifulSoup
+from datetime import date
+
+class TestFormExamples(base.TestCase):
+
+    def test_string_form(self):
+        """
+        Form with a couple of string fields
+        """
+        schema = schemaish.Structure()
+        schema.add('fieldOne',schemaish.String())
+        schema.add('fieldTwo',schemaish.String())
+
+        form_name = 'form_name'
+        form = formish.Form(schema, form_name)
+
+        request_data = {'fieldOne':'a','fieldTwo':'b'}
+        expected_data = {'fieldOne':'a','fieldTwo':'b'}
+
+        request = self.Request(form_name,request_data)
+
+        data = form.validate(request)
+        assert data == expected_data
+
+        form.defaults = request_data
+        htmlsoup = BeautifulSoup(form())
+        assert htmlsoup.findAll(id='form_name-fieldOne-field')[0]['class'] == 'field string input'
+        assert htmlsoup.findAll(id='form_name-fieldTwo-field')[0]['class'] == 'field string input'
+        assert htmlsoup.findAll(id='form_name-fieldOne')[0]['value'] == 'a'
+        assert htmlsoup.findAll(id='form_name-fieldTwo')[0]['value'] == 'b'
 
 
-class TestCheckboxMultiChoice(unittest.TestCase):
+    def test_integer_form(self):
+        """
+        Form with a couple of integer fields
+        """
+        schema = schemaish.Structure()
+        schema.add('fieldOne',schemaish.Integer())
+        schema.add('fieldTwo',schemaish.Integer())
 
-    def test_empty_options(self):
-        formish.CheckboxMultiChoice([])
+        form_name = 'form_name'
+        form = formish.Form(schema, form_name)
 
+        request_data = {'fieldOne':'1','fieldTwo':'2'}
+        expected_data = {'fieldOne':1,'fieldTwo':2}
 
-class TestSelectChoice(unittest.TestCase):
+        request = self.Request(form_name,request_data)
 
-    def test_empty_options(self):
-        formish.SelectChoice([])
+        data = form.validate(request)
+        assert data == expected_data
 
+        form.defaults = expected_data
+        htmlsoup = BeautifulSoup(form())
+        assert htmlsoup.findAll(id='form_name-fieldOne-field')[0]['class'] == 'field integer input'
+        assert htmlsoup.findAll(id='form_name-fieldTwo-field')[0]['class'] == 'field integer input'
+        assert htmlsoup.findAll(id='form_name-fieldOne')[0]['value'] == '1'
+        assert htmlsoup.findAll(id='form_name-fieldTwo')[0]['value'] == '2'
+        
+    def test_date_form(self):
+        """
+        Form with a date
+        """
+        schema = schemaish.Structure()
+        schema.add('a',schemaish.Date())
 
-class TestRadioChoice(unittest.TestCase):
+        form_name = 'form_name'
+        form = formish.Form(schema, form_name)
 
-    def test_empty_options(self):
-        formish.RadioChoice([])
+        request_data = {'a':'1966-12-18'}
+        expected_data = {'a': date(1966,12,18)}
+
+        request = self.Request(form_name,request_data)
+
+        try:
+            data = form.validate(request)
+        except:
+            print form()
+        assert data == expected_data
+
+        form.defaults = expected_data
+        htmlsoup = BeautifulSoup(form())
+        assert htmlsoup.findAll(id='form_name-a-field')[0]['class'] == 'field date input'
+        assert htmlsoup.findAll(id='form_name-a')[0]['value'] == '1966-12-18'
+        
+    def test_date_dateparts_form(self):
+        """
+        Form with a date
+        """
+        schema = schemaish.Structure()
+        schema.add('a',schemaish.Date())
+
+        form_name = 'form_name'
+        form = formish.Form(schema, form_name)
+        form['a'].widget = formish.DateParts()
+
+        request_data = {'a.day':'18', 'a.month':'12','a.year':'1966'}
+        expected_data = {'a': date(1966,12,18)}
+
+        request = self.Request(form_name,request_data)
+
+        data = form.validate(request)
+        assert data == expected_data
+
+        form.defaults = expected_data
+        htmlsoup = BeautifulSoup(form())
+        assert htmlsoup.findAll(id='form_name-a-field')[0]['class'] == 'field date dateparts'
+        assert htmlsoup.findAll(id='form_name-a')[0]['value'] == '18'
 
 
 if __name__ == '__main__':
