@@ -11,6 +11,9 @@ else:
   % if field.title:
   <legend>${field.title}</legend>
   % endif
+  % if field.error:
+  <span class="error">${unicode(field.error)}</span>
+  % endif
   % if field.description:
   <div class="description">${field.description}</div>
   % endif

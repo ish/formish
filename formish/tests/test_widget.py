@@ -112,6 +112,50 @@ class TestFormExamples(base.TestCase):
         assert htmlsoup.findAll(id='form_name-a')[0]['value'] == '18'
 
 
+class TestErrorRendering(base.TestCase):
+
+    def test_simple(self):
+        """
+        Check simple field templates emit errors correctly.
+        """
+        self._test(
+                schemaish.Structure([
+                    ('simple', schemaish.String()),
+                    ]),
+                'simple')
+
+    def test_structure_error(self):
+        """
+        Check structure field templates emit errors correctly.
+        """
+        self._test(
+                schemaish.Structure([
+                    ('structure', schemaish.Structure([
+                        ('string', schemaish.String())]
+                        ))
+                    ]),
+                'structure')
+
+    def test_sequence_error(self):
+        self._test(
+                schemaish.Structure([
+                    ('sequence', schemaish.Sequence(schemaish.String()))
+                    ]),
+                'sequence')
+
+    def _test(self, schema, attr):
+        ERROR_TEXT = '!!!WOOP!!!WOOP!!!WOOP!!!'
+        form = formish.Form(schema, errors={attr: ERROR_TEXT})
+        html = form()
+        print "*****************************************************************"
+        print html
+        print "*****************************************************************"
+        element = BeautifulSoup(html).find(id='formish-%s-field'%(attr.replace('.', '-'),))
+        error = element.find('span', {'class': 'error'})
+        assert error
+        assert error.string == ERROR_TEXT
+
+
 if __name__ == '__main__':
     unittest.main()
 
