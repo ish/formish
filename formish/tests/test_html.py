@@ -1,13 +1,13 @@
 import unittest
 import webob
 import schemaish
-from schemaish import validators as v
 from schemaish import *
 from formish import *
 from formish.widgets import *
 from BeautifulSoup import BeautifulSoup
 from formish import validation as fv
 from datetime import date
+from validatish import validate as v
 
 
 class TestHTML(unittest.TestCase):
@@ -24,19 +24,20 @@ class TestHTML(unittest.TestCase):
     def test_error_html(self):
         r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
         r.POST['one'] = ''
-        schema = schemaish.Structure([('one', schemaish.String(validator=NotEmpty))])
+        schema = schemaish.Structure([('one', schemaish.String(validator=v.required))])
         f = Form(schema,name="form")
         try:
             data = f.validate(r)
         except fv.FormError, e:
-            assert isinstance(f.errors['one'], schemaish.Invalid)        
+            assert isinstance(f.errors['one'], attr.Invalid)        
         soup = BeautifulSoup(f())
-        assert soup.find(id='form-one-field').find("span", "error").string == 'Please enter a value' , "test that the form error is being created"
+        print soup.find(id='form-one-field').find("span", "error").string
+        assert soup.find(id='form-one-field').find("span", "error").string == 'is required' , "test that the form error is being created"
         
     def test_complex_form(self):
         
-        one = Structure([("a", String(validator=v.Email(not_empty=True))), ("b", String()), ("c", Sequence(Integer()))])
-        two = Structure([("a", String()), ("b", Date()), ('c', Sequence(String())), ("d", String()), ("e", Integer(validator=v.NotEmpty())), ("f", String(validator=v.NotEmpty())) ])
+        one = Structure([("a", String(validator=v.All(v.email,v.required))), ("b", String()), ("c", Sequence(Integer()))])
+        two = Structure([("a", String()), ("b", Date()), ('c', Sequence(String())), ("d", String()), ("e", Integer(validator=v.required)), ("f", String(validator=v.required)) ])
         schema = Structure([("one", one), ("two", two)])
         f = Form(schema,name="form")
 

@@ -1,11 +1,11 @@
 from formish.forms import *
-from formish import validation
+from formish.validation import *
 import unittest
 from schemaish import *
 from formish.dottedDict import dottedDict
 import copy
 from webob import MultiDict
-
+from validatish import validate
 class DummyObject():
     pass
 
@@ -99,7 +99,7 @@ class TestFormBuilding(unittest.TestCase):
     def test_nested_form_validation_errors(self):
         schema_nested = Structure([
             ("one", Structure([
-                ("a", String(validator=NotEmpty)),
+                ("a", String(validator=validate.required)),
                 ("b", String()),
                 ("c", Structure([("x", String()),("y", String())])),
                 ])
@@ -112,18 +112,18 @@ class TestFormBuilding(unittest.TestCase):
         r = {'one.a':'','one.b': '','one.c.x': '','one.c.y': ''}
         request =  Request(name, r)
         
-        self.assertRaises(validation.FormError, form.validate, request)
+        self.assertRaises(FormError, form.validate, request)
 
         # Do we get an error
-        self.assert_( isinstance(form.errors['one.a'], Invalid) )
+        self.assert_( isinstance(form.errors['one.a'], attr.Invalid) )
         # Is the error message correct
-        self.assertEqual( form.errors['one.a'].message, "Please enter a value" )
+        self.assertEqual( form.errors['one.a'].msg, "is required" )
 
         
     def test_nested_form_validation_output(self):
         schema_nested = Structure([
             ("one", Structure([
-                ("a", String(validator=NotEmpty)),
+                ("a", String(validator=validate.required)),
                 ("b", String()),
                 ("c", Structure([("x", String()),("y", String())])),
                 ])

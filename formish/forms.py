@@ -4,10 +4,11 @@ from webob import UnicodeMultiDict
 
 from formish import util
 from formish.dottedDict import dottedDict, isInt
-from formish.converter import *
+from convertish.convert import *
 from formish.validation import *
 from formish.widgets import *
 from formish.renderer import _default_renderer
+from validatish.validate import Required, required
 
 
 class Action(object):
@@ -50,19 +51,19 @@ def _classes(self):
 
 def _required(self):
     """ Does this field have a Not Empty validator of some sort """
-    hasrequiredvalidator = _isNotEmpty(self, self.attr.validator)
+    hasrequiredvalidator = _isNotEmpty(self.attr.validator)
     return hasrequiredvalidator
 
 
-def _isNotEmpty(self,validator):
+def _isNotEmpty(validator):
     """ parses through validators to work out if there is a not empty validator """
     if validator is None:
         return False
-    if isinstance(validator, schemaish.NotEmpty) or getattr(validator, 'not_empty', None):
+    if isinstance(validator, Required) or validator == required:
         return True
     if hasattr(validator,'validators'):
         for v in validator.validators:
-            self._isNotEmpty(v)
+            _isNotEmpty(v)
     return False
 
 def starify(name):
@@ -538,7 +539,7 @@ class Form(object):
         data = self.get_unvalidated_data(request_data, raiseErrors=False)
         try:
             self.structure.attr.validate(data)
-        except schemaish.Invalid, e:
+        except schemaish.attr.Invalid, e:
             for key, value in e.error_dict.items():
                 if not self.errors.has_key(key):
                     self.errors[key] = value

@@ -6,7 +6,7 @@ __all__ = ['Input', 'Password', 'CheckedPassword', 'Hidden', 'TextArea',
         'Checkbox', 'DateParts', 'FileUpload', 'SelectChoice', 'RadioChoice',
         'CheckboxMultiChoice', 'SequenceDefault','CheckboxMultiChoiceTree']
 
-from formish.converter import *
+from convertish.convert import *
 from formish.validation import *
 from formish import dottedDict, file
 

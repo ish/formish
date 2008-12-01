@@ -58,7 +58,7 @@ def validate(structure, requestData, errors=None, keyprefix=None):
     """ Take a schemaish structure and use it's validators to return any errors"""
     if errors is None:
         errors = dottedDict()
-    # Use formencode to validate each field in the schema, return 
+    # Validate each field in the schema, return 
     # a dictionary of errors keyed by field name
     for attr in structure.attrs:
         # function is recursive so we have to build up a full key
