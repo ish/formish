@@ -1,6 +1,6 @@
 import re
-import schemaish
 from formish.dottedDict import dottedDict
+from validatish.validate import Invalid
 
 def convert_sequences(d):
     if not hasattr(d,'keys'):
@@ -73,7 +73,7 @@ def validate(structure, requestData, errors=None, keyprefix=None):
                 if requestData.has_key(newprefix):
                     c = convert_sequences(requestData[newprefix])
                     attr[1].validate(c)
-        except (schemaish.Invalid, FieldValidationError), e:
+        except (Invalid, FieldValidationError), e:
             errors[newprefix] = e
     return errors
 
@@ -90,7 +90,7 @@ def convertDataToRequestData(formStructure, data, requestData=None, errors=None)
             else:
                 d = getNestedProperty(data, field.name)
                 requestData[field.name] = field.widget.pre_render(field.attr,d)
-        except schemaish.Invalid, e:
+        except Invalid, e:
             errors[field.name] = e
             raise
     return requestData
@@ -113,7 +113,7 @@ def convertRequestDataToData(formStructure, requestData, data=None, errors=None)
             else: 
                 # This needs to be cleverer... 
                 data[field.name] = field.widget.convert(field.attr,requestData.get(field.name,[]))
-        except (schemaish.Invalid, FieldValidationError), e:
+        except (Invalid, FieldValidationError), e:
             errors[field.name] = e
             
     data = recursive_convert_sequences(dottedDict(data))
