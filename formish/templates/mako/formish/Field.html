@@ -8,9 +8,7 @@
     ${widget(f)}
   </div>
   % if f.widget.widget.__class__.__name__ != 'Hidden':
-  % if f.error:
-  <span class="error">${unicode(f.error)}</span>
-  % endif
+  ${error(f)}
   % if f.description:
   <span class="description">${f.description}</span>
   % endif
@@ -23,6 +21,7 @@ ${widget(f)}
   % if f.title:
   <legend>${f.title}</legend>
   % endif
+  ${error(f)}
   % if f.description:
   <div class="description">${f.description}</div>
   % endif
@@ -36,6 +35,11 @@ ${widget(f)}
 %endif
 </%def>
 
+<%def name="error(field)">
+% if field.error:
+<span class="error">${unicode(field.error)}</span>
+% endif
+</%def>
 
 <%def name="widget(field)">
 <%include file="/formish/widgets/${field.widget.widget._template}.html" args="field=field"/>
