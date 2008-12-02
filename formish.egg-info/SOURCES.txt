@@ -2,9 +2,12 @@ README
 setup.cfg
 setup.py
 formish/__init__.py
-formish/converter.py
 formish/dottedDict.py
+formish/file.py
+formish/filehandler.py
+formish/fileresource.py
 formish/forms.py
+formish/renderer.py
 formish/util.py
 formish/validation.py
 formish/widgets.py
@@ -13,4 +16,5 @@ formish.egg-info/SOURCES.txt
 formish.egg-info/dependency_links.txt
 formish.egg-info/entry_points.txt
 formish.egg-info/not-zip-safe
+formish.egg-info/requires.txt
 formish.egg-info/top_level.txt
