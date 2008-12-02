@@ -1,4 +1,5 @@
 import pdb
+from validatish import validate
 from formish import *
 from schemaish import *
 import unittest
@@ -9,8 +10,8 @@ class TestFormData(unittest.TestCase):
 
     schema_nested = Structure([
         ("one", Structure([
-            ("a", String(validator=NotEmpty, 
-                description="This is a field with name a and title A and has a NotEmpty validator")),
+            ("a", String(validator=validate.Required(), 
+                description="This is a field with name a and title A and has a Required validator")),
             ("b", String(title='bee')),
             ("c", Structure([("x", String(title='cee')),("y", String())])),
             ])
@@ -41,7 +42,7 @@ class TestFormData(unittest.TestCase):
 
         form = Form(self.schema_nested, 'nested')
 
-        assert form['one.a'].description == "This is a field with name a and title A and has a NotEmpty validator"
+        assert form['one.a'].description == "This is a field with name a and title A and has a Required validator"
         form['one.a'].description = "This is a new description"
         assert form['one.a'].description == "This is a new description"
 

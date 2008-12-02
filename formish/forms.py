@@ -59,7 +59,7 @@ def _isNotEmpty(validator):
     """ parses through validators to work out if there is a not empty validator """
     if validator is None:
         return False
-    if isinstance(validator, Required) or validator == required:
+    if isinstance(validator, Required) or validator is required:
         return True
     if hasattr(validator,'validators'):
         for v in validator.validators:
