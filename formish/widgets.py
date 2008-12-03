@@ -6,9 +6,10 @@ __all__ = ['Input', 'Password', 'CheckedPassword', 'Hidden', 'TextArea',
         'Checkbox', 'DateParts', 'FileUpload', 'SelectChoice', 'RadioChoice',
         'CheckboxMultiChoice', 'SequenceDefault','CheckboxMultiChoiceTree']
 
-from convertish.convert import *
+from convertish.convert import string_converter,datetuple_converter, ConvertError
 from formish.validation import *
-from formish import dottedDict, file
+from formish import dottedDict
+from schemaish import type
 
 
 UNSET = object()
@@ -102,7 +103,7 @@ class CheckedPassword(Widget):
             if not confirm:
                 confirm = None
         if password != confirm:
-            raise FieldValidationError('Password did not match')
+            raise ConvertError('Password did not match')
         return string_converter(schemaType).toType(password)
 
 
@@ -216,7 +217,7 @@ class FileUpload(Widget):
         self.originalurl = originalurl
     
     def pre_render(self, schemaType, data):
-        if isinstance(data, file.File):
+        if isinstance(data, type.File):
             self.default = self.fileHandler.urlfactory(data)
         elif data is not None:
             self.default = data
@@ -247,7 +248,7 @@ class FileUpload(Widget):
             path_for_file = self.fileHandler.get_path_for_file(filename)
             f = open(path_for_file)
             mimetype = self.fileHandler.get_mimetype(filename)
-            fs = file.File(f, filename, mimetype)
+            fs = type.File(f, filename, mimetype)
             return fs
 
 
