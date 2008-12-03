@@ -7,7 +7,7 @@ from formish.widgets import *
 from BeautifulSoup import BeautifulSoup
 from formish import validation as fv
 from datetime import date
-from validatish import validate as v
+import validatish
 
 
 class TestHTML(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestHTML(unittest.TestCase):
     def test_error_html(self):
         r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
         r.POST['one'] = ''
-        schema = schemaish.Structure([('one', schemaish.String(validator=v.required))])
+        schema = schemaish.Structure([('one', schemaish.String(validator=validatish.Required()))])
         f = Form(schema,name="form")
         try:
             data = f.validate(r)
@@ -36,8 +36,8 @@ class TestHTML(unittest.TestCase):
         
     def test_complex_form(self):
         
-        one = Structure([("a", String(validator=v.All(v.email,v.required))), ("b", String()), ("c", Sequence(Integer()))])
-        two = Structure([("a", String()), ("b", Date()), ('c', Sequence(String())), ("d", String()), ("e", Integer(validator=v.required)), ("f", String(validator=v.required)) ])
+        one = Structure([("a", String(validator=validatish.All(validatish.Email(), validatish.Required()))), ("b", String()), ("c", Sequence(Integer()))])
+        two = Structure([("a", String()), ("b", Date()), ('c', Sequence(String())), ("d", String()), ("e", Integer(validator=validatish.Required())), ("f", String(validator=validatish.Required())) ])
         schema = Structure([("one", one), ("two", two)])
         f = Form(schema,name="form")
 

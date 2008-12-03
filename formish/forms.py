@@ -8,7 +8,7 @@ from convertish.convert import *
 from formish.validation import *
 from formish.widgets import *
 from formish.renderer import _default_renderer
-from validatish.validate import Required, required, validation_includes
+from validatish import Required, validation_includes
 
 
 class Action(object):
