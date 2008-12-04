@@ -363,11 +363,13 @@ def _normalise_options(options):
     Return a sequence of (value, label) pairs for all options where each option
     can be a scalar value or a (value, label) tuple.
     """
+    out = []
     if hasattr(options, '__call__'):
         options = options()
     for option in options:
         if isinstance(option, tuple):
-            yield option
+            out.append( option )
         else:
-            yield (option, option)
+            out.append( (option, option) )
+    return out
 

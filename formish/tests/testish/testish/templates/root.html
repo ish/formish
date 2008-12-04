@@ -1,10 +1,44 @@
 <%inherit file="base.html"/>
 
+<div class="content">
+<div id="primary">
 <p>Formish Examples</p>
 
 <p>Some interactive form examples:</p>
 
+
+<h3>Simple Fields</h3>
+<%
+ids = ['SimpleString','SimpleInteger','SimpleBoolean','SimpleFloat','SimpleDecimal','SimpleDate']
+links(ids)
+%>
+
+
+
+
+<h3>Simple Widgets</h3>
+<%
+ids = ['StringWidgets','SelectWidgets']
+links(ids)
+%>
+
+
+<h3>Sequence of Structures (using javascript)</h3>
+<%
+ids = ['SequenceOfStructures','SequenceOfStructuresWithSelects']
+links(ids)
+%>
+</div>
+</div>
+
+<%def name="links(ids)">
 <ul>
-  <li><a href="/SimpleForm">Simple Form</a> -- a simple form with one string field</li>
+%for f in get_forms(ids):
+  <li><a href="/${f['name']}?show_tests=True">${f['title']}</a> -- ${f['summary']|n}</li>
+% endfor
 </ul>
+</%def>
+
+
+<%def name="header()">Formish Examples</%def>
 

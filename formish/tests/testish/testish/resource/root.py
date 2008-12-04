@@ -9,6 +9,27 @@ from testish.lib import extract_function
 
 log = logging.getLogger(__name__)
 
+try:
+    import markdown
+    def _format(v):
+        print v
+        v = '\n'.join([l[4:] for l in v.split('\n')])
+        print v
+        return markdown.markdown(v)
+except ImportError:
+    def _format(v):
+        v = '\n'.join([l[4:] for l in v.split('\n')])
+        return '<pre>%s</pre>'%v
+
+def get_forms(ids):
+    out = []
+    for f in ids:
+        form_def = getattr(form_defs, f)
+        out.append( {'name': f,
+        'title': formish.util.title_from_name(f),
+        'description': _format(form_def.func_doc),
+        'summary': form_def.func_doc.strip().split('\n')[0]})
+    return out
 
 
 class Root(resource.Resource):
@@ -16,7 +37,7 @@ class Root(resource.Resource):
     @resource.GET()
     @templating.page('root.html')
     def root(self, request):
-        return {}
+        return {'get_forms': get_forms}
     
     def resource_child(self, request, segments):
         if segments[0] == 'filehandler':
@@ -30,7 +51,7 @@ class FormResource(resource.Resource):
         self.id = id
         self.title = formish.util.title_from_name(id)
         self.form_getter = getattr(form_defs,id)
-        self.description = self.form_getter.func_doc
+        self.description = _format(self.form_getter.func_doc)
     
     @resource.GET()
     def GET(self, request):

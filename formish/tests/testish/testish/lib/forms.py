@@ -238,7 +238,88 @@ def test_SimpleDecimal(self, sel):
 
     return
 
+def StringWidgets():
+    """
+    A demonstration of simple string type widgets
+
+    * **Input** fields are the default and need not be specified but you might want to specify a 'strip' argument
+    * **TextArea** take cols and rows keyword arguments (css usually overrides this). it can also take a 'strip' argument
+    """
+    schema = schemaish.Structure()
+    schema.add('myInputStrip', schemaish.String())
+    schema.add('myTextArea', schemaish.String())
+    schema.add('myTextAreaCustom', schemaish.String())
+    schema.add('myTextAreaStrip', schemaish.String())
+
+    form = formish.Form(schema, 'form')
+    form['myInputStrip'].widget = formish.Input(strip=True)
+    form['myTextArea'].widget = formish.TextArea()
+    form['myTextAreaCustom'].widget = formish.TextArea(cols=20,rows=4)
+    form['myTextAreaStrip'].widget = formish.TextArea(strip=True)
+    return form
+
+def SelectWidgets():
+    """
+    A set of widget demonstrations using choices of various kinds
+    """
+    schema = schemaish.Structure()
+    schema.add('mySelect', schemaish.String())
+    options = [('a',1),('b',2),('c',3)]
+
+    form = formish.Form(schema, 'form')
+    form['mySelect'].widget = formish.SelectChoice(options)
+    return form
 
 
+def SequenceOfStructures():
+    """
+    A structure witin a sequence, should be enhanced with javascript
+    """
+    substructure = schemaish.Structure()
+    substructure.add( 'a', schemaish.String() )
+    substructure.add( 'b', schemaish.Integer() )
+
+    schema = schemaish.Structure()
+    schema.add( 'myList', schemaish.Sequence( substructure ))
+
+    form = formish.Form(schema, 'form')
+    return form
+  
     
+def SequenceOfStructuresWithSelects():
+    """
+    A sequence including selects
+    """
+    substructure = schemaish.Structure()
+    substructure.add( 'a', schemaish.String() )
+    substructure.add( 'b', schemaish.String() )
+
+    schema = schemaish.Structure()
+    schema.add( 'myList', schemaish.Sequence( substructure ))
+
+    form = formish.Form(schema, 'form')
+
+    options = [('a',1),('b',2),('c',3)]
+    form['myList.*.b'].widget = formish.SelectChoice(options)
+
+    form.defaults = {'myList': [{'a':'foo','b':'b'}]}
+    return form
+
+def test_SequenceOfStructuresWithSelects(self, sel):
+    sel.open("/SequenceOfStructuresWithSelects")
+
+    try: self.assertEqual("foo", sel.get_value("form-myList-0-a"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    try: self.assertEqual("b", sel.get_value("form-myList-0-b"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.click_at("css=#form-myList-field > a", "")
+    try: self.assertEqual("", sel.get_value("form-myList-1-a"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    try: self.assertEqual("", sel.get_value("form-myList-1-b"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    return
 
