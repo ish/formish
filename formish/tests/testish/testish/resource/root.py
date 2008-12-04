@@ -38,12 +38,17 @@ class FormResource(resource.Resource):
 
     @templating.page('form.html')
     def render_form(self, request, form=None, data=None):
+        if request.GET.get('show_tests','False') == 'True':
+            tests = extract_function.extract('test_%s'%self.id)
+            tests += '<a href="?show_tests=False">Click here to hide tests</a>'
+        else:
+            tests = '<a href="?show_tests=True">Click here to see tests</a>'
         if form is None:
             form = self.form_getter()
         return {'title': self.title, 'description': self.description,
                 'form': form, 'data': pformat(data),
                 'definition': extract_function.extract(self.id),
-                'tests': extract_function.extract('test_%s'%self.id)}
+                'tests': tests}
     
     @resource.POST()
     def POST(self, request):

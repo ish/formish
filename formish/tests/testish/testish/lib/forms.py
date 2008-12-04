@@ -20,11 +20,26 @@ def SimpleString():
 
 def test_SimpleString(self, sel):
     sel.open("/SimpleString")
-    sel.type("form-myStringField", "test")
+
     sel.click("form-action-submit")
-    sel.wait_for_page_to_load("3000")
-    self.failUnless("{'myStringField': u'test'}" in sel.get_text('id=data'))
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myStringField': None}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myStringField", "Test")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myStringField': u'Test'}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myStringField", "80")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myStringField': u'80'}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
     return
+
 
 def SimpleInteger():
     """
@@ -37,15 +52,32 @@ def SimpleInteger():
 
 def test_SimpleInteger(self,sel):
     sel.open("/SimpleInteger")
+
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myIntegerField': None}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
     sel.type("form-myIntegerField", "a")
     sel.click("form-action-submit")
-    sel.wait_for_page_to_load("3000")
-    self.failUnless("Not a valid number" in sel.get_text('id=form'))
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("Not a valid number"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myIntegerField", "8.0")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("Not a valid number"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
     sel.type("form-myIntegerField", "8")
     sel.click("form-action-submit")
-    sel.wait_for_page_to_load("3000")
-    self.failUnless("{'myIntegerField': 8}" in sel.get_text('id=data'))
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myIntegerField': 8}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
     return
+
 
 def SimpleDate():
     """
@@ -57,15 +89,32 @@ def SimpleDate():
     return form
 
 def test_SimpleDate(self, sel):
+
     sel.open("/SimpleDate")
-    sel.type("form-myDateField", "8")
+
     sel.click("form-action-submit")
-    sel.wait_for_page_to_load("3000")
-    self.failUnless("Invalid date" in sel.get_text('id=form'))
-    sel.type("form-myDateField", "2008-12-8")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myDateField': None}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myDateField", "a")
     sel.click("form-action-submit")
-    sel.wait_for_page_to_load("3000")
-    self.failUnless("{'myDateField': datetime.date(2008, 12, 8)}" in sel.get_text('id=data'))
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("Invalid date"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myDateField", "18/12/1966")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("Invalid date"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myDateField", "2008-12-18")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myDateField': datetime.date(2008, 12, 18)}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
     return
 
 def SimpleFloat():
@@ -79,15 +128,33 @@ def SimpleFloat():
 
 def test_SimpleFloat(self, sel):
     sel.open("/SimpleFloat")
+
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myFloatField': None}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
     sel.type("form-myFloatField", "a")
     sel.click("form-action-submit")
-    sel.wait_for_page_to_load("3000")
-    self.failUnless("Not a valid number" in sel.get_text('id=form'))
-    sel.type("form-myFloatField", "1.5")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("Not a valid number"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myFloatField", "11")
     sel.click("form-action-submit")
-    sel.wait_for_page_to_load("3000")
-    self.failUnless("{'myFloatField': 1.5}" in sel.get_text('id=data'))
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myFloatField': 11.0}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myFloatField", "12.27")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myFloatField': 12.27}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
     return
+
+
 
 def SimpleBoolean():
     """
@@ -100,18 +167,78 @@ def SimpleBoolean():
 
 def test_SimpleBoolean(self, sel):
     sel.open("/SimpleBoolean")
+
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myBooleanField': None}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
     sel.type("form-myBooleanField", "a")
     sel.click("form-action-submit")
-    sel.wait_for_page_to_load("3000")
-    self.failUnless("either True or False" in sel.get_text('id=form'))
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("u'a' should be either True or False"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myBooleanField", "t")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("u't' should be either True or False"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
     sel.type("form-myBooleanField", "True")
     sel.click("form-action-submit")
-    sel.wait_for_page_to_load("3000")
-    self.failUnless("{'myBooleanField': True}" in sel.get_text('id=data'))
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myBooleanField': True}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
     sel.type("form-myBooleanField", "False")
     sel.click("form-action-submit")
-    sel.wait_for_page_to_load("3000")
-    self.failUnless("{'myBooleanField': False}" in sel.get_text('id=data'))
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myBooleanField': False}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
     return
 
+
+def SimpleDecimal():
+    """
+    A simple form with a single decimal field
+    """
+    schema = schemaish.Structure()
+    schema.add('myDecimalField', schemaish.Decimal())
+    form = formish.Form(schema, 'form')
+    return form
+
+
+def test_SimpleDecimal(self, sel):
+    sel.open("/SimpleDecimal")
+
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myDecimalField': None}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myDecimalField", "a")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("Not a valid number"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myDecimalField", "1")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myDecimalField': Decimal(\"1\")}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myDecimalField", "18.001")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myDecimalField': Decimal(\"18.001\")}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    return
+
+
+
+    
 
