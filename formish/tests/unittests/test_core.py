@@ -5,7 +5,9 @@ from schemaish import *
 from formish.dottedDict import dottedDict
 import copy
 from webob import MultiDict
-from validatish import validate
+import validatish
+
+
 class DummyObject():
     pass
 
@@ -99,7 +101,7 @@ class TestFormBuilding(unittest.TestCase):
     def test_nested_form_validation_errors(self):
         schema_nested = Structure([
             ("one", Structure([
-                ("a", String(validator=validate.required)),
+                ("a", String(validator=validatish.Required())),
                 ("b", String()),
                 ("c", Structure([("x", String()),("y", String())])),
                 ])
@@ -123,7 +125,7 @@ class TestFormBuilding(unittest.TestCase):
     def test_nested_form_validation_output(self):
         schema_nested = Structure([
             ("one", Structure([
-                ("a", String(validator=validate.required)),
+                ("a", String(validator=validatish.Required())),
                 ("b", String()),
                 ("c", Structure([("x", String()),("y", String())])),
                 ])

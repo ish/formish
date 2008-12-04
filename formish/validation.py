@@ -1,6 +1,6 @@
 import re
 from formish.dottedDict import dottedDict
-from validatish.validate import Invalid
+from validatish import Invalid
 from convertish import convert
 
 def convert_sequences(d):

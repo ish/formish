@@ -8,7 +8,7 @@ from convertish.convert import *
 from formish.validation import *
 from formish.widgets import *
 from formish.renderer import _default_renderer
-from validatish.validate import Required, required
+from validatish import Required, validation_includes
 
 
 class Action(object):
@@ -48,23 +48,6 @@ def _classes(self):
         classes.append('error')
     return ' '.join(classes)
             
-
-def _required(self):
-    """ Does this field have a Not Empty validator of some sort """
-    hasrequiredvalidator = _isNotEmpty(self.attr.validator)
-    return hasrequiredvalidator
-
-
-def _isNotEmpty(validator):
-    """ parses through validators to work out if there is a not empty validator """
-    if validator is None:
-        return False
-    if isinstance(validator, Required) or validator is required:
-        return True
-    if hasattr(validator,'validators'):
-        for v in validator.validators:
-            _isNotEmpty(v)
-    return False
 
 def starify(name):
     newname = []
@@ -112,7 +95,7 @@ class Field(object):
     @property 
     def required(self):
         """ Does this field have a Not Empty validator of some sort """
-        return _required(self)
+        return validation_includes(self.attr.validator, Required)
         
     @property
     def description(self):
@@ -201,7 +184,7 @@ class Collection(object):
     @property 
     def required(self):
         """ Does this field have a Not Empty validator of some sort """
-        return _required(self)
+        return validation_includes(self.attr.validator, Required)
 
     @property
     def description(self):
