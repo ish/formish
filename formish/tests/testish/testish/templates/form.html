@@ -1,0 +1,27 @@
+<%inherit file="base.html"/>
+
+<div id="primary">
+
+<h2>${title}</h2>
+${description|n}
+
+${form()|n}
+
+<div id="data">
+  <h3>Data</h3>
+<pre>
+${data}
+</pre>
+</div>
+
+<div id="definition">
+<h3>Form Definition</h3>
+${definition|n}
+</div>
+</div>
+<div id="secondary">
+<h3>Tests</h3>
+${tests|n}
+</div>
+
+<%def name="header()">${title}</%def>

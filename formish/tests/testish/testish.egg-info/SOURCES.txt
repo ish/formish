@@ -1,0 +1,12 @@
+setup.py
+testish/__init__.py
+testish/wsgiapp.py
+testish.egg-info/PKG-INFO
+testish.egg-info/SOURCES.txt
+testish.egg-info/dependency_links.txt
+testish.egg-info/entry_points.txt
+testish.egg-info/not-zip-safe
+testish.egg-info/requires.txt
+testish.egg-info/top_level.txt
+testish/resource/__init__.py
+testish/resource/root.py

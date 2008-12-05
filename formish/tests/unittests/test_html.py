@@ -7,7 +7,7 @@ from formish.widgets import *
 from BeautifulSoup import BeautifulSoup
 from formish import validation as fv
 from datetime import date
-import validatish
+from validatish import validator as v
 
 
 class TestHTML(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestHTML(unittest.TestCase):
     def test_error_html(self):
         r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
         r.POST['one'] = ''
-        schema = schemaish.Structure([('one', schemaish.String(validator=validatish.Required()))])
+        schema = schemaish.Structure([('one', schemaish.String(validator=v.Required()))])
         f = Form(schema,name="form")
         try:
             data = f.validate(r)
@@ -37,8 +37,8 @@ class TestHTML(unittest.TestCase):
         
     def test_complex_form(self):
         
-        one = Structure([("a", String(validator=validatish.All(validatish.Email(), validatish.Required()))), ("b", String()), ("c", Sequence(Integer()))])
-        two = Structure([("a", String()), ("b", Date()), ('c', Sequence(String())), ("d", String()), ("e", Integer(validator=validatish.Required())), ("f", String(validator=validatish.Required())) ])
+        one = Structure([("a", String(validator=v.All(v.Email(),v.Required()))), ("b", String()), ("c", Sequence(Integer()))])
+        two = Structure([("a", String()), ("b", Date()), ('c', Sequence(String())), ("d", String()), ("e", Integer(validator=v.Required())), ("f", String(validator=v.Required())) ])
         schema = Structure([("one", one), ("two", two)])
         f = Form(schema,name="form")
 
@@ -54,11 +54,10 @@ class TestHTML(unittest.TestCase):
         soup = BeautifulSoup(f())
         ## Latch the results for acceptance tests
         #open('formish/tests/expectations/test_complex_form.html','w').write(html)
-        expectedSoup = BeautifulSoup( open('formish/tests/expectations/test_complex_form.html').read())
+        expectedSoup = BeautifulSoup( open('formish/tests/unittests/expectations/test_complex_form.html').read())
         
         #assert soup == expectedSoup
 
 
 if __name__ == '__main__':
     unittest.main()
-

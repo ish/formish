@@ -1,0 +1,52 @@
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+  <meta name="description" value="" />
+  <meta name="keywords" value="" />
+  <title>${self.header()}</title>
+  <link href="/css/formish.css" type="text/css" rel="stylesheet" />
+  <link href="/css/base.css" type="text/css" rel="stylesheet" />
+  <link href="/css/pygments.css" type="text/css" rel="stylesheet" />
+  <link href="/css/tripoli/tripoli.css" type="text/css" rel="stylesheet" />
+  <script src="/js/jquery-1.2.6.min.js" type="text/javascript"></script>
+  <script src="/js/jquery.base64.js" type="text/javascript"></script>
+  <script src="/js/jquery-sortable.js" type="text/javascript"></script>
+  <script src="/js/formish.js" type="text/javascript"></script>
+  
+  <script type="text/javascript">
+   //<![CDATA[
+$(document).ready(function() {
+    formish();
+});
+   //]]>
+  </script>
+</head>
+
+<body class="l1">
+  <div id="container">
+<div id="header">
+  <h1><a href="/">Formish</a></h1>
+</div>
+<div id="body" class="content">
+  ${self.body()}
+</div>
+
+
+<div id="footer">
+  &copy; <strong class="infomy">Tim and Matt</strong> 
+</div>
+</div>
+</body>
+</html>
+
+<%def name="title()">
+% if hasattr(self, 'page_title'):
+  ${self.page_title()} @ Formish Tests
+% else:
+  Formish Tests
+% endif
+</%def>
+
+
+

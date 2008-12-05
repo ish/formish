@@ -1,0 +1,24 @@
+h1 {
+  font-size: 2em;
+}
+h2 {
+  font-size: 1.6em;
+}
+#footer {
+  color: #999;
+}
+
+#header {
+  background-color: #ccc;
+  padding: 20px;
+}
+
+#primary, #secondary, #footer {
+  margin: 0 20px;
+}
+
+pre {
+  margin: 10px; 
+  padding: 10px;
+}
+
