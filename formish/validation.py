@@ -141,9 +141,12 @@ class FormishError(Exception):
     The message is not passed on to the Exception base class because it doesn't
     seem to be able to handle unicode at all.
     """
-    def __init__(self, message):
-        Exception.__init__(self, message)
+    def __init__(self, message, *a):
+        Exception.__init__(self, message, *a)
         self.message = message
+    def __str__(self):
+        return self.message
+    __unicode__ = __str__
 
 
 class FormError(FormishError):
@@ -152,6 +155,7 @@ class FormError(FormishError):
     signal that the form (not an individual field) failed to validate.
     """
     pass
+
     
 class NoActionError(FormishError):
     """
@@ -167,7 +171,7 @@ class FieldError(FormishError):
     field name are stored as attributes.
     """
     def __init__(self, message, fieldName=None):
-        FormishError.__init__(self, message)
+        FormishError.__init__(self, message, fieldName)
         self.fieldName = fieldName
 
 
@@ -184,3 +188,4 @@ class FieldRequiredError(FieldValidationError):
     entered.
     """
     pass
+

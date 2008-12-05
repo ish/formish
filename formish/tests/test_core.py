@@ -119,7 +119,7 @@ class TestFormBuilding(unittest.TestCase):
         # Do we get an error
         self.assert_( isinstance(form.errors['one.a'], attr.Invalid) )
         # Is the error message correct
-        self.assertEqual( form.errors['one.a'].msg, "is required" )
+        self.assertEqual( form.errors['one.a'].message, "is required" )
 
         
     def test_nested_form_validation_output(self):
