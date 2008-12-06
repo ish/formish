@@ -60,7 +60,10 @@ class FormResource(resource.Resource):
     @templating.page('form.html')
     def render_form(self, request, form=None, data=None):
         if request.GET.get('show_tests','False') == 'True':
-            tests = extract_function.extract('test_%s'%self.id)
+            tests = '<h4>Selenium (Func) Tests</h4>'
+            tests += extract_function.extract('functest_%s'%self.id)
+            tests += '<h4>Unit Tests</h4>'
+            tests += extract_function.extract('unittest_%s'%self.id)
             tests += '<a href="?show_tests=False">Click here to hide tests</a>'
         else:
             tests = '<a href="?show_tests=True">Click here to see tests</a>'

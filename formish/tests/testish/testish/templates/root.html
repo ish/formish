@@ -34,7 +34,7 @@ links(ids)
 <%def name="links(ids)">
 <ul>
 %for f in get_forms(ids):
-  <li><a href="/${f['name']}?show_tests=True">${f['title']}</a> -- ${f['summary']|n}</li>
+  <li><a href="/${f['name']}">${f['title']}</a> -- ${f['summary']|n}</li>
 % endfor
 </ul>
 </%def>

@@ -3,6 +3,8 @@ import formish, schemaish, validatish
 
 from testish.lib import base
 
+import datetime
+
 log = logging.getLogger(__name__)
 
 ##
@@ -18,7 +20,7 @@ def SimpleString():
     form = formish.Form(schema, 'form')
     return form
 
-def test_SimpleString(self, sel):
+def functest_SimpleString(self, sel):
     sel.open("/SimpleString")
 
     sel.click("form-action-submit")
@@ -40,6 +42,23 @@ def test_SimpleString(self, sel):
 
     return
 
+def unittest_SimpleString(self):
+    # Test no data
+    f = SimpleString()
+    self.assertIdHasValue(f, 'form-myStringField', '')
+    # Test None data
+    f = SimpleString()
+    testdata = {'myStringField': None}
+    f.defaults = testdata
+    self.assertIdHasValue(f, 'form-myStringField', '')
+    self.assertRoundTrip(f, testdata)
+    # Test sample data
+    f = SimpleString()
+    testdata = {'myStringField': '8'}
+    f.defaults = testdata
+    self.assertIdHasValue(f, 'form-myStringField', '8')
+    self.assertRoundTrip(f, testdata)
+
 
 def SimpleInteger():
     """
@@ -50,7 +69,7 @@ def SimpleInteger():
     form = formish.Form(schema, 'form')
     return form
 
-def test_SimpleInteger(self,sel):
+def functest_SimpleInteger(self,sel):
     sel.open("/SimpleInteger")
 
     sel.click("form-action-submit")
@@ -78,6 +97,22 @@ def test_SimpleInteger(self,sel):
 
     return
 
+def unittest_SimpleInteger(self):
+    # Test no data
+    f = SimpleInteger()
+    self.assertIdHasValue(f, 'form-myIntegerField', '')
+    # Test None data
+    f = SimpleInteger()
+    testdata = {'myIntegerField': None}
+    f.defaults = testdata
+    self.assertIdHasValue(f, 'form-myIntegerField', '')
+    self.assertRoundTrip(f, testdata)
+    # Test sample data
+    f = SimpleInteger()
+    testdata = {'myIntegerField': 8}
+    f.defaults = testdata
+    self.assertIdHasValue(f, 'form-myIntegerField', '8')
+    self.assertRoundTrip(f, testdata)
 
 def SimpleDate():
     """
@@ -88,7 +123,7 @@ def SimpleDate():
     form = formish.Form(schema, 'form')
     return form
 
-def test_SimpleDate(self, sel):
+def functest_SimpleDate(self, sel):
 
     sel.open("/SimpleDate")
 
@@ -126,7 +161,7 @@ def SimpleFloat():
     form = formish.Form(schema, 'form')
     return form
 
-def test_SimpleFloat(self, sel):
+def functest_SimpleFloat(self, sel):
     sel.open("/SimpleFloat")
 
     sel.click("form-action-submit")
@@ -165,7 +200,7 @@ def SimpleBoolean():
     form = formish.Form(schema, 'form')
     return form
 
-def test_SimpleBoolean(self, sel):
+def functest_SimpleBoolean(self, sel):
     sel.open("/SimpleBoolean")
 
     sel.click("form-action-submit")
@@ -210,7 +245,7 @@ def SimpleDecimal():
     return form
 
 
-def test_SimpleDecimal(self, sel):
+def functest_SimpleDecimal(self, sel):
     sel.open("/SimpleDecimal")
 
     sel.click("form-action-submit")
@@ -305,7 +340,7 @@ def SequenceOfStructuresWithSelects():
     form.defaults = {'myList': [{'a':'foo','b':'b'}]}
     return form
 
-def test_SequenceOfStructuresWithSelects(self, sel):
+def functest_SequenceOfStructuresWithSelects(self, sel):
     sel.open("/SequenceOfStructuresWithSelects")
 
     try: self.assertEqual("foo", sel.get_value("form-myList-0-a"))
