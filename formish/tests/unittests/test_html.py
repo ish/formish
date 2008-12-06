@@ -30,6 +30,7 @@ class TestHTML(unittest.TestCase):
             data = f.validate(r)
         except fv.FormError, e:
             assert isinstance(f.errors['one'], attr.Invalid)        
+        print f()
         soup = BeautifulSoup(f())
         print soup.find(id='form-one-field').find("span", "error").string
         assert soup.find(id='form-one-field').find("span", "error").string == 'is required' , "test that the form error is being created"
