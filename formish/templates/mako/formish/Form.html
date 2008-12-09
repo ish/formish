@@ -31,9 +31,9 @@ else:
 </%def>
 
 <%def name="fields(form)">
-    % for f in form.fields:
-      ${f()|n}
-    % endfor
+%for f in form.fields:
+${f()|n}
+%endfor
 </%def>    
     
 <%def name="actions(form)">

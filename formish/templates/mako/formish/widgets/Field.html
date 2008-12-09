@@ -1,0 +1,16 @@
+<%namespace name="fieldmodule" file="/formish/Field.html" />
+<%page args="field" />
+<div id="${field.cssname}-field" class="${field.classes}">
+  % if field.widget._template != 'Hidden':
+  <label for="${field.cssname}">${field.title}</label>
+  %endif
+  <div class="inputs">
+    ${self.body(field)}
+  </div>
+  % if field.widget._template != 'Hidden':
+  ${fieldmodule.error(field)}
+  % if field.description:
+  <span class="description">${field.description}</span>
+  % endif
+  % endif
+</div>

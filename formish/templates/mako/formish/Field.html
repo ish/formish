@@ -1,38 +1,5 @@
 <%def name="field(f)">
-%if f.type is 'field' or (f.type is 'sequence' and f.widget is not None and f.widget.widget.__class__.__name__ in ['TextArea','CheckboxMultiChoice']):
-<div id="${f.cssname}-field" class="${f.classes}">
-  % if f.widget.widget.__class__.__name__ != 'Hidden':
-  <label for="${f.cssname}">${f.title}</label>
-  %endif
-  <div class="inputs">
-    ${widget(f)}
-  </div>
-  % if f.widget.widget.__class__.__name__ != 'Hidden':
-  ${error(f)}
-  % if f.description:
-  <span class="description">${f.description}</span>
-  % endif
-  % endif
-</div>
-%elif f.type is 'sequence' and f.widget is not None:
 ${widget(f)}
-%else:
-<fieldset id="${f.cssname}-field" class="${f.classes}">
-  % if f.title:
-  <legend>${f.title}</legend>
-  % endif
-  ${error(f)}
-  % if f.description:
-  <div class="description">${f.description}</div>
-  % endif
-  % for ff in f.fields:
-      ${ff()|n}
-  % endfor
-  % if f.type is 'sequence':
-     <input type="hidden" name="${f.template.name}" class="adder" value="${fieldtemplate(f.template)}" />
-  % endif
-</fieldset>
-%endif
 </%def>
 
 <%def name="error(field)">
@@ -42,7 +9,7 @@ ${widget(f)}
 </%def>
 
 <%def name="widget(field)">
-<%include file="/formish/widgets/${field.widget.widget._template}.html" args="field=field"/>
+<%include file="/formish/widgets/${field.widget._template}.html" args="field=field"/>
 </%def>
 
 

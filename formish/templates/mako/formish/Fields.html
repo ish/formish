@@ -1,0 +1,39 @@
+%if f.widget is not None:
+  ${widget(f)}
+%else:
+<fieldset id="${f.cssname}-field" class="${f.classes}">
+  % if f.title:
+  <legend>${f.title}</legend>
+  % endif
+  ${error(f)}
+  % if f.description:
+  <div class="description">${f.description}</div>
+  % endif
+  ${f.structure()}
+  % if f.type is 'sequence':
+     <input type="hidden" name="${f.template.name}" class="adder" value="${fieldtemplate(f.template)}" />
+  % endif
+</fieldset>
+%endif
+
+<%def name="error(field)">
+% if field.error:
+<span class="error">${unicode(field.error)}</span>
+% endif
+</%def>
+
+<%def name="widget(field)">
+<%include file="/formish/widgets/${field.widget.widget._template}.html" args="field=field"/>
+</%def>
+
+
+<%!
+def b64(text):
+    import base64
+    return base64.b64encode(text)
+%>
+
+<%def name="fieldtemplate(f)" filter="b64, trim">
+    ${f()|n}
+</%def>
+

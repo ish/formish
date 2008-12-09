@@ -1,13 +1,6 @@
 <%page args="field" />
 
-<div id="${field.cssname}-field" class="${field.classes}">
-  <label for="${field.cssname}">${field.title}</label>
-  <div class="inputs">
-
-
-
 <%def name="render_subtree(field,options,optiontree,prefix='')">
-
 <%
     optionkeys = [option[0] for option in options]
 %>
@@ -28,13 +21,5 @@
 %   endif
 </%def>
 
-  ${render_subtree(field,field.widget.widget.options,field.widget.widget.optiontree)}
+${render_subtree(field,field.widget.widget.options,field.widget.widget.optiontree)}
 
-  </div>
-  % if field.error:
-  <span class="error">${unicode(field.error)}</span>
-  % endif
-  % if field.description:
-  <span class="description">${field.description}</span>
-  % endif
-</div>

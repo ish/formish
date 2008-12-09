@@ -248,7 +248,7 @@ class Collection(object):
         try:
             return BoundWidget(self.form.get_item_data(starify(self.name),'widget'), self)
         except KeyError:
-            return None
+            return BoundWidget(SequenceDefault(),self)
     
     @property
     def value(self):
@@ -274,9 +274,11 @@ class Collection(object):
     
 class Group(Collection):
     type = 'group'
+    _template='structure'
 
 class Sequence(Collection):
     type = 'sequence'
+    _template = 'ssequence'
     
     @property
     def fields(self):
@@ -324,6 +326,7 @@ class BoundWidget(object):
         self.field = field
         self.cssClass=widget.cssClass
         self.converttostring = widget.converttostring
+        self._template = widget._template
         
     def pre_render(self, schemaType, data):
         return self.widget.pre_render(schemaType, data)
