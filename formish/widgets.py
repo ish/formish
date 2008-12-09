@@ -241,8 +241,10 @@ class FileUpload(Widget):
     
     def convert(self, schemaType, data):
         # XXX We could add a file converter that converts this to a string data?
-        if data['name'] == [''] or data['name'] == data['default']:
+        if data['name'] == ['']:
             return None
+        elif data['name'] == data['default']:
+            return type.File(None, None, None)
         else:
             filename = data['name'][0]
             path_for_file = self.fileHandler.get_path_for_file(filename)
