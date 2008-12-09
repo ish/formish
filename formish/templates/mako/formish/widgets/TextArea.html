@@ -1,7 +1,15 @@
 <%inherit file="/formish/widgets/Field.html"/>
 <%page args="field" />
 <%
-cols = 'cols="%s"'%field.widget.widget.cols
-rows = 'rows="%s"'%field.widget.widget.rows
+cols = field.widget.widget.cols
+rows = field.widget.widget.rows
+if cols is not None:
+    cols = 'cols="%s"'%field.widget.widget.cols
+else:
+    cols = ''
+if rows is not None:
+    rows = 'rows="%s"'%field.widget.widget.rows
+else:
+    rows = ''
 %>
 <textarea id="${field.cssname}" name="${field.name}"${cols|n}${rows|n}>${field.value[0]}</textarea>
