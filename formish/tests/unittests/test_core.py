@@ -91,10 +91,10 @@ class TestFormBuilding(unittest.TestCase):
         request =  Request(name, r)
         form = Form(schema_nested, name)
         # request to data
-        rdtd = convertRequestDataToData(form.structure, dottedDict(copy.deepcopy(request.POST)))
+        rdtd = convert_request_data_to_data(form.structure, dottedDict(copy.deepcopy(request.POST)))
         assert rdtd == dottedDict(reqr)
         # data to request
-        dtrd = convertDataToRequestData(form.structure, dottedDict(data))
+        dtrd = convert_data_to_request_data(form.structure, dottedDict(data))
         assert dtrd == reqrdata
 
 
@@ -155,9 +155,9 @@ class TestFormBuilding(unittest.TestCase):
         # Does the form produce an int and a string
         self.assertEquals(form.validate(request), {'a': 3, 'b': '4'})
         # Does the convert request to data work
-        self.assertEqual( convertRequestDataToData(form.structure, dottedDict(request.POST)) , {'a': 3, 'b': '4'})
+        self.assertEqual( convert_request_data_to_data(form.structure, dottedDict(request.POST)) , {'a': 3, 'b': '4'})
         # Does the convert data to request work
-        self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == reqr)
+        self.assert_( convert_data_to_request_data(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == reqr)
         
           
     def test_datetuple_type(self):
@@ -176,9 +176,9 @@ class TestFormBuilding(unittest.TestCase):
         # Check the data is converted correctly
         self.assertEquals(form.validate(request), {'a': d, 'b': '4'})
         # Check req to data
-        self.assertEqual( convertRequestDataToData(form.structure, dottedDict(request.POST)) , dottedDict({'a': d, 'b': '4'}))
+        self.assertEqual( convert_request_data_to_data(form.structure, dottedDict(request.POST)) , dottedDict({'a': d, 'b': '4'}))
         # Check data to req
-        self.assert_( convertDataToRequestData(form.structure, dottedDict( {'a': d, 'b': '4'} )) == dottedDict({'a': {'month': [3], 'day': [1], 'year': [1966]}, 'b': ['4']}))
+        self.assert_( convert_data_to_request_data(form.structure, dottedDict( {'a': d, 'b': '4'} )) == dottedDict({'a': {'month': [3], 'day': [1], 'year': [1966]}, 'b': ['4']}))
                
 if __name__ == "__main__":
     unittest.main()

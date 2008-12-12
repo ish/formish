@@ -32,7 +32,7 @@ class Test(unittest.TestCase):
                 getattr(forms,attr)(self)
 
     def assertRoundTrip(self, f, testdata):
-        r = self.request(f._getRequestData())
+        r = self.request(f._get_request_data())
         d = f.validate(r)
         self.assertEquals(d, testdata)
 

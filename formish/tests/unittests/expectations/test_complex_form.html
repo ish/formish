@@ -48,7 +48,7 @@ class TestHTML(unittest.TestCase):
         f['two.d'].widget = RadioChoice([('opt1',"Options 1"),('opt2',"Option 2")])
         f['two.f'].widget = CheckedPassword()
 
-        f.addAction(lambda x: x, 'submit', label="Submit Me")
+        f.add_action(lambda x: x, 'submit', label="Submit Me")
         f.defaults = {'one': {'a' : 'ooteenee','c':['3','4','5']}, 'two': {'a': 'opt1','b': date(1966,1,3),'c':['opt2'],'d':'opt2'} } 
         soup = BeautifulSoup(f())
         ## Latch the results for acceptance tests

@@ -107,10 +107,10 @@ class Field(object):
         
     @property
     def value(self):
-        """Convert the requestData to a value object for the form or None."""
+        """Convert the request_data to a value object for the form or None."""
         if '*' in self.name:
             return ['']
-        return self.form._requestData[self.name]
+        return self.form._request_data[self.name]
 
     @property
     def error(self):
@@ -147,7 +147,6 @@ class Field(object):
 class Collection(object):
     """
     A wrapper for a schema group type that includes form information.
-    
     The Schema structure does not have any bindings to the form library, it can be
     used on it's own. We bind the schema Structure Attribute to a Group which includes form information.
     
@@ -252,8 +251,8 @@ class Collection(object):
     
     @property
     def value(self):
-        """Convert the requestData to a value object for the form or None."""
-        return self.form._requestData.get(self.name,[''])
+        """Convert the request_data to a value object for the form or None."""
+        return self.form._request_data.get(self.name,[''])
     
     def __repr__(self):
         return '<formish %s name="%s">'%(self.type, self.name)
@@ -352,8 +351,15 @@ class BoundWidget(object):
 
 class Form(object):
     """
+    The definition of a form
+
     The Form type is the container for all the information a form needs to
     render and validate data.
+
+    :var name: The name of the form, used to namespace classes and ids
+    :var defaults: Property to allow getting and setting of defaults
+    :var error: Used to indicate a non field specific error on the form. None
+                if no error
     """    
 
     renderer = _default_renderer
@@ -361,50 +367,49 @@ class Form(object):
     _element_name = None
     _name = None
 
-    __requestData = None
+    __request_data = None
     _POST = None
 
-    def __init__(self, structure, name=None, defaults=None, errors=None,
-            action_url=None, embed_schema=False, renderer=None):
+    def __init__(self, structure, name='formish', defaults={}, errors={},
+            action_url=None, renderer=None):
         """
-        The form can be initiated with a set of data defaults (using defaults) or with some requestData. The requestData
-        can be instantiated in order to set up a partially completed form with data that was persisted in some fashion.
-        
-        @param structure:       a Schema Structure attribute to bind to the the form
-        @type structure:        Schema Structure Attribute object
-        @param name:            Optional form name used to identify multiple forms on the same page (defaults to 'formish'; can't be empty).
-        @type name:             String
-        @param defaults:        Defaults to override the standard form widget defaults
-        @type defaults:         Dictionary (dotted or nested)
-        @param widgets:         Widgets to use for form fields
-        @type widgets:          Dictionary (dotted or nested)
-        @param errors:          Errors to store on the form for redisplay
-        @type errors:           Dictionary of validation error objects
+        Create a new form instance
+
+        :arg structure: Schema Structure attribute to bind to the the form
+        :type structure: schemaish.Structure
+
+        :arg name: Optional form name used to identify multiple forms on the same page
+        :type name: str "valid html id"
+            
+        :arg defaults: Default values for the form
+        :type defaults: dict
+
+        :arg errors: Errors to store on the form for redisplay
+        :type errors: dict
+
+        :arg action_url: Use if you don't want the form to post to itself
+        :type action_url: string "url or path"
+
+        :arg renderer: Something that returns a form serialization when called
+        :type renderer: callable
+
+
         """
         self.structure = Group(None, structure, self)
         self.item_data = {}
         self.name = name
-        self.defaults = defaults or {}
-        self.errors = dottedDict(errors or {})
+        self.defaults = defaults
+        self.errors = dottedDict(errors)
         self.error = None
         self.actions = []
         self.action_url = action_url
-        self.embed_schema = embed_schema
         if renderer is not None:
             self.renderer = renderer
 
-    # This hasn't been implemented yet but this is roughly how it should be..
-    # if we can implement the formish builder function - most of the rest is
-    # done
-    # XXX I know it's only an idea but you *really* don't want to introduce a
-    # formish -> formishbuilder -> formish dependency !!! -- mg
-    ##def schema_json(self):
-        ##schema = self.structure.attrs[0]
-        ##import formishbuilder
-        ##return formishbuilder.convert_schema_to_fb_json(schema)
-        
-        
     def element_name():
+        """
+        property to use when dealing with restish elements
+        """
         def get(self):
             return self._element_name
         def set(self, name):
@@ -415,12 +420,13 @@ class Form(object):
     element_name = element_name()
 
     def name():
+        """
+        The name of the form, used to namespace classes and ids
+        """
         def get(self):
             if self._element_name is not None:
                 return self._element_name
-            if self._name is not None:
-                return self._name
-            return 'formish'
+            return self._name
         def set(self, name):
             if self._element_name is not None:
                 raise Exception("Named forms cannot be used as elements.")
@@ -428,16 +434,19 @@ class Form(object):
         return property(get, set)
     name = name()
 
-    def addAction(self, callback, name="submit", label=None):
+    def add_action(self, callback, name="submit", label=None):
         """ 
-        Add an action object to the form
-        
-        @param callback:       A function to call if this action is triggered
-        @type callback:        Function or Method
-        @param name:           The identifier for this action
-        @type name:            Python identifier string
-        @param label:          Use this label instead of the name for the value (label) of the action
-        @type label:           String
+        Add an action callable to the form
+
+        :arg callback: A function to call if this action is triggered
+        :type callback: callable
+
+        :arg name: The identifier for this action
+        :type name: string
+
+        :arg label: Use this label instead of the form.name for the value of
+            the action (for buttons, the value is used as the text on the button)
+        :type label: string
         
         """
         if name in [action.name for action in self.actions]:
@@ -445,69 +454,77 @@ class Form(object):
         self.actions.append( Action(callback, name, label) )              
 
     def action(self, request, *args):
-        """ Find and call the action callback for the action used """
+        """
+        Find and call the action callback for the action found in the request
+
+        :arg request: request which is used to find the action and also passed through to
+            the callback
+        :type request: webob.Request
+
+        :arg args: list of arguments Pass through to the callback
+        """
         if len(self.actions)==0:
             raise NoActionError('The form does not have any actions')
         for action in self.actions:
             if action.name in request.POST.keys():
-                return action.callback(request,self)
-        return self.actions[0].callback(request, self)
+                return action.callback(request,self, *args)
+        return self.actions[0].callback(request, self, *args)
 
 
-    def get_unvalidated_data(self, request_data, raiseErrors=True):
+    def get_unvalidated_data(self, request_data, raise_exceptions=True):
         """
         Convert the request object into a nested dict in the correct structure
         of the schema but without applying the schema's validation.
+
+        :arg request_data: Webob style request data
+        :arg raise_exceptions: Whether to raise exceptions or return errors
         """
-        data = convertRequestDataToData(self.structure, request_data, errors=self.errors) 
-        if raiseErrors and len(self.errors.keys()):
+        data = convert_request_data_to_data(self.structure, request_data, errors=self.errors) 
+        if raise_exceptions and len(self.errors.keys()):
             raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(self.errors.keys()), self.errors.data))
         return data
     
 
-    ## 
-    #  request_data
-    #
-
-    def _getRequestData(self):
-        if self.__requestData is not None:
-            return self.__requestData
-        self.__requestData = convertDataToRequestData(self.structure, dottedDict(self.defaults))
-        return self.__requestData
-    
-    def _setRequestData(self, requestData):
-        """ 
-        Assign raw request data 
-        
-        @param requestData:     raw request data (e.g. request.POST)
-        @type requestData:      Dictionary (dotted or nested or dottedDict or MultiDict)
+    def _get_request_data(self):
         """
-        self.__requestData = dottedDict(requestData)
+        Convert the forms schema data into request compatible data
+        """
+        if self.__request_data is not None:
+            return self.__request_data
+        self.__request_data = convert_data_to_request_data(self.structure, dottedDict(self.defaults))
+        return self.__request_data
 
-    _requestData = property(_getRequestData, _setRequestData)
+
+    def _set_request_data(self, request_data):
+        """ 
+        Assign raw request data to the form
+        
+        :arg request_data: raw request data (e.g. request.POST)
+        :type request_data: Dictionary (dotted or nested or dottedDict or MultiDict)
+        """
+        self.__request_data = dottedDict(request_data)
+
+    _request_data = property(_get_request_data, _set_request_data)
     
-    
-    ##
-    # defaults
-    #
     
     def _getDefaults(self):
         """ Get the raw default data """
         return dottedDict(self._defaults)
-    
+   
+
     def _setDefaults(self, data):
         """ assign data """
         self._defaults = data
-        self.__requestData = None
+        self.__request_data = None
         self._POST = None
-        
+   
+
     defaults = property(_getDefaults, _setDefaults)
     
 
-
     def validate(self, raw_request):
         """ 
-        Get the data without raising exception and then validate the data. If
+        Get the data without raising exceptions and then validate the data. If
         there are errors, raise them; otherwise return the data
         """
         self.errors = {}
@@ -521,8 +538,8 @@ class Form(object):
         for k in requestPOST.keys():
             if '*' in k:
                 requestPOST.pop(k)
-        request_data = preParseRequestData(self.structure,dottedDict(requestPOST))
-        data = self.get_unvalidated_data(request_data, raiseErrors=False)
+        request_data = pre_parse_request_data(self.structure,dottedDict(requestPOST))
+        data = self.get_unvalidated_data(request_data, raise_exceptions=False)
         try:
             self.structure.attr.validate(data)
         except schemaish.attr.Invalid, e:
@@ -530,25 +547,31 @@ class Form(object):
                 if not self.errors.has_key(key):
                     self.errors[key] = value
         if len(self.errors.keys()) > 0:
-            self.__requestData = request_data
+            self.__request_data = request_data
             raise FormError('Tried to access data but conversion from request failed with %s errors'%(len(self.errors.keys())))
         return data
 
 
-
-    ##
-    # The handler for item_data
-    #
-    
     def set_item_data(self, key, name, value):
+        """
+        Allow the setting os certain attributes on item_data, a dictionary used
+        to associates data with fields.
+        """
+        
         allowed = ['title','widget','description']
         if name in allowed:
             self.item_data.setdefault(key, {})[name] = value
         else:
             raise KeyError('Cannot set data onto this attribute')
 
+
     def get_item_data(self, key, name):
+        """
+        Access item data associates with a field key and an attribute name
+        (e.g. title, widget, description')
+        """
         return self.item_data.get(key, {})[name]
+
 
     def get_item_data_values(self, name):
         d = dottedDict({})
@@ -556,15 +579,28 @@ class Form(object):
             if v.has_key(name):
                 d[k] = v[name]
         return d
-    
+
+
     def __getitem__(self, key):
         return FormAccessor(self, key)
-    
+
+
     @property
     def fields(self):
+        """
+        Return a generator that yields all of the fields at the top level of
+        the form (e.g. if a field is a subsection or sequence, it will be up to
+        the application to iterate that field's fields.
+        """
         return self.structure.fields
-    
+
+
     def get_field(self, name):
+        """
+        Get a field by dotted field name
+
+        :arg name: Dotted name e.g. names.0.firstname
+        """
         segments = name.split('.')
         for field in self.fields:
             if field.name.split('.')[-1] == segments[0]:
@@ -572,13 +608,24 @@ class Form(object):
                     return field
                 else:
                     return field.get_field(segments[1:])
-                
+
+
     def __call__(self):
+        """
+        Calling the Form generates a serialisation using the form's renderer
+        """
         return self.renderer('/formish/Form.html',{'form':self})
         
     
     
 class FormAccessor(object):
+    """
+    Helps in setting item_data on a form
+
+    :arg form: The form instance we're setting data on 
+    :arg key: The dotted key of the field we want to set/get an attribute on e.g. ['x.y']
+    :arg prefix: A prefix used internally for recursion and allowing ['x']['y'] type access
+    """
 
     def __init__(self, form, key, prefix=None):
         self.__dict__['form'] = form
@@ -600,19 +647,4 @@ class FormAccessor(object):
     def __getitem__(self, key):
         return FormAccessor(self.form, key, prefix=self.key)
     
-        
-        
-        
-NOVALUE = object()
-def recursiveDottedGet(o, key):
-    if key == '':
-        if o == NOVALUE:
-            raise KeyError
-        else:
-            return o
-    ks = key.split('.')
-    first = ks[0]
-    remaining = '.'.join(ks[1:])
-    return recursiveDottedGet( o.get(first, NOVALUE), remaining )
-
         
