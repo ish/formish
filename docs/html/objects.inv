@@ -1,0 +1,19 @@
+# Sphinx inventory version 1
+# Project: Formish
+# Version: 0.1
+formish.forms.Form.__call__ method introduction.html
+formish.forms.Form class introduction.html
+formish.forms.Form.validate method introduction.html
+formish.forms.Field.__call__ method introduction.html
+formish.forms.Field.title attribute introduction.html
+formish.forms.Field.description attribute introduction.html
+formish.forms.Form.add_action method introduction.html
+formish.forms.Form.action method introduction.html
+formish.forms.Form.fields attribute introduction.html
+formish.forms.Field.classes attribute introduction.html
+formish.forms.Field.value attribute introduction.html
+formish.forms.Field class introduction.html
+formish.forms.Field.error attribute introduction.html
+formish.forms.Field.widget attribute introduction.html
+formish.forms.Field.required attribute introduction.html
+formish.forms.Field.cssname attribute introduction.html

@@ -14,17 +14,15 @@ if form.action_url:
 else:
     action_url = ''
 %>
-<form id="${form.name}" action="${action_url}" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">
-  <div>
-    <input type="hidden" name="_charset_" />
-    <input type="hidden" name="__formish_form__" value="${form.name}" />
-    
+<form id="${form.name}" action="${action_url}" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+  <input type="hidden" name="_charset_" />
+  <input type="hidden" name="__formish_form__" value="${form.name}" />
 </%def>
 
 <%def name="errors(form)">
-    %if form.error is not None:
-      <p class="error">${unicode(form.error)}</p>
-    %endif
+  %if form.error is not None:
+    <p class="error">${unicode(form.error)}</p>
+  %endif
 </%def>
 
 <%def name="fields(form)">
@@ -34,19 +32,18 @@ ${f()|n}
 </%def>    
     
 <%def name="actions(form)">
-    <div class="actions">
-      %if form.actions == []:
-        <input type="submit" id="${form.name}-action-submit" name="submit" value="Submit" />
-      %else:
-        %for action in form.actions:
-        <input type="submit" id="${form.name}-action-${action.name}" name="${action.name}" value="${action.label}" />
-        %endfor
-      %endif
-    </div>
+  <div class="actions">
+    %if form.actions == []:
+      <input type="submit" id="${form.name}-action-submit" name="submit" value="Submit" />
+    %else:
+      %for action in form.actions:
+      <input type="submit" id="${form.name}-action-${action.name}" name="${action.name}" value="${action.label}" />
+      %endfor
+    %endif
+  </div>
 </%def>
 
 <%def name="footer(form)">
-  </div>
 </form>
 </%def>
 

@@ -372,6 +372,6 @@ def _normalise_options(options):
         if isinstance(option, tuple):
             out.append( option )
         else:
-            out.append( (option, option) )
+            out.append( (option, str(option)) )
     return out
 
