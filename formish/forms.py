@@ -12,9 +12,14 @@ from validatish import Required, validation_includes
 
 
 class Action(object):
-    """ Tracks an action that has been added to a form. """
-    def __init__(self, callback, name, label):
+    """
+    An action that that can added to a form.
 
+    :arg callback: A callable with the signature (request, form, *args)
+    :arg name: an valid html id used to lookup an action
+    :arg label: The 'value' of the submit button and hence the text that people see
+    """
+    def __init__(self, callback, name, label):
         if not util.valid_identifier(name):
             raise FormError('Invalid action name %r.'%name)
         self.callback = callback
@@ -31,7 +36,7 @@ def _cssname(self):
 
 
 def _classes(self):
-    """ Works out a list of classes that can be applied to the field """
+    """ Works out a list of classes that should be applied to the field """
     classes = [
         'field',
         self.attr.__class__.__name__.lower(),
@@ -50,6 +55,9 @@ def _classes(self):
             
 
 def starify(name):
+    """
+    Replace any ints in a dotted key with stars. Used when applying defaults and widgets to fields
+    """
     newname = []
     for key in name.split('.'):
         if isInt(key):
@@ -66,45 +74,56 @@ class Field(object):
     The Schema Type Atribute does not have any bindings to the form library, it can be
     used on it's own. We bind the Schema Attribute to a Field in order to include form
     related information.
+
+    :method __call__: returns a serialisation for this field using the form's renderer - read only
     
     """
     type = 'field'
     def __init__(self, name, attr, form):
         """
-        @param name:            Fields dotted name
-        @type name:             String
-        @param attr:            a Schema attr to bind to the field
-        @type attr:             Schema Attribute object
-        @param form:            The form the field belongs to.
-        @type form:             Form instance.
+        :arg name: Name for the field
+        :arg attr: Schema attr to bind to the field
+        :type attr:  schemaish.attr.*
+        :param form: The form the field belongs to.
+        :type form: formish.Form instance.
         """
         self.name = name
         self.attr = attr
         self.form = form
 
     @property
-    def cssname(self):
-        """ Works out a list of classes that can be applied to the field """
-        return _cssname(self)
-    
-    @property
-    def classes(self):
-        """ Works out a list of classes that can be applied to the field """
-        return _classes(self)
-   
-    @property 
-    def required(self):
-        """ Does this field have a Not Empty validator of some sort """
-        return validation_includes(self.attr.validator, Required)
-        
+    def title(self):
+        """ The Field schema's title """
+        try:
+            return self.form.get_item_data(self.name,'title')
+        except KeyError:
+            if self.attr.title is not None:
+                return self.attr.title
+            else:
+                return util.title_from_name(self.name.split('.')[-1])
+
+
     @property
     def description(self):
-        """ Description attribute """
+        """ The Field schema's description """
         try:
             return self.form.get_item_data(self.name,'description')
         except KeyError:
             return self.attr.description        
-        
+
+
+    @property
+    def cssname(self):
+        """ cssname identifier for the field """
+        return _cssname(self)
+
+
+    @property
+    def classes(self):
+        """ Works out a list of classes that should be applied to the field """
+        return _classes(self)
+  
+
     @property
     def value(self):
         """Convert the request_data to a value object for the form or None."""
@@ -112,11 +131,19 @@ class Field(object):
             return ['']
         return self.form._request_data[self.name]
 
+
+    @property 
+    def required(self):
+        """ Does this field have a Not Empty validator of some sort """
+        return validation_includes(self.attr.validator, Required)
+
+
     @property
     def error(self):
         """ Lazily get the error from the form.errors when needed """
         return self.form.errors.get(self.name, None)
-    
+
+
     @property
     def widget(self):
         """ return the fields widget bound with extra params. """
@@ -127,39 +154,30 @@ class Field(object):
             w = Input()
         return BoundWidget(w, self)
         
-    @property
-    def title(self):
-        try:
-            return self.form.get_item_data(self.name,'title')
-        except KeyError:
-            if self.attr.title is not None:
-                return self.attr.title
-            else:
-                return util.title_from_name(self.name.split('.')[-1])
-            
 
     def __call__(self):
+        """ returns a serialisation for this field using the form's renderer """
         return self.form.renderer('/formish/Field.html',{'f':self})
             
     
 
-
 class Collection(object):
     """
     A wrapper for a schema group type that includes form information.
-    The Schema structure does not have any bindings to the form library, it can be
-    used on it's own. We bind the schema Structure Attribute to a Group which includes form information.
-    
+
+    The Schema structure does not have any bindings to the form library, it can
+    be used on it's own. We bind the schema Structure Attribute to a Group
+    which includes form information.
     """    
+
 
     def __init__(self, name, attr, form):
         """
-        @param name:            Group's dotted name
-        @type name:             String
-        @param attr:            a Schema attr to bind to the this group
-        @type attr:             Schema Attribute object
-        @param form:            The form the field belongs to.
-        @type form:             Form instance.        
+        :arg name: Name for the Collection 
+        :arg attr: Schema attr to bind to the field
+        :type attr:  schemaish.attr.*
+        :param form: The form the field belongs to.
+        :type form: formish.Form instance.
         """
         self.name = name
         self.attr = attr
@@ -170,53 +188,97 @@ class Collection(object):
         if self.title is None and name is not None:
             self.title = util.title_from_name(self.name.split('.')[-1])
 
+
+    @property
+    def description(self):
+        return self.attr.description        
+
+
     @property
     def cssname(self):
         """ Works out a list of classes that can be applied to the field """        
         return _cssname(self)
     
+
     @property
     def classes(self):
         """ Works out a list of classes that can be applied to the field """        
         return _classes(self)           
-            
+   
+
+    @property
+    def value(self):
+        """Convert the request_data to a value object for the form or None."""
+        return self.form._request_data.get(self.name,[''])
+   
+
     @property 
     def required(self):
         """ Does this field have a Not Empty validator of some sort """
         return validation_includes(self.attr.validator, Required)
 
-    @property
-    def description(self):
-        return self.attr.description        
 
     @property
     def defaults(self):
         """Get the defaults from the form."""
         defaults = self.form.defaults.get(self.name,None)
         return defaults
-    
+
+
+    @property
+    def error(self):
+        """ Lazily get the error from the form.errors when needed """
+        return self.form.errors.get(self.name, None)
+
+
+    @property
+    def widget(self):
+        """ return the fields widget bound with extra params. """
+        
+        try:
+            return BoundWidget(self.form.get_item_data(starify(self.name),'widget'), self)
+        except KeyError:
+            return BoundWidget(SequenceDefault(),self)
+
+
+    def get_field(self, segments):
+        for field in self.fields:
+            if field.name.split('.')[-1] == segments[0]:
+                if isinstance(field, Field):
+                    return field
+                else:
+                    return field.get_field(segments[1:])
+
+
+    def __getitem__(self, key):
+        return FormAccessor(self.form, '%s.%s'%(self.name,key))
+
+
     @property
     def attrs(self):
+        """ The schemaish attrs below this collection """
         return self.attr.attrs
-    
+
+
     @property
     def fields(self):
         """ 
-        If we iterate through the fields, lazily bind the schema to the fields
+        Iterate through the fields, lazily bind the schema to the fields
         before returning.
         """
         for attr in self.attr.attrs:
             yield self.bind(attr[0], attr[1])        
-    
+
+
     def bind(self, attr_name, attr):
         """ 
         return cached bound schema as a field; Otherwise bind the attr to a
         Group or Field as appropriate and store on the _fields cache
         
-        @param attr_name:     Form Field/Group identifier
-        @type attr_name:      Python identifier string
-        @param attr:          Attribute to bind
-        @type attr:           Schema attribute
+        :param attr_name:     Form Field/Group identifier
+        :type attr_name:      Python identifier string
+        :param attr:          Attribute to bind
+        :type attr:           Schema attribute
         """
         try:
             return self._fields[attr_name]
@@ -235,50 +297,27 @@ class Collection(object):
             self._fields[attr_name] = bf
             return bf
 
-    @property
-    def error(self):
-        """ Lazily get the error from the form.errors when needed """
-        return self.form.errors.get(self.name, None)
-        
-    @property
-    def widget(self):
-        """ return the fields widget bound with extra params. """
-        
-        try:
-            return BoundWidget(self.form.get_item_data(starify(self.name),'widget'), self)
-        except KeyError:
-            return BoundWidget(SequenceDefault(),self)
-    
-    @property
-    def value(self):
-        """Convert the request_data to a value object for the form or None."""
-        return self.form._request_data.get(self.name,[''])
-    
-    def __repr__(self):
-        return '<formish %s name="%s">'%(self.type, self.name)
-    
-    def get_field(self, segments):
-        for field in self.fields:
-            if field.name.split('.')[-1] == segments[0]:
-                if isinstance(field, Field):
-                    return field
-                else:
-                    return field.get_field(segments[1:])
-                
-    def __getitem__(self, key):
-        return FormAccessor(self.form, '%s.%s'%(self.name,key))
 
     def __call__(self):
         return self.form.renderer('/formish/Field.html',{'f':self})
-    
+
+
+    def __repr__(self):
+        return '<formish %s name="%s">'%(self.type, self.name)
+   
+
+
 class Group(Collection):
     type = 'group'
     _template='structure'
 
+
+
 class Sequence(Collection):
     type = 'sequence'
     _template = 'ssequence'
-    
+
+
     @property
     def fields(self):
         """ 
@@ -319,26 +358,34 @@ class Sequence(Collection):
 
     
 class BoundWidget(object):
-    
+    """
+    Because widget's need to 
+    """  
+   
+
     def __init__(self, widget, field):
         self.widget = widget
         self.field = field
         self.cssClass=widget.cssClass
         self.converttostring = widget.converttostring
         self._template = widget._template
-        
+    
+
     def pre_render(self, schemaType, data):
         return self.widget.pre_render(schemaType, data)
+
 
     def pre_parse_request(self, schemaType, data):
         if hasattr(self.widget,'pre_parse_request'):
             return self.widget.pre_parse_request(schemaType, data)
         else:
             return data
-    
+
+
     def convert(self, schemaType, data):
         return self.widget.convert(schemaType, data)
-        
+
+
     def __repr__(self):
         attrclassstr = str(self.field.attr.__class__)
         if attrclassstr[8:22] == 'schemaish.attr':
@@ -370,7 +417,7 @@ class Form(object):
     __request_data = None
     _POST = None
 
-    def __init__(self, structure, name='formish', defaults={}, errors={},
+    def __init__(self, structure, name=None, defaults={}, errors={},
             action_url=None, renderer=None):
         """
         Create a new form instance
@@ -426,7 +473,9 @@ class Form(object):
         def get(self):
             if self._element_name is not None:
                 return self._element_name
-            return self._name
+            if self._name is not None:
+                return self._name
+            return 'formish'
         def set(self, name):
             if self._element_name is not None:
                 raise Exception("Named forms cannot be used as elements.")

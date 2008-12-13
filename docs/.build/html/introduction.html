@@ -192,6 +192,75 @@ there are errors, raise them; otherwise return the data</dd></dl>
 </dd></dl>
 
 </div>
+<div class="section" id="field-class">
+<h3>Field Class<a class="headerlink" href="#field-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="formish.forms.Field">
+<!--[formish.forms.Field]-->class <tt class="descclassname">formish.forms.</tt><tt class="descname">Field</tt><big>(</big><em>name</em>, <em>attr</em>, <em>form</em><big>)</big><a class="headerlink" href="#formish.forms.Field" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a schema field type that includes form information.</p>
+<p>The Schema Type Atribute does not have any bindings to the form library, it can be
+used on it&#8217;s own. We bind the Schema Attribute to a Field in order to include form
+related information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name" colspan="2">Method __call__:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body"><p class="first">returns a serialisation for this field using the form&#8217;s renderer - read only</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>name</em> &#8211; Name for the field</li>
+<li><em>attr</em> (schemaish.attr.*) &#8211; Schema attr to bind to the field</li>
+<li><em>form</em> (formish.Form instance.) &#8211; The form the field belongs to.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="formish.forms.Field.description">
+<!--[formish.forms.Field.description]--><tt class="descname">description</tt><a class="headerlink" href="#formish.forms.Field.description" title="Permalink to this definition">¶</a></dt>
+<dd>Description attribute</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.cssname">
+<!--[formish.forms.Field.cssname]--><tt class="descname">cssname</tt><a class="headerlink" href="#formish.forms.Field.cssname" title="Permalink to this definition">¶</a></dt>
+<dd>cssname identifier for the field</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.classes">
+<!--[formish.forms.Field.classes]--><tt class="descname">classes</tt><a class="headerlink" href="#formish.forms.Field.classes" title="Permalink to this definition">¶</a></dt>
+<dd>Works out a list of classes that can be applied to the field</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.value">
+<!--[formish.forms.Field.value]--><tt class="descname">value</tt><a class="headerlink" href="#formish.forms.Field.value" title="Permalink to this definition">¶</a></dt>
+<dd>Convert the request_data to a value object for the form or None.</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.required">
+<!--[formish.forms.Field.required]--><tt class="descname">required</tt><a class="headerlink" href="#formish.forms.Field.required" title="Permalink to this definition">¶</a></dt>
+<dd>Does this field have a Not Empty validator of some sort</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.error">
+<!--[formish.forms.Field.error]--><tt class="descname">error</tt><a class="headerlink" href="#formish.forms.Field.error" title="Permalink to this definition">¶</a></dt>
+<dd>Lazily get the error from the form.errors when needed</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.widget">
+<!--[formish.forms.Field.widget]--><tt class="descname">widget</tt><a class="headerlink" href="#formish.forms.Field.widget" title="Permalink to this definition">¶</a></dt>
+<dd>return the fields widget bound with extra params.</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Field.__call__">
+<!--[formish.forms.Field.__call__]--><tt class="descname">__call__</tt><big>(</big><big>)</big><a class="headerlink" href="#formish.forms.Field.__call__" title="Permalink to this definition">¶</a></dt>
+<dd>returns a serialisation for this field using the form&#8217;s renderer</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 </div>
 
@@ -207,6 +276,7 @@ there are errors, raise them; otherwise return the data</dd></dl>
 <li><a class="reference" href="#how-do-i-try-it-out">How do I try it out</a><ul>
 <li><a class="reference" href="#creating-a-schema">Creating a schema</a></li>
 <li><a class="reference" href="#form-class">Form Class</a></li>
+<li><a class="reference" href="#field-class">Field Class</a></li>
 </ul>
 </li>
 </ul>

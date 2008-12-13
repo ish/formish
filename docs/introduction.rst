@@ -63,3 +63,9 @@ Form Class
 
 .. autoclass:: formish.forms.Form
   :members: action, add_action, fields, validate,__call__
+
+Field Class
+-----------
+
+.. autoclass:: formish.forms.Field
+  :members: title, description, cssname, classes, value, required, error, widget,__call__
