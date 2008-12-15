@@ -14,7 +14,7 @@ if form.action_url:
 else:
     action_url = ''
 %>
-<form id="${form.name}" action="${action_url}" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+<form id="${form.name}" action="${action_url}" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">
   <input type="hidden" name="_charset_" />
   <input type="hidden" name="__formish_form__" value="${form.name}" />
 </%def>
