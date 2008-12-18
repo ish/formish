@@ -11,6 +11,7 @@ Contents:
    :maxdepth: 2
 
    introduction
+   restish
 
 Indices and tables
 ==================
