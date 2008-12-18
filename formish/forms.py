@@ -325,11 +325,16 @@ class Sequence(Collection):
         on a fields values and spits out a 
         """
         
-        if self.form._POST is None:
-            v = self.defaults
+        # Work out how many fields are in the sequence.
+        # XXX We can't use self.form.request_data here because to build the
+        # request_data we need to recurse throught the fields ... which calls
+        # Sequence.fields ... which tries to build the request data ... which
+        # calls Sequence.fields, etc, etc. Bang!
+        if self.form._request_data:
+            v = self.form._request_data.get(self.name, [])
         else:
-            v = dottedDict(self.form._POST).get(self.name,[])
-            
+            v = self.defaults
+
         if v is None:
             num_fields = 0
         else:
@@ -415,7 +420,6 @@ class Form(object):
     _name = None
 
     _request_data = None
-    _POST = None
 
     def __init__(self, structure, name=None, defaults={}, errors={},
             action_url=None, renderer=None):
@@ -567,7 +571,6 @@ class Form(object):
         """ assign data """
         self._defaults = data
         self._request_data = None
-        self._POST = None
    
 
     defaults = property(_getDefaults, _setDefaults)
@@ -582,8 +585,6 @@ class Form(object):
         # Check this request was POSTed by this form.
         if not request.method =='POST' and request.POST.get('__formish_form__',None) == self.name:
             raise Exception("request does not match form name")
-        P = request.POST
-        self._POST = request.POST
         
         requestPOST = UnicodeMultiDict(request.POST, encoding=util.getPOSTCharset(request))
         for k in requestPOST.keys():
