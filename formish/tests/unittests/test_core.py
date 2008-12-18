@@ -179,6 +179,36 @@ class TestFormBuilding(unittest.TestCase):
         self.assertEqual( convert_request_data_to_data(form.structure, dottedDict(request.POST)) , dottedDict({'a': d, 'b': '4'}))
         # Check data to req
         self.assert_( convert_data_to_request_data(form.structure, dottedDict( {'a': d, 'b': '4'} )) == dottedDict({'a': {'month': [3], 'day': [1], 'year': [1966]}, 'b': ['4']}))
+
+    def test_form_retains_request_data(self):
+        form = Form(Structure([("field", String())]))
+        assert 'name="field" value=""' in form()
+        data = form.validate(Request('formish', {'field': 'value'}))
+        assert data == {'field': 'value'}
+        assert form.request_data == {'field': ['value']}
+        assert 'name="field" value="value"' in form()
+
+    def test_form_accepts_request_data(self):
+        form = Form(Structure([("field", String())]))
+        form.request_data = {'field': ['value']}
+        assert form.request_data == {'field': ['value']}
+
+    def test_form_with_defaults_accepts_request_data(self):
+        form = Form(Structure([("field", String())]))
+        form.defaults = {'field': 'default value'}
+        assert 'name="field" value="default value"' in form()
+        form.request_data = {'field': ['value']}
+        assert form.request_data == {'field': ['value']}
+        assert 'name="field" value="value"' in form()
+
+    def test_form_defaults_clears_request_data(self):
+        form = Form(Structure([("field", String())]))
+        form.request_data = {'field': ['value']}
+        form.defaults = {'field': 'default value'}
+        assert form.defaults == {'field': 'default value'}
+        assert form.request_data == {'field': ['default value']}
+        assert 'name="field" value="default value"' in form()
+
                
 if __name__ == "__main__":
     unittest.main()
