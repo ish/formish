@@ -166,7 +166,7 @@ class TestFormBuilding(unittest.TestCase):
         form = Form(schema_flat, name)
         form['a'].widget = DateParts()
 
-        r = {'a.day':1,'a.month':3,'a.year':1966, 'b': '4'}
+        r = {'a.day': '1','a.month': '3','a.year': '1966', 'b': '4'}
         R = copy.deepcopy(r)
         request = Request(name, r)
 
