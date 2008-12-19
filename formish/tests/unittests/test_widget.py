@@ -97,11 +97,14 @@ class TestFormExamples(base.TestCase):
         form = formish.Form(schema, form_name)
         form['a'].widget = formish.DateParts()
 
+        request = self.Request(form_name,{'a.year': '', 'a.month': '', 'a.day': ''})
+        data = form.validate(request)
+        assert data == {'a': None}
+
         request_data = {'a.day':'18', 'a.month':'12','a.year':'1966'}
         expected_data = {'a': date(1966,12,18)}
 
         request = self.Request(form_name,request_data)
-
         data = form.validate(request)
         assert data == expected_data
 

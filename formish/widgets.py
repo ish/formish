@@ -183,12 +183,14 @@ class DateParts(Widget):
         return {'year': [data[0]], 'month': [data[1]], 'day': [data[2]]}
     
     def convert(self, schemaType, data):
-        year = data.get('year', [''])[0]
-        month = data.get('month', [''])[0]
-        day = data.get('day', [''])[0]
-        return datetuple_converter(schemaType).toType((year, month, day))
-   
-
+        year = data.get('year', [''])[0].strip()
+        month = data.get('month', [''])[0].strip()
+        day = data.get('day', [''])[0].strip()
+        if year or month or day:
+            date_parts = (year, month, day)
+        else:
+            date_parts = None
+        return datetuple_converter(schemaType).toType(date_parts)
         
 
 class FileUpload(Widget):
