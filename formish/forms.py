@@ -442,6 +442,8 @@ class Form(object):
 
 
         """
+        if not isinstance(structure, schemaish.Structure):
+            structure = schemaish.Structure([structure])
         self.structure = Group(None, structure, self)
         self.item_data = {}
         self.name = name
@@ -571,11 +573,13 @@ class Form(object):
     defaults = property(_getDefaults, _setDefaults)
     
 
-    def validate(self, raw_request):
+    def validate(self, raw_request, failure_callable=None, success_callable=None):
         """ 
         Get the data without raising exceptions and then validate the data. If
         there are errors, raise them; otherwise return the data
         """
+        if failure_callable is not None and success_callable is not None:
+            return self._validate_and_call(raw_request, failure_callable=None, success_callable=None)
         self.errors = {}
         # Check this request was POSTed by this form.
         if not raw_request.method =='POST' and raw_request.POST.get('__formish_form__',None) == self.name:
@@ -599,6 +603,14 @@ class Form(object):
             self.__request_data = request_data
             raise FormError('Tried to access data but conversion from request failed with %s errors'%(len(self.errors.keys())))
         return data
+
+    def _validate_and_call(self, raw_request, failure_callable=None, success_callable=None):
+        try: 
+            data = self.validate(raw_request)
+        except FormError, e:
+            return failure_callable(request, self)
+        return success_callable(request, data)
+ 
 
 
     def set_item_data(self, key, name, value):
