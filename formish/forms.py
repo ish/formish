@@ -129,7 +129,7 @@ class Field(object):
         """Convert the request_data to a value object for the form or None."""
         if '*' in self.name:
             return ['']
-        return self.form._request_data[self.name]
+        return self.form.request_data[self.name]
 
 
     @property 
@@ -209,7 +209,7 @@ class Collection(object):
     @property
     def value(self):
         """Convert the request_data to a value object for the form or None."""
-        return self.form._request_data.get(self.name,[''])
+        return self.form.request_data.get(self.name,[''])
    
 
     @property 
@@ -325,11 +325,16 @@ class Sequence(Collection):
         on a fields values and spits out a 
         """
         
-        if self.form._POST is None:
-            v = self.defaults
+        # Work out how many fields are in the sequence.
+        # XXX We can't use self.form.request_data here because to build the
+        # request_data we need to recurse throught the fields ... which calls
+        # Sequence.fields ... which tries to build the request data ... which
+        # calls Sequence.fields, etc, etc. Bang!
+        if self.form._request_data:
+            v = self.form._request_data.get(self.name, [])
         else:
-            v = dottedDict(self.form._POST).get(self.name,[])
-            
+            v = self.defaults
+
         if v is None:
             num_fields = 0
         else:
@@ -414,8 +419,7 @@ class Form(object):
     _element_name = None
     _name = None
 
-    __request_data = None
-    _POST = None
+    _request_data = None
 
     def __init__(self, structure, name=None, defaults={}, errors={},
             action_url=None, renderer=None):
@@ -538,12 +542,13 @@ class Form(object):
 
     def _get_request_data(self):
         """
-        Convert the forms schema data into request compatible data
+        Retrieve previously set request_data or return the defaults in
+        request_data format.
         """
-        if self.__request_data is not None:
-            return self.__request_data
-        self.__request_data = convert_data_to_request_data(self.structure, dottedDict(self.defaults))
-        return self.__request_data
+        if self._request_data is not None:
+            return self._request_data
+        self._request_data = convert_data_to_request_data(self.structure, dottedDict(self.defaults))
+        return self._request_data
 
 
     def _set_request_data(self, request_data):
@@ -553,9 +558,10 @@ class Form(object):
         :arg request_data: raw request data (e.g. request.POST)
         :type request_data: Dictionary (dotted or nested or dottedDict or MultiDict)
         """
-        self.__request_data = dottedDict(request_data)
+        self._request_data = dottedDict(request_data)
 
-    _request_data = property(_get_request_data, _set_request_data)
+
+    request_data = property(_get_request_data, _set_request_data)
     
     
     def _getDefaults(self):
@@ -566,14 +572,13 @@ class Form(object):
     def _setDefaults(self, data):
         """ assign data """
         self._defaults = data
-        self.__request_data = None
-        self._POST = None
+        self._request_data = None
    
 
     defaults = property(_getDefaults, _setDefaults)
     
 
-    def validate(self, raw_request, failure_callable=None, success_callable=None):
+    def validate(self, request, failure_callable=None, success_callable=None):
         """ 
         Get the data without raising exceptions and then validate the data. If
         there are errors, raise them; otherwise return the data
@@ -582,17 +587,15 @@ class Form(object):
             return self._validate_and_call(raw_request, failure_callable=None, success_callable=None)
         self.errors = {}
         # Check this request was POSTed by this form.
-        if not raw_request.method =='POST' and raw_request.POST.get('__formish_form__',None) == self.name:
+        if not request.method =='POST' and request.POST.get('__formish_form__',None) == self.name:
             raise Exception("request does not match form name")
-        P = raw_request.POST
-        self._POST = raw_request.POST
         
-        requestPOST = UnicodeMultiDict(raw_request.POST, encoding=util.getPOSTCharset(raw_request))
+        requestPOST = UnicodeMultiDict(request.POST, encoding=util.getPOSTCharset(request))
         for k in requestPOST.keys():
             if '*' in k:
                 requestPOST.pop(k)
-        request_data = pre_parse_request_data(self.structure,dottedDict(requestPOST))
-        data = self.get_unvalidated_data(request_data, raise_exceptions=False)
+        self.request_data = pre_parse_request_data(self.structure,dottedDict(requestPOST))
+        data = self.get_unvalidated_data(self.request_data, raise_exceptions=False)
         try:
             self.structure.attr.validate(data)
         except schemaish.attr.Invalid, e:
@@ -600,7 +603,6 @@ class Form(object):
                 if not self.errors.has_key(key):
                     self.errors[key] = value
         if len(self.errors.keys()) > 0:
-            self.__request_data = request_data
             raise FormError('Tried to access data but conversion from request failed with %s errors'%(len(self.errors.keys())))
         return data
 
