@@ -4,22 +4,34 @@ from validatish import Invalid
 from convertish import convert
 
 def convert_sequences(d):
+    """
+    Converts numeric keyed dictionaries into sequences
+
+    Converts ``{'0': 'foo', '1': 'bar'}`` into ``['foo','bar']``. leaves anything else alone
+    """
+    # must be a dict
     if not hasattr(d,'keys'):
         return d
+    # if the first key cannot be converted to an int then we don't have a sequence
     try:
         k = int(d.keys()[0])
     except ValueError:
         return dottedDict(d)
+    # collect the keys as sorted integers
     intkeys = []
     for key in d.keys():
         intkeys.append(int(key))
     intkeys.sort()
+    # construct the sequence
     out = []
     for key in intkeys:
         out.append(d[str(key)])
     return out
 
 def recursive_convert_sequences(d):
+    """
+    recursively applies ``convert_sequences``
+    """
     if not hasattr(d,'keys'):
         return d
     if len(d.keys()) == 0:
@@ -41,6 +53,22 @@ def recursive_convert_sequences(d):
     return out
 
 def getNestedProperty(d,dottedkey):
+    """
+    Gets's data out of structures using dotted strings
+
+    Given a structure that may be a sequence or a dictionary or a combination
+    (e.g. {'a': [1,2]}) and a dotted string, traverses the structure one
+    segment of the dotted key at a time.
+
+    e.g.
+
+    .. code-block:: python
+    
+      getNestedProperty({'a': [1,{'b':'foo'}]} , 'a.1.b') == 'foo'
+
+    :arg d: a dictionary or sequence or combination
+    :arg dottedkey: a dotted string (e.g. ``a.1``)
+    """
     if dottedkey == '':
         return d
     keys = dottedkey.split('.')
@@ -56,7 +84,14 @@ def getNestedProperty(d,dottedkey):
         return None
 
 def validate(structure, request_data, errors=None, keyprefix=None):
-    """ Take a schemaish structure and use it's validators to return any errors"""
+    """
+    Take a schemaish structure and use it's validators to return any errors
+    
+    :arg structure: schemaish structure
+    :arg request_data: webob request
+    :arg errors: we can pass in an errors dictionary and any failures will get stored on it (internal - used while recursing)
+    :arg keyprefix: used when recursively validating a structure (internal - used while recursing)
+    """
     if errors is None:
         errors = dottedDict()
     # Validate each field in the schema, return 
@@ -69,9 +104,12 @@ def validate(structure, request_data, errors=None, keyprefix=None):
             newprefix = '%s.%s'%(keyprefix,attr[0])
         try:
             if hasattr(attr[1],'attrs'):
+                # recurse
                 validate(attr[1], request_data, errors=errors, keyprefix=newprefix)
             else: 
+                # we only validate data that exists
                 if request_data.has_key(newprefix):
+                    # firstly convert sequences
                     c = convert_sequences(request_data[newprefix])
                     attr[1].validate(c)
         except (Invalid, FieldValidationError), e:
@@ -79,7 +117,15 @@ def validate(structure, request_data, errors=None, keyprefix=None):
     return errors
 
 def convert_data_to_request_data(formStructure, data, request_data=None, errors=None):
-    """ Take a form structure and use it's widgets to convert data to request data """
+    """
+    Take a form structure and use it's widgets to convert schema data (dict) to request data
+    
+    :arg formStructure: a formish form
+    :arg data: a dictionary structure to be converted using the form
+    :arg request_data: used to accumulate request data (internal - used while recursing)
+    :arg errors: used to accumulate conversion failures (internal - used while recursing)
+    
+    """
     if request_data is None:
         request_data = dottedDict()
     if errors is None:
@@ -97,8 +143,15 @@ def convert_data_to_request_data(formStructure, data, request_data=None, errors=
     return request_data
         
 def convert_request_data_to_data(formStructure, request_data, data=None, errors=None):
-    """ Take a form structure and use it's widgets to convert data to request data """
+    """
+    Take a form structure and use it's widgets to convert request data to schema data (dict)
     
+    :arg formStructure: a formish form
+    :arg data: a webob.POST like dictionary
+    :arg data: used to accumulate schema data (internal - used while recursing)
+    :arg errors: used to accumulate conversion failures (internal - used while recursing)
+    
+    """
     if data is None:
         data = {}
     if errors is None:
@@ -121,6 +174,11 @@ def convert_request_data_to_data(formStructure, request_data, data=None, errors=
     return data
 
 def pre_parse_request_data(formStructure, request_data, data=None):
+    """
+    Some widgets (at the moment only files) need to have their data massaged in order to make sure that data->request and request->data is symmetric
+
+    This pre parsing is a null operation for most widgets
+    """
     if data is None:
         data = {}
     for field in formStructure.fields:

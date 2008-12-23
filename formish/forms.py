@@ -191,6 +191,7 @@ class Collection(object):
 
     @property
     def description(self):
+        """ Returns the schema's description """
         return self.attr.description        
 
 
@@ -353,8 +354,8 @@ class Sequence(Collection):
 
 
         for n in xrange(num_fields):
-            bf = self.bind(n, self.attr.attr)
-            yield bf
+            f = self.bind(n, self.attr.attr)
+            yield f
             
     @property
     def template(self):
