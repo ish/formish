@@ -26,14 +26,26 @@ class Widget(object):
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
     
+
     def pre_render(self, schemaType, data):
         data = string_converter(schemaType).fromType(data)
         if data is None:
             return ['']
         return [data]
 
+
     def convert(self, schemaType, data):
         return string_converter(schemaType).toType(data[0])
+
+
+    def pre_parse_request(self, schemaType, data):
+        return data
+
+
+    def __repr__(self):
+        return '<widget "%s">'%(self._template)
+
+
 
 
 class Input(Widget):

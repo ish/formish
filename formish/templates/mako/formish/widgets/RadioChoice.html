@@ -1,14 +1,14 @@
 <%inherit file="/formish/widgets/Field.html"/>
 <%page args="field" />
-%if field.widget.widget.noneOption:
+%if field.widget.noneOption:
 <div class="radiobutton">
-  <input type="radio" id="${field.cssname}-noneoption" value="${field.widget.widget.noneOption[0]}" />
-  <label for="${field.cssname}-noneoption">${field.widget.widget.noneOption[1]}</label>
+  <input type="radio" id="${field.cssname}-noneoption" value="${field.widget.noneOption[0]}" />
+  <label for="${field.cssname}-noneoption">${field.widget.noneOption[1]}</label>
 </div>
 %endif
-%for n, option in enumerate(field.widget.widget.options):
+%for n, option in enumerate(field.widget.options):
 <div class="radiobutton">
-  <input type="radio" name="${field.name}" id="${field.cssname}-${n}" value="${option[0]}"${field.widget.widget.selected(option,field.value[0],field.attr)|n} />
+  <input type="radio" name="${field.name}" id="${field.cssname}-${n}" value="${option[0]}"${field.widget.selected(option,field.value[0],field.attr)|n} />
   <label for="${field.cssname}-${n}">${option[1]}</label>
 </div>
 %endfor

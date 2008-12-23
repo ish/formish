@@ -1,14 +1,14 @@
 <%inherit file="/formish/widgets/Field.html"/>
 <%page args="field" />
 <%
-cols = field.widget.widget.cols
-rows = field.widget.widget.rows
+cols = field.widget.cols
+rows = field.widget.rows
 if cols is not None:
-    cols = 'cols="%s"'%field.widget.widget.cols
+    cols = 'cols="%s"'%field.widget.cols
 else:
     cols = ''
 if rows is not None:
-    rows = 'rows="%s"'%field.widget.widget.rows
+    rows = 'rows="%s"'%field.widget.rows
 else:
     rows = ''
 %>

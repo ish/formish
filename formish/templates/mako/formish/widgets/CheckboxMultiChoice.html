@@ -1,7 +1,7 @@
 <%inherit file="/formish/widgets/Field.html"/>
 <%page args="field" />
-%for n, option in enumerate(field.widget.widget.options):
-<input id="${field.cssname}-${n}" name="${field.name}" type="checkbox" value="${option[0]}"${field.widget.widget.checked(option,field.value,field.attr)|n} />
+%for n, option in enumerate(field.widget.options):
+<input id="${field.cssname}-${n}" name="${field.name}" type="checkbox" value="${option[0]}"${field.widget.checked(option,field.value,field.attr)|n} />
 <label for="${field.cssname}-${n}">${option[1]}</label>
 <br />
 %endfor

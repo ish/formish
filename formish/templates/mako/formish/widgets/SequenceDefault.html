@@ -1,7 +1,7 @@
 <%namespace name="fieldmodule" file="/formish/Field.html" />
 <%page args="field" />
 <%
-if field.widget.widget.addremove is True:
+if field.widget.addremove is True:
     addremoveclass = ' sequencecontrols'
 else:
     addremoveclass = ''
@@ -20,7 +20,7 @@ else:
   % for ff in field.fields:
       ${fieldmodule.field(ff)}
   % endfor
-  % if field.type is 'sequence' and field.widget.widget.addremove is True:
+  % if field.type is 'sequence' and field.widget.addremove is True:
      <input type="hidden" name="${field.template.name}" class="adder" value="${fieldmodule.fieldtemplate(field.template)}" />
   % endif
 </fieldset>

@@ -13,7 +13,7 @@
             index = optionkeys.index(fullkey)
             option = options[index]
 %>
-  <li><input id="${field.cssname}-${index}" name="${field.name}" type="checkbox" value="${option[0]}"${field.widget.widget.checked(option,field.value,field.attr)|n} />
+  <li><input id="${field.cssname}-${index}" name="${field.name}" type="checkbox" value="${option[0]}"${field.widget.checked(option,field.value,field.attr)|n} />
   <label for="${field.cssname}-${index}">${option[1]}</label></li>
   ${render_subtree(field,options,v,prefix='%s.'%fullkey)}
   
@@ -22,5 +22,5 @@
 %   endif
 </%def>
 
-${render_subtree(field,field.widget.widget.options,field.widget.widget.optiontree)}
+${render_subtree(field,field.widget.options,field.widget.optiontree)}
 

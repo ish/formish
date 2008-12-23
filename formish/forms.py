@@ -42,7 +42,7 @@ def _classes(self):
         self.attr.__class__.__name__.lower(),
         ]
     if self.widget is not None:
-        classes.append(self.widget.widget.__class__.__name__.lower())
+        classes.append(self.widget.__class__.__name__.lower())
     else:
         classes.append('defaultwidget')
     if self.required:
@@ -152,7 +152,7 @@ class Field(object):
             w = self.form.get_item_data(starify(self.name),'widget')
         except KeyError:
             w = Input()
-        return BoundWidget(w, self)
+        return w
         
 
     def __call__(self):
@@ -236,9 +236,10 @@ class Collection(object):
         """ return the fields widget bound with extra params. """
         
         try:
-            return BoundWidget(self.form.get_item_data(starify(self.name),'widget'), self)
+            w = self.form.get_item_data(starify(self.name),'widget')
         except KeyError:
-            return BoundWidget(SequenceDefault(),self)
+            w = SequenceDefault()
+        return w
 
 
     def get_field(self, segments):
@@ -272,7 +273,7 @@ class Collection(object):
 
     def bind(self, attr_name, attr):
         """ 
-        return cached bound schema as a field; Otherwise bind the attr to a
+        return cached schema as a field; Otherwise bind the attr to a
         Group or Field as appropriate and store on the _fields cache
         
         :param attr_name:     Form Field/Group identifier
@@ -289,13 +290,13 @@ class Collection(object):
                 keyprefix = '%s.%s'%(self.name,attr_name)
                 
             if isinstance(attr, schemaish.Sequence):
-                bf = Sequence(keyprefix, attr, self.form)
+                f = Sequence(keyprefix, attr, self.form)
             elif isinstance(attr, schemaish.Structure):
-                bf = Group(keyprefix, attr, self.form)
+                f = Group(keyprefix, attr, self.form)
             else:
-                bf = Field(keyprefix, attr, self.form)
-            self._fields[attr_name] = bf
-            return bf
+                f = Field(keyprefix, attr, self.form)
+            self._fields[attr_name] = f
+            return f
 
 
     def __call__(self):
@@ -343,8 +344,8 @@ class Sequence(Collection):
         min=None
         max=None
         if self.widget is not None:
-            min = getattr(self.widget.widget, 'min', None)
-            max = getattr(self.widget.widget, 'max', None)
+            min = getattr(self.widget, 'min', None)
+            max = getattr(self.widget, 'max', None)
         if min is not None and num_fields < min:
             num_fields = min
         elif max is not None and num_fields > max:
@@ -362,44 +363,6 @@ class Sequence(Collection):
 
 
     
-class BoundWidget(object):
-    """
-    Because widget's need to 
-    """  
-   
-
-    def __init__(self, widget, field):
-        self.widget = widget
-        self.field = field
-        self.cssClass=widget.cssClass
-        self.converttostring = widget.converttostring
-        self._template = widget._template
-    
-
-    def pre_render(self, schemaType, data):
-        return self.widget.pre_render(schemaType, data)
-
-
-    def pre_parse_request(self, schemaType, data):
-        if hasattr(self.widget,'pre_parse_request'):
-            return self.widget.pre_parse_request(schemaType, data)
-        else:
-            return data
-
-
-    def convert(self, schemaType, data):
-        return self.widget.convert(schemaType, data)
-
-
-    def __repr__(self):
-        attrclassstr = str(self.field.attr.__class__)
-        if attrclassstr[8:22] == 'schemaish.attr':
-            attrname = attrclassstr[23:-2]
-        else:
-            attrname = attrclassstr[8:-2]
-        return '<bound widget name="%s", widget="%s", type="%s">'%(self.field.name, self.widget._template, attrname)
-
-
 
 class Form(object):
     """

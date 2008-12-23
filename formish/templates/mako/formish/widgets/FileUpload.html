@@ -1,13 +1,13 @@
 <%inherit file="/formish/widgets/Field.html"/>
 <%page args="field" />
-% if field.widget.widget.showImagePreview is True:
+% if field.widget.showImagePreview is True:
 %   if field.value['name'][0] != '':
-<img src="${field.widget.widget.fileHandler.resource_root}/${field.value['name'][0]}" />
+<img src="${field.widget.fileHandler.resource_root}/${field.value['name'][0]}" />
 %   else:
-<img src="${field.widget.widget.originalurl}" />
+<img src="${field.widget.originalurl}" />
 %   endif
 % endif
-% if field.widget.widget.allowClear is True:
+% if field.widget.allowClear is True:
 <input id="${field.cssname}.remove" type="checkbox" name="${field.name}.remove" value="true" />
 % endif
 <input id="${field.cssname}.id" type="hidden" name="${field.name}.name" value="${field.value['name'][0]}" />

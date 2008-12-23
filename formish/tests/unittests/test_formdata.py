@@ -34,9 +34,9 @@ class TestFormData(unittest.TestCase):
 
         form = Form(self.schema_nested, 'nested')
 
-        assert isinstance(form['one.a'].widget.widget,Input)
+        assert isinstance(form['one.a'].widget,Input)
         form['one.a'].widget = TextArea()
-        assert isinstance(form['one.a'].widget.widget,TextArea)
+        assert isinstance(form['one.a'].widget,TextArea)
 
     def test_description(self):
 
@@ -62,16 +62,16 @@ class TestSequenceFormData(unittest.TestCase):
     def test_widgets(self):
         form = Form(self.schema, 'sequences')
         form.defaults = {'a': ['1','2']}
-        assert isinstance(form['a.0'].widget.widget,Input)
+        assert isinstance(form['a.0'].widget,Input)
         form['a.*'].widget = TextArea()
-        assert isinstance(form['a.0'].widget.widget,TextArea)
+        assert isinstance(form['a.0'].widget,TextArea)
         
 
     def test_widgets_before_data(self):
         form = Form(self.schema, 'sequences')
         form['a.*'].widget = TextArea()
         form.defaults = {'a': ['1','2']}
-        assert isinstance(form['a.0'].widget.widget,TextArea)
+        assert isinstance(form['a.0'].widget,TextArea)
 
 
 
