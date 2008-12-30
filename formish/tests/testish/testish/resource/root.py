@@ -12,9 +12,7 @@ log = logging.getLogger(__name__)
 try:
     import markdown
     def _format(v):
-        print v
         v = '\n'.join([l[4:] for l in v.split('\n')])
-        print v
         return markdown.markdown(v)
 except ImportError:
     def _format(v):

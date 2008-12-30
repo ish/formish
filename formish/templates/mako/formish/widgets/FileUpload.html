@@ -8,8 +8,17 @@
 %   endif
 % endif
 % if field.widget.allowClear is True:
-<input id="${field.cssname}.remove" type="checkbox" name="${field.name}.remove" value="true" />
+<input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" />
 % endif
-<input id="${field.cssname}.id" type="hidden" name="${field.name}.name" value="${field.value['name'][0]}" />
-<input id="${field.cssname}.default" type="hidden" name="${field.name}.default" value="${field.value['default'][0]}" />
+<%
+if '*' in field.name:
+    value_name = ''
+    value_default = ''
+else:
+    value_name = field.value['name'][0]
+    value_default = field.value['default'][0]
+%>
+
+<input id="${field.cssname}-id" type="hidden" name="${field.name}.name" value="${value_name}" />
+<input id="${field.cssname}-default" type="hidden" name="${field.name}.default" value="${value_default}" />
 <input id="${field.cssname}" type="file" name="${field.name}.file" />
