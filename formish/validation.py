@@ -1,3 +1,4 @@
+import pdb
 import re
 from formish.dottedDict import dottedDict
 from validatish import Invalid
@@ -159,17 +160,16 @@ def convert_request_data_to_data(formStructure, request_data, data=None, errors=
 
     for field in formStructure.fields:
         try:
-            if field.type is 'group' or (field.type == 'sequence' and (field.widget is None or field.widget.converttostring is False)):
+            if field.type is 'group' or (field.type == 'sequence' and (field.widget._template is 'SequenceDefault'  or field.widget.converttostring is False)):
                 if field.type == 'sequence':
                     # Make sure we have an empty field at least. If we don't do this and there are no items in the list then this key wouldn't appear.
                     data[field.name] = []
                 convert_request_data_to_data(field, request_data, data=data, errors=errors)
             else: 
-                # This needs to be cleverer... 
                 data[field.name] = field.widget.convert(field.attr,request_data.get(field.name,[]))
         except convert.ConvertError, e:
             errors[field.name] = e
-            
+    
     data = recursive_convert_sequences(dottedDict(data))
     return data
 
@@ -182,12 +182,13 @@ def pre_parse_request_data(formStructure, request_data, data=None):
     if data is None:
         data = {}
     for field in formStructure.fields:
-        if field.type is 'group' or (field.type == 'sequence' and field.widget is None):
+        if field.type is 'group' or (field.type == 'sequence' and field.widget._template is 'SequenceDefault'):
             pre_parse_request_data(field, request_data, data=data)
         else: 
             # This needs to be cleverer...
             d = request_data.get(field.name,[])
             data[field.name] = field.widget.pre_parse_request(field.attr,d)
+
     return dottedDict(data)
 
 
