@@ -47,7 +47,7 @@ class FileResource(resource.Resource):
         filepath = '/'.join(segments)
         if '.' in filepath:
             splits = filepath.split('.')
-            filename, suffix = ''.join(splits[:-1]), splits[-1]
+            filename, suffix = '.'.join(splits[:-1]), splits[-1]
         else:
             filename = filepath
             suffix = ''
