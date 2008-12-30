@@ -185,7 +185,7 @@ class TestFormBuilding(unittest.TestCase):
         assert 'name="field" value=""' in form()
         data = form.validate(Request('formish', {'field': 'value'}))
         assert data == {'field': 'value'}
-        assert form.request_data == {'field': ['value']}
+        assert form.request_data['field'] == ['value']
         assert 'name="field" value="value"' in form()
 
     def test_form_accepts_request_data(self):
