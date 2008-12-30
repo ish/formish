@@ -237,7 +237,6 @@ class FileUpload(Widget):
             self.default = data
         else:
             self.default = ''
-        print 'inbound', self.default
         return {'name': [self.default], 'default':[self.default]}
     
     def pre_parse_request(self, schemaType, data):
@@ -255,6 +254,7 @@ class FileUpload(Widget):
     
     def convert(self, schemaType, data):
         # XXX We could add a file converter that converts this to a string data?
+
         if data['name'] == ['']:
             return None
         elif data['name'] == data['default']:
