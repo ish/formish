@@ -1,5 +1,6 @@
 import logging
 import formish, schemaish, validatish
+from formish.filehandler import TempFileHandlerWeb
 
 from testish.lib import base
 
@@ -320,6 +321,21 @@ def SequenceOfStructures():
     form = formish.Form(schema, 'form')
     return form
   
+def SequenceOfUploadStructures():
+    """
+    A structure witin a sequence, should be enhanced with javascript
+    """
+    substructure = schemaish.Structure()
+    substructure.add( 'a', schemaish.File() )
+    substructure.add( 'b', schemaish.Integer() )
+
+    schema = schemaish.Structure()
+    schema.add( 'myList', schemaish.Sequence( substructure ))
+
+    form = formish.Form(schema, 'form')
+
+    form['myList.*.a'].widget = formish.FileUpload(fileHandler=TempFileHandlerWeb())
+    return form
     
 def SequenceOfStructuresWithSelects():
     """
