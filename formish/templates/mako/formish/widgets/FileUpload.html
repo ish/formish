@@ -1,15 +1,5 @@
 <%inherit file="/formish/widgets/Field.html"/>
 <%page args="field" />
-% if field.widget.showImagePreview is True:
-%   if field.value['name'][0] != '':
-<img src="${field.widget.fileHandler.resource_root}/${field.value['name'][0]}" />
-%   else:
-<img src="${field.widget.originalurl}" />
-%   endif
-% endif
-% if field.widget.allowClear is True:
-<input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" />
-% endif
 <%
 if '*' in field.name:
     value_name = ''
@@ -18,6 +8,17 @@ else:
     value_name = field.value['name'][0]
     value_default = field.value['default'][0]
 %>
+% if field.widget.showImagePreview is True:
+<img src="${field.widget.originalurl}" />
+%   if value_name != '':
+<img src="${field.widget.fileHandler.resource_root}/${value_name}" />
+%   else:
+<img src="${field.widget.originalurl}" />
+%   endif
+% endif
+% if field.widget.allowClear is True:
+<input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" />
+% endif
 
 <input id="${field.cssname}-id" type="hidden" name="${field.name}.name" value="${value_name}" />
 <input id="${field.cssname}-default" type="hidden" name="${field.name}.default" value="${value_default}" />
