@@ -190,10 +190,16 @@ def _set(data, dottedkey, value):
 
 def _get(d, dottedkey):
     keys = str(dottedkey).split('.')
-    try:
-        for n,key in enumerate(keys):
-            d = d[tryInt(key)]
-    except (KeyError, TypeError), e:
+    K_parts = []
+    for n,key in enumerate(keys):
+        K_parts.append(key)
+        K = '.'.join(K_parts)
+        try:
+            d = d[tryInt(K)]
+            K_parts = []
+        except (KeyError, TypeError), e:
+            pass
+    if K_parts != []:
         raise KeyError('Error accessing dotted key %s - key %s does not exist'%(dottedkey, key))
     return d
     
