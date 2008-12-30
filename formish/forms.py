@@ -410,6 +410,7 @@ class Form(object):
 
 
         """
+        # allow a single schema items to be used on a form
         if not isinstance(structure, schemaish.Structure):
             structure = schemaish.Structure([structure])
         self.structure = Group(None, structure, self)
@@ -547,6 +548,7 @@ class Form(object):
         Get the data without raising exceptions and then validate the data. If
         there are errors, raise them; otherwise return the data
         """
+        # If we pass in explicit failure and success callables then do this first
         if failure_callable is not None and success_callable is not None:
             return self._validate_and_call(raw_request, failure_callable=None, success_callable=None)
         self.errors = {}
@@ -555,11 +557,17 @@ class Form(object):
             raise Exception("request does not match form name")
         
         requestPOST = UnicodeMultiDict(request.POST, encoding=util.getPOSTCharset(request))
+        # Remove the sequence factory data from the request
         for k in requestPOST.keys():
             if '*' in k:
                 requestPOST.pop(k)
+        # We need the _request_data to be populated so sequences know how many
+        # items they have (i.e. .fields method on a sequence uses the number of
+        # values on the _request_data)
+        self._request_data = dottedDict(requestPOST)
         self.request_data = pre_parse_request_data(self.structure,dottedDict(requestPOST))
         data = self.get_unvalidated_data(self.request_data, raise_exceptions=False)
+        self._request_data = dottedDict(requestPOST)
         try:
             self.structure.attr.validate(data)
         except schemaish.attr.Invalid, e:
@@ -567,7 +575,8 @@ class Form(object):
                 if not self.errors.has_key(key):
                     self.errors[key] = value
         if len(self.errors.keys()) > 0:
-            raise FormError('Tried to access data but conversion from request failed with %s errors'%(len(self.errors.keys())))
+            err_msg = 'Tried to access data but conversion from request failed with %s errors'
+            raise FormError(err_msg%(len(self.errors.keys())))
         return data
 
     def _validate_and_call(self, raw_request, failure_callable=None, success_callable=None):
