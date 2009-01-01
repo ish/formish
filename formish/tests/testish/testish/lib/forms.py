@@ -1,4 +1,4 @@
-import logging
+import logging, os.path
 import formish, schemaish, validatish
 from formish.filehandler import TempFileHandlerWeb
 
@@ -274,6 +274,38 @@ def functest_SimpleDecimal(self, sel):
 
     return
 
+
+
+def SimpleFile():
+    """
+    A simple form with a single integer field
+    """
+    schema = schemaish.Structure()
+    schema.add('myFileField', schemaish.File())
+    form = formish.Form(schema, 'form')
+    form['myFileField'].widget = formish.FileUpload(fileHandler=TempFileHandlerWeb())
+    return form
+
+def functest_SimpleFile(self, sel):
+    sel.open("/SimpleFile")
+
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myFileField': None}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myFileField", os.path.abspath("testdata/test.txt"))
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    
+
+    try: self.failUnless(sel.is_text_present("{'myFileField': <schemaish.type.File object at"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    return
+
+
+
 def StringWidgets():
     """
     A demonstration of simple string type widgets
@@ -336,6 +368,24 @@ def SequenceOfUploadStructures():
 
     form['myList.*.a'].widget = formish.FileUpload(fileHandler=TempFileHandlerWeb())
     return form
+
+def functest_SequenceOfUploadStructures(self, sel):
+
+    sel.open("/SequenceOfUploadStructures")
+    sel.wait_for_page_to_load("30000")
+    sel.mouse_down("link=Add")
+
+    sel.type("form-myList-0-a", os.path.abspath("testdata/test.txt"))
+    sel.type("form-myList-0-b", "13")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+
+    try: self.failUnless(sel.is_text_present("{'myList': [{'a': <schemaish.type.File object at *, 'b': 13}]}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    return
+
+
     
 def SequenceOfStructuresWithSelects():
     """
