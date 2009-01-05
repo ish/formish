@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: formish
-Version: 0.5dev
+Version: 0.5
 Summary: Formish is a schema backed, templating language agnostic form generation and handling library.
 Home-page: http://ish.io/projects/show/formish
 Author: Tim Parkin, Matt Goodall
@@ -13,8 +13,10 @@ Platform: UNKNOWN
 Classifier: Development Status :: 4 - Beta
 Classifier: Intended Audience :: Developers
 Classifier: License :: OSI Approved :: BSD License
-Classifier: Environment :: Web EnvironmentOperating System :: OS Independent
+Classifier: Environment :: Web Environment
+Classifier: Operating System :: OS Independent
 Classifier: Programming Language :: Python :: 2
 Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
 Classifier: Topic :: Internet :: WWW/HTTP :: WSGI
-Classifier: Topic :: Software Development :: Libraries :: Python ModulesTopic :: Software Development :: Widget Sets
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Widget Sets

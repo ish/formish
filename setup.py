@@ -13,12 +13,12 @@ Formish is a schema backed, templating language agnostic form generation and han
           "Development Status :: 4 - Beta",
           "Intended Audience :: Developers",
           "License :: OSI Approved :: BSD License",
-          "Environment :: Web Environment"
+          "Environment :: Web Environment",
           "Operating System :: OS Independent",
           "Programming Language :: Python :: 2",
           "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
           "Topic :: Internet :: WWW/HTTP :: WSGI",
-          "Topic :: Software Development :: Libraries :: Python Modules"
+          "Topic :: Software Development :: Libraries :: Python Modules",
           "Topic :: Software Development :: Widget Sets",
       ], 
       keywords='form,forms,widgets,form library, ',
