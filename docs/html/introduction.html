@@ -21,8 +21,19 @@
     <link rel="top" title="Formish v1 documentation" href="index.html" />
     <link rel="next" title="Using Formish within Restish" href="restish.html" />
     <link rel="prev" title="Welcome to Formish&#8217;s documentation!" href="index.html" /> 
+
+
+  <link media="screen" href="_static/css/screen.css" type="text/css" rel="stylesheet" />
+  <link media="screen" href="_static/css/images.css" type="text/css" rel="stylesheet" />
+  <link media="screen" href="_static/css/sIFR-screen.css" type="text/css" rel="stylesheet" />
+  <link media="print" href="_static/css/sIFR-print.css" type="text/css" rel="stylesheet" />  
+  <script type="text/javascript" src="_static/js/sifr.js" ></script>
+  <script type="text/javascript" src="_static/js/sifr-config.js" ></script> 
+  <script type="text/javascript" src="_static/js/sifr-debug.js" ></script> 
+
   </head>
-  <body>
+  <body id="sphinx">
+    <div id="wrapper">
     <div class="related">
       <h3>Navigation</h3>
       <ul>
@@ -38,7 +49,13 @@
         <li><a href="index.html">Formish v1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
-    <div class="document">
+
+    <div id="header">
+      <div id="logo"><img src="_static/images/logo/ish.io.png" /></div>
+    </div>
+
+<div id="main">
+    <div  class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body">
@@ -825,7 +842,7 @@ the application to iterate that field&#8217;s fields.</dd></dl>
 
 <dl class="method">
 <dt id="formish.forms.Form.validate">
-<!--[formish.forms.Form.validate]--><tt class="descname">validate</tt><big>(</big><em>raw_request</em>, <em>failure_callable=None</em>, <em>success_callable=None</em><big>)</big><a class="headerlink" href="#formish.forms.Form.validate" title="Permalink to this definition">¶</a></dt>
+<!--[formish.forms.Form.validate]--><tt class="descname">validate</tt><big>(</big><em>request</em>, <em>failure_callable=None</em>, <em>success_callable=None</em><big>)</big><a class="headerlink" href="#formish.forms.Form.validate" title="Permalink to this definition">¶</a></dt>
 <dd>Get the data without raising exceptions and then validate the data. If
 there are errors, raise them; otherwise return the data</dd></dl>
 
@@ -1016,7 +1033,8 @@ related information.</p>
     </div>
     <div class="footer">
       &copy; Copyright 2008, Tim Parkin, Matt Goodall.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.5.
     </div>
+  </div> 
+  </div>
   </body>
 </html>
