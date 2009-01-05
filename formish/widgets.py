@@ -208,21 +208,26 @@ class DateParts(Widget):
 class FileUpload(Widget):
     """
     File upload widget.
-
-    fileHandler is any object with the following methods:
-
-        storeFile(self, f)
-            where f is a file instance
-
-        getUrlForFile(self, data)
-            where data is the form item data or a path to a temporary file and
-            is expected to return a URL to access the persisted or temporary
-            data.
     """
 
     _template = 'FileUpload'
     
     def __init__(self, fileHandler, showImagePreview=False, allowClear=True, cssClass=None,originalurl=None):
+        """
+        :arg filehandler: fileHandler is any object with the following methods:
+
+            storeFile(self, f)
+                where f is a file instance
+
+            getUrlForFile(self, data)
+                where data is the form item data or a path to a temporary file and
+                is expected to return a URL to access the persisted or temporary
+                data.
+
+        :arg showImagePreview: a boolean that, if set, will include an image thumbnail with the widget
+        :arg cssClass: extra css classes to apply to the widget
+        :arg originalurl: a default url to 
+        """
         Widget.__init__(self)
         self.cssClass = cssClass
         self.fileHandler = fileHandler
