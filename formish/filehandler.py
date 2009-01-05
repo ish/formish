@@ -7,11 +7,6 @@ import uuid, magic
 class FileHandlerMinimal(object):
     """ Example of File handler for formish file upload support. """
 
-    resource_root = 'filehandler'
-
-    def __init__(self, default_url=None):
-        self.default_url = default_url
-
     def store_file(self, fs):
         """ Method to store a file """
 
