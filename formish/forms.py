@@ -129,7 +129,7 @@ class Field(object):
         """Convert the request_data to a value object for the form or None."""
         if '*' in self.name:
             return ['']
-        return self.form.request_data[self.name]
+        return self.form.request_data.get(self.name,None)
 
 
     @property 

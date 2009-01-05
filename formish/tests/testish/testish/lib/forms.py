@@ -276,6 +276,42 @@ def functest_SimpleDecimal(self, sel):
 
 
 
+def RequiredStringAndCheckbox():
+    """
+    Testing that a checkbox is working properly when another required field is missing
+    """
+    schema = schemaish.Structure()
+    schema.add('myString', schemaish.String(validator=validatish.Required()))
+    schema.add('myBoolean', schemaish.Boolean())
+    form = formish.Form(schema, 'form')
+    form['myBoolean'].widget=formish.Checkbox()
+    return form
+
+def functest_RequiredStringAndCheckbox(self, sel):
+    sel.open("/RequiredStringAndCheckbox")
+
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("is required"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myString", "anything")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myBoolean': False, 'myString': u'anything'}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myString", "anythingelse")
+    sel.click("form-myBoolean")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myBoolean': True, 'myString': u'anythingelse'}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+    
+
+    return
+
+
 def SimpleFile():
     """
     A simple form with a single integer field

@@ -1,7 +1,7 @@
 <%inherit file="Field.html"/>
 <%page args="field" />
 <%
-  if len(field.value) > 0 and field.value[0] == 'True':
+  if field.value is not None and len(field.value) > 0 and field.value[0] == 'True':
     checked  = 'checked="checked"'
   else:
     checked = ''

@@ -2,7 +2,6 @@
 README
 TODO
 nose.sh
-setup.cfg
 setup.py
 docs-build/Makefile
 docs-build/conf.py
