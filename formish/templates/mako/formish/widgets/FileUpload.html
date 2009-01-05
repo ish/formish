@@ -9,7 +9,6 @@ else:
     value_default = field.value['default'][0]
 %>
 % if field.widget.showImagePreview is True:
-<img src="${field.widget.originalurl}" />
 %   if value_name != '':
 <img src="${field.widget.fileHandler.resource_root}/${value_name}" />
 %   else:
