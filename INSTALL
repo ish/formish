@@ -1,0 +1,35 @@
+==========
+Installing
+==========
+
+Requirements
+------------
+
+You will need:
+
+* python 2.4 or later.
+
+* PEAK-rules which can be found here:
+  http://pypi.python.org/pypi/PEAK-Rules
+
+* validatish
+  http://pypi.python.org/pypi/validatish
+
+* convertish
+  http://pypi.python.org/pypi/convertish
+
+* schemaish
+  http://pypi.python.org/pypi/schemaish
+
+Installation
+------------
+
+If you have easy_install, you can run the following 
+
+  easy_install formish
+
+This will also bring in all of the requirements.
+
+  
+
+

@@ -1,0 +1,19 @@
+==========
+Changlelog
+==========
+
+0.5.2 (2009-01-05)
+------------------
+
+BUG FIX: Added an import except wrapper around the default mako import
+
+0.5.1 (2009-01-05)
+------------------
+
+BUG FIX: Problem with redisplayed empty checkboxes after validation
+
+
+0.5 (2009-01-05)
+----------------
+
+NOTE: First External Release

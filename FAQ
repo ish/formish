@@ -1,0 +1,14 @@
+***
+FAQ
+***
+
+
+Can't locate template
+---------------------
+
+Formish requires Mako in order to render the default template. However, this is not required and hence not installed by default. 'easy_install mako' to possibly get past this.
+
+The required version of setuptools 
+----------------------------------
+
+Try 'easy_install -U setuptools' and then try installing again

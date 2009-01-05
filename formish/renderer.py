@@ -12,21 +12,23 @@ possible the application will have to reimplement all of formish's templates.
 """
 
 import pkg_resources
-import mako.lookup
+try:
+    import mako.lookup
 
+    class Renderer(object):
 
-class Renderer(object):
+        def __init__(self):
+            self.lookup = mako.lookup.TemplateLookup(
+                    directories=[pkg_resources.resource_filename('formish', 'templates/mako')],
+                    input_encoding='utf-8', output_encoding='utf-8',
+                    default_filters=['unicode', 'h']
+                    )
 
-    def __init__(self):
-        self.lookup = mako.lookup.TemplateLookup(
-                directories=[pkg_resources.resource_filename('formish', 'templates/mako')],
-                input_encoding='utf-8', output_encoding='utf-8',
-                default_filters=['unicode', 'h']
-                )
+        def __call__(self, template, args):
+            return self.lookup.get_template(template).render(**args)
 
-    def __call__(self, template, args):
-        return self.lookup.get_template(template).render(**args)
+    _default_renderer = Renderer()
 
-
-_default_renderer = Renderer()
+except ImportEror:
+    _default_renderer = None
 
