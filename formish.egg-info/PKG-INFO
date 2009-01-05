@@ -1,10 +1,20 @@
 Metadata-Version: 1.0
 Name: formish
-Version: 0.1dev
-Summary: Formal like library for mako/pylons
-Home-page: UNKNOWN
+Version: 0.5dev
+Summary: Formish is a schema backed, templating language agnostic form generation and handling library.
+Home-page: http://ish.io/projects/show/formish
 Author: Tim Parkin, Matt Goodall
-Author-email: developers@jdi-associates.com
-License: UNKNOWN
-Description: UNKNOWN
+Author-email: developers@ish.io
+License: BSD
+Description: Formish is a schema backed, templating language agnostic form generation and handling library. It's main features are its granular components and its ability to create quite complex forms (including sequences, groups, sequences of groups, groups of sequences, etc). It has a built in mako templating library but should be straightforward to add other templating systems. It also has strong support for file uploads with a default tempfile storage handler. It uses schemaish for its schema, validatish for validation and convertish for type coercion.
+        
+Keywords: form,forms,widgets,form library,
 Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Environment :: Web EnvironmentOperating System :: OS Independent
+Classifier: Programming Language :: Python :: 2
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Internet :: WWW/HTTP :: WSGI
+Classifier: Topic :: Software Development :: Libraries :: Python ModulesTopic :: Software Development :: Widget Sets
