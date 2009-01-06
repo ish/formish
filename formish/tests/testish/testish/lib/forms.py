@@ -319,7 +319,7 @@ def SimpleFile():
     schema = schemaish.Structure()
     schema.add('myFileField', schemaish.File())
     form = formish.Form(schema, 'form')
-    form['myFileField'].widget = formish.FileUpload(fileHandler=TempFileHandlerWeb())
+    form['myFileField'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
     return form
 
 def functest_SimpleFile(self, sel):
@@ -402,7 +402,7 @@ def SequenceOfUploadStructures():
 
     form = formish.Form(schema, 'form')
 
-    form['myList.*.a'].widget = formish.FileUpload(fileHandler=TempFileHandlerWeb())
+    form['myList.*.a'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
     return form
 
 def functest_SequenceOfUploadStructures(self, sel):

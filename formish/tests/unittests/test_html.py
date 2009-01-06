@@ -42,7 +42,7 @@ class TestHTML(unittest.TestCase):
         f = Form(schema,name="form")
 
         f['one.b'].widget = TextArea()
-        f['two.a'].widget = SelectChoice([('opt1',"Options 1"),('opt2',"Option 2")], noneOption=('-select option-',None))
+        f['two.a'].widget = SelectChoice([('opt1',"Options 1"),('opt2',"Option 2")], none_option=('-select option-',None))
         f['two.b'].widget = DateParts()
         f['two.c'].widget = CheckboxMultiChoice([('opt1',"Options 1"),('opt2',"Option 2")])
         f['two.d'].widget = RadioChoice([('opt1',"Options 1"),('opt2',"Option 2")])

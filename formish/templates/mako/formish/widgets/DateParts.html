@@ -5,7 +5,7 @@ day = field.value['day'][0]
 month = field.value['month'][0]
 year = field.value['year'][0]
 %>
-% if field.widget.dayFirst:
+% if field.widget.day_first:
 <input id="${field.cssname}" type="text" name="${field.name}.day" value="${day}" size="2" /> /
 <input id="${field.cssname}-month" type="text" name="${field.name}.month" value="${month}" size="2" /> /
 % else:

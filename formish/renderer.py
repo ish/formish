@@ -11,7 +11,8 @@ If an application completely replaces the form's renderer then it's quite
 possible the application will have to reimplement all of formish's templates.
 """
 
-import pkg_resources
+from pkg_resources import resource_filename #IGNORE:E0611
+
 try:
     import mako.lookup
 
@@ -19,7 +20,7 @@ try:
 
         def __init__(self):
             self.lookup = mako.lookup.TemplateLookup(
-                    directories=[pkg_resources.resource_filename('formish', 'templates/mako')],
+                    directories=[resource_filename('formish', 'templates/mako')],
                     input_encoding='utf-8', output_encoding='utf-8',
                     default_filters=['unicode', 'h']
                     )
@@ -29,6 +30,6 @@ try:
 
     _default_renderer = Renderer()
 
-except ImportEror:
+except ImportError, e:
     _default_renderer = None
 

@@ -157,6 +157,8 @@ class TestFormBuilding(unittest.TestCase):
         # Does the convert request to data work
         self.assertEqual( convert_request_data_to_data(form.structure, dottedDict(request.POST)) , {'a': 3, 'b': '4'})
         # Does the convert data to request work
+        print convert_data_to_request_data(form.structure, dottedDict( {'a': 3, 'b': '4'} ))
+        print reqr
         self.assert_( convert_data_to_request_data(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == reqr)
         
           

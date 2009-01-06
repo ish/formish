@@ -10,9 +10,14 @@ Adding additional templating languages
 
 
 Widgets
-----------
+-------
 
 * Select with other widget
+
+Tests
+-----
+
+* Add tests for checkedpassword widget
 
 
 

@@ -258,10 +258,10 @@
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;country&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">SelectChoice</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;UK&#39;</span><span class="p">,</span><span class="s">&#39;US&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>If we wanted different values for our options we would pass each option in as a tuple of (&#8216;value&#8217;,&#8217;label&#8217;). We could also set a label for the field that appears when there is no input value. This is called the &#8216;noneOption&#8217;. The noneOptions defaults to (&#8216;&#8217;, &#8216;&#8211;choose&#8211;&#8217;) so we could change it to (&#8216;&#8217;,&#8217;Pick a Country&#8217;). Here is an example</p>
+<p>If we wanted different values for our options we would pass each option in as a tuple of (&#8216;value&#8217;,&#8217;label&#8217;). We could also set a label for the field that appears when there is no input value. This is called the &#8216;none_option&#8217;. The none_options defaults to (&#8216;&#8217;, &#8216;&#8211;choose&#8211;&#8217;) so we could change it to (&#8216;&#8217;,&#8217;Pick a Country&#8217;). Here is an example</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">options</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;UK&#39;</span><span class="p">,</span><span class="s">&#39;I live in the UK&#39;</span><span class="p">),(</span><span class="s">&#39;US&#39;</span><span class="p">,</span><span class="s">&#39;I live in the US&#39;</span><span class="p">)]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">noneOption</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="s">&#39;Where do you live&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;country&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">SelectChoice</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">noneOption</span><span class="o">=</span><span class="n">noneOption</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">none_option</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="s">&#39;Where do you live&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;country&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">SelectChoice</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">none_option</span><span class="o">=</span><span class="n">none_option</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Finally, we&#8217;d like a checkbox for the Boolean value</p>
@@ -330,7 +330,7 @@
 </div>
 <div class="section" id="select-field">
 <h4>Select Field<a class="headerlink" href="#select-field" title="Permalink to this headline">¶</a></h4>
-<p>This uses the &#8216;noneOption&#8217; value to show &#8216;Where do you live&#8217; by default but because we have set a default value, &#8216;I live in the UK&#8217; is selected.</p>
+<p>This uses the &#8216;none_option&#8217; value to show &#8216;Where do you live&#8217; by default but because we have set a default value, &#8216;I live in the UK&#8217; is selected.</p>
 <div id="formish-country-field" class="field string selectchoice">
   <label for="formish-country">Country</label>
   <div class="inputs">
@@ -444,12 +444,11 @@
 </div>
 </div>
 </div>
-</div>
 <div class="section" id="validation">
-<h1>Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h1>
+<h2>Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
 <p>Validation in Formish uses simple callable validators that raise exceptions if validation fails (Either a formish.FieldValidationError or a validatish.Invalid exception.</p>
 <div class="section" id="how-validators-work">
-<h2>How Validators Work<a class="headerlink" href="#how-validators-work" title="Permalink to this headline">¶</a></h2>
+<h3>How Validators Work<a class="headerlink" href="#how-validators-work" title="Permalink to this headline">¶</a></h3>
 <p>There is a library of validators called Validatish that has most of the typical examples you might need. Let&#8217;s take a look at a simple integer validator.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">is_string</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
     <span class="n">msg</span> <span class="o">=</span> <span class="s">&quot;must be a string&quot;</span>
@@ -511,11 +510,176 @@
 </div>
 </div>
 </div>
+<div class="section" id="file-uploads">
+<h2>File Uploads<a class="headerlink" href="#file-uploads" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="short-version">
+<h3>Short Version<a class="headerlink" href="#short-version" title="Permalink to this headline">¶</a></h3>
+<p>We handle files for you so that all you have to do is process the file handle given to you.. Here is an example using the default filehandlers..</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myfile&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">File</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">formish</span> <span class="kn">import</span> <span class="n">filehandler</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;myfile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">FileUpload</span><span class="p">(</span><span class="n">filehandler</span><span class="o">=</span><span class="n">filehandler</span><span class="o">.</span><span class="n">TempFileHandlerWeb</span><span class="p">())</span>
+</pre></div>
+</div>
+<div class="section" id="what-does-this-produce">
+<h4>What does this produce?<a class="headerlink" href="#what-does-this-produce" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-myfile-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type fileupload&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-myfile&quot;</span><span class="nt">&gt;</span>Myfile<span class="nt">&lt;/label&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-myfile-remove&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">name=</span><span class="s">&quot;myfile.remove&quot;</span> <span class="na">value=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-myfile-id&quot;</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;myfile.name&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-myfile-default&quot;</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;myfile.default&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-myfile&quot;</span> <span class="na">type=</span><span class="s">&quot;file&quot;</span> <span class="na">name=</span><span class="s">&quot;myfile.file&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;/div&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</pre></div>
+</div>
+<p>and looks like</p>
+<div id="formish-myfile-field" class="field type fileupload">
+  <label for="formish-myfile">Myfile</label>
+  <div class="inputs">
+    <input id="formish-myfile-remove" type="checkbox" name="myfile.remove" value="true" />
+    <input id="formish-myfile-id" type="hidden" name="myfile.name" value="" />
+    <input id="formish-myfile-default" type="hidden" name="myfile.default" value="" />
+    <input id="formish-myfile" type="file" name="myfile.file" />
+  </div>
+</div><p>The checkbox is included to allow you to remove a file if necessary.</p>
+</div>
+<div class="section" id="how-does-this-return-a-file-to-me">
+<h4>How does this return a file to me?<a class="headerlink" href="#how-does-this-return-a-file-to-me" title="Permalink to this headline">¶</a></h4>
+<p>You will get a schemaish.type.File object back which looks like this</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">File</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">file</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mimetype</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="nb">file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="o">=</span><span class="n">filename</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mimetype</span><span class="o">=</span><span class="n">mimetype</span>
+</pre></div>
+</div>
+<p>Where file is a file like object, filename is the original filename and the mimetype is worked out from the file suffix. All you have to do is <tt class="docutils literal"><span class="pre">.read()</span></tt> from the file attribute to get the contents.</p>
+</div>
+</div>
+<div class="section" id="longer-version">
+<h3>Longer Version<a class="headerlink" href="#longer-version" title="Permalink to this headline">¶</a></h3>
+<p>File uploads are quite often the most difficult aspect of form handling. Formish has tried to make some pragmatic decisions that should ease this process for you. The first of these decisions is what type of data to use to store a file. Because we are using webob, files that arrive in formish do so in FieldStorage representation.</p>
+<div class="section" id="upload-file-temporary-storage">
+<h4>Upload File Temporary Storage<a class="headerlink" href="#upload-file-temporary-storage" title="Permalink to this headline">¶</a></h4>
+<p>Formish tries to ensure that fields are &#8216;symmetric&#8217;. i.e. what goes in comes back out in the same format). For text fields this is quite simple but for a file upload things are a little more difficult. What formish does is to use a temporary store in order to save the file in a secure location for access later. You can implement this store if you wish, using sessions or databaseses, etc. Here is the signature for a filehandler..</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">FileHandlerMinimal</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Example of File handler for formish file upload support. &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">store_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method to store a file &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">get_path_for_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Method to get a path for a file on disk &quot;&quot;&quot;</span>
+</pre></div>
+</div>
+<p>As you can see, the two important things are a method to store the file and a method to get the file back off disk given the filename.</p>
+<p>Our tempfile handler implements this as follows.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">TempFileHandler</span><span class="p">(</span><span class="n">FileHandlerMinimal</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    File handler using python tempfile module to store file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">store_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fs</span><span class="p">):</span>
+        <span class="n">fileno</span><span class="p">,</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkstemp</span><span class="p">(</span><span class="n">suffix</span><span class="o">=</span><span class="s">&#39;</span><span class="si">%s</span><span class="s">-</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span><span class="n">fs</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
+        <span class="n">fp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fdopen</span><span class="p">(</span><span class="n">fileno</span><span class="p">,</span> <span class="s">&#39;wb&#39;</span><span class="p">)</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fs</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">fp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempprefix</span><span class="p">()</span>
+        <span class="n">tempdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">filename</span><span class="p">[(</span><span class="nb">len</span><span class="p">(</span><span class="n">tempdir</span><span class="p">)</span><span class="o">+</span><span class="nb">len</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span><span class="o">+</span><span class="mf">1</span><span class="p">):]</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">filename</span>
+
+    <span class="k">def</span> <span class="nf">get_path_for_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempprefix</span><span class="p">()</span>
+        <span class="n">tempdir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">/</span><span class="si">%s%s</span><span class="s">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">tempdir</span><span class="p">,</span><span class="n">prefix</span><span class="p">,</span><span class="n">filename</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We also implement a <tt class="docutils literal"><span class="pre">get_mimetype</span></tt> method that helps in building the schemaish.type.File</p>
+</div>
+<p>We typically want to access the file again from our widget however (especially in the case of image uploads!). Formish extends the TempFileHandler with a get_url_for_file method as follows..</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">TempFileHandlerWeb</span><span class="p">(</span><span class="n">TempFileHandler</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">default_url</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">resource_root</span><span class="o">=</span><span class="s">&#39;/filehandler&#39;</span><span class="p">,</span><span class="n">urlfactory</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_url</span> <span class="o">=</span> <span class="n">default_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_root</span> <span class="o">=</span> <span class="n">resource_root</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">urlfactory</span> <span class="o">=</span> <span class="n">urlfactory</span>
+
+    <span class="k">def</span> <span class="nf">get_url_for_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">urlfactory</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">urlfactory</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">id</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39; &#39;</span><span class="p">,</span><span class="s">&#39;+&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&#39;</span><span class="si">%s</span><span class="s">/</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resource_root</span><span class="p">,</span><span class="nb">object</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This needs configuring with a resource root (where to find files), a default_url (if we have no file, what to use - useful to showing missing images) and a urlfactory (how to convert a object into a url representation).</p>
+</div>
+<div class="section" id="so-what-happens-when-a-file-is-uploaded">
+<h4>So what happens when a file is uploaded?<a class="headerlink" href="#so-what-happens-when-a-file-is-uploaded" title="Permalink to this headline">¶</a></h4>
+<p>If we&#8217;re using the TempFileHandlerWeb handler the following steps take place.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">we&#8217;ll presume that the first form submit has a missing field and so the form gets redisplayed.</p>
+</div>
+<p>The first time a file is uploaded, formish takes the FieldStorage object and copies the contents of the file to a tempfile using it&#8217;s <tt class="docutils literal"><span class="pre">store_file</span></tt> method.</p>
+<p>When the form page is redisplayed, the widget uses the handlers <tt class="docutils literal"><span class="pre">get_url_for_file`</span></tt> method to work out a url for the file. The file can then be displayed.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We&#8217;re not covering how the file is actually displayed. This is framework specific but we&#8217;ll give an example for restish after this section.</p>
+</div>
+<p>When the users completes the corrections to the form and resubmits, formish processes the file. It first checks to see if the file is new (the widget stores a reference to the old file so it can check) and if it isn&#8217;t new, it returns a schema.type.File object with None for all of the attributes.</p>
+<p>If there is no file (i.e. no file was submitted on a clean form or a file was removed using the checkbox) then a None is returned.</p>
+<p>If the file is new or has changed, formish generates the schemaish.type.File object from the data stored in the temporary file.</p>
+</div>
+<div class="section" id="what-else-can-i-configure">
+<h4>What else can I configure?<a class="headerlink" href="#what-else-can-i-configure" title="Permalink to this headline">¶</a></h4>
+<p>The formish <tt class="docutils literal"><span class="pre">FileUpload</span></tt> widget takes the following arguments</p>
+<dl class="method">
+<dt id="formish.widgets.FileUpload.__init__">
+<!--[formish.widgets.FileUpload.__init__]--><tt class="descclassname">FileUpload.</tt><tt class="descname">__init__</tt><big>(</big><em>filehandler</em>, <em>show_image_preview=False</em>, <em>allow_clear=True</em>, <em>css_class=None</em>, <em>originalurl=None</em><big>)</big><a class="headerlink" href="#formish.widgets.FileUpload.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>filehandler</em> &#8211; <p>filehandler is any object with the following methods:</p>
+<dl class="docutils">
+<dt>storeFile(self, f)</dt>
+<dd>where f is a file instance</dd>
+<dt>getUrlForFile(self, data)</dt>
+<dd>where data is the form item data or a path to a temporary file
+and is expected to return a URL to access the persisted or
+temporary data.</dd>
+</dl>
+</li>
+<li><em>show_image_preview</em> &#8211; a boolean that, if set, will include an image
+thumbnail with the widget</li>
+<li><em>css_class</em> &#8211; extra css classes to apply to the widget</li>
+<li><em>originalurl</em> &#8211; a default url to</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+</div>
 <div class="section" id="sequences">
-<h1>Sequences<a class="headerlink" href="#sequences" title="Permalink to this headline">¶</a></h1>
+<h2>Sequences<a class="headerlink" href="#sequences" title="Permalink to this headline">¶</a></h2>
 <p>Formish also handles sequences in fields, the basic example of this is the checkbox and the multi-select. However formish can also handle sequences in text areas and also sequences in separate fields.</p>
 <div class="section" id="checkbox-multi-choice">
-<h2>Checkbox Multi Choice<a class="headerlink" href="#checkbox-multi-choice" title="Permalink to this headline">¶</a></h2>
+<h3>Checkbox Multi Choice<a class="headerlink" href="#checkbox-multi-choice" title="Permalink to this headline">¶</a></h3>
 <p>Now we&#8217;ve talked through the basics.. I&#8217;ll skip a lot of the detail and just demonstrate the process..</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myfield&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Sequence</span><span class="p">(</span><span class="n">schemaish</span><span class="o">.</span><span class="n">Integer</span><span class="p">())</span> <span class="p">)</span>
@@ -562,14 +726,14 @@
 </div>
 </div>
 <div class="section" id="select-multi-choice">
-<h2>Select Multi Choice<a class="headerlink" href="#select-multi-choice" title="Permalink to this headline">¶</a></h2>
+<h3>Select Multi Choice<a class="headerlink" href="#select-multi-choice" title="Permalink to this headline">¶</a></h3>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">Not implemented yet</p>
 </div>
 </div>
 <div class="section" id="text-area-sequence">
-<h2>Text Area Sequence<a class="headerlink" href="#text-area-sequence" title="Permalink to this headline">¶</a></h2>
+<h3>Text Area Sequence<a class="headerlink" href="#text-area-sequence" title="Permalink to this headline">¶</a></h3>
 <p>Sometimes it&#8217;s easier to enter information directly into a textarea</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;myfield&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">TextArea</span><span class="p">()</span>
 </pre></div>
@@ -603,7 +767,7 @@
 </div>
 </div>
 <div class="section" id="text-area-sequence-of-sequences">
-<h2>Text Area Sequence of Sequences<a class="headerlink" href="#text-area-sequence-of-sequences" title="Permalink to this headline">¶</a></h2>
+<h3>Text Area Sequence of Sequences<a class="headerlink" href="#text-area-sequence-of-sequences" title="Permalink to this headline">¶</a></h3>
 <p>You can also use a textarea to represent a sequence of sequences...</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myfield&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Sequence</span><span class="p">(</span><span class="n">schemaish</span><span class="o">.</span><span class="n">Sequence</span><span class="p">(</span><span class="n">schemaish</span><span class="o">.</span><span class="n">Integer</span><span class="p">())))</span>
@@ -619,7 +783,7 @@
 </div>
 </div>
 <div class="section" id="multiple-input-fields">
-<h2>Multiple Input Fields<a class="headerlink" href="#multiple-input-fields" title="Permalink to this headline">¶</a></h2>
+<h3>Multiple Input Fields<a class="headerlink" href="#multiple-input-fields" title="Permalink to this headline">¶</a></h3>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p class="last">This code hasn&#8217;t settled down yet, please check for updates.</p>
@@ -628,10 +792,10 @@
 </div>
 </div>
 <div class="section" id="nested-form-structures">
-<h1>Nested Form Structures<a class="headerlink" href="#nested-form-structures" title="Permalink to this headline">¶</a></h1>
+<h2>Nested Form Structures<a class="headerlink" href="#nested-form-structures" title="Permalink to this headline">¶</a></h2>
 <p>Formish also allows you to create sub-sections in forms that can contain any other valid form part. We&#8217;ll use an address and name section to expand out registration form.</p>
 <div class="section" id="a-structure-of-structures">
-<h2>A Structure of Structures<a class="headerlink" href="#a-structure-of-structures" title="Permalink to this headline">¶</a></h2>
+<h3>A Structure of Structures<a class="headerlink" href="#a-structure-of-structures" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyName</span><span class="p">(</span><span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">firstName</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">()</span>
 <span class="gp">... </span>    <span class="n">surname</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">()</span>
@@ -739,11 +903,11 @@
 </div>
 </div>
 <div class="section" id="other-combinations">
-<h2>Other Combinations<a class="headerlink" href="#other-combinations" title="Permalink to this headline">¶</a></h2>
+<h3>Other Combinations<a class="headerlink" href="#other-combinations" title="Permalink to this headline">¶</a></h3>
 <p>Formish will also let you build up a sequence of structures and will use it&#8217;s jquery javascript to allow you to dynamically add and remove sections. This also works when recursively nested so it is perfectly possibly to have a list of addresses, each of which has a list of phone numbers.</p>
 </div>
 <div class="section" id="tuples">
-<h2>Tuples<a class="headerlink" href="#tuples" title="Permalink to this headline">¶</a></h2>
+<h3>Tuples<a class="headerlink" href="#tuples" title="Permalink to this headline">¶</a></h3>
 <p>A tuple can be used to create a list that has different types in it. For instance, if we used the Sequence of Sequence example above, we have no control over how many items are in each row. Using a Sequence of Tuples allows us to define the length of the row and also the types of the items in the row.</p>
 <p>Lets see how that works.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myfield&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Sequence</span><span class="p">(</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Tuple</span><span class="p">(</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Integer</span><span class="p">(),</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Date</span><span class="p">()</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
@@ -755,9 +919,9 @@
 </div>
 </div>
 <div class="section" id="class-documentation">
-<h1>Class Documentation<a class="headerlink" href="#class-documentation" title="Permalink to this headline">¶</a></h1>
+<h2>Class Documentation<a class="headerlink" href="#class-documentation" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="form-class">
-<h2>Form Class<a class="headerlink" href="#form-class" title="Permalink to this headline">¶</a></h2>
+<h3>Form Class<a class="headerlink" href="#form-class" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="formish.forms.Form">
 <!--[formish.forms.Form]-->class <tt class="descclassname">formish.forms.</tt><tt class="descname">Form</tt><big>(</big><em>structure</em>, <em>name=None</em>, <em>defaults={}</em>, <em>errors={}</em>, <em>action_url=None</em>, <em>renderer=None</em><big>)</big><a class="headerlink" href="#formish.forms.Form" title="Permalink to this definition">¶</a></dt>
@@ -856,7 +1020,7 @@ there are errors, raise them; otherwise return the data</dd></dl>
 
 </div>
 <div class="section" id="field-class">
-<h2>Field Class<a class="headerlink" href="#field-class" title="Permalink to this headline">¶</a></h2>
+<h3>Field Class<a class="headerlink" href="#field-class" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="formish.forms.Field">
 <!--[formish.forms.Field]-->class <tt class="descclassname">formish.forms.</tt><tt class="descname">Field</tt><big>(</big><em>name</em>, <em>attr</em>, <em>form</em><big>)</big><a class="headerlink" href="#formish.forms.Field" title="Permalink to this definition">¶</a></dt>
@@ -930,6 +1094,7 @@ related information.</p>
 
 </div>
 </div>
+</div>
 
 
           </div>
@@ -972,10 +1137,22 @@ related information.</p>
 <li><a class="reference external" href="#showing-the-errors">Showing the errors</a></li>
 </ul>
 </li>
-</ul>
-</li>
 <li><a class="reference external" href="#validation">Validation</a><ul>
 <li><a class="reference external" href="#how-validators-work">How Validators Work</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#file-uploads">File Uploads</a><ul>
+<li><a class="reference external" href="#short-version">Short Version</a><ul>
+<li><a class="reference external" href="#what-does-this-produce">What does this produce?</a></li>
+<li><a class="reference external" href="#how-does-this-return-a-file-to-me">How does this return a file to me?</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#longer-version">Longer Version</a><ul>
+<li><a class="reference external" href="#upload-file-temporary-storage">Upload File Temporary Storage</a></li>
+<li><a class="reference external" href="#so-what-happens-when-a-file-is-uploaded">So what happens when a file is uploaded?</a></li>
+<li><a class="reference external" href="#what-else-can-i-configure">What else can I configure?</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference external" href="#sequences">Sequences</a><ul>
@@ -995,6 +1172,8 @@ related information.</p>
 <li><a class="reference external" href="#class-documentation">Class Documentation</a><ul>
 <li><a class="reference external" href="#form-class">Form Class</a></li>
 <li><a class="reference external" href="#field-class">Field Class</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

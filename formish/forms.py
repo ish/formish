@@ -1,9 +1,12 @@
+"""
+The form module contains the main form, field, group and sequence classes
+"""
 import schemaish
 
 from webob import UnicodeMultiDict
 
 from formish import util
-from formish.dottedDict import dottedDict, isInt
+from formish.dottedDict import dottedDict, is_int
 from convertish.convert import *
 from formish.validation import *
 from formish.widgets import *
@@ -21,7 +24,7 @@ class Action(object):
     """
     def __init__(self, callback, name, label):
         if not util.valid_identifier(name):
-            raise FormError('Invalid action name %r.'%name)
+            raise FormError('Invalid action name %r.'% name)
         self.callback = callback
         self.name = name
         if label is None:
@@ -32,7 +35,7 @@ class Action(object):
             
 def _cssname(self):
     """ Returns a hyphenated identifier using the form name and field name """
-    return '%s-%s'%(self.form.name, '-'.join(self.name.split('.')))    
+    return '%s-%s'% (self.form.name, '-'.join(self.name.split('.')))    
 
 
 def _classes(self):
@@ -47,8 +50,8 @@ def _classes(self):
         classes.append('defaultwidget')
     if self.required:
         classes.append('required')
-    if self.widget is not None and self.widget.cssClass:
-        classes.append(self.widget.cssClass)
+    if self.widget is not None and self.widget.css_class:
+        classes.append(self.widget.css_class)
     if self.error:
         classes.append('error')
     return ' '.join(classes)
@@ -60,7 +63,7 @@ def starify(name):
     """
     newname = []
     for key in name.split('.'):
-        if isInt(key):
+        if is_int(key):
             newname.append('*')
         else:
             newname.append(key)
@@ -129,7 +132,7 @@ class Field(object):
         """Convert the request_data to a value object for the form or None."""
         if '*' in self.name:
             return ['']
-        return self.form.request_data.get(self.name,None)
+        return self.form.request_data.get(self.name, None)
 
 
     @property 
@@ -149,15 +152,15 @@ class Field(object):
         """ return the fields widget bound with extra params. """
         # Loop on the name to work out if any '*' widgets are used
         try:
-            w = self.form.get_item_data(starify(self.name),'widget')
+            widget_type = self.form.get_item_data(starify(self.name),'widget')
         except KeyError:
-            w = Input()
-        return w
+            widget_type = Input()
+        return widget_type
         
 
     def __call__(self):
         """ returns a serialisation for this field using the form's renderer """
-        return self.form.renderer('/formish/Field.html',{'f':self})
+        return self.form.renderer('/formish/Field.html', {'f':self})
             
     
 
@@ -169,6 +172,7 @@ class Collection(object):
     be used on it's own. We bind the schema Structure Attribute to a Group
     which includes form information.
     """    
+    type = None
 
 
     def __init__(self, name, attr, form):
@@ -197,20 +201,21 @@ class Collection(object):
 
     @property
     def cssname(self):
-        """ Works out a list of classes that can be applied to the field """        
+        """ Works out a list of classes that can be applied to the field """
         return _cssname(self)
     
 
     @property
     def classes(self):
-        """ Works out a list of classes that can be applied to the field """        
+        """
+        Works out a list of classes that can be applied to the field """
         return _classes(self)           
    
 
     @property
     def value(self):
         """Convert the request_data to a value object for the form or None."""
-        return self.form.request_data.get(self.name,[''])
+        return self.form.request_data.get(self.name, [''])
    
 
     @property 
@@ -222,7 +227,7 @@ class Collection(object):
     @property
     def defaults(self):
         """Get the defaults from the form."""
-        defaults = self.form.defaults.get(self.name,None)
+        defaults = self.form.defaults.get(self.name, None)
         return defaults
 
 
@@ -237,13 +242,14 @@ class Collection(object):
         """ return the fields widget bound with extra params. """
         
         try:
-            w = self.form.get_item_data(starify(self.name),'widget')
+            widget_type = self.form.get_item_data(starify(self.name),'widget')
         except KeyError:
-            w = SequenceDefault()
-        return w
+            widget_type = SequenceDefault()
+        return widget_type
 
 
     def get_field(self, segments):
+        """ recursively get dotted field names """
         for field in self.fields:
             if field.name.split('.')[-1] == segments[0]:
                 if isinstance(field, Field):
@@ -253,7 +259,7 @@ class Collection(object):
 
 
     def __getitem__(self, key):
-        return FormAccessor(self.form, '%s.%s'%(self.name,key))
+        return FormAccessor(self.form, '%s.%s'% (self.name, key))
 
 
     @property
@@ -288,37 +294,42 @@ class Collection(object):
             if self.name is None:
                 keyprefix = attr_name
             else:
-                keyprefix = '%s.%s'%(self.name,attr_name)
+                keyprefix = '%s.%s'% (self.name, attr_name)
                 
             if isinstance(attr, schemaish.Sequence):
-                f = Sequence(keyprefix, attr, self.form)
+                field = Sequence(keyprefix, attr, self.form)
             elif isinstance(attr, schemaish.Structure):
-                f = Group(keyprefix, attr, self.form)
+                field = Group(keyprefix, attr, self.form)
             else:
-                f = Field(keyprefix, attr, self.form)
-            self._fields[attr_name] = f
-            return f
+                field = Field(keyprefix, attr, self.form)
+            self._fields[attr_name] = field
+            return field
 
 
     def __call__(self):
-        return self.form.renderer('/formish/Field.html',{'f':self})
+        return self.form.renderer('/formish/Field.html', {'f':self})
 
 
     def __repr__(self):
-        return '<formish %s name="%s">'%(self.type, self.name)
+        return '<formish %s name="%s">'% (self.type, self.name)
    
 
 
 class Group(Collection):
+    """
+    A group is a basic collection with a different template
+    """
     type = 'group'
-    _template='structure'
+    _template = 'structure'
 
 
 
 class Sequence(Collection):
+    """
+    A sequence is a collection with a variable number of fields depending on request data, data or min/max values
+    """
     type = 'sequence'
     _template = 'ssequence'
-
 
     @property
     def fields(self):
@@ -333,33 +344,33 @@ class Sequence(Collection):
         # Sequence.fields ... which tries to build the request data ... which
         # calls Sequence.fields, etc, etc. Bang!
         if self.form._request_data:
-            v = self.form._request_data.get(self.name, [])
+            data = self.form._request_data.get(self.name, [])
         else:
-            v = self.defaults
+            data = self.defaults
 
-        if v is None:
+        if data is None:
             num_fields = 0
         else:
-            num_fields = len(v)
+            num_fields = len(data)
             
-        min=None
-        max=None
+        minimum = None
+        maximum = None
         if self.widget is not None:
-            min = getattr(self.widget, 'min', None)
-            max = getattr(self.widget, 'max', None)
-        if min is not None and num_fields < min:
-            num_fields = min
+            minimum = getattr(self.widget, 'min', None)
+            maximum = getattr(self.widget, 'max', None)
+        if minimum is not None and num_fields < min:
+            num_fields = minimum
         elif max is not None and num_fields > max:
-            num_fields = max
+            num_fields = maximum
 
 
-        for n in xrange(num_fields):
-            f = self.bind(n, self.attr.attr)
-            yield f
+        for num in xrange(num_fields):
+            field = self.bind(num, self.attr.attr)
+            yield field
             
     @property
     def template(self):
-        return self.bind('*',self.attr.attr)
+        return self.bind('*', self.attr.attr)
             
 
 
@@ -385,7 +396,7 @@ class Form(object):
 
     _request_data = None
 
-    def __init__(self, structure, name=None, defaults={}, errors={},
+    def __init__(self, structure, name=None, defaults=None, errors=None,
             action_url=None, renderer=None):
         """
         Create a new form instance
@@ -416,6 +427,10 @@ class Form(object):
         self.structure = Group(None, structure, self)
         self.item_data = {}
         self.name = name
+        if defaults is None:
+            defaults = {}
+        if errors is None:
+            errors = {}
         self.defaults = defaults
         self.errors = dottedDict(errors)
         self.error = None
@@ -424,35 +439,34 @@ class Form(object):
         if renderer is not None:
             self.renderer = renderer
 
-    def element_name():
-        """
-        property to use when dealing with restish elements
-        """
-        def get(self):
-            return self._element_name
-        def set(self, name):
-            if self._name is not None:
-                raise Exception("Named forms cannot be used as elements.")
-            self._element_name = name
-        return property(get, set)
-    element_name = element_name()
 
-    def name():
-        """
-        The name of the form, used to namespace classes and ids
-        """
-        def get(self):
-            if self._element_name is not None:
-                return self._element_name
-            if self._name is not None:
-                return self._name
-            return 'formish'
-        def set(self, name):
-            if self._element_name is not None:
-                raise Exception("Named forms cannot be used as elements.")
-            self._name = name
-        return property(get, set)
-    name = name()
+    def _element_name_get(self):
+        """ Set the element name """
+        return self._element_name
+
+    def _element_name_set(self, name):
+        """ Get the element name or raise an error """
+        if self._name is not None:
+            raise Exception("Named forms cannot be used as elements.")
+        self._element_name = name
+
+    element_name = property(_element_name_get, _element_name_set)
+
+    def _name_get(self):
+        """ Get the name of the form, default to `formish` """
+        if self._element_name is not None:
+            return self._element_name
+        if self._name is not None:
+            return self._name
+        return 'formish'
+
+    def _name_set(self, name):
+        """ Set the form name """ 
+        if self._element_name is not None:
+            raise Exception("Named forms cannot be used as elements.")
+        self._name = name
+
+    name = property(_name_get, _name_set)
 
     def add_action(self, callback, name="submit", label=None):
         """ 
@@ -470,7 +484,7 @@ class Form(object):
         
         """
         if name in [action.name for action in self.actions]:
-            raise ValueError('Action with name %r already exists.' % name)
+            raise ValueError('Action with name %r already exists.'% name)
         self.actions.append( Action(callback, name, label) )              
 
     def action(self, request, *args):
@@ -487,7 +501,7 @@ class Form(object):
             raise NoActionError('The form does not have any actions')
         for action in self.actions:
             if action.name in request.POST.keys():
-                return action.callback(request,self, *args)
+                return action.callback(request, self, *args)
         return self.actions[0].callback(request, self, *args)
 
 
@@ -499,9 +513,12 @@ class Form(object):
         :arg request_data: Webob style request data
         :arg raise_exceptions: Whether to raise exceptions or return errors
         """
-        data = convert_request_data_to_data(self.structure, request_data, errors=self.errors) 
+        data = convert_request_data_to_data(self.structure, \
+                                            request_data, errors=self.errors) 
         if raise_exceptions and len(self.errors.keys()):
-            raise FormError('Tried to access data but conversion from request failed with %s errors (%s)'%(len(self.errors.keys()), self.errors.data))
+            raise FormError('Tried to access data but conversion' \
+        ' from request failed with %s errors (%s)'% \
+                   (len(self.errors.keys()), self.errors.data))
         return data
     
 
@@ -512,7 +529,8 @@ class Form(object):
         """
         if self._request_data is not None:
             return self._request_data
-        self._request_data = convert_data_to_request_data(self.structure, dottedDict(self.defaults))
+        self._request_data = convert_data_to_request_data(self.structure, \
+                                dottedDict(self.defaults))
         return self._request_data
 
 
@@ -529,18 +547,18 @@ class Form(object):
     request_data = property(_get_request_data, _set_request_data)
     
     
-    def _getDefaults(self):
+    def _get_defaults(self):
         """ Get the raw default data """
         return dottedDict(self._defaults)
    
 
-    def _setDefaults(self, data):
+    def _set_defaults(self, data):
         """ assign data """
         self._defaults = data
         self._request_data = None
    
 
-    defaults = property(_getDefaults, _setDefaults)
+    defaults = property(_get_defaults, _set_defaults)
     
 
     def validate(self, request, failure_callable=None, success_callable=None):
@@ -548,26 +566,32 @@ class Form(object):
         Get the data without raising exceptions and then validate the data. If
         there are errors, raise them; otherwise return the data
         """
-        # If we pass in explicit failure and success callables then do this first
+        # If we pass in explicit failure and success callables then do this
+        # first
         if failure_callable is not None and success_callable is not None:
-            return self._validate_and_call(raw_request, failure_callable=None, success_callable=None)
+            return self._validate_and_call(request, \
+                          failure_callable=None, success_callable=None)
         self.errors = {}
         # Check this request was POSTed by this form.
-        if not request.method =='POST' and request.POST.get('__formish_form__',None) == self.name:
+        if not request.method =='POST' and \
+           request.POST.get('__formish_form__',None) == self.name:
             raise Exception("request does not match form name")
         
-        requestPOST = UnicodeMultiDict(request.POST, encoding=util.getPOSTCharset(request))
+        request_post = UnicodeMultiDict(request.POST, \
+                        encoding=util.get_post_charset(request))
         # Remove the sequence factory data from the request
-        for k in requestPOST.keys():
+        for k in request_post.keys():
             if '*' in k:
-                requestPOST.pop(k)
+                request_post.pop(k)
         # We need the _request_data to be populated so sequences know how many
         # items they have (i.e. .fields method on a sequence uses the number of
         # values on the _request_data)
-        self._request_data = dottedDict(requestPOST)
-        self.request_data = pre_parse_request_data(self.structure,dottedDict(requestPOST))
-        data = self.get_unvalidated_data(self.request_data, raise_exceptions=False)
-        self._request_data = dottedDict(requestPOST)
+        self._request_data = dottedDict(request_post)
+        self.request_data = pre_parse_request_data( \
+                    self.structure,dottedDict(request_post))
+        data = self.get_unvalidated_data( \
+                    self.request_data, raise_exceptions=False)
+        self._request_data = dottedDict(request_post)
         try:
             self.structure.attr.validate(data)
         except schemaish.attr.Invalid, e:
@@ -575,13 +599,15 @@ class Form(object):
                 if not self.errors.has_key(key):
                     self.errors[key] = value
         if len(self.errors.keys()) > 0:
-            err_msg = 'Tried to access data but conversion from request failed with %s errors'
-            raise FormError(err_msg%(len(self.errors.keys())))
+            err_msg = 'Tried to access data but conversion' \
+                    'from request failed with %s errors'
+            raise FormError(err_msg% (len(self.errors.keys())))
         return data
 
-    def _validate_and_call(self, raw_request, failure_callable=None, success_callable=None):
+    def _validate_and_call(self, request, \
+                    failure_callable=None, success_callable=None):
         try: 
-            data = self.validate(raw_request)
+            data = self.validate(request)
         except FormError, e:
             return failure_callable(request, self)
         return success_callable(request, data)
@@ -594,7 +620,7 @@ class Form(object):
         to associates data with fields.
         """
         
-        allowed = ['title','widget','description']
+        allowed = ['title', 'widget', 'description']
         if name in allowed:
             self.item_data.setdefault(key, {})[name] = value
         else:
@@ -610,11 +636,14 @@ class Form(object):
 
 
     def get_item_data_values(self, name):
-        d = dottedDict({})
-        for k,v in self.item_data:
-            if v.has_key(name):
-                d[k] = v[name]
-        return d
+        """
+        get all of the item data values
+        """
+        data = dottedDict({})
+        for key, value in self.item_data:
+            if value.has_key(name):
+                data[key] = value[name]
+        return data
 
 
     def __getitem__(self, key):
@@ -650,7 +679,7 @@ class Form(object):
         """
         Calling the Form generates a serialisation using the form's renderer
         """
-        return self.renderer('/formish/Form.html',{'form':self})
+        return self.renderer('/formish/Form.html', {'form':self})
         
     
     
@@ -666,7 +695,7 @@ class FormAccessor(object):
     def __init__(self, form, key, prefix=None):
         self.__dict__['form'] = form
         if prefix is not None:
-            self.__dict__['key'] = '%s.%s'%(prefix,key)
+            self.__dict__['key'] = '%s.%s'% (prefix, key)
         else:
             self.__dict__['key'] = key
 

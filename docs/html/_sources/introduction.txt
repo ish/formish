@@ -1,11 +1,11 @@
-
+*************
 About Formish
-=============
+*************
 
 Formish is a templating language agnostic form generation and handling library. 
 
 Introduction - A Simple Form
-++++++++++++++++++++++++++++
+============================
 
 Creating a schema
 -----------------
@@ -20,7 +20,7 @@ First of all we need to create a data schema to define what types of data we wan
 [('myfield', <schemaish.attr.String object at 0x...>)]
 
 Creating a form
------------------
+---------------
 
 So we now have a single field in our schema which is defined as a string. We can now create a form from this
 
@@ -28,7 +28,7 @@ So we now have a single field in our schema which is defined as a string. We can
 >>> form = formish.Form(schema)
 
 Attributes of a form
-....................
+^^^^^^^^^^^^^^^^^^^^
 
 And what can we do with the form? Well at the moment we have a form name and some fields
 
@@ -41,7 +41,7 @@ And what can we do with the form? Well at the moment we have a form name and som
 <formish.forms.Field object at 0x...>
 
 Attributes of a field
-.....................
+^^^^^^^^^^^^^^^^^^^^^
 
 And what about our field? Well it's now become a form field, which means it has a few extra attributes to do with creating things like classes, ids, etc.
 
@@ -104,7 +104,7 @@ Otherwise the form defaults to 'formish'.
 The method at the moment is always 'post' but a future release will implement get forms also. The final two attributes, enctype and accept-charset make the form behave in as consistent a way as possible. Defaulting to content type of 'utf-8' and handling the form data accoring to http://www.ietf.org/rfc/rfc2388.txt 'multipart/form-data'. 
 
 The form html element
-.....................
+^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: html
 
@@ -114,7 +114,8 @@ The form html element
 The first hidden field is '_charset_ which is a hack to help mozilla handle charsets as described here https://bugzilla.mozilla.org/show_bug.cgi?id=18643. The second is the name of the form, used after submission to work out which form has been returned.
 
 The form configuration attributes
-.................................
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 
 .. code-block:: html
 
@@ -130,7 +131,7 @@ The label points at the field, which in this case is the only input field. In th
 The 'input's div is a container that holds the widget itself, in this case just a single input field with an id for the label to point at.
 
 The input field(s)
-..................
+^^^^^^^^^^^^^^^^^^
 
 .. code-block:: html
 
@@ -143,7 +144,7 @@ The input field(s)
       </div>
 
 The action(s)
-.............
+^^^^^^^^^^^^^
 
 Finally, the actions block contains all of the submit buttons - in this case just a single input with the default 'submit' value.
 
@@ -170,7 +171,7 @@ Once the form is submitted, we can get the data by calling 'validate'. In order 
 And that is our simple form overview complete. 
 
 Introduction - A Slightly More Complex Form
-+++++++++++++++++++++++++++++++++++++++++++
+===========================================
 
 OK, We're going to put a more things together for this.. 
 
@@ -180,7 +181,7 @@ OK, We're going to put a more things together for this..
 * Form errors
 
 Creating the form
--------------------
+-----------------
 
 For our contrived example, we'll build a simple registration form.
 
@@ -217,11 +218,11 @@ Next we'll make the country a select box. To do this we pass a series of options
 
 >>> form['country'].widget = formish.SelectChoice(options=['UK','US'])
 
-If we wanted different values for our options we would pass each option in as a tuple of ('value','label'). We could also set a label for the field that appears when there is no input value. This is called the 'noneOption'. The noneOptions defaults to ('', '--choose--') so we could change it to ('','Pick a Country'). Here is an example
+If we wanted different values for our options we would pass each option in as a tuple of ('value','label'). We could also set a label for the field that appears when there is no input value. This is called the 'none_option'. The none_options defaults to ('', '--choose--') so we could change it to ('','Pick a Country'). Here is an example
 
 >>> options = [('UK','I live in the UK'),('US','I live in the US')]
->>> noneOption = ('','Where do you live')
->>> form['country'].widget = formish.SelectChoice(options=options, noneOption=noneOption)
+>>> none_option = ('','Where do you live')
+>>> form['country'].widget = formish.SelectChoice(options=options, none_option=none_option)
 
 Finally, we'd like a checkbox for the Boolean value
 
@@ -238,7 +239,7 @@ Well let's give it some default values and look at what we get.
 If we create the form now, we get the following fields. One thing to note is that most widgets within Formish use strings to serialise their values into forms. The exception here is the date parts widget. 
 
 String fields
-.............
+^^^^^^^^^^^^^
 
 This is the same as our first example but note that the label for firstName has been expanded into 'First Name'.
 
@@ -259,7 +260,7 @@ This is the same as our first example but note that the label for firstName has 
     </div>
 
 Date Field
-..........
+^^^^^^^^^^
 
 The date field splits the date into three parts, each part indicated using dotted notation.
 
@@ -286,7 +287,7 @@ The date field splits the date into three parts, each part indicated using dotte
     </div>
 
 Integer Field
-.............
+^^^^^^^^^^^^^
 
 .. code-block:: html
 
@@ -298,9 +299,9 @@ Integer Field
     </div>
 
 Select Field
-............
+^^^^^^^^^^^^
 
-This uses the 'noneOption' value to show 'Where do you live' by default but because we have set a default value, 'I live in the UK' is selected.
+This uses the 'none_option' value to show 'Where do you live' by default but because we have set a default value, 'I live in the UK' is selected.
 
 .. raw:: html
 
@@ -330,7 +331,7 @@ This uses the 'noneOption' value to show 'Where do you live' by default but beca
 
 
 Boolean Field
-.............
+^^^^^^^^^^^^^
 
 .. code-block:: html
 
@@ -430,13 +431,16 @@ Finally, lets see what valid data gives us..
 {'termsAndConditions': True, 'surname': u'Parkin', 'firstName': u'Tim', 'country': u'UK', 'dateOfBirth': datetime.date(1966, 12, 18), 'streetNumber': 123}
 
 
+
+
+
 Validation
 ==========
 
 Validation in Formish uses simple callable validators that raise exceptions if validation fails (Either a formish.FieldValidationError or a validatish.Invalid exception.
 
 How Validators Work
-+++++++++++++++++++
+-------------------
 
 There is a library of validators called Validatish that has most of the typical examples you might need. Let's take a look at a simple integer validator.
 
@@ -507,13 +511,182 @@ So the validator is a callable and it uses the python 'non_zero' check so see if
 
 .. note:: The Required validator must be sub-classed if you want to create your own required validator. This is to ensure that formish inserts the appropriate css to mark up the required form fields
 
+
+File Uploads 
+============
+
+Short Version
+-------------
+
+We handle files for you so that all you have to do is process the file handle given to you.. Here is an example using the default filehandlers..
+
+>>> schema = schemaish.Structure()
+>>> schema.add( 'myfile', schemaish.File )
+>>> form = formish.Form(schema)
+>>> from formish import filehandler
+>>> form['myfile'].widget = formish.FileUpload(filehandler=filehandler.TempFileHandlerWeb())
+
+What does this produce?
+^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: html
+
+    <div id="formish-myfile-field" class="field type fileupload">
+      <label for="formish-myfile">Myfile</label>
+      <div class="inputs">
+        <input id="formish-myfile-remove" type="checkbox" name="myfile.remove" value="true" />
+        <input id="formish-myfile-id" type="hidden" name="myfile.name" value="" />
+        <input id="formish-myfile-default" type="hidden" name="myfile.default" value="" />
+        <input id="formish-myfile" type="file" name="myfile.file" />
+      </div>
+    </div>
+
+and looks like
+
+.. raw:: html 
+
+    <div id="formish-myfile-field" class="field type fileupload">
+      <label for="formish-myfile">Myfile</label>
+      <div class="inputs">
+        <input id="formish-myfile-remove" type="checkbox" name="myfile.remove" value="true" />
+        <input id="formish-myfile-id" type="hidden" name="myfile.name" value="" />
+        <input id="formish-myfile-default" type="hidden" name="myfile.default" value="" />
+        <input id="formish-myfile" type="file" name="myfile.file" />
+      </div>
+    </div>
+
+The checkbox is included to allow you to remove a file if necessary. 
+
+How does this return a file to me?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You will get a schemaish.type.File object back which looks like this
+
+.. code-block:: python
+
+    class File(object):
+
+        def __init__(self, file, filename, mimetype):
+            self.file = file
+            self.filename=filename
+            self.mimetype=mimetype
+
+Where file is a file like object, filename is the original filename and the mimetype is worked out from the file suffix. All you have to do is ``.read()`` from the file attribute to get the contents.
+
+Longer Version
+--------------
+
+File uploads are quite often the most difficult aspect of form handling. Formish has tried to make some pragmatic decisions that should ease this process for you. The first of these decisions is what type of data to use to store a file. Because we are using webob, files that arrive in formish do so in FieldStorage representation.
+
+Upload File Temporary Storage
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Formish tries to ensure that fields are 'symmetric'. i.e. what goes in comes back out in the same format). For text fields this is quite simple but for a file upload things are a little more difficult. What formish does is to use a temporary store in order to save the file in a secure location for access later. You can implement this store if you wish, using sessions or databaseses, etc. Here is the signature for a filehandler..
+
+.. code-block:: python
+
+    class FileHandlerMinimal(object):
+        """ Example of File handler for formish file upload support. """
+
+        def store_file(self, fs):
+            """ Method to store a file """
+
+        def get_path_for_file(self, filename):
+            """ Method to get a path for a file on disk """
+
+As you can see, the two important things are a method to store the file and a method to get the file back off disk given the filename. 
+
+Our tempfile handler implements this as follows.
+
+.. code-block:: python
+
+    class TempFileHandler(FileHandlerMinimal):
+        """
+        File handler using python tempfile module to store file
+        """
+
+        def store_file(self, fs):
+            fileno, filename = tempfile.mkstemp(suffix='%s-%s'%(uuid.uuid4().hex,fs.filename))
+            fp = os.fdopen(fileno, 'wb')
+            fp.write(fs.value)
+            fp.close()
+            prefix = tempfile.gettempprefix()
+            tempdir = tempfile.gettempdir()
+            filename = ''.join( filename[(len(tempdir)+len(prefix)+1):] )
+            return filename
+
+        def get_path_for_file(self, filename):
+            prefix = tempfile.gettempprefix()
+            tempdir = tempfile.gettempdir()
+            return '%s/%s%s'%(tempdir,prefix,filename)
+
+.. note:: We also implement a ``get_mimetype`` method that helps in building the schemaish.type.File
+
+We typically want to access the file again from our widget however (especially in the case of image uploads!). Formish extends the TempFileHandler with a get_url_for_file method as follows..
+
+.. code-block:: python
+
+    class TempFileHandlerWeb(TempFileHandler):
+
+        def __init__(self, default_url=None,
+                     resource_root='/filehandler',urlfactory=None):
+            self.default_url = default_url
+            self.resource_root = resource_root
+            self.urlfactory = urlfactory
+
+        def get_url_for_file(self, object):
+            if self.urlfactory is not None:
+                return self.urlfactory(object)
+            if id is None:
+                return self.default_url.replace(' ','+')
+            else:
+                return '%s/%s'%(self.resource_root,object)
+
+This needs configuring with a resource root (where to find files), a default_url (if we have no file, what to use - useful to showing missing images) and a urlfactory (how to convert a object into a url representation). 
+
+So what happens when a file is uploaded?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If we're using the TempFileHandlerWeb handler the following steps take place.
+
+.. note:: we'll presume that the first form submit has a missing field and so the form gets redisplayed.
+
+The first time a file is uploaded, formish takes the FieldStorage object and copies the contents of the file to a tempfile using it's ``store_file`` method. 
+
+When the form page is redisplayed, the widget uses the handlers ``get_url_for_file``` method to work out a url for the file. The file can then be displayed.
+
+.. note:: We're not covering how the file is actually displayed. This is framework specific but we'll give an example for restish after this section.
+
+When the users completes the corrections to the form and resubmits, formish processes the file. It first checks to see if the file is new (the widget stores a reference to the old file so it can check) and if it isn't new, it returns a schema.type.File object with None for all of the attributes.
+
+If there is no file (i.e. no file was submitted on a clean form or a file was removed using the checkbox) then a None is returned.
+
+If the file is new or has changed, formish generates the schemaish.type.File object from the data stored in the temporary file.
+
+What else can I configure?
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The formish ``FileUpload`` widget takes the following arguments
+
+.. automethod:: formish.widgets.FileUpload.__init__
+
+
+
+
+
+
+
+
+
+
+
 Sequences
 =========
 
 Formish also handles sequences in fields, the basic example of this is the checkbox and the multi-select. However formish can also handle sequences in text areas and also sequences in separate fields. 
 
 Checkbox Multi Choice
-+++++++++++++++++++++
+---------------------
 
 Now we've talked through the basics.. I'll skip a lot of the detail and just demonstrate the process.. 
 
@@ -565,12 +738,12 @@ Let's take a look at the html that produced..
     </div>
 
 Select Multi Choice
-+++++++++++++++++++
+-------------------
 
 .. warning:: Not implemented yet
 
 Text Area Sequence
-++++++++++++++++++
+------------------
 
 Sometimes it's easier to enter information directly into a textarea
 
@@ -616,7 +789,7 @@ However you can change this behaviour by passing the Textarea widget a converter
     <textarea id="formish-myfield" name="myfield">1\n3\n5\n7</textarea>
 
 Text Area Sequence of Sequences
-+++++++++++++++++++++++++++++++
+-------------------------------
 
 You can also use a textarea to represent a sequence of sequences... 
 
@@ -638,7 +811,7 @@ In this case, the default delimiter is a comma and is used on a row by row basis
     <textarea id="formish-myfield" name="myfield">2,4\n6,8</textarea>
 
 Multiple Input Fields
-+++++++++++++++++++++
+---------------------
 
 .. warning:: This code hasn't settled down yet, please check for updates.
 
@@ -650,7 +823,7 @@ Nested Form Structures
 Formish also allows you to create sub-sections in forms that can contain any other valid form part. We'll use an address and name section to expand out registration form.
 
 A Structure of Structures
-+++++++++++++++++++++++++
+-------------------------
 
 >>> class MyName(schemaish.Structure):
 ...     firstName = schemaish.String()
@@ -767,12 +940,12 @@ This data will come back in dictionary form.. i.e.
   {'name': {'firstName':'Tim', 'surname':'Tim'}, 'address': {'streetNumber': 123, 'country': 'UK'}, 'termsAndConditions': True}
 
 Other Combinations
-++++++++++++++++++
+------------------
 
 Formish will also let you build up a sequence of structures and will use it's jquery javascript to allow you to dynamically add and remove sections. This also works when recursively nested so it is perfectly possibly to have a list of addresses, each of which has a list of phone numbers.
 
 Tuples
-++++++
+------
 
 A tuple can be used to create a list that has different types in it. For instance, if we used the Sequence of Sequence example above, we have no control over how many items are in each row. Using a Sequence of Tuples allows us to define the length of the row and also the types of the items in the row.
 
@@ -819,13 +992,13 @@ Class Documentation
 
 
 Form Class
-++++++++++
+----------
 
 .. autoclass:: formish.forms.Form
   :members: action, add_action, fields, validate,__call__
 
 Field Class
-+++++++++++
+-----------
 
 .. autoclass:: formish.forms.Field
   :members: title, description, cssname, classes, value, required, error, widget,__call__

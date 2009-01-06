@@ -16,4 +16,5 @@ formish.forms.Field class introduction.html
 formish.forms.Field.error attribute introduction.html
 formish.forms.Field.widget attribute introduction.html
 formish.forms.Field.required attribute introduction.html
+formish.widgets.FileUpload.__init__ method introduction.html
 formish.forms.Field.cssname attribute introduction.html

@@ -13,9 +13,12 @@ def title_from_name(name):
     Create a title from an attribute name.
     """
     def _():
+        """
+        Generator to convert parts of title
+        """
         try:
             int(name)
-            yield 'Item #%s'%name
+            yield 'Item #%s'% name
             return
         except ValueError:
             pass
@@ -52,7 +55,7 @@ def form_in_request(request):
     """
     return request.POST.get('__formish_form__')
 
-def getPOSTCharset(request):
+def get_post_charset(request):
     """Locate the unicode encoding of the POST'ed form data.
 
     To work reliably you must do the following:
@@ -69,14 +72,15 @@ def getPOSTCharset(request):
       </form> 
     """     
     # Try the magic '_charset_' field, Mozilla and IE set this.
-    charset = request.POST.get('_charset_',None)
+    charset = request.POST.get('_charset_', None)
     if charset:
         return charset
 
     # Look in the 'content-type' request header
-    contentType = request.headers.get('content-type')
-    if contentType:
-        charset = dict([ s.strip().split('=') for s in contentType.split(';')[1:] ]).get('charset')
+    content_type = request.headers.get('content-type')
+    if content_type:
+        charset = dict([ s.strip().split('=') \
+                 for s in content_type.split(';')[1:] ]).get('charset')
         if charset:
             return charset
 

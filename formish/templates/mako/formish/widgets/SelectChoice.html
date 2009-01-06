@@ -1,8 +1,8 @@
 <%inherit file="/formish/widgets/Field.html"/>
 <%page args="field" />
 <select id="${field.cssname}" name="${field.name}">
-%if field.widget.noneOption:
-  <option value="${field.widget.get_noneOption(field.attr)[0]}">${field.widget.get_noneOption(field.attr)[1]}</option>
+%if field.widget.none_option:
+  <option value="${field.widget.get_none_option(field.attr)[0]}">${field.widget.get_none_option(field.attr)[1]}</option>
 %endif
 %for option in field.widget.get_options(field.attr):
   <option value="${option[0]}" ${field.widget.selected(option,field.value[0], field.attr)|n}>${option[1]}</option>

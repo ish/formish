@@ -218,11 +218,11 @@ Next we'll make the country a select box. To do this we pass a series of options
 
 >>> form['country'].widget = formish.SelectChoice(options=['UK','US'])
 
-If we wanted different values for our options we would pass each option in as a tuple of ('value','label'). We could also set a label for the field that appears when there is no input value. This is called the 'noneOption'. The noneOptions defaults to ('', '--choose--') so we could change it to ('','Pick a Country'). Here is an example
+If we wanted different values for our options we would pass each option in as a tuple of ('value','label'). We could also set a label for the field that appears when there is no input value. This is called the 'none_option'. The none_options defaults to ('', '--choose--') so we could change it to ('','Pick a Country'). Here is an example
 
 >>> options = [('UK','I live in the UK'),('US','I live in the US')]
->>> noneOption = ('','Where do you live')
->>> form['country'].widget = formish.SelectChoice(options=options, noneOption=noneOption)
+>>> none_option = ('','Where do you live')
+>>> form['country'].widget = formish.SelectChoice(options=options, none_option=none_option)
 
 Finally, we'd like a checkbox for the Boolean value
 
@@ -301,7 +301,7 @@ Integer Field
 Select Field
 ^^^^^^^^^^^^
 
-This uses the 'noneOption' value to show 'Where do you live' by default but because we have set a default value, 'I live in the UK' is selected.
+This uses the 'none_option' value to show 'Where do you live' by default but because we have set a default value, 'I live in the UK' is selected.
 
 .. raw:: html
 
@@ -524,7 +524,7 @@ We handle files for you so that all you have to do is process the file handle gi
 >>> schema.add( 'myfile', schemaish.File )
 >>> form = formish.Form(schema)
 >>> from formish import filehandler
->>> form['myfile'].widget = formish.FileUpload(fileHandler=filehandler.TempFileHandlerWeb())
+>>> form['myfile'].widget = formish.FileUpload(filehandler=filehandler.TempFileHandlerWeb())
 
 What does this produce?
 ^^^^^^^^^^^^^^^^^^^^^^^

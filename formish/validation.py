@@ -1,59 +1,64 @@
-import pdb
-import re
+"""
+The validation module converts data to and from request format (or at least
+calls the converters that do so) and also converts dotted numeric formats into
+sequences (e.g. a.0 and a.1 onto a[0] and a[1]). It also includes some
+validation exceptions.
+"""
 from formish.dottedDict import dottedDict
 from validatish import Invalid
 from convertish import convert
 
-def convert_sequences(d):
+def convert_sequences(data):
     """
     Converts numeric keyed dictionaries into sequences
 
     Converts ``{'0': 'foo', '1': 'bar'}`` into ``['foo','bar']``. leaves anything else alone
     """
     # must be a dict
-    if not hasattr(d,'keys'):
-        return d
-    # if the first key cannot be converted to an int then we don't have a sequence
+    if not hasattr(data,'keys'):
+        return data
+    # if the first key cannot be converted to an int then we don't have a
+    # sequence
     try:
-        k = int(d.keys()[0])
+        int(data.keys()[0])
     except ValueError:
-        return dottedDict(d)
+        return dottedDict(data)
     # collect the keys as sorted integers
     intkeys = []
-    for key in d.keys():
+    for key in data.keys():
         intkeys.append(int(key))
     intkeys.sort()
     # construct the sequence
     out = []
     for key in intkeys:
-        out.append(d[str(key)])
+        out.append(data[str(key)])
     return out
 
-def recursive_convert_sequences(d):
+def recursive_convert_sequences(data):
     """
     recursively applies ``convert_sequences``
     """
-    if not hasattr(d,'keys'):
-        return d
-    if len(d.keys()) == 0:
-        return d
+    if not hasattr(data,'keys'):
+        return data
+    if len(data.keys()) == 0:
+        return data
     try:
-        k = int(d.keys()[0])
+        int(data.keys()[0])
     except ValueError:
         tmp = {}
-        for k, v in d.items():
-            tmp[k] = recursive_convert_sequences(v)
+        for key, value in data.items():
+            tmp[key] = recursive_convert_sequences(value)
         return tmp
     intkeys = []
-    for key in d.keys():
+    for key in data.keys():
         intkeys.append(int(key))
     intkeys.sort()
     out = []
     for key in intkeys:
-        out.append(recursive_convert_sequences(d[str(key)]))
+        out.append(recursive_convert_sequences(data[str(key)]))
     return out
 
-def getNestedProperty(d,dottedkey):
+def getNestedProperty(data, dottedkey):
     """
     Gets's data out of structures using dotted strings
 
@@ -71,7 +76,7 @@ def getNestedProperty(d,dottedkey):
     :arg dottedkey: a dotted string (e.g. ``a.1``)
     """
     if dottedkey == '':
-        return d
+        return data
     keys = dottedkey.split('.')
     firstkey = keys[0]
     remaining_dottedkey = '.'.join(keys[1:])
@@ -80,7 +85,7 @@ def getNestedProperty(d,dottedkey):
     except:
         pass
     try:
-        return getNestedProperty(d[firstkey],remaining_dottedkey)
+        return getNestedProperty(data[firstkey], remaining_dottedkey)
     except (KeyError, IndexError):
         return None
 
@@ -102,52 +107,63 @@ def validate(structure, request_data, errors=None, keyprefix=None):
         if keyprefix is None:
             newprefix = attr[0]
         else:
-            newprefix = '%s.%s'%(keyprefix,attr[0])
+            newprefix = '%s.%s'% (keyprefix, attr[0])
         try:
             if hasattr(attr[1],'attrs'):
                 # recurse
-                validate(attr[1], request_data, errors=errors, keyprefix=newprefix)
+                validate(attr[1], request_data,
+                         errors=errors, keyprefix=newprefix)
             else: 
                 # we only validate data that exists
                 if request_data.has_key(newprefix):
                     # firstly convert sequences
-                    c = convert_sequences(request_data[newprefix])
-                    attr[1].validate(c)
+                    data = convert_sequences(request_data[newprefix])
+                    attr[1].validate(data)
         except (Invalid, FieldValidationError), e:
             errors[newprefix] = e
     return errors
 
-def convert_data_to_request_data(formStructure, data, request_data=None, errors=None):
+def convert_data_to_request_data(form_structure, data,
+                      request_data=None, errors=None):
     """
-    Take a form structure and use it's widgets to convert schema data (dict) to request data
+    Take a form structure and use it's widgets to convert schema data (dict) to
+    request data
     
-    :arg formStructure: a formish form
+    :arg form_structure: a formish form
     :arg data: a dictionary structure to be converted using the form
-    :arg request_data: used to accumulate request data (internal - used while recursing)
-    :arg errors: used to accumulate conversion failures (internal - used while recursing)
+    :arg request_data: used to accumulate request
+        data (internal - used while recursing)
+    :arg errors: used to accumulate conversion 
+        failures (internal - used while recursing)
     
     """
     if request_data is None:
         request_data = dottedDict()
     if errors is None:
         errors = dottedDict()
-    for field in formStructure.fields:
+    for field in form_structure.fields:
         try:
-            if field.type is 'group' or (field.type is 'sequence' and (field.widget is None or field.widget.converttostring is False)):
-                convert_data_to_request_data(field, data, request_data=request_data, errors=errors)
+            if field.type is 'group' or \
+              (field.type is 'sequence' and \
+                (field.widget is None or \
+                  field.widget.converttostring is False)):
+                convert_data_to_request_data(field, data,
+                        request_data=request_data, errors=errors)
             else:
-                d = getNestedProperty(data, field.name)
-                request_data[field.name] = field.widget.pre_render(field.attr,d)
+                item_data = getNestedProperty(data, field.name)
+                request_data[field.name] = \
+                        field.widget.pre_render(field.attr, item_data)
         except Invalid, e:
             errors[field.name] = e
             raise
     return request_data
         
-def convert_request_data_to_data(formStructure, request_data, data=None, errors=None):
+def convert_request_data_to_data(form_structure,
+                  request_data, data=None, errors=None):
     """
     Take a form structure and use it's widgets to convert request data to schema data (dict)
     
-    :arg formStructure: a formish form
+    :arg form_structure: a formish form
     :arg data: a webob.POST like dictionary
     :arg data: used to accumulate schema data (internal - used while recursing)
     :arg errors: used to accumulate conversion failures (internal - used while recursing)
@@ -158,36 +174,46 @@ def convert_request_data_to_data(formStructure, request_data, data=None, errors=
     if errors is None:
         errors = {}
 
-    for field in formStructure.fields:
+    for field in form_structure.fields:
         try:
-            if field.type is 'group' or (field.type == 'sequence' and (field.widget._template is 'SequenceDefault'  or field.widget.converttostring is False)):
+            if field.type is 'group' or \
+              (field.type == 'sequence' and \
+                (field.widget._template is 'SequenceDefault' \
+                 or field.widget.converttostring is False)):
                 if field.type == 'sequence':
-                    # Make sure we have an empty field at least. If we don't do this and there are no items in the list then this key wouldn't appear.
+                    # Make sure we have an empty field at least. If we don't do
+                    # this and there are no items in the list then this key
+                    # wouldn't appear.
                     data[field.name] = []
-                convert_request_data_to_data(field, request_data, data=data, errors=errors)
+                convert_request_data_to_data(field, request_data,
+                                          data=data, errors=errors)
             else: 
-                data[field.name] = field.widget.convert(field.attr,request_data.get(field.name,[]))
+                data[field.name] = field.widget.convert(field.attr, \
+                                                request_data.get(field.name,[]))
         except convert.ConvertError, e:
             errors[field.name] = e
     
     data = recursive_convert_sequences(dottedDict(data))
     return data
 
-def pre_parse_request_data(formStructure, request_data, data=None):
+def pre_parse_request_data(form_structure, request_data, data=None):
     """
-    Some widgets (at the moment only files) need to have their data massaged in order to make sure that data->request and request->data is symmetric
+    Some widgets (at the moment only files) need to have their data massaged in
+    order to make sure that data->request and request->data is symmetric
 
     This pre parsing is a null operation for most widgets
     """
     if data is None:
         data = {}
-    for field in formStructure.fields:
-        if field.type is 'group' or (field.type == 'sequence' and field.widget._template is 'SequenceDefault'):
+    for field in form_structure.fields:
+        if field.type is 'group' or \
+          (field.type == 'sequence' and \
+             field.widget._template is 'SequenceDefault'):
             pre_parse_request_data(field, request_data, data=data)
         else: 
             # This needs to be cleverer...
-            d = request_data.get(field.name,[])
-            data[field.name] = field.widget.pre_parse_request(field.attr,d)
+            item_data = request_data.get(field.name, [])
+            data[field.name] = field.widget.pre_parse_request(field.attr, item_data)
 
     return dottedDict(data)
 
@@ -200,8 +226,8 @@ class FormishError(Exception):
     The message is not passed on to the Exception base class because it doesn't
     seem to be able to handle unicode at all.
     """
-    def __init__(self, message, *a):
-        Exception.__init__(self, message, *a)
+    def __init__(self, message, *args):
+        Exception.__init__(self, message, *args)
         self.message = message
     def __str__(self):
         return self.message
@@ -229,9 +255,9 @@ class FieldError(FormishError):
     Base class for field-related exceptions. The failure message and the failing
     field name are stored as attributes.
     """
-    def __init__(self, message, fieldName=None):
-        FormishError.__init__(self, message, fieldName)
-        self.fieldName = fieldName
+    def __init__(self, message, field_name=None):
+        FormishError.__init__(self, message, field_name)
+        self.field_name = field_name
 
 
 class FieldValidationError(FieldError):

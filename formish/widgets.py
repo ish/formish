@@ -6,7 +6,8 @@ __all__ = ['Input', 'Password', 'CheckedPassword', 'Hidden', 'TextArea',
         'Checkbox', 'DateParts', 'FileUpload', 'SelectChoice', 'RadioChoice',
         'CheckboxMultiChoice', 'SequenceDefault','CheckboxMultiChoiceTree']
 
-from convertish.convert import string_converter,datetuple_converter, ConvertError
+from convertish.convert import string_converter, \
+        datetuple_converter,ConvertError
 from formish.validation import *
 from formish import dottedDict
 from schemaish import type
@@ -16,97 +17,117 @@ UNSET = object()
 
 
 class Widget(object):
+    """
+    Base class for widgets
+    """
 
     _template = None
     
-    def __init__(self,**k):
-        self.converter_options = k.get('converter_options',{})
-        self.cssClass = k.get('cssClass', None)
+    def __init__(self, **k):
+        self.converter_options = k.get('converter_options', {})
+        self.css_class = k.get('css_class', None)
         self.converttostring = True
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
     
 
-    def pre_render(self, schemaType, data):
-        data = string_converter(schemaType).fromType(data)
-        if data is None:
+    def pre_render(self, schema_type, data):
+        """
+        Before the widget is rendered, the data is converted to a string
+        format.If the data is None then we return an empty string. The sequence
+        is request data representation.
+        """
+        string_data = string_converter(schema_type).fromType(data)
+        if string_data is None:
             return ['']
-        return [data]
+        return [string_data]
 
 
-    def convert(self, schemaType, data):
-        return string_converter(schemaType).toType(data[0])
+    def pre_parse_request(self, schema_type, request_data):
+        """
+        Prior to convert being run, we have a chance to munge the data. This is
+        only used by file upload at the moment
+        """
+        return request_data
 
 
-    def pre_parse_request(self, schemaType, data):
-        return data
-
+    def convert(self, schema_type, request_data):
+        """
+        after the form has been submitted, the request data is converted into
+        to the schema type.
+        """
+        return string_converter(schema_type).toType(request_data[0])
 
     def __repr__(self):
-        return '<widget "%s">'%(self._template)
+        return '<widget "%s">'% (self._template)
 
 
 
 
 class Input(Widget):
+    """
+    Basic input widget type, used for text input
+    """
 
     _template = 'Input'
 
-    def __init__(self,**k):
+    def __init__(self, **k):
         self.strip = k.pop('strip', True)
         Widget.__init__(self, **k)
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
-            
-    def convert(self, schemaType, data):
+
+    def convert(self, schema_type, request_data):
+        """
+        Default to stripping whitespace
+        """
         if self.strip is True:
-            d = data[0].strip()
+            string_data = request_data[0].strip()
         else:
-            d = data[0]
-        if not d:
-            d = None
-        return string_converter(schemaType).toType(d)
+            string_data = request_data[0]
+        if not string_data:
+            string_data = None
+        return string_converter(schema_type).toType(string_data)
 
-class Password(Widget):
 
+
+class Password(Input):
+    """
+    Password widget is a basic input type but using password html input type
+    """
     _template = 'Password'
 
-    def __init__(self,**k):
-        self.strip = k.pop('strip', True)
-        Widget.__init__(self, **k)
-        if not self.converter_options.has_key('delimiter'):
-            self.converter_options['delimiter'] = ','
-            
-    def convert(self, schemaType, data):
-        if self.strip is True:
-            d = data[0].strip()
-        else:
-            d = data[0]
-        if not d:
-            d = None
-        return string_converter(schemaType).toType(d)
 
    
-class CheckedPassword(Widget):
+class CheckedPassword(Input):
+    """
+    Checked Password ensures that the password has been entered twice
+    """
 
     _template = 'CheckedPassword'
 
-    def __init__(self,**k):
+    def __init__(self, **k):
         self.strip = k.pop('strip', True)
-        self.cssClass = k.pop('cssClass', None)
-        Widget.__init__(self, **k)
+        self.css_class = k.pop('css_class', None)
+        Input.__init__(self, **k)
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
             
-    def pre_render(self, schemaType, data):
-        data = string_converter(schemaType).fromType(data)
-        if data is None:
+    def pre_render(self, schema_type, data):
+        """
+        Extract both the password and confirm fields
+        """
+        string_data = string_converter(schema_type).fromType(data)
+        if string_data is None:
             return {'password': [''], 'confirm': ['']}
-        return {'password': [password], 'confirm': [password]}
+        return {'password': [string_data], 'confirm': [string_data]}
     
-    def convert(self, schemaType, data):
-        password = data['password'][0]
-        confirm = data['confirm'][0]
+    def convert(self, schema_type, request_data):
+        """
+        Check the password and confirm match (when stripped)
+        """
+        password = request_data['password'][0]
+        confirm = request_data['confirm'][0]
         if self.strip is True:
             password = password.strip()
             if not password:
@@ -116,93 +137,145 @@ class CheckedPassword(Widget):
                 confirm = None
         if password != confirm:
             raise ConvertError('Password did not match')
-        return string_converter(schemaType).toType(password)
+        return string_converter(schema_type).toType(password)
 
 
-class Hidden(Widget):
-    _template= 'Hidden'
+
+class Hidden(Input):
+    """
+    Basic input but using a hidden html input field
+    """
+    _template = 'Hidden'
+
 
 
 class SequenceDefault(Widget):
+    """
+    Sequence handling widget - used by default for schema sequences
+
+    :arg min: minimum number of sequence items to show
+    :arg max: maximum number of sequence items to show
+    :arg addremove: boolean whether to show the addremove buttons (jquery
+        activated)
+    """
 
     _template = 'SequenceDefault'
 
-    def __init__(self,**k):
-        Widget.__init__(self,**k)
+    def __init__(self, **k):
+        Widget.__init__(self, **k)
         self.max = k.get('max')
         self.min = k.get('min')
         self.addremove = k.get('addremove', True)
         self.converttostring = False
 
-    def pre_render(self, schemaType, data):
+    def pre_render(self, schema_type, data):
+        """
+        Short circuits the usual pre_render
+        """
         return data
 
         
-class TextArea(Widget):
+class TextArea(Input):
+    """
+    Textarea input field
+
+    :arg cols: set the cols attr on the textarea element
+    :arg rows: set the cols attr on the textarea element
+    """
 
     _template = 'TextArea'
     
     def __init__(self, **k):
-        Widget.__init__(self,**k)
+        Input.__init__(self, **k)
         self.cols = k.pop('cols', None)
         self.rows = k.pop('rows', None)
         self.strip = k.pop('strip', True)
-        Widget.__init__(self, **k)
+        Input.__init__(self, **k)
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = '\n'
     
-    def pre_render(self, schemaType, data):
-        data = string_converter(schemaType).fromType(data, converter_options=self.converter_options)
-        if data is None:
+    def pre_render(self, schema_type, data):
+        """
+        We're using the converter options to allow processing sequence data
+        using the csv module
+        """
+        string_data = string_converter(schema_type).fromType(data, \
+            converter_options=self.converter_options)
+        if string_data is None:
             return ['']
-        return [data]
+        return [string_data]
     
-    def convert(self, schemaType, data):
+    def convert(self, schema_type, request_data):
+        """
+        We're using the converter options to allow processing sequence data
+        using the csv module
+        """
         if self.strip is True:
-            d = data[0].strip()
+            string_data = request_data[0].strip()
         else:
-            d = data[0]
-        if not d:
-            d = None
-        return string_converter(schemaType).toType(d, converter_options=self.converter_options)
+            string_data = request_data[0]
+        if not string_data:
+            string_data = None
+        return string_converter(schema_type).toType(string_data,
+            converter_options=self.converter_options)
 
     
 class Checkbox(Widget):
+    """
+    Checkbox widget, defaults to True or False
+    """
 
     _template = 'Checkbox'
 
-    def convert(self, schemaType, data):
-        if len(data) == 0:
-            out='False'
+    def convert(self, schema_type, request_data):
+        """
+        If the request data exists, then we treat this as True
+        """
+        if len(request_data) == 0:
+            out_string = 'False'
         else:
-            out='True'
-        return string_converter(schemaType).toType(out)
+            out_string = 'True'
+        return string_converter(schema_type).toType(out_string)
 
     
 class DateParts(Widget):
+    """
+    Simple three part date entry form
+    """
 
     _template = 'DateParts'
     
-    def __init__(self, dayFirst=False, cssClass=None):
-        Widget.__init__(self)
-        self.cssClass = cssClass
-        self.dayFirst = dayFirst
+    def __init__(self, **k):
+        self.strip = k.pop('strip', True)
+        self.day_first = k.pop('day_first', None)
+        Widget.__init__(self, **k)
+        if not self.converter_options.has_key('delimiter'):
+            self.converter_options['delimiter'] = ','
+
         
-    def pre_render(self, schemaType, data):
-        data = datetuple_converter(schemaType).fromType(data)
-        if data is None:
+    def pre_render(self, schema_type, data):
+        """
+        Convert to date parts
+        """
+        dateparts = datetuple_converter(schema_type).fromType(data)
+        if dateparts is None:
             return {'year': [''], 'month': [''], 'day': ['']}
-        return {'year': [data[0]], 'month': [data[1]], 'day': [data[2]]}
+        return {'year': [dateparts[0]],
+                'month': [dateparts[1]],
+                'day': [dateparts[2]]}
     
-    def convert(self, schemaType, data):
-        year = data.get('year', [''])[0].strip()
-        month = data.get('month', [''])[0].strip()
-        day = data.get('day', [''])[0].strip()
+    def convert(self, schema_type, request_data):
+        """
+        Pull out the parts and convert
+        """
+        year = request_data.get('year', [''])[0].strip()
+        month = request_data.get('month', [''])[0].strip()
+        day = request_data.get('day', [''])[0].strip()
         if year or month or day:
             date_parts = (year, month, day)
         else:
             date_parts = None
-        return datetuple_converter(schemaType).toType(date_parts)
+        return datetuple_converter(schema_type).toType(date_parts)
         
 
 class FileUpload(Widget):
@@ -212,171 +285,206 @@ class FileUpload(Widget):
 
     _template = 'FileUpload'
     
-    def __init__(self, fileHandler, showImagePreview=False, allowClear=True, cssClass=None,originalurl=None):
+    def __init__(self, filehandler, show_image_preview=False, \
+                 allow_clear=True, css_class=None, originalurl=None):
         """
-        :arg filehandler: fileHandler is any object with the following methods:
+        :arg filehandler: filehandler is any object with the following methods:
 
             storeFile(self, f)
                 where f is a file instance
 
             getUrlForFile(self, data)
-                where data is the form item data or a path to a temporary file and
-                is expected to return a URL to access the persisted or temporary
-                data.
+                where data is the form item data or a path to a temporary file
+                and is expected to return a URL to access the persisted or
+                temporary data.
 
-        :arg showImagePreview: a boolean that, if set, will include an image thumbnail with the widget
-        :arg cssClass: extra css classes to apply to the widget
+        :arg show_image_preview: a boolean that, if set, will include an image
+            thumbnail with the widget
+        :arg css_class: extra css classes to apply to the widget
         :arg originalurl: a default url to 
         """
         Widget.__init__(self)
-        self.cssClass = cssClass
-        self.fileHandler = fileHandler
-        self.showImagePreview = showImagePreview
-        self.allowClear = allowClear
+        self.css_class = css_class
+        self.filehandler = filehandler
+        self.show_image_preview = show_image_preview
+        self.allow_clear = allow_clear
         self.originalurl = originalurl
     
-    def pre_render(self, schemaType, data):
+    def pre_render(self, schema_type, data):
+        """
+        We use the url factory to get an identifier for the file which we use
+        as the name. We also store it in the 'default' field so we can check if
+        something has been uploaded (the identifier doesn't match the name)
+        """
         if isinstance(data, type.File):
-            self.default = self.fileHandler.urlfactory(data)
+            self.default = self.filehandler.urlfactory(data)
         elif data is not None:
             self.default = data
         else:
             self.default = ''
         return {'name': [self.default], 'default':[self.default]}
     
-    def pre_parse_request(self, schemaType, data):
-        if data.get('remove',[None])[0] is not None:
+    def pre_parse_request(self, schema_type, data):
+        """
+        File uploads are wierd; in out case this means assymetric. We store the
+        file in a temporary location and just store an identifier in the field.
+        This at least makes the file look symmetric.
+        """
+        if data.get('remove', [None])[0] is not None:
             # Removing the file
             data['name'] = ['']
             return data
 
-        fs = data.get('file',[''])[0]
-        if fs is not u'':
+        fieldstorage = data.get('file', [''])[0]
+        if fieldstorage is not u'':
             # Storing an uploaded file
-            name = self.fileHandler.store_file(fs)
+            name = self.filehandler.store_file(fieldstorage)
             data['name'] = [name]
         return data
     
-    def convert(self, schemaType, data):
+    def convert(self, schema_type, request_data):
+        """
+        Creates a File object if possible
+        """
         # XXX We could add a file converter that converts this to a string data?
 
-        if data['name'] == ['']:
+        if request_data['name'] == ['']:
             return None
-        elif data['name'] == data['default']:
+        elif request_data['name'] == request_data['default']:
             return type.File(None, None, None)
         else:
-            filename = data['name'][0]
-            path_for_file = self.fileHandler.get_path_for_file(filename)
-            f = open(path_for_file)
-            mimetype = self.fileHandler.get_mimetype(filename)
-            fs = type.File(f, filename, mimetype)
-            return fs
+            filename = request_data['name'][0]
+            path_for_file = self.filehandler.get_path_for_file(filename)
+            filepath = open(path_for_file)
+            mimetype = self.filehandler.get_mimetype(filename)
+            filetype = type.File(filepath, filename, mimetype)
+            return filetype
 
 
 
     
 class SelectChoice(Widget):
+    """
+    Html Select element
+    """
 
     _template = 'SelectChoice'
 
-    noneOption = ('', '- choose -')
+    none_option = ('', '- choose -')
 
-    def __init__(self, options, noneOption=UNSET, cssClass=None):
+    def __init__(self, options, none_option=UNSET, css_class=None):
         Widget.__init__(self)
-        self.cssClass = cssClass
+        self.css_class = css_class
         self.options = _normalise_options(options)
-        if noneOption is not UNSET:
-            self.noneOption = noneOption
+        if none_option is not UNSET:
+            self.none_option = none_option
             
-    def selected(self, option, value, schemaType):
+    def selected(self, option, value, schema_type):
+        """
+        Check the value passed matches the actual value
+        """
         if option[0] == value:
             return ' selected="selected"'
         else:
             return ''
 
-    def get_options(self, schemaType):
+    def get_options(self, schema_type):
+        """
+        Return all of the options for the widget
+        """
         options = []
         for value, label in self.options:
-            options.append( (string_converter(schemaType).fromType(value),label) )
+            options.append(
+        (string_converter(schema_type).fromType(value),label)
+            )
         return options
     
-    def get_noneOption(self, schemaType):
-        return (string_converter(schemaType).fromType(self.noneOption[0]), self.noneOption[1])
+    def get_none_option(self, schema_type):
+        """
+        Get the default option (the 'unselected' option)
+        """
+        return (string_converter(schema_type).fromType(
+            self.none_option[0]), self.none_option[1])
     
 
 class RadioChoice(Widget):
+    """
+    Radio choice html element
+    """
 
     _template = 'RadioChoice'
 
-    noneOption = ('', '- choose -')
+    none_option = ('', '- choose -')
 
-    def __init__(self, options, noneOption=UNSET, cssClass=None):
+    def __init__(self, options, none_option=UNSET, css_class=None):
         Widget.__init__(self)
-        self.cssClass = cssClass
+        self.css_class = css_class
         self.options = _normalise_options(options)
-        if noneOption is not UNSET:
-            self.noneOption = noneOption
+        if none_option is not UNSET:
+            self.none_option = none_option
             
-    def convert(self, schemaType, data):
-        if not data:
-            data = ['']
-        return super(RadioChoice, self).convert(schemaType, data)
+    def convert(self, schema_type, request_data):
+        """
+        If we don't have a choice, set a blank value
+        """
+        if not request_data:
+            request_data = ['']
+        return super(RadioChoice, self).convert(schema_type, request_data)
 
-    def selected(self, option, value, schemaType):
-        if option[0] == self.convert(schemaType,[value]):
+    def selected(self, option, value, schema_type):
+        """
+        Check if the currently rendering input is the same as the value
+        """
+        if option[0] == self.convert(schema_type, [value]):
             return ' checked="checked"'
         else:
             return ''
     
     
 class CheckboxMultiChoice(Widget):
+    """
+    Checkbox multi choice is a set of checkboxes that for a sequence of data
+    """
 
     _template = 'CheckboxMultiChoice'
 
-    def __init__(self, options, cssClass=None):
+    def __init__(self, options, css_class=None):
         self.options = _normalise_options(options)
-        Widget.__init__(self,cssClass=cssClass)
+        Widget.__init__(self, css_class=css_class)
             
-    def pre_render(self, schemaType, data):
+    def pre_render(self, schema_type, data):
+        """
+        Iterate over the data, converting each one
+        """
         if data is None: 
             return []
-        return [string_converter(schemaType.attr).fromType(d) for d in data]
+        return [string_converter(schema_type.attr).fromType(d) for d in data]
     
-    def convert(self, schemaType, data):
-        return [string_converter(schemaType.attr).toType(d) for d in data]
+    def convert(self, schema_type, request_data):
+        """
+        Iterating to convert back to the source data
+        """
+        return [string_converter(schema_type.attr).toType(d) \
+                for d in request_data]
 
-    def checked(self, option, values, schemaType):
+    def checked(self, option, values, schema_type):
+        """
+        For each value, convert it and check to see if it matches the input data
+        """
         if values is not None:
-            typed_values = self.convert(schemaType,values)
+            typed_values = self.convert(schema_type, values)
         if values is not None and option[0] in typed_values:
             return ' checked="checked"'
         else:
             return ''
 
 class CheckboxMultiChoiceTree(Widget):
+    """
+    A more complicated checkbox select that
+    """
 
     _template = 'CheckboxMultiChoiceTree'
 
-    def __init__(self, options, cssClass=None):
-        self.options = options
-        self.optiontree = dottedDict._getDictFromDottedKeyDict(dict(options),noexcept=True) 
-        Widget.__init__(self,cssClass=cssClass)
-            
-    def pre_render(self, schemaType, data):
-        if data is None: 
-            return []
-        return [string_converter(schemaType.attr).fromType(d) for d in data]
-    
-    def convert(self, schemaType, data):
-        return [string_converter(schemaType.attr).toType(d) for d in data]
-
-    def checked(self, option, values, schemaType):
-        if values is not None:
-            typed_values = self.convert(schemaType,values)
-        if values is not None and option[0] in typed_values:
-            return ' checked="checked"'
-        else:
-            return ''
         
         
 def _normalise_options(options):

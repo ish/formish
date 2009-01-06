@@ -8,14 +8,14 @@ else:
     value_name = field.value['name'][0]
     value_default = field.value['default'][0]
 %>
-% if field.widget.showImagePreview is True:
+% if field.widget.show_image_preview is True:
 %   if value_name != '':
-<img src="${field.widget.fileHandler.resource_root}/${value_name}" />
+<img src="${field.widget.filehandler.resource_root}/${value_name}" />
 %   else:
 <img src="${field.widget.originalurl}" />
 %   endif
 % endif
-% if field.widget.allowClear is True:
+% if field.widget.allow_clear is True:
 <input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" />
 % endif
 
