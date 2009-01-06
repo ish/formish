@@ -1,7 +1,6 @@
 import logging
-from restish import http, resource, templating
-import formish, schemaish, validatish
-from formish.util import title_from_name
+from restish import resource, templating
+import formish
 from pprint import pformat
 
 from testish.lib import forms as form_defs
@@ -39,7 +38,7 @@ class Root(resource.Resource):
     
     def resource_child(self, request, segments):
         if segments[0] == 'filehandler':
-            return FileResource(), segments[1:]
+            return formish.fileresource.FileResource(), segments[1:]
         return FormResource(segments[0]), segments[1:]
 
 

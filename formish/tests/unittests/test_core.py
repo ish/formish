@@ -1,8 +1,8 @@
-from formish.forms import *
-from formish.validation import *
+import formish
 import unittest
-from schemaish import *
+import schemaish
 from formish.dottedDict import dottedDict
+from formish.forms import validation
 import copy
 from webob import MultiDict
 import validatish
@@ -28,10 +28,10 @@ class TestFormBuilding(unittest.TestCase):
 
     def test_form(self):
         """Test empty form construction """
-        schema_empty = Structure()        
+        schema_empty = schemaish.Structure()        
         name = "Empty Form"
         request =  Request(name)
-        form = Form(schema_empty, name)
+        form = formish.Form(schema_empty, name)
 
         # Schema matches
         self.assertEqual(form.structure.attr,schema_empty)
@@ -43,10 +43,10 @@ class TestFormBuilding(unittest.TestCase):
 
     def test_flat_form(self):
         """Test a form that has no nested sections """
-        schema_flat = Structure([("a", String()), ("b", String())])
+        schema_flat = schemaish.Structure([("a", schemaish.String()), ("b", schemaish.String())])
         name = "Flat Form"
         request =  Request(name)
-        form = Form(schema_flat, name)
+        form = formish.Form(schema_flat, name)
 
         # stored schema
         assert form.structure.attr is schema_flat
@@ -56,13 +56,13 @@ class TestFormBuilding(unittest.TestCase):
         
     def test_nested_form(self):
         """Test a form two nested levels"""
-        one = Structure([("a", String()), ("b", String())])
-        two = Structure([("a", String()), ("b", String())])
-        schema_nested = Structure([("one", one), ("two", two)])
+        one = schemaish.Structure([("a", schemaish.String()), ("b", schemaish.String())])
+        two = schemaish.Structure([("a", schemaish.String()), ("b", schemaish.String())])
+        schema_nested = schemaish.Structure([("one", one), ("two", two)])
 
         name = "Nested Form One"
         request =  Request(name)
-        form = Form(schema_nested, name)
+        form = formish.Form(schema_nested, name)
 
         # stored schema
         assert form.structure.attr is schema_nested
@@ -74,11 +74,11 @@ class TestFormBuilding(unittest.TestCase):
         """
         Test convert request to data and convert data to request
         """
-        schema_nested = Structure([
-            ("one", Structure([
-                ("a", String()),
-                ("b", String()),
-                ("c", Structure([("x", String()),("y", String())])),
+        schema_nested = schemaish.Structure([
+            ("one", schemaish.Structure([
+                ("a", schemaish.String()),
+                ("b", schemaish.String()),
+                ("c", schemaish.Structure([("x", schemaish.String()),("y", schemaish.String())])),
                 ])
              ),
             ])
@@ -89,51 +89,51 @@ class TestFormBuilding(unittest.TestCase):
         
         name = "Nested Form Two"
         request =  Request(name, r)
-        form = Form(schema_nested, name)
+        form = formish.Form(schema_nested, name)
         # request to data
-        rdtd = convert_request_data_to_data(form.structure, dottedDict(copy.deepcopy(request.POST)))
+        rdtd = validation.convert_request_data_to_data(form.structure, dottedDict(copy.deepcopy(request.POST)))
         assert rdtd == dottedDict(reqr)
         # data to request
-        dtrd = convert_data_to_request_data(form.structure, dottedDict(data))
+        dtrd = validation.convert_data_to_request_data(form.structure, dottedDict(data))
         assert dtrd == reqrdata
 
 
     def test_nested_form_validation_errors(self):
-        schema_nested = Structure([
-            ("one", Structure([
-                ("a", String(validator=validatish.Required())),
-                ("b", String()),
-                ("c", Structure([("x", String()),("y", String())])),
+        schema_nested = schemaish.Structure([
+            ("one", schemaish.Structure([
+                ("a", schemaish.String(validator=validatish.Required())),
+                ("b", schemaish.String()),
+                ("c", schemaish.Structure([("x", schemaish.String()),("y", schemaish.String())])),
                 ])
              ),
             ])
         
         name = "Nested Form Two"
-        form = Form(schema_nested, name)
+        form = formish.Form(schema_nested, name)
 
         r = {'one.a':'','one.b': '','one.c.x': '','one.c.y': ''}
         request =  Request(name, r)
         
-        self.assertRaises(FormError, form.validate, request)
+        self.assertRaises(formish.FormError, form.validate, request)
 
         # Do we get an error
-        self.assert_( isinstance(form.errors['one.a'], attr.Invalid) )
+        self.assert_( isinstance(form.errors['one.a'], schemaish.attr.Invalid) )
         # Is the error message correct
         self.assertEqual( form.errors['one.a'].message, "is required" )
 
         
     def test_nested_form_validation_output(self):
-        schema_nested = Structure([
-            ("one", Structure([
-                ("a", String(validator=validatish.Required())),
-                ("b", String()),
-                ("c", Structure([("x", String()),("y", String())])),
+        schema_nested = schemaish.Structure([
+            ("one", schemaish.Structure([
+                ("a", schemaish.String(validator=validatish.Required())),
+                ("b", schemaish.String()),
+                ("c", schemaish.Structure([("x", schemaish.String()),("y", schemaish.String())])),
                 ])
              ),
             ])
         # Test passing validation
         name = "Nested Form two"
-        form = Form(schema_nested, name)
+        form = formish.Form(schema_nested, name)
 
         request = Request(name, {'one.a': 'woot!', 'one.b': '', 'one.c.x': '', 'one.c.y': ''})
         expected = {'one': {'a':u'woot!','b':None, 'c': {'x':None,'y':None}}}
@@ -142,9 +142,9 @@ class TestFormBuilding(unittest.TestCase):
 
 
     def test_integer_type(self):
-        schema_flat = Structure([("a", Integer()), ("b", String())])
+        schema_flat = schemaish.Structure([("a", schemaish.Integer()), ("b", schemaish.String())])
         name = "Integer Form"
-        form = Form(schema_flat, name)
+        form = formish.Form(schema_flat, name)
         r = {'a': '3', 'b': '4'}
         request = Request(name, r)
         R = copy.deepcopy(r)
@@ -155,18 +155,16 @@ class TestFormBuilding(unittest.TestCase):
         # Does the form produce an int and a string
         self.assertEquals(form.validate(request), {'a': 3, 'b': '4'})
         # Does the convert request to data work
-        self.assertEqual( convert_request_data_to_data(form.structure, dottedDict(request.POST)) , {'a': 3, 'b': '4'})
+        self.assertEqual( validation.convert_request_data_to_data(form.structure, dottedDict(request.POST)) , {'a': 3, 'b': '4'})
         # Does the convert data to request work
-        print convert_data_to_request_data(form.structure, dottedDict( {'a': 3, 'b': '4'} ))
-        print reqr
-        self.assert_( convert_data_to_request_data(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == reqr)
+        self.assert_( validation.convert_data_to_request_data(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == reqr)
         
           
     def test_datetuple_type(self):
-        schema_flat = Structure([("a", Date()), ("b", String())])
+        schema_flat = schemaish.Structure([("a", schemaish.Date()), ("b", schemaish.String())])
         name = "Date Form"
-        form = Form(schema_flat, name)
-        form['a'].widget = DateParts()
+        form = formish.Form(schema_flat, name)
+        form['a'].widget = formish.DateParts()
 
         r = {'a.day': '1','a.month': '3','a.year': '1966', 'b': '4'}
         R = copy.deepcopy(r)
@@ -178,12 +176,12 @@ class TestFormBuilding(unittest.TestCase):
         # Check the data is converted correctly
         self.assertEquals(form.validate(request), {'a': d, 'b': '4'})
         # Check req to data
-        self.assertEqual( convert_request_data_to_data(form.structure, dottedDict(request.POST)) , dottedDict({'a': d, 'b': '4'}))
+        self.assertEqual( validation.convert_request_data_to_data(form.structure, dottedDict(request.POST)) , dottedDict({'a': d, 'b': '4'}))
         # Check data to req
-        self.assert_( convert_data_to_request_data(form.structure, dottedDict( {'a': d, 'b': '4'} )) == dottedDict({'a': {'month': [3], 'day': [1], 'year': [1966]}, 'b': ['4']}))
+        self.assert_( validation.convert_data_to_request_data(form.structure, dottedDict( {'a': d, 'b': '4'} )) == dottedDict({'a': {'month': [3], 'day': [1], 'year': [1966]}, 'b': ['4']}))
 
     def test_form_retains_request_data(self):
-        form = Form(Structure([("field", String())]))
+        form = formish.Form(schemaish.Structure([("field", schemaish.String())]))
         assert 'name="field" value=""' in form()
         data = form.validate(Request('formish', {'field': 'value'}))
         assert data == {'field': 'value'}
@@ -191,12 +189,12 @@ class TestFormBuilding(unittest.TestCase):
         assert 'name="field" value="value"' in form()
 
     def test_form_accepts_request_data(self):
-        form = Form(Structure([("field", String())]))
+        form = formish.Form(schemaish.Structure([("field", schemaish.String())]))
         form.request_data = {'field': ['value']}
         assert form.request_data == {'field': ['value']}
 
     def test_form_with_defaults_accepts_request_data(self):
-        form = Form(Structure([("field", String())]))
+        form = formish.Form(schemaish.Structure([("field", schemaish.String())]))
         form.defaults = {'field': 'default value'}
         assert 'name="field" value="default value"' in form()
         form.request_data = {'field': ['value']}
@@ -204,7 +202,7 @@ class TestFormBuilding(unittest.TestCase):
         assert 'name="field" value="value"' in form()
 
     def test_form_defaults_clears_request_data(self):
-        form = Form(Structure([("field", String())]))
+        form = formish.Form(schemaish.Structure([("field", schemaish.String())]))
         form.request_data = {'field': ['value']}
         form.defaults = {'field': 'default value'}
         assert form.defaults == {'field': 'default value'}

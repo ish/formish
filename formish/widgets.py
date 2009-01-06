@@ -8,8 +8,6 @@ __all__ = ['Input', 'Password', 'CheckedPassword', 'Hidden', 'TextArea',
 
 from convertish.convert import string_converter, \
         datetuple_converter,ConvertError
-from formish.validation import *
-from formish import dottedDict
 from schemaish import type
 
 

@@ -1,12 +1,10 @@
 import logging
 
-import os, signal, urllib, shutil, socket, time
+import os, signal, urllib, socket, time
 from ConfigParser import ConfigParser
 import subprocess
 import unittest
-import operator
 from selenium import selenium
-from restish.url import URL
 
 log = logging.getLogger(__name__)
 

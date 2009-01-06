@@ -1,19 +1,18 @@
-import pdb
 import validatish
-from formish import *
-from schemaish import *
+import formish
+import schemaish
 import unittest
 
 
 class TestFormData(unittest.TestCase):
     """Build a Simple Form and test that it doesn't raise exceptions on build and that the methods/properties are as expected"""
 
-    schema_nested = Structure([
-        ("one", Structure([
-            ("a", String(validator=validatish.Required(), 
+    schema_nested = schemaish.Structure([
+        ("one", schemaish.Structure([
+            ("a", schemaish.String(validator=validatish.Required(), 
                 description="This is a field with name a and title A and has a Required validator")),
-            ("b", String(title='bee')),
-            ("c", Structure([("x", String(title='cee')),("y", String())])),
+            ("b", schemaish.String(title='bee')),
+            ("c", schemaish.Structure([("x", schemaish.String(title='cee')),("y", schemaish.String())])),
             ])
          ),
         ])      
@@ -21,7 +20,7 @@ class TestFormData(unittest.TestCase):
     
     def test_titles(self):
 
-        form = Form(self.schema_nested, 'nested')
+        form = formish.Form(self.schema_nested, 'nested')
 
         assert form['one.b'].title == 'bee'
         assert form['one.c.x'].title == 'cee'
@@ -32,15 +31,15 @@ class TestFormData(unittest.TestCase):
 
     def test_widgets(self):
 
-        form = Form(self.schema_nested, 'nested')
+        form = formish.Form(self.schema_nested, 'nested')
 
-        assert isinstance(form['one.a'].widget,Input)
-        form['one.a'].widget = TextArea()
-        assert isinstance(form['one.a'].widget,TextArea)
+        assert isinstance(form['one.a'].widget,formish.Input)
+        form['one.a'].widget = formish.TextArea()
+        assert isinstance(form['one.a'].widget,formish.TextArea)
 
     def test_description(self):
 
-        form = Form(self.schema_nested, 'nested')
+        form = formish.Form(self.schema_nested, 'nested')
 
         assert form['one.a'].description == "This is a field with name a and title A and has a Required validator"
         form['one.a'].description = "This is a new description"
@@ -48,30 +47,30 @@ class TestFormData(unittest.TestCase):
 
     def test_value(self):
 
-        form = Form(self.schema_nested, 'nested')
+        form = formish.Form(self.schema_nested, 'nested')
         self.assertRaises(KeyError, setattr, form['one.a'], 'value', 7)
 
 
 
 class TestSequenceFormData(unittest.TestCase):
 
-    schema = Structure()
-    schema.add('a',Sequence(String(title='bee')))
+    schema = schemaish.Structure()
+    schema.add('a',schemaish.Sequence(schemaish.String(title='bee')))
 
 
     def test_widgets(self):
-        form = Form(self.schema, 'sequences')
+        form = formish.Form(self.schema, 'sequences')
         form.defaults = {'a': ['1','2']}
-        assert isinstance(form['a.0'].widget,Input)
-        form['a.*'].widget = TextArea()
-        assert isinstance(form['a.0'].widget,TextArea)
+        assert isinstance(form['a.0'].widget,formish.Input)
+        form['a.*'].widget = formish.TextArea()
+        assert isinstance(form['a.0'].widget,formish.TextArea)
         
 
     def test_widgets_before_data(self):
-        form = Form(self.schema, 'sequences')
-        form['a.*'].widget = TextArea()
+        form = formish.Form(self.schema, 'sequences')
+        form['a.*'].widget = formish.TextArea()
         form.defaults = {'a': ['1','2']}
-        assert isinstance(form['a.0'].widget,TextArea)
+        assert isinstance(form['a.0'].widget,formish.TextArea)
 
 
 

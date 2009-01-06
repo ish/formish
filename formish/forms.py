@@ -1,17 +1,15 @@
 """
 The form module contains the main form, field, group and sequence classes
 """
-import schemaish
+import schemaish, validatish
 
 from webob import UnicodeMultiDict
 
 from formish import util
 from formish.dottedDict import dottedDict, is_int
-from convertish.convert import *
-from formish.validation import *
-from formish.widgets import *
+from formish import validation
+from formish import widgets
 from formish.renderer import _default_renderer
-from validatish import Required, validation_includes
 
 
 class Action(object):
@@ -24,7 +22,7 @@ class Action(object):
     """
     def __init__(self, callback, name, label):
         if not util.valid_identifier(name):
-            raise FormError('Invalid action name %r.'% name)
+            raise validation.FormError('Invalid action name %r.'% name)
         self.callback = callback
         self.name = name
         if label is None:
@@ -138,7 +136,7 @@ class Field(object):
     @property 
     def required(self):
         """ Does this field have a Not Empty validator of some sort """
-        return validation_includes(self.attr.validator, Required)
+        return validatish.validation_includes(self.attr.validator, validatish.Required)
 
 
     @property
@@ -154,7 +152,7 @@ class Field(object):
         try:
             widget_type = self.form.get_item_data(starify(self.name),'widget')
         except KeyError:
-            widget_type = Input()
+            widget_type = widgets.Input()
         return widget_type
         
 
@@ -221,7 +219,7 @@ class Collection(object):
     @property 
     def required(self):
         """ Does this field have a Not Empty validator of some sort """
-        return validation_includes(self.attr.validator, Required)
+        return validatish.validation_includes(self.attr.validator, validatish.Required)
 
 
     @property
@@ -244,7 +242,7 @@ class Collection(object):
         try:
             widget_type = self.form.get_item_data(starify(self.name),'widget')
         except KeyError:
-            widget_type = SequenceDefault()
+            widget_type = widgets.SequenceDefault()
         return widget_type
 
 
@@ -498,7 +496,7 @@ class Form(object):
         :arg args: list of arguments Pass through to the callback
         """
         if len(self.actions)==0:
-            raise NoActionError('The form does not have any actions')
+            raise validation.NoActionError('The form does not have any actions')
         for action in self.actions:
             if action.name in request.POST.keys():
                 return action.callback(request, self, *args)
@@ -513,10 +511,10 @@ class Form(object):
         :arg request_data: Webob style request data
         :arg raise_exceptions: Whether to raise exceptions or return errors
         """
-        data = convert_request_data_to_data(self.structure, \
+        data = validation.convert_request_data_to_data(self.structure, \
                                             request_data, errors=self.errors) 
         if raise_exceptions and len(self.errors.keys()):
-            raise FormError('Tried to access data but conversion' \
+            raise validation.FormError('Tried to access data but conversion' \
         ' from request failed with %s errors (%s)'% \
                    (len(self.errors.keys()), self.errors.data))
         return data
@@ -529,7 +527,7 @@ class Form(object):
         """
         if self._request_data is not None:
             return self._request_data
-        self._request_data = convert_data_to_request_data(self.structure, \
+        self._request_data = validation.convert_data_to_request_data(self.structure, \
                                 dottedDict(self.defaults))
         return self._request_data
 
@@ -587,7 +585,7 @@ class Form(object):
         # items they have (i.e. .fields method on a sequence uses the number of
         # values on the _request_data)
         self._request_data = dottedDict(request_post)
-        self.request_data = pre_parse_request_data( \
+        self.request_data = validation.pre_parse_request_data( \
                     self.structure,dottedDict(request_post))
         data = self.get_unvalidated_data( \
                     self.request_data, raise_exceptions=False)
@@ -601,14 +599,14 @@ class Form(object):
         if len(self.errors.keys()) > 0:
             err_msg = 'Tried to access data but conversion' \
                     'from request failed with %s errors'
-            raise FormError(err_msg% (len(self.errors.keys())))
+            raise validation.FormError(err_msg% (len(self.errors.keys())))
         return data
 
     def _validate_and_call(self, request, \
                     failure_callable=None, success_callable=None):
         try: 
             data = self.validate(request)
-        except FormError, e:
+        except validation.FormError, e:
             return failure_callable(request, self)
         return success_callable(request, data)
  

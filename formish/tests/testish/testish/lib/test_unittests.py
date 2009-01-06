@@ -1,4 +1,3 @@
-from testish.lib.base import TestCase
 from testish.lib import forms
 import unittest
 import webob

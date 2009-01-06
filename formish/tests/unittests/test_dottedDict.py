@@ -1,6 +1,4 @@
-from formish.forms import *
 import unittest
-from schemaish import *
 from formish.dottedDict import dottedDict, _setDict, _get, _setdefault
 
 

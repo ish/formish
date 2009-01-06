@@ -2,10 +2,6 @@ import logging, os.path
 import formish, schemaish, validatish
 from formish.filehandler import TempFileHandlerWeb
 
-from testish.lib import base
-
-import datetime
-
 log = logging.getLogger(__name__)
 
 ##
