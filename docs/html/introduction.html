@@ -70,7 +70,7 @@
 <div class="section" id="creating-a-schema">
 <h3>Creating a schema<a class="headerlink" href="#creating-a-schema" title="Permalink to this headline">¶</a></h3>
 <p>First of all we need to create a data schema to define what types of data we want in the form. Schema&#8217;s use the &#8216;Schemaish&#8217; package which lets you define structures against which you can validate/convert data. Lets take a look at the structure of a Form instance to begin with</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">schemaish</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">schemaish</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myfield&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">()</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">attrs</span>
@@ -81,7 +81,7 @@
 <div class="section" id="creating-a-form">
 <h3>Creating a form<a class="headerlink" href="#creating-a-form" title="Permalink to this headline">¶</a></h3>
 <p>So we now have a single field in our schema which is defined as a string. We can now create a form from this</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">formish</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">formish</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -204,7 +204,7 @@
 <div class="section" id="processing-the-submitted-form">
 <h3>Processing the Submitted Form<a class="headerlink" href="#processing-the-submitted-form" title="Permalink to this headline">¶</a></h3>
 <p>Once the form is submitted, we can get the data by calling &#8216;validate&#8217;. In order to simulate this, we&#8217;re going to create a request object by hand using webob..</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">webob</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">webob</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">webob</span><span class="o">.</span><span class="n">Request</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="s">&#39;http://localhost/&#39;</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;REQUEST_METHOD&#39;</span><span class="p">:</span> <span class="s">&#39;POST&#39;</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;myfield&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;myvalue&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
@@ -226,7 +226,7 @@
 <div class="section" id="creating-the-form">
 <h3>Creating the form<a class="headerlink" href="#creating-the-form" title="Permalink to this headline">¶</a></h3>
 <p>For our contrived example, we&#8217;ll build a simple registration form.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">schemaish</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">schemaish</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;firstName&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">()</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;surname&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">()</span> <span class="p">)</span>
@@ -272,7 +272,7 @@
 <div class="section" id="how-does-this-form-work">
 <h3>How does this form work?<a class="headerlink" href="#how-does-this-form-work" title="Permalink to this headline">¶</a></h3>
 <p>Well let&#8217;s give it some default values and look at what we get.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datetime</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">datetime</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;firstName&#39;</span><span class="p">:</span> <span class="s">&#39;Tim&#39;</span><span class="p">,</span> <span class="s">&#39;surname&#39;</span><span class="p">:</span> <span class="s">&#39;Parkin&#39;</span><span class="p">,</span> <span class="s">&#39;dateOfBirth&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mf">1966</span><span class="p">,</span><span class="mf">12</span><span class="p">,</span><span class="mf">18</span><span class="p">),</span> <span class="s">&#39;streetNumber&#39;</span><span class="p">:</span> <span class="mf">123</span><span class="p">,</span> <span class="s">&#39;country&#39;</span><span class="p">:</span> <span class="s">&#39;UK&#39;</span><span class="p">,</span> <span class="s">&#39;termsAndConditions&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
 </pre></div>
 </div>
@@ -368,7 +368,7 @@
 <div class="section" id="id1">
 <h3>Processing the submitted form<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>Repeating the creation of a request using webob, setting some input values and validating gives us:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">webob</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">webob</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">webob</span><span class="o">.</span><span class="n">Request</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="s">&#39;http://localhost/&#39;</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;REQUEST_METHOD&#39;</span><span class="p">:</span> <span class="s">&#39;POST&#39;</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;firstName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Tim&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;surname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Parkin&#39;</span>
@@ -518,7 +518,7 @@
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myfile&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">File</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">formish</span> <span class="kn">import</span> <span class="n">filehandler</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">formish</span> <span class="k">import</span> <span class="n">filehandler</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;myfile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">FileUpload</span><span class="p">(</span><span class="n">filehandler</span><span class="o">=</span><span class="n">filehandler</span><span class="o">.</span><span class="n">TempFileHandlerWeb</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -924,7 +924,7 @@ thumbnail with the widget</li>
 <h3>Form Class<a class="headerlink" href="#form-class" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="formish.forms.Form">
-<!--[formish.forms.Form]-->class <tt class="descclassname">formish.forms.</tt><tt class="descname">Form</tt><big>(</big><em>structure</em>, <em>name=None</em>, <em>defaults={}</em>, <em>errors={}</em>, <em>action_url=None</em>, <em>renderer=None</em><big>)</big><a class="headerlink" href="#formish.forms.Form" title="Permalink to this definition">¶</a></dt>
+<!--[formish.forms.Form]-->class <tt class="descclassname">formish.forms.</tt><tt class="descname">Form</tt><big>(</big><em>structure</em>, <em>name=None</em>, <em>defaults=None</em>, <em>errors=None</em>, <em>action_url=None</em>, <em>renderer=None</em><big>)</big><a class="headerlink" href="#formish.forms.Form" title="Permalink to this definition">¶</a></dt>
 <dd><p>The definition of a form</p>
 <p>The Form type is the container for all the information a form needs to
 render and validate data.</p>
