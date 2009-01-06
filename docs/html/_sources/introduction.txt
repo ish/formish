@@ -4,6 +4,8 @@ About Formish
 
 Formish is a templating language agnostic form generation and handling library. 
 
+Have a look at `http://ish.io:8890 <http://ish.io:8890>`_ for an example - if this isn't running, please email `support@ish.io <mailto://support@ish.io>`_
+
 Introduction - A Simple Form
 ============================
 

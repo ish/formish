@@ -7,7 +7,9 @@ setup(name='formish',
       version=version,
       description="Formish is a schema backed, templating language agnostic form generation and handling library.",
       long_description="""\
-Formish is a schema backed, templating language agnostic form generation and handling library. It's main features are its granular components and its ability to create quite complex forms (including sequences, groups, sequences of groups, groups of sequences, etc). It has a built in mako templating library but should be straightforward to add other templating systems. It also has strong support for file uploads with a default tempfile storage handler. It uses schemaish for its schema, validatish for validation and convertish for type coercion.
+Formish is a schema backed, templating language agnostic form generation and handling library. It's main features are its granular components and its ability to create quite complex forms (including sequences, groups, sequences of groups, groups of sequences, etc). It has a built in mako templating library but should be straightforward to add other templating systems. It also has strong support for file uploads with a default tempfile storage handler. It uses schemaish for its schema, validatish for validation and convertish for type coercion. 
+
+      Have a look at `http://ish.io:8891 <http://ish.io:8891>`_ for an example - if this isn't running, please email `support@ish.io <mailto://support@ish.io>`_
 """,
       classifiers=[
           "Development Status :: 4 - Beta",
