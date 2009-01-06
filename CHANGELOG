@@ -2,6 +2,11 @@
 Changlelog
 ==========
 
+0.5.4 (2009-01-06)
+------------------
+
+Removed all * imports apart from those at the module level. Checked against pyflakes.
+
 0.5.3 (2009-01-06)
 ------------------
 
