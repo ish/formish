@@ -7,7 +7,7 @@ def extract(id):
     in_quotes = False
     prev_line = ''
     for line in lines:
-        if 'def %s'%id in line:
+        if 'def %s('%id in line:
             in_function = True
 
         if in_function and not in_quotes and '    """' in line:

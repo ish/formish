@@ -9,6 +9,7 @@ __all__ = ['Input', 'Password', 'CheckedPassword', 'Hidden', 'TextArea',
 from convertish.convert import string_converter, \
         datetuple_converter,ConvertError
 from schemaish import type
+from formish import dottedDict
 
 
 UNSET = object()
@@ -483,7 +484,26 @@ class CheckboxMultiChoiceTree(Widget):
 
     _template = 'CheckboxMultiChoiceTree'
 
-        
+    def __init__(self, options, cssClass=None):
+        self.options = options
+        self.optiontree = dottedDict._getDictFromDottedKeyDict(dict(options),noexcept=True) 
+        Widget.__init__(self,cssClass=cssClass)
+            
+    def pre_render(self, schemaType, data):
+        if data is None: 
+            return []
+        return [string_converter(schemaType.attr).fromType(d) for d in data]
+    
+    def convert(self, schemaType, data):
+        return [string_converter(schemaType.attr).toType(d) for d in data]
+
+    def checked(self, option, values, schemaType):
+        if values is not None:
+            typed_values = self.convert(schemaType,values)
+        if values is not None and option[0] in typed_values:
+            return ' checked="checked"'
+        else:
+            return ''        
         
 def _normalise_options(options):
     """

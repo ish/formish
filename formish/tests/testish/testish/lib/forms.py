@@ -8,7 +8,12 @@ log = logging.getLogger(__name__)
 # Make sure forms have the doc string with triple quotes 
 # on a separate line as this file is parsed
 
-def SimpleString():
+
+################
+#
+#  Simple Types
+
+def String():
     """
     A simple form with a single string field
     """
@@ -17,7 +22,7 @@ def SimpleString():
     form = formish.Form(schema, 'form')
     return form
 
-def functest_SimpleString(self, sel):
+def functest_String(self, sel):
     sel.open("/SimpleString")
 
     sel.click("form-action-submit")
@@ -39,7 +44,7 @@ def functest_SimpleString(self, sel):
 
     return
 
-def unittest_SimpleString(self):
+def unittest_String(self):
     # Test no data
     f = SimpleString()
     self.assertIdHasValue(f, 'form-myStringField', '')
@@ -57,7 +62,7 @@ def unittest_SimpleString(self):
     self.assertRoundTrip(f, testdata)
 
 
-def SimpleInteger():
+def Integer():
     """
     A simple form with a single integer field
     """
@@ -66,7 +71,7 @@ def SimpleInteger():
     form = formish.Form(schema, 'form')
     return form
 
-def functest_SimpleInteger(self,sel):
+def functest_Integer(self,sel):
     sel.open("/SimpleInteger")
 
     sel.click("form-action-submit")
@@ -94,7 +99,7 @@ def functest_SimpleInteger(self,sel):
 
     return
 
-def unittest_SimpleInteger(self):
+def unittest_Integer(self):
     # Test no data
     f = SimpleInteger()
     self.assertIdHasValue(f, 'form-myIntegerField', '')
@@ -111,7 +116,7 @@ def unittest_SimpleInteger(self):
     self.assertIdHasValue(f, 'form-myIntegerField', '8')
     self.assertRoundTrip(f, testdata)
 
-def SimpleDate():
+def Date():
     """
     A simple form with a single integer field
     """
@@ -120,7 +125,7 @@ def SimpleDate():
     form = formish.Form(schema, 'form')
     return form
 
-def functest_SimpleDate(self, sel):
+def functest_Date(self, sel):
 
     sel.open("/SimpleDate")
 
@@ -149,7 +154,7 @@ def functest_SimpleDate(self, sel):
 
     return
 
-def SimpleFloat():
+def Float():
     """
     A simple form with a single integer field
     """
@@ -158,7 +163,7 @@ def SimpleFloat():
     form = formish.Form(schema, 'form')
     return form
 
-def functest_SimpleFloat(self, sel):
+def functest_Float(self, sel):
     sel.open("/SimpleFloat")
 
     sel.click("form-action-submit")
@@ -188,7 +193,7 @@ def functest_SimpleFloat(self, sel):
 
 
 
-def SimpleBoolean():
+def Boolean():
     """
     A simple form with a single boolean field
     """
@@ -197,7 +202,7 @@ def SimpleBoolean():
     form = formish.Form(schema, 'form')
     return form
 
-def functest_SimpleBoolean(self, sel):
+def functest_Boolean(self, sel):
     sel.open("/SimpleBoolean")
 
     sel.click("form-action-submit")
@@ -232,7 +237,7 @@ def functest_SimpleBoolean(self, sel):
     return
 
 
-def SimpleDecimal():
+def Decimal():
     """
     A simple form with a single decimal field
     """
@@ -242,7 +247,7 @@ def SimpleDecimal():
     return form
 
 
-def functest_SimpleDecimal(self, sel):
+def functest_Decimal(self, sel):
     sel.open("/SimpleDecimal")
 
     sel.click("form-action-submit")
@@ -269,8 +274,6 @@ def functest_SimpleDecimal(self, sel):
     except AssertionError, e: self.verificationErrors.append(str(e))
 
     return
-
-
 
 def RequiredStringAndCheckbox():
     """
@@ -303,12 +306,10 @@ def functest_RequiredStringAndCheckbox(self, sel):
     sel.wait_for_page_to_load("30000")
     try: self.failUnless(sel.is_text_present("{'myBoolean': True, 'myString': u'anythingelse'}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
-    
 
     return
 
-
-def SimpleFile():
+def File():
     """
     A simple form with a single integer field
     """
@@ -318,7 +319,7 @@ def SimpleFile():
     form['myFileField'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
     return form
 
-def functest_SimpleFile(self, sel):
+def functest_File(self, sel):
     sel.open("/SimpleFile")
 
     sel.click("form-action-submit")
@@ -336,42 +337,262 @@ def functest_SimpleFile(self, sel):
 
     return
 
+#########################
+#
+#   String Widgets
+#
 
-
-def StringWidgets():
+def Input():
     """
-    A demonstration of simple string type widgets
-
-    * **Input** fields are the default and need not be specified but you might want to specify a 'strip' argument
-    * **TextArea** take cols and rows keyword arguments (css usually overrides this). it can also take a 'strip' argument
+    Simple input field with a strip parameter
     """
     schema = schemaish.Structure()
-    schema.add('myInputStrip', schemaish.String())
-    schema.add('myTextArea', schemaish.String())
-    schema.add('myTextAreaCustom', schemaish.String())
-    schema.add('myTextAreaStrip', schemaish.String())
+    schema.add('inputStrip', schemaish.String())
 
     form = formish.Form(schema, 'form')
-    form['myInputStrip'].widget = formish.Input(strip=True)
-    form['myTextArea'].widget = formish.TextArea()
-    form['myTextAreaCustom'].widget = formish.TextArea(cols=20,rows=4)
-    form['myTextAreaStrip'].widget = formish.TextArea(strip=True)
+    form['inputStrip'].widget = formish.Input(strip=True)
     return form
 
-def SelectWidgets():
+def Hidden():
     """
-    A set of widget demonstrations using choices of various kinds
+    Hidden Field with a visible friend.. 
+    """
+    schema = schemaish.Structure()
+    schema.add('Visible', schemaish.String())
+    schema.add('Hidden', schemaish.String())
+
+    form = formish.Form(schema, 'form')
+    form['Hidden'].widget = formish.Hidden()
+    return form
+
+def Password():
+    """
+    Using a password html element
+    """
+    schema = schemaish.Structure()
+    schema.add('Password', schemaish.String())
+
+    form = formish.Form(schema, 'form')
+    form['Password'].widget = formish.Password()
+    return form
+
+def CheckedPassword():
+    """
+    Simple input field with a strip parameter
+    """
+    schema = schemaish.Structure()
+    schema.add('CheckedPassword', schemaish.String())
+
+    form = formish.Form(schema, 'form')
+    form['CheckedPassword'].widget = formish.CheckedPassword()
+    return form
+
+def TextAreaSimple():
+    """
+    Simple text area
+    """
+    schema = schemaish.Structure()
+    schema.add('textArea', schemaish.String())
+
+    form = formish.Form(schema, 'form')
+    form['textArea'].widget = formish.TextArea()
+    return form
+
+def TextAreaColsAndRows():
+    """
+    Passing cols and rows to a text area
+    """
+    schema = schemaish.Structure()
+    schema.add('textAreaCustom', schemaish.String())
+
+    form = formish.Form(schema, 'form')
+    form['textAreaCustom'].widget = formish.TextArea(cols=20,rows=4)
+    return form
+
+def TextAreaStrip():
+    """
+    Stripping text area input
+    """
+    schema = schemaish.Structure()
+    schema.add('textAreaStrip', schemaish.String())
+
+    form = formish.Form(schema, 'form')
+    form['textAreaStrip'].widget = formish.TextArea(strip=True)
+    return form
+
+#######################
+#
+#   Validation
+
+def Required():
+    """
+    Required Fields
+    """
+    schema = schemaish.Structure()
+    schema.add('required', schemaish.String(validator=validatish.Required()))
+
+    form = formish.Form(schema, 'form')
+    return form
+
+def MinLength():
+    """
+    Minimum Length fields - this one is min length four chars
+    """
+    schema = schemaish.Structure()
+    schema.add('min', schemaish.String(validator=validatish.Length(min=4)))
+
+    form = formish.Form(schema, 'form')
+    return form
+
+def MaxLength():
+    """
+    Maximum Length fields - this one is max length eight chars
+    """
+    schema = schemaish.Structure()
+    schema.add('max', schemaish.String(validator=validatish.Length(max=8)))
+
+    form = formish.Form(schema, 'form')
+    return form
+
+def MinMaxLength():
+    """
+    Minimum and maximum length
+    """
+    schema = schemaish.Structure()
+    schema.add('minmax', schemaish.String(validator=validatish.Length(min=4,max=8)))
+
+    form = formish.Form(schema, 'form')
+    return form
+
+def PlainText():
+    """
+    Plain Text (alphanum only)
+    """
+    schema = schemaish.Structure()
+    schema.add('plainText', schemaish.String(validator=validatish.PlainText()))
+
+    form = formish.Form(schema, 'form')
+    return form
+
+def OneOf():
+    """
+    One of a set of
+    """
+    schema = schemaish.Structure()
+    items = ['one','two','three']
+    schema.add('oneOf', schemaish.String(validator=validatish.OneOf(items)))
+
+    form = formish.Form(schema, 'form')
+    return form
+
+def All():
+    """
+    Required and Plain Text (alphanum only plus _ and -)
+    """
+    schema = schemaish.Structure()
+    schema.add('requiredPlainText', schemaish.String(validator=validatish.All(validatish.Required(),validatish.PlainText(extra='-_'))))
+
+    form = formish.Form(schema, 'form')
+    return form
+
+########################
+#
+#   Checkbox
+
+def Checkbox():
+    """
+    Simple Boolean Checkbox
+    """
+    schema = schemaish.Structure()
+    schema.add('checkbox', schemaish.Boolean())
+
+    form = formish.Form(schema, 'form')
+    form['checkbox'].widget = formish.Checkbox()
+    return form
+
+
+#########################
+#
+#   Select Widgets
+#
+
+def SelectChoice():
+    """
+    A basic select choice
     """
     schema = schemaish.Structure()
     schema.add('mySelect', schemaish.String())
-    options = [('a',1),('b',2),('c',3)]
+    options = [(1,'a'),(2,'b'),(3,'c')]
 
     form = formish.Form(schema, 'form')
     form['mySelect'].widget = formish.SelectChoice(options)
     return form
 
 
-def SequenceOfStructures():
+def SelectChoiceNoneOption():
+    """
+    Setting a None Option on the select choice element
+    """
+    schema = schemaish.Structure()
+    schema.add('mySelect', schemaish.String())
+    options = [(1,'a'),(2,'b'),(3,'c')]
+
+    form = formish.Form(schema, 'form')
+    form['mySelect'].widget = formish.SelectChoice(options,none_option=(None, '--select--'))
+    return form
+
+def SelectChoiceCallableOptions():
+    """
+    Passing in a callable list of options
+    """
+    schema = schemaish.Structure()
+    schema.add('mySelect', schemaish.String())
+    def _():
+        options = [(1,'a'),(2,'b'),(3,'c')]
+        for option in options:
+            yield option
+
+    form = formish.Form(schema, 'form')
+    form['mySelect'].widget = formish.SelectChoice(_)
+    return form
+
+#########################
+#
+#   Multi Select Widgets
+#
+
+def CheckboxMultiChoice():
+    """
+    A checkbox representing a set of values
+    """
+    schema = schemaish.Structure()
+    schema.add('multiChoice', schemaish.Sequence(schemaish.String()))
+    options = [(1,'a'),(2,'b'),(3,'c')]
+
+    form = formish.Form(schema, 'form')
+    form['multiChoice'].widget = formish.CheckboxMultiChoice(options)
+    return form
+
+
+def CheckboxMultiChoiceTree():
+    """
+    A checkbox representing a set of values
+    """
+    schema = schemaish.Structure()
+    schema.add('multiChoice', schemaish.Sequence(schemaish.String()))
+    options = [('a','Top Level A'),('a.x','Second Level X'),('a.y','Second Level Y'),('b','First Level B')]
+
+    form = formish.Form(schema, 'form')
+    form['multiChoice'].widget = formish.CheckboxMultiChoiceTree(options)
+    return form
+
+#########################
+#
+#   Sequences
+#
+
+
+def SimpleStructures():
     """
     A structure witin a sequence, should be enhanced with javascript
     """
@@ -385,7 +606,7 @@ def SequenceOfStructures():
     form = formish.Form(schema, 'form')
     return form
   
-def SequenceOfUploadStructures():
+def UploadStructures():
     """
     A structure witin a sequence, should be enhanced with javascript
     """
@@ -401,7 +622,7 @@ def SequenceOfUploadStructures():
     form['myList.*.a'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
     return form
 
-def functest_SequenceOfUploadStructures(self, sel):
+def functest_UploadStructures(self, sel):
 
     sel.open("/SequenceOfUploadStructures")
     sel.wait_for_page_to_load("30000")
@@ -417,9 +638,7 @@ def functest_SequenceOfUploadStructures(self, sel):
 
     return
 
-
-    
-def SequenceOfStructuresWithSelects():
+def StructuresWithSelects():
     """
     A sequence including selects
     """
@@ -438,7 +657,7 @@ def SequenceOfStructuresWithSelects():
     form.defaults = {'myList': [{'a':'foo','b':'b'}]}
     return form
 
-def functest_SequenceOfStructuresWithSelects(self, sel):
+def functest_StructuresWithSelects(self, sel):
     sel.open("/SequenceOfStructuresWithSelects")
 
     try: self.assertEqual("foo", sel.get_value("form-myList-0-a"))

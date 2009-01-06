@@ -9,25 +9,53 @@
 
 <h3>Simple Fields</h3>
 <%
-ids = ['SimpleString','SimpleInteger','SimpleBoolean','SimpleFloat','SimpleDecimal','SimpleDate']
+ids = ['String','Integer','Boolean','Float','Decimal','Date']
 links(ids)
 %>
 
 <h3>File Fields</h3>
 <%
-ids = ['SimpleFile']
+ids = ['File']
 links(ids)
 %>
 
 <h3>Simple Widgets</h3>
 <%
-ids = ['StringWidgets','SelectWidgets']
+ids = ['Input','Hidden','Password','CheckedPassword','TextAreaSimple','TextAreaColsAndRows','TextAreaStrip']
 links(ids)
 %>
 
+<h3>Checkbox Widgets</h3>
+<%
+ids = ['Checkbox']
+links(ids)
+%>
+
+
+<h3>Validation Examples</h3>
+<%
+ids = ['Required', 'MinLength','MaxLength','MinMaxLength','PlainText','OneOf','All']
+links(ids)
+%>
+
+
+<h3>Select Widgets</h3>
+<%
+ids = ['SelectChoice','SelectChoiceNoneOption','SelectChoiceCallableOptions']
+links(ids)
+%>
+
+
+<h3>Multi Select Widgets</h3>
+<%
+ids = ['CheckboxMultiChoice','CheckboxMultiChoiceTree']
+links(ids)
+%>
+
+
 <h3>Sequence of Structures (using javascript)</h3>
 <%
-ids = ['SequenceOfStructures','SequenceOfUploadStructures','SequenceOfStructuresWithSelects']
+ids = ['SimpleStructures','UploadStructures','StructuresWithSelects']
 links(ids)
 %>
 </div>
