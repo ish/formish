@@ -37,7 +37,7 @@ class Widget(object):
         format.If the data is None then we return an empty string. The sequence
         is request data representation.
         """
-        string_data = string_converter(schema_type).fromType(data)
+        string_data = string_converter(schema_type).from_type(data)
         if string_data is None:
             return ['']
         return [string_data]
@@ -56,7 +56,7 @@ class Widget(object):
         after the form has been submitted, the request data is converted into
         to the schema type.
         """
-        return string_converter(schema_type).toType(request_data[0])
+        return string_converter(schema_type).to_type(request_data[0])
 
     def __repr__(self):
         return '<widget "%s">'% (self._template)
@@ -87,7 +87,7 @@ class Input(Widget):
             string_data = request_data[0]
         if not string_data:
             string_data = None
-        return string_converter(schema_type).toType(string_data)
+        return string_converter(schema_type).to_type(string_data)
 
 
 
@@ -117,7 +117,7 @@ class CheckedPassword(Input):
         """
         Extract both the password and confirm fields
         """
-        string_data = string_converter(schema_type).fromType(data)
+        string_data = string_converter(schema_type).from_type(data)
         if string_data is None:
             return {'password': [''], 'confirm': ['']}
         return {'password': [string_data], 'confirm': [string_data]}
@@ -137,7 +137,7 @@ class CheckedPassword(Input):
                 confirm = None
         if password != confirm:
             raise ConvertError('Password did not match')
-        return string_converter(schema_type).toType(password)
+        return string_converter(schema_type).to_type(password)
 
 
 
@@ -199,7 +199,7 @@ class TextArea(Input):
         We're using the converter options to allow processing sequence data
         using the csv module
         """
-        string_data = string_converter(schema_type).fromType(data, \
+        string_data = string_converter(schema_type).from_type(data, \
             converter_options=self.converter_options)
         if string_data is None:
             return ['']
@@ -216,7 +216,7 @@ class TextArea(Input):
             string_data = request_data[0]
         if not string_data:
             string_data = None
-        return string_converter(schema_type).toType(string_data,
+        return string_converter(schema_type).to_type(string_data,
             converter_options=self.converter_options)
 
     
@@ -235,7 +235,7 @@ class Checkbox(Widget):
             out_string = 'False'
         else:
             out_string = 'True'
-        return string_converter(schema_type).toType(out_string)
+        return string_converter(schema_type).to_type(out_string)
 
     
 class DateParts(Widget):
@@ -257,7 +257,7 @@ class DateParts(Widget):
         """
         Convert to date parts
         """
-        dateparts = datetuple_converter(schema_type).fromType(data)
+        dateparts = datetuple_converter(schema_type).from_type(data)
         if dateparts is None:
             return {'year': [''], 'month': [''], 'day': ['']}
         return {'year': [dateparts[0]],
@@ -275,7 +275,7 @@ class DateParts(Widget):
             date_parts = (year, month, day)
         else:
             date_parts = None
-        return datetuple_converter(schema_type).toType(date_parts)
+        return datetuple_converter(schema_type).to_type(date_parts)
         
 
 class FileUpload(Widget):
@@ -395,7 +395,7 @@ class SelectChoice(Widget):
         options = []
         for value, label in self.options:
             options.append(
-        (string_converter(schema_type).fromType(value),label)
+        (string_converter(schema_type).from_type(value),label)
             )
         return options
     
@@ -403,7 +403,7 @@ class SelectChoice(Widget):
         """
         Get the default option (the 'unselected' option)
         """
-        return (string_converter(schema_type).fromType(
+        return (string_converter(schema_type).from_type(
             self.none_option[0]), self.none_option[1])
     
 
@@ -458,13 +458,13 @@ class CheckboxMultiChoice(Widget):
         """
         if data is None: 
             return []
-        return [string_converter(schema_type.attr).fromType(d) for d in data]
+        return [string_converter(schema_type.attr).from_type(d) for d in data]
     
     def convert(self, schema_type, request_data):
         """
         Iterating to convert back to the source data
         """
-        return [string_converter(schema_type.attr).toType(d) \
+        return [string_converter(schema_type.attr).to_type(d) \
                 for d in request_data]
 
     def checked(self, option, values, schema_type):
