@@ -60,6 +60,9 @@ class Widget(object):
     def __repr__(self):
         return '<widget "%s">'% (self._template)
 
+    def __call__(self, field):
+        return field.form.renderer('/formish/widgets/%s.html'%self._template, {'f':field})
+
 
 
 

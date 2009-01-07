@@ -33,9 +33,9 @@ class TestFormData(unittest.TestCase):
 
         form = formish.Form(self.schema_nested, 'nested')
 
-        assert isinstance(form['one.a'].widget,formish.Input)
+        assert isinstance(form['one.a'].widget.widget,formish.Input)
         form['one.a'].widget = formish.TextArea()
-        assert isinstance(form['one.a'].widget,formish.TextArea)
+        assert isinstance(form['one.a'].widget.widget,formish.TextArea)
 
     def test_description(self):
 
@@ -61,16 +61,16 @@ class TestSequenceFormData(unittest.TestCase):
     def test_widgets(self):
         form = formish.Form(self.schema, 'sequences')
         form.defaults = {'a': ['1','2']}
-        assert isinstance(form['a.0'].widget,formish.Input)
+        assert isinstance(form['a.0'].widget.widget,formish.Input)
         form['a.*'].widget = formish.TextArea()
-        assert isinstance(form['a.0'].widget,formish.TextArea)
+        assert isinstance(form['a.0'].widget.widget,formish.TextArea)
         
 
     def test_widgets_before_data(self):
         form = formish.Form(self.schema, 'sequences')
         form['a.*'].widget = formish.TextArea()
         form.defaults = {'a': ['1','2']}
-        assert isinstance(form['a.0'].widget,formish.TextArea)
+        assert isinstance(form['a.0'].widget.widget,formish.TextArea)
 
 
 
