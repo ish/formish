@@ -1,0 +1,7 @@
+<%
+if form.action_url:
+    action_url = form.action_url
+else:
+    action_url = ''
+%>
+<form id="${form.name}" action="${action_url}" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">

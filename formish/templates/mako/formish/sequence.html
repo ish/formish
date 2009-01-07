@@ -1,0 +1,13 @@
+<%page args="field" />
+<%
+if field.widget.addremove is True:
+    addremoveclass = ' sequencecontrols'
+else:
+    addremoveclass = ''
+%>
+<fieldset id="${field.cssname}-field" class="${field.classes}">
+${field.label()|n}
+${field.fields()|n}
+${field.description()|n}
+${field.metadata()|n}
+</fieldset>

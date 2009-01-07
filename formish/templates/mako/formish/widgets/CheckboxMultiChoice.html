@@ -1,4 +1,3 @@
-<%inherit file="/formish/widgets/Field.html"/>
 <%page args="field" />
 %for n, option in enumerate(field.widget.options):
 <input id="${field.cssname}-${n}" name="${field.name}" type="checkbox" value="${option[0]}"${field.widget.checked(option,field.value,field.attr)|n} />

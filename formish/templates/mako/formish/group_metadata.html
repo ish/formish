@@ -1,0 +1,18 @@
+<%page args="field" />
+
+<%!
+def b64(text):
+    import base64
+    return base64.b64encode(text)
+%>
+
+<%def name="fieldtemplate(f)" filter="b64, trim">
+  ${f()|n}
+</%def>
+
+
+% if field.type is 'sequence':
+   <input type="hidden" name="${field.template.name}" class="adder" value="${fieldtemplate(field.template)}" />
+% endif
+
+

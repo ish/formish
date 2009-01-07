@@ -588,11 +588,48 @@ def CheckboxMultiChoiceTree():
 
 #########################
 #
+#   Structures
+#
+
+def SimpleStructure():
+    """
+    A simple structure
+    """
+    structure = schemaish.Structure()
+    structure.add( 'a', schemaish.String() )
+    structure.add( 'b', schemaish.Integer() )
+
+    schema = schemaish.Structure()
+    schema.add( 'myStruct', structure )
+
+    form = formish.Form(schema, 'form')
+    return form
+  
+def UploadStructure():
+    """
+    A structure with a file upload
+    """
+    structure = schemaish.Structure()
+    structure.add( 'a', schemaish.File() )
+    structure.add( 'b', schemaish.Integer() )
+
+    schema = schemaish.Structure()
+    schema.add( 'myStruct', structure)
+
+    form = formish.Form(schema, 'form')
+
+    form['myStruct.a'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
+    return form
+
+
+
+#########################
+#
 #   Sequences
 #
 
 
-def SimpleStructures():
+def SequenceOfSimpleStructures():
     """
     A structure witin a sequence, should be enhanced with javascript
     """
@@ -606,7 +643,7 @@ def SimpleStructures():
     form = formish.Form(schema, 'form')
     return form
   
-def UploadStructures():
+def SequenceOfUploadStructures():
     """
     A structure witin a sequence, should be enhanced with javascript
     """
@@ -638,7 +675,7 @@ def functest_UploadStructures(self, sel):
 
     return
 
-def StructuresWithSelects():
+def SequenceOfStructuresWithSelects():
     """
     A sequence including selects
     """
@@ -675,3 +712,45 @@ def functest_StructuresWithSelects(self, sel):
 
     return
 
+
+
+def CustomisedFormLayout():
+    """
+    A custom form
+    """
+    substructure = schemaish.Structure()
+    substructure.add( 'date', schemaish.Date() )
+    substructure.add( 'celebrate', schemaish.Boolean() )
+
+    schema = schemaish.Structure()
+    schema.add( 'firstName', schemaish.String() )
+    #schema.add( 'surname', schemaish.String() )
+    #schema.add( 'address', schemaish.String() )
+    #schema.add( 'occupation', schemaish.String() )
+    #schema.add( 'birth', substructure)
+
+    form = formish.Form(schema, 'form')
+
+    occupationOptions = [('miner','Miner'),('queen','Queen')]
+    addressOptions = [('leeds','Leeds'),('123 Banger Stree, Leeds','123 Banger Street, Leeds')]
+
+    #form['occupation'].widget = formish.SelectChoice(occupationOptions)
+    #form['address'].widget = formish.SelectChoice(addressOptions)
+    #form['birth.date'].widget = formish.DateParts(day_first=True)
+    #form['birth.celebrate'].widget = formish.Checkbox()
+
+    return form
+
+
+def template_CustomisedFormLayout():
+    """
+${form()|n}
+<h4>First Name</h4>
+${form['firstName']()|n}
+<h3>First Name (Title)</h4>
+${form['firstName'].title}
+<h3>First Name (Widget)</h4>
+${form['firstName'].widget()}
+    """
+
+    

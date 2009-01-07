@@ -68,6 +68,8 @@ class FormResource(resource.Resource):
             form = self.form_getter()
         return {'title': self.title, 'description': self.description,
                 'form': form, 'data': pformat(data),
+                'template': extract_function.extract_docstring('template_%s'%self.id),
+                'template_highlighted': extract_function.extract_docstring_highlighted('template_%s'%self.id),
                 'definition': extract_function.extract(self.id),
                 'tests': tests}
     

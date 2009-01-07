@@ -49,9 +49,8 @@ def _classes(self):
     if self.required:
         classes.append('required')
     if self.widget is not None and self.widget.css_class:
-        print self.widget.css_class
         classes.append(self.widget.css_class)
-    if self.error:
+    if self.error.val:
         classes.append('error')
     return ' '.join(classes)
             
@@ -68,6 +67,29 @@ def starify(name):
             newname.append(key)
     name = '.'.join(newname)
     return name
+
+
+class TemplatedString(object):
+    """
+    A callable, teplated string
+    """
+    def __init__(self, obj, attr_name, val):
+        self.obj = obj
+        self.attr_name = attr_name
+        self.val = val
+
+    def __str__(self):
+        if not self.val:
+            return ''
+        return self.val
+
+    def __call__(self):
+        try:
+            return self.obj.form.renderer('/formish/%s_%s.html'%(self.obj.type,self.attr_name), {'field':self.obj})
+        except Exception, e:
+            print 'OOH!',e
+
+
 
 class Field(object):
     """
@@ -109,9 +131,10 @@ class Field(object):
     def description(self):
         """ The Field schema's description """
         try:
-            return self.form.get_item_data(self.name,'description')
+            val =  self.form.get_item_data(self.name,'description')
         except KeyError:
-            return self.attr.description        
+            val = self.attr.description        
+        return TemplatedString(self, 'description', val)
 
 
     @property
@@ -143,7 +166,12 @@ class Field(object):
     @property
     def error(self):
         """ Lazily get the error from the form.errors when needed """
-        return self.form.errors.get(self.name, None)
+        error = self.form.errors.get(self.name, None)
+        if error is not None:
+            val = str(error)
+        else: 
+            val = ''
+        return TemplatedString(self, 'error', val)
 
 
     @property
@@ -155,13 +183,37 @@ class Field(object):
         except KeyError:
             widget_type = widgets.Input()
         return BoundWidget(widget_type, self)
+
         
 
     def __call__(self):
         """ returns a serialisation for this field using the form's renderer """
-        return self.form.renderer('/formish/Field.html', {'f':self})
+        return self.form.renderer('/formish/field.html', {'field':self})
             
+    def label(self):
+        """ returns the templated title """
+        return self.form.renderer('/formish/field_label.html', {'field':self})
     
+    def inputs(self):
+        """ returns the templated widget """
+        return self.form.renderer('/formish/field_inputs.html', {'field':self})
+
+
+class CollectionFieldsWrapper(object):
+    """
+    Allow fields attr of a form to be accessed (as a generator) but also callable
+    """
+    def __init__(self, collection):
+        self.collection = collection
+        self.val= collection.collection_fields()
+
+    def __iter__(self):
+        if self.val is None:
+            return iter([])
+        return iter(self.val)
+
+    def __call__(self):
+        return self.collection.form.renderer('/formish/%s_fields.html'%self.collection.type, {'field':self.collection})
 
 class Collection(object):
     """
@@ -195,7 +247,8 @@ class Collection(object):
     @property
     def description(self):
         """ Returns the schema's description """
-        return self.attr.description        
+        val = self.attr.description        
+        return TemplatedString(self,'description',val)
 
 
     @property
@@ -233,7 +286,8 @@ class Collection(object):
     @property
     def error(self):
         """ Lazily get the error from the form.errors when needed """
-        return self.form.errors.get(self.name, None)
+        val = self.form.errors.get(self.name, None)
+        return TemplatedString(self, 'error', val)
 
 
     @property
@@ -266,6 +320,10 @@ class Collection(object):
         """ The schemaish attrs below this collection """
         return self.attr.attrs
 
+    def collection_fields(self):
+        for attr in self.attrs:
+            yield self.bind(attr[0], attr[1])        
+        
 
     @property
     def fields(self):
@@ -273,8 +331,7 @@ class Collection(object):
         Iterate through the fields, lazily bind the schema to the fields
         before returning.
         """
-        for attr in self.attr.attrs:
-            yield self.bind(attr[0], attr[1])        
+        return CollectionFieldsWrapper(self)
 
 
     def bind(self, attr_name, attr):
@@ -305,13 +362,22 @@ class Collection(object):
             return bound_field
 
 
-    def __call__(self):
-        return self.form.renderer('/formish/Field.html', {'f':self})
-
 
     def __repr__(self):
         return '<formish %s name="%s">'% (self.type, self.name)
-   
+
+
+    def __call__(self):
+        """ returns a serialisation for this field using the form's renderer """
+        return self.form.renderer('/formish/%s.html'%self.type, {'field':self})
+            
+    def label(self):
+        """ returns the templated title """
+        return self.form.renderer('/formish/%s_label.html'%self.type, {'field':self})
+         
+    def metadata(self):
+        """ returns the metadata """
+        return self.form.renderer('/formish/%s_metadata.html'%self.type, {'field':self})
 
 
 class Group(Collection):
@@ -330,8 +396,7 @@ class Sequence(Collection):
     type = 'sequence'
     _template = 'ssequence'
 
-    @property
-    def fields(self):
+    def collection_fields(self):
         """ 
         For sequences we check to see if the name is numeric. As names cannot be numeric normally, the first iteration loops 
         on a fields values and spits out a 
@@ -390,9 +455,7 @@ class BoundWidget(object):
         setattr(self.widget, name, value)
 
     def __call__(self):
-        return self.widget()
-        
-
+        return self.field.form.renderer('/formish/widgets/%s.html'%self._template, {'field':self.field})
     def __repr__(self):
         attrclassstr = str(self.field.attr.__class__)
         if attrclassstr[8:22] == 'schemaish.attr':
@@ -401,6 +464,21 @@ class BoundWidget(object):
             attrname = attrclassstr[8:-2]
         return '<bound widget name="%s", widget="%s", type="%s">'%(self.field.name, self.widget._template, attrname)
 
+class FormFieldsWrapper(object):
+    """
+    Allow fields attr of a form to be accessed (as a generator) but also callable
+    """
+    def __init__(self, form):
+        self.form = form
+        self.val= form.structure.fields
+
+    def __iter__(self):
+        if self.val is None:
+            return iter([])
+        return iter(self.val)
+
+    def __call__(self):
+        return self.form.renderer('/formish/form_fields.html', {'form':self.form})
     
 
 class Form(object):
@@ -461,7 +539,7 @@ class Form(object):
         self.defaults = defaults
         self.errors = dottedDict(errors)
         self.error = None
-        self.actions = []
+        self._actions = []
         self.action_url = action_url
         if renderer is not None:
             self.renderer = renderer
@@ -510,9 +588,9 @@ class Form(object):
         :type label: string
         
         """
-        if name in [action.name for action in self.actions]:
+        if name in [action.name for action in self._actions]:
             raise ValueError('Action with name %r already exists.'% name)
-        self.actions.append( Action(callback, name, label) )              
+        self._actions.append( Action(callback, name, label) )              
 
     def action(self, request, *args):
         """
@@ -524,12 +602,12 @@ class Form(object):
 
         :arg args: list of arguments Pass through to the callback
         """
-        if len(self.actions)==0:
+        if len(self._actions)==0:
             raise validation.NoActionError('The form does not have any actions')
-        for action in self.actions:
+        for action in self._actions:
             if action.name in request.POST.keys():
                 return action.callback(request, self, *args)
-        return self.actions[0].callback(request, self, *args)
+        return self._actions[0].callback(request, self, *args)
 
 
     def get_unvalidated_data(self, request_data, raise_exceptions=True):
@@ -677,6 +755,7 @@ class Form(object):
         return FormAccessor(self, key)
 
 
+
     @property
     def fields(self):
         """
@@ -684,7 +763,8 @@ class Form(object):
         the form (e.g. if a field is a subsection or sequence, it will be up to
         the application to iterate that field's fields.
         """
-        return self.structure.fields
+        return FormFieldsWrapper(self)
+
 
 
     def get_field(self, name):
@@ -706,10 +786,26 @@ class Form(object):
         """
         Calling the Form generates a serialisation using the form's renderer
         """
-        return self.renderer('/formish/Form.html', {'form':self})
+        return self.renderer('/formish/form.html', {'form':self})
+
+    def header(self):
+        """ Return just the header part of the template """
+        return self.renderer('/formish/form_header.html', {'form':self})
         
-    
-    
+    def footer(self):
+        """ Return just the footer part of the template """
+        return self.renderer('/formish/form_footer.html', {'form':self})
+        
+    def metadata(self):
+        """ Return just the metada part of the template """
+        return self.renderer('/formish/form_metadata.html', {'form':self})
+
+    def actions(self):
+        """ Return just the actions part of the template """
+        return self.renderer('/formish/form_actions.html', {'form':self})
+   
+
+
 class FormAccessor(object):
     """
     Helps in setting item_data on a form

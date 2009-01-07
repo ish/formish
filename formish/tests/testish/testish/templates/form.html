@@ -1,11 +1,23 @@
 <%inherit file="base.html"/>
-
+<%!
+from mako.template import Template
+%>
 <div id="primary">
 
 <h2>${title}</h2>
 ${description|n}
 
-${form()|n}
+% if not template:
+${Template('${form()|n}').render(form=form)|n}
+%else:
+${Template(template).render(form=form)|n}
+%endif
+
+<div id="template">
+<h3>Template</h3>
+${template_highlighted|n}
+</div>
+
 
 <div id="data">
   <h3>Data</h3>
