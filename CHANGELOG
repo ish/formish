@@ -2,6 +2,11 @@
 Changlelog
 ==========
 
+0.5.5 (2009-01-08)
+------------------
+
+Add a granular template rendering system (have a look at http://ish.io:8891/CustomisedFormLayout)
+
 0.5.4 (2009-01-06)
 ------------------
 
