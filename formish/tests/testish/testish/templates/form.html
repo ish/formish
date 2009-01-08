@@ -13,6 +13,14 @@ ${Template('${form()|n}', input_encoding='utf-8', output_encoding='utf-8', defau
 ${Template(template, input_encoding='utf-8', output_encoding='utf-8', default_filters=['unicode', 'h']).render(form=form)|n}
 %endif
 
+
+<div id="data">
+  <h3>Data</h3>
+<pre>
+${data}
+</pre>
+  </div>
+
 <div id="template">
 <h3>Template</h3>
 % if not template:
@@ -22,13 +30,6 @@ ${template_highlighted|n}
 %endif
 </div>
 
-
-<div id="data">
-  <h3>Data</h3>
-<pre>
-${data}
-</pre>
-</div>
 
 <div id="definition">
 <h3>Form Definition</h3>
