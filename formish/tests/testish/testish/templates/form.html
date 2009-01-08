@@ -16,15 +16,15 @@ ${Template(template, input_encoding='utf-8', output_encoding='utf-8', default_fi
 
 <div id="data">
   <h3>Data</h3>
-<pre>
+  <pre>
 ${data}
-</pre>
-  </div>
+  </pre>
+</div>
 
 <div id="template">
 <h3>Template</h3>
 % if not template:
-<div class="highlight"><pre><span class="cp"><%text>$</%text>{</span><span class="n">form</span><span class="p">()</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span>
+<div class="highlight"><pre><span class="cp"><%text>$</%text>{</span><span class="n">form</span><span class="p">()</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span></pre></div>
 %else:
 ${template_highlighted|n}
 %endif
@@ -35,7 +35,9 @@ ${template_highlighted|n}
 <h3>Form Definition</h3>
 ${definition|n}
 </div>
+
 </div>
+
 <div id="secondary">
 <h3>Tests</h3>
 ${tests|n}
