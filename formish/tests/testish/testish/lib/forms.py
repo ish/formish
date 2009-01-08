@@ -759,13 +759,15 @@ def template_CustomisedFormLayout():
 
 ${form()|n}
 
+<h2>Form</h2>
+
 <h3>Normal Form</h3>
-<div class="boxed"><pre>
+<pre>
 ${form()}
-</pre></div>
+</pre>
 
 <h4>Form Header, metadata, actions and Footer</h4>
-<div class="boxed"><pre>
+<pre>
 
 ${form.header()}
 <hr />
@@ -774,74 +776,74 @@ ${form.metadata()}
 ${form.actions()}
 <hr />
 ${form.footer()}
-</pre></div>
+</pre>
 
 <h4>First Name</h4>
-<div class="boxed"><pre>
+<pre>
 ${form['firstName']()}
-</pre></div>
+</pre>
 
 <h3>First Name (.title)</h4>
-<div class="boxed"><pre>
+<pre>
 ${form['firstName'].title}
-</pre></div>
+</pre>
 
 <h3>First Name (.label())</h4>
-<div class="boxed"><pre>
+<pre>
 ${form['firstName'].label()}
-</pre></div>
+</pre>
 
 <h3>First Name (.inputs())</h4>
-<div class="boxed"><pre>
+<pre>
 ${form['firstName'].inputs()}
-</pre></div>
+</pre>
 
 <h3>First Name (.widget())</h4>
-<div class="boxed"><pre>
+<pre>
 ${form['firstName'].widget()}
-</pre></div>
+</pre>
 
 <h3>First Name (.error())</h4>
-<div class="boxed"><pre>
+<pre>
 ${form['firstName'].error()}
-</pre></div>
+</pre>
 
 <h3>First Name (.error)</h4>
-<div class="boxed"><pre>
+<pre>
 ${form['firstName'].error}
-</pre></div>
+</pre>
 
 <h3>First Name (.cssname)</h4>
-<div class="boxed"><pre>
+<pre>
 ${form['firstName'].cssname}
-</pre></div>
+</pre>
 
 <h3>First Name (.classes)</h4>
-<div class="boxed"><pre>
+<pre>
 ${form['firstName'].classes}
-</pre></div>
+</pre>
 
 <h3>First Name (.value)</h4>
-<div class="boxed"><pre>
+<pre>
 ${form['firstName'].value}
-</pre></div>
+</pre>
 
 <h3>First Name (.required)</h4>
-<div class="boxed"><pre>
+<pre>
 ${form['firstName'].required}
-</pre></div>
+</pre>
 
 
 
 <h3>First Name (.description)</h4>
-<div class="boxed"><pre>
+<pre>
 ${form['firstName'].description}
-</pre></div>
+</pre>
 
 <h3>First Name (.description())</h4>
-<div class="boxed"><pre>
+<pre>
 ${form['firstName'].description()}
-</pre></div>
+</pre>
     """
 
     
