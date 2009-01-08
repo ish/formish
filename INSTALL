@@ -12,6 +12,9 @@ You will need:
 * PEAK-rules which can be found here:
   http://pypi.python.org/pypi/PEAK-Rules
 
+* ProxyTypes which can be found here:
+  http://pypi.python.org/pypi/ProxyTypes
+
 * validatish
   http://pypi.python.org/pypi/validatish
 

@@ -11,6 +11,9 @@ from formish import validation
 from formish import widgets
 from formish.renderer import _default_renderer
 
+from peak.util.proxies import ObjectWrapper
+
+
 
 class Action(object):
     """
@@ -220,18 +223,14 @@ class Field(object):
         return fall_back_renderer(renderer, name, widget, vars)
 
 
-class CollectionFieldsWrapper(object):
+class CollectionFieldsWrapper(ObjectWrapper):
     """
     Allow fields attr of a form to be accessed (as a generator) but also callable
     """
+    collection = None
     def __init__(self, collection):
+        ObjectWrapper.__init__(self, iter(collection.collection_fields()))
         self.collection = collection
-        self.val= collection.collection_fields()
-
-    def __iter__(self):
-        if self.val is None:
-            return iter([])
-        return iter(self.val)
 
     def __call__(self):
         renderer = self.collection.form.renderer
@@ -509,18 +508,14 @@ class BoundWidget(object):
             attrname = attrclassstr[8:-2]
         return '<bound widget name="%s", widget="%s", type="%s">'%(self.field.name, self.widget._template, attrname)
 
-class FormFieldsWrapper(object):
+class FormFieldsWrapper(ObjectWrapper):
     """
     Allow fields attr of a form to be accessed (as a generator) but also callable
     """
+    form = None
     def __init__(self, form):
         self.form = form
-        self.val= form.structure.fields
-
-    def __iter__(self):
-        if self.val is None:
-            return iter([])
-        return iter(self.val)
+        ObjectWrapper.__init__(self, form.structure.fields)
 
     def __call__(self):
         return self.form.renderer('/formish/form_fields.html', {'form':self.form})
