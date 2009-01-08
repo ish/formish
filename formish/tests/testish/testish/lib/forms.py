@@ -568,6 +568,46 @@ def SelectChoiceCallableOptions():
     form['mySelect'].widget = formish.SelectChoice(_)
     return form
 
+def RadioChoice():
+    """
+    A basic select choice
+    """
+    schema = schemaish.Structure()
+    schema.add('myRadio', schemaish.String())
+    options = [(1,'a'),(2,'b'),(3,'c')]
+
+    form = formish.Form(schema, 'form')
+    form['myRadio'].widget = formish.RadioChoice(options)
+    return form
+
+
+def RadioChoiceNoneOption():
+    """
+    Setting a None Option on the select choice element
+    """
+    schema = schemaish.Structure()
+    schema.add('myRadio', schemaish.String())
+    options = [(1,'a'),(2,'b'),(3,'c')]
+
+    form = formish.Form(schema, 'form')
+    form['myRadio'].widget = formish.RadioChoice(options,none_option=(None, '--select--'))
+    return form
+
+def RadioChoiceCallableOptions():
+    """
+    Passing in a callable list of options
+    """
+    schema = schemaish.Structure()
+    schema.add('myRadio', schemaish.String())
+    def _():
+        options = [(1,'a'),(2,'b'),(3,'c')]
+        for option in options:
+            yield option
+
+    form = formish.Form(schema, 'form')
+    form['myRadio'].widget = formish.RadioChoice(_)
+    return form
+
 #########################
 #
 #   Multi Select Widgets
@@ -726,35 +766,20 @@ def functest_SequenceOfStructuresWithSelects(self, sel):
 
 
 
-def CustomisedFormLayout():
+def GranularFormLayout():
     """
-    A custom form
+    A simple demonstration of partial rendering of parts of forms.
     """
-    substructure = schemaish.Structure()
-    substructure.add( 'date', schemaish.Date() )
-    substructure.add( 'celebrate', schemaish.Boolean() )
 
     schema = schemaish.Structure()
     schema.add( 'firstName', schemaish.String(title='First Name',description='The name before your last one',validator=validatish.Required()) )
-    #schema.add( 'surname', schemaish.String() )
-    #schema.add( 'address', schemaish.String() )
-    #schema.add( 'occupation', schemaish.String() )
-    #schema.add( 'birth', substructure)
 
     form = formish.Form(schema, 'form')
-
-    occupationOptions = [('miner','Miner'),('queen','Queen')]
-    addressOptions = [('leeds','Leeds'),('123 Banger Stree, Leeds','123 Banger Street, Leeds')]
-
-    #form['occupation'].widget = formish.SelectChoice(occupationOptions)
-    #form['address'].widget = formish.SelectChoice(addressOptions)
-    #form['birth.date'].widget = formish.DateParts(day_first=True)
-    #form['birth.celebrate'].widget = formish.Checkbox()
 
     return form
 
 
-def template_CustomisedFormLayout():
+def template_GranularFormLayout():
     """
 
 ${form()|n}
@@ -844,6 +869,40 @@ ${form['firstName'].description}
 <pre>
 ${form['firstName'].description()}
 </pre>
+    """
+
+    
+def CustomisedFormLayout():
+    """
+    A custom form
+    """
+    schema = schemaish.Structure()
+    schema.add( 'firstName', schemaish.String())
+    schema.add( 'surname', schemaish.String(description='THIS MUST BE YOUR SURNAME') )
+
+    form = formish.Form(schema, 'form')
+
+    form['surname'].widget = formish.Input(css_class="surnamewidget")
+
+    return form
+
+
+def template_CustomisedFormLayout():
+    """
+${form.header()|n}
+${form.metadata()|n}
+
+${form['firstName']()|n}
+
+<div id="${form['surname'].cssname}-field" class="${form['surname'].classes}">
+  <strong>${form['surname'].description}</strong>
+  <em>${form['surname'].error}</em>
+  ${form['surname'].widget()|n}
+</div>
+
+${form.actions()|n}
+${form.footer()|n}
+
     """
 
     

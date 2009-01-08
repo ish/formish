@@ -40,7 +40,7 @@ links(ids)
 
 <h3>Select Widgets</h3>
 <%
-ids = ['SelectChoice','SelectChoiceNoneOption','SelectChoiceCallableOptions']
+ids = ['SelectChoice','SelectChoiceNoneOption','SelectChoiceCallableOptions','RadioChoice','RadioChoiceNoneOption','RadioChoiceCallableOptions']
 links(ids)
 %>
 
@@ -62,21 +62,21 @@ links(ids)
 ids = ['SequenceOfSimpleStructures','SequenceOfUploadStructures','SequenceOfStructuresWithSelects']
 links(ids)
 %>
-</div>
-</div>
 
 <h3>Customised, Granular Form Layout</h3>
 <%
-ids = ['CustomisedFormLayout']
+ids = ['GranularFormLayout','CustomisedFormLayout']
 links(ids)
 %>
 
+</div>
+</div>
 
 
 
 <%def name="links(ids)">
 <ul>
-%for f in get_forms(ids):
+% for f in get_forms(ids):
   <li><a href="/${f['name']}">${f['title']}</a> -- ${f['summary']|n}</li>
 % endfor
 </ul>

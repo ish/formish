@@ -22,3 +22,13 @@ pre {
   padding: 10px;
 }
 
+
+/* CSS for examples */
+
+.surnamewidget input {
+  margin: 0;
+  clear: left;
+  display: block;
+  width: 100%;
+
+}
