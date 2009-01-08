@@ -476,6 +476,36 @@ def MinLengthCheckboxMultiChoice():
     form['multiChoice'].widget = formish.CheckboxMultiChoice(options)
     return form
 
+def MinRange():
+    """
+    Minimum Value fields - this one is min value of 4
+    """
+    schema = schemaish.Structure()
+    schema.add('min', schemaish.Float(validator=validatish.Range(min=4)))
+
+    form = formish.Form(schema, 'form')
+    return form
+
+def MaxRange():
+    """
+    Maximum value for a field - this one is max of 8
+    """
+    schema = schemaish.Structure()
+    schema.add('max', schemaish.Float(validator=validatish.Range(max=8)))
+
+    form = formish.Form(schema, 'form')
+    return form
+
+def MinMaxRange():
+    """
+    Minimum and maximum value
+    """
+    schema = schemaish.Structure()
+    schema.add('minmax', schemaish.Float(validator=validatish.Range(min=4,max=8)))
+
+    form = formish.Form(schema, 'form')
+    return form
+
 def PlainText():
     """
     Plain Text (alphanum only)
