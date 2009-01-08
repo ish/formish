@@ -23,7 +23,7 @@ def String():
     return form
 
 def functest_String(self, sel):
-    sel.open("/SimpleString")
+    sel.open("/String")
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
@@ -46,16 +46,16 @@ def functest_String(self, sel):
 
 def unittest_String(self):
     # Test no data
-    f = SimpleString()
+    f = String()
     self.assertIdHasValue(f, 'form-myStringField', '')
     # Test None data
-    f = SimpleString()
+    f = String()
     testdata = {'myStringField': None}
     f.defaults = testdata
     self.assertIdHasValue(f, 'form-myStringField', '')
     self.assertRoundTrip(f, testdata)
     # Test sample data
-    f = SimpleString()
+    f = String()
     testdata = {'myStringField': '8'}
     f.defaults = testdata
     self.assertIdHasValue(f, 'form-myStringField', '8')
@@ -72,7 +72,7 @@ def Integer():
     return form
 
 def functest_Integer(self,sel):
-    sel.open("/SimpleInteger")
+    sel.open("/Integer")
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
@@ -101,16 +101,16 @@ def functest_Integer(self,sel):
 
 def unittest_Integer(self):
     # Test no data
-    f = SimpleInteger()
+    f = Integer()
     self.assertIdHasValue(f, 'form-myIntegerField', '')
     # Test None data
-    f = SimpleInteger()
+    f = Integer()
     testdata = {'myIntegerField': None}
     f.defaults = testdata
     self.assertIdHasValue(f, 'form-myIntegerField', '')
     self.assertRoundTrip(f, testdata)
     # Test sample data
-    f = SimpleInteger()
+    f = Integer()
     testdata = {'myIntegerField': 8}
     f.defaults = testdata
     self.assertIdHasValue(f, 'form-myIntegerField', '8')
@@ -127,7 +127,7 @@ def Date():
 
 def functest_Date(self, sel):
 
-    sel.open("/SimpleDate")
+    sel.open("/Date")
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
@@ -164,7 +164,7 @@ def Float():
     return form
 
 def functest_Float(self, sel):
-    sel.open("/SimpleFloat")
+    sel.open("/Float")
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
@@ -203,7 +203,7 @@ def Boolean():
     return form
 
 def functest_Boolean(self, sel):
-    sel.open("/SimpleBoolean")
+    sel.open("/Boolean")
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
@@ -248,7 +248,7 @@ def Decimal():
 
 
 def functest_Decimal(self, sel):
-    sel.open("/SimpleDecimal")
+    sel.open("/Decimal")
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
@@ -287,7 +287,7 @@ def RequiredStringAndCheckbox():
     return form
 
 def functest_RequiredStringAndCheckbox(self, sel):
-    sel.open("/RequiredStringAndCheckbox")
+        sel.open("/RequiredStringAndCheckbox")
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
@@ -320,7 +320,7 @@ def File():
     return form
 
 def functest_File(self, sel):
-    sel.open("/SimpleFile")
+    sel.open("/File")
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
@@ -462,6 +462,18 @@ def MinMaxLength():
     schema.add('minmax', schemaish.String(validator=validatish.Length(min=4,max=8)))
 
     form = formish.Form(schema, 'form')
+    return form
+
+def MinLengthCheckboxMultiChoice():
+    """
+    A checkbox multi choice with minimum length 3 (NOT WORKING)
+    """
+    schema = schemaish.Structure()
+    schema.add('multiChoice', schemaish.Sequence(schemaish.String(validation=validatish.Length(min=2))))
+    options = [(1,'a'),(2,'b'),(3,'c')]
+
+    form = formish.Form(schema, 'form')
+    form['multiChoice'].widget = formish.CheckboxMultiChoice(options)
     return form
 
 def PlainText():
@@ -659,7 +671,7 @@ def SequenceOfUploadStructures():
     form['myList.*.a'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
     return form
 
-def functest_UploadStructures(self, sel):
+def functest_SequenceOfUploadStructures(self, sel):
 
     sel.open("/SequenceOfUploadStructures")
     sel.wait_for_page_to_load("30000")
@@ -694,7 +706,7 @@ def SequenceOfStructuresWithSelects():
     form.defaults = {'myList': [{'a':'foo','b':'b'}]}
     return form
 
-def functest_StructuresWithSelects(self, sel):
+def functest_SequenceOfStructuresWithSelects(self, sel):
     sel.open("/SequenceOfStructuresWithSelects")
 
     try: self.assertEqual("foo", sel.get_value("form-myList-0-a"))

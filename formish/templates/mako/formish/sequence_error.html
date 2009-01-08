@@ -1,0 +1,4 @@
+<%page args="field" />
+% if field.error:
+<span class="error">${unicode(field.error)}</span>
+% endif

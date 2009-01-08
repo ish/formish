@@ -69,6 +69,17 @@ def starify(name):
     return name
 
 
+def fall_back_renderer(renderer, name, widget, vars):
+    import mako
+    try:
+        print 'trying /formish/widgets/%s/%s.html'%(widget,name)
+        return renderer('/formish/widgets/%s/%s.html'%(widget,name), vars)
+    except mako.exceptions.TopLevelLookupException, e:
+        print 'EXCEPTION', e.message
+        print 'trying /formish/%s.html'%(name)
+        return renderer('/formish/%s.html'%(name), vars)
+    
+
 class TemplatedString(object):
     """
     A callable, teplated string
@@ -84,10 +95,11 @@ class TemplatedString(object):
         return self.val
 
     def __call__(self):
-        try:
-            return self.obj.form.renderer('/formish/%s_%s.html'%(self.obj.type,self.attr_name), {'field':self.obj})
-        except Exception, e:
-            print 'OOH!',e
+        renderer = self.obj.form.renderer
+        name = '%s_%s'%(self.obj.type,self.attr_name)
+        widget = self.obj.widget._template
+        vars = {'field':self.obj}
+        return fall_back_renderer(renderer, name, widget, vars)
 
 
 
@@ -188,15 +200,27 @@ class Field(object):
 
     def __call__(self):
         """ returns a serialisation for this field using the form's renderer """
-        return self.form.renderer('/formish/field.html', {'field':self})
+        renderer = self.form.renderer
+        name = 'field'
+        widget = self.widget._template
+        vars = {'field':self}
+        return fall_back_renderer(renderer, name, widget, vars)
             
     def label(self):
         """ returns the templated title """
-        return self.form.renderer('/formish/field_label.html', {'field':self})
+        renderer = self.form.renderer
+        name = 'field_label'
+        widget = self.widget._template
+        vars = {'field':self}
+        return fall_back_renderer(renderer, name, widget, vars)
     
     def inputs(self):
         """ returns the templated widget """
-        return self.form.renderer('/formish/field_inputs.html', {'field':self})
+        renderer = self.form.renderer
+        name = 'field_inputs'
+        widget = self.widget._template
+        vars = {'field':self}
+        return fall_back_renderer(renderer, name, widget, vars)
 
 
 class CollectionFieldsWrapper(object):
@@ -213,7 +237,11 @@ class CollectionFieldsWrapper(object):
         return iter(self.val)
 
     def __call__(self):
-        return self.collection.form.renderer('/formish/%s_fields.html'%self.collection.type, {'field':self.collection})
+        renderer = self.collection.form.renderer
+        name = '%s_fields'%self.collection.type
+        widget = self.collection.widget._template
+        vars = {'field':self.collection}
+        return fall_back_renderer(renderer, name, widget, vars)
 
 class Collection(object):
     """
@@ -369,16 +397,35 @@ class Collection(object):
 
     def __call__(self):
         """ returns a serialisation for this field using the form's renderer """
-        return self.form.renderer('/formish/%s.html'%self.type, {'field':self})
+        renderer = self.form.renderer
+        name = self.type
+        widget = self.widget._template
+        vars = {'field':self}
+        return fall_back_renderer(renderer, name, widget, vars)
             
     def label(self):
         """ returns the templated title """
-        return self.form.renderer('/formish/%s_label.html'%self.type, {'field':self})
+        renderer = self.form.renderer
+        name = '%s_label'%self.type
+        widget = self.widget._template
+        vars = {'field':self}
+        return fall_back_renderer(renderer, name, widget, vars)
          
     def metadata(self):
         """ returns the metadata """
-        return self.form.renderer('/formish/%s_metadata.html'%self.type, {'field':self})
+        renderer = self.form.renderer
+        name = '%s_metadata'%self.type
+        widget = self.widget._template
+        vars = {'field':self}
+        return fall_back_renderer(renderer, name, widget, vars)
 
+    def inputs(self):
+        """ returns the templated widget """
+        renderer = self.form.renderer
+        name = '%s_inputs'%self.type
+        widget = self.widget._template
+        vars = {'field':self}
+        return fall_back_renderer(renderer, name, widget, vars)
 
 class Group(Collection):
     """
@@ -455,7 +502,8 @@ class BoundWidget(object):
         setattr(self.widget, name, value)
 
     def __call__(self):
-        return self.field.form.renderer('/formish/widgets/%s.html'%self._template, {'field':self.field})
+        return self.field.form.renderer('/formish/widgets/%s/widget.html'%self._template, {'field':self.field})
+
     def __repr__(self):
         attrclassstr = str(self.field.attr.__class__)
         if attrclassstr[8:22] == 'schemaish.attr':
