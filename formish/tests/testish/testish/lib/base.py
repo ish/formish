@@ -57,7 +57,7 @@ class TestCase(unittest.TestCase):
 
     config = load_config(HTTP_PORT=http_port)
     
-    _server_cmd = ['paster', 'serve', 'development.ini']
+    _server_cmd = ['paster', 'serve', '--log-file','test.log','development.ini']
     _server_process = None
     server_url = 'http://%s:%s' % (local_ip(), http_port)
 

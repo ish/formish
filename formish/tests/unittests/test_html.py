@@ -16,7 +16,6 @@ class TestHTML(unittest.TestCase):
         r = webob.Request.blank('http://localhost/')
         schema = schemaish.Structure([('one', schemaish.String())])
         f = formish.Form(schema,name='form')
-        print f()
         soup = BeautifulSoup(f())
         assert len(soup.findAll(id='form-one')) == 1 , "test that the form field is being created"
         
@@ -54,7 +53,6 @@ class TestHTML(unittest.TestCase):
         ## Latch the results for acceptance tests
         #open('formish/tests/expectations/test_complex_form.html','w').write(html)
         expectedSoup = BeautifulSoup( open('formish/tests/unittests/expectations/test_complex_form.html').read())
-        print f()
         #assert soup == expectedSoup
 
 

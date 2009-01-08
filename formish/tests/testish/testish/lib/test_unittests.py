@@ -22,7 +22,6 @@ class Test(unittest.TestCase):
                 kvpairs.append( (k,v) )
 
         r.body = urllib.urlencode(kvpairs)
-        print r.body
         return r
 
     def test_unit(self):

@@ -41,9 +41,9 @@ class TestFormData(unittest.TestCase):
 
         form = formish.Form(self.schema_nested, 'nested')
 
-        assert form['one.a'].description == "This is a field with name a and title A and has a Required validator"
+        assert str(form['one.a'].description) == "This is a field with name a and title A and has a Required validator"
         form['one.a'].description = "This is a new description"
-        assert form['one.a'].description == "This is a new description"
+        assert str(form['one.a'].description) == "This is a new description"
 
     def test_value(self):
 

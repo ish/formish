@@ -72,11 +72,8 @@ def starify(name):
 def fall_back_renderer(renderer, name, widget, vars):
     import mako
     try:
-        print 'trying /formish/widgets/%s/%s.html'%(widget,name)
         return renderer('/formish/widgets/%s/%s.html'%(widget,name), vars)
     except mako.exceptions.TopLevelLookupException, e:
-        print 'EXCEPTION', e.message
-        print 'trying /formish/%s.html'%(name)
         return renderer('/formish/%s.html'%(name), vars)
     
 

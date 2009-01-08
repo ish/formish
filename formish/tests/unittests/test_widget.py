@@ -78,7 +78,7 @@ class TestFormExamples(base.TestCase):
         try:
             data = form.validate(request)
         except:
-            print form()
+            pass
         assert data == expected_data
 
         form.defaults = expected_data
@@ -149,9 +149,6 @@ class TestErrorRendering(base.TestCase):
         ERROR_TEXT = '!!!WOOP!!!WOOP!!!WOOP!!!'
         form = formish.Form(schema, errors={attr: ERROR_TEXT})
         html = form()
-        print "*****************************************************************"
-        print html
-        print "*****************************************************************"
         element = BeautifulSoup(html).find(id='formish-%s-field'%(attr.replace('.', '-'),))
         error = element.find('span', {'class': 'error'})
         assert error

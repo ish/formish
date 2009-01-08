@@ -287,7 +287,7 @@ def RequiredStringAndCheckbox():
     return form
 
 def functest_RequiredStringAndCheckbox(self, sel):
-        sel.open("/RequiredStringAndCheckbox")
+    sel.open("/RequiredStringAndCheckbox")
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
@@ -735,7 +735,7 @@ def CustomisedFormLayout():
     substructure.add( 'celebrate', schemaish.Boolean() )
 
     schema = schemaish.Structure()
-    schema.add( 'firstName', schemaish.String() )
+    schema.add( 'firstName', schemaish.String(title='First Name',description='The name before your last one',validator=validatish.Required()) )
     #schema.add( 'surname', schemaish.String() )
     #schema.add( 'address', schemaish.String() )
     #schema.add( 'occupation', schemaish.String() )
@@ -756,13 +756,92 @@ def CustomisedFormLayout():
 
 def template_CustomisedFormLayout():
     """
+
 ${form()|n}
+
+<h3>Normal Form</h3>
+<div class="boxed"><pre>
+${form()}
+</pre></div>
+
+<h4>Form Header, metadata, actions and Footer</h4>
+<div class="boxed"><pre>
+
+${form.header()}
+<hr />
+${form.metadata()}
+<hr />
+${form.actions()}
+<hr />
+${form.footer()}
+</pre></div>
+
 <h4>First Name</h4>
-${form['firstName']()|n}
-<h3>First Name (Title)</h4>
+<div class="boxed"><pre>
+${form['firstName']()}
+</pre></div>
+
+<h3>First Name (.title)</h4>
+<div class="boxed"><pre>
 ${form['firstName'].title}
-<h3>First Name (Widget)</h4>
+</pre></div>
+
+<h3>First Name (.label())</h4>
+<div class="boxed"><pre>
+${form['firstName'].label()}
+</pre></div>
+
+<h3>First Name (.inputs())</h4>
+<div class="boxed"><pre>
+${form['firstName'].inputs()}
+</pre></div>
+
+<h3>First Name (.widget())</h4>
+<div class="boxed"><pre>
 ${form['firstName'].widget()}
+</pre></div>
+
+<h3>First Name (.error())</h4>
+<div class="boxed"><pre>
+${form['firstName'].error()}
+</pre></div>
+
+<h3>First Name (.error)</h4>
+<div class="boxed"><pre>
+${form['firstName'].error}
+</pre></div>
+
+<h3>First Name (.cssname)</h4>
+<div class="boxed"><pre>
+${form['firstName'].cssname}
+</pre></div>
+
+<h3>First Name (.classes)</h4>
+<div class="boxed"><pre>
+${form['firstName'].classes}
+</pre></div>
+
+<h3>First Name (.value)</h4>
+<div class="boxed"><pre>
+${form['firstName'].value}
+</pre></div>
+
+<h3>First Name (.required)</h4>
+<div class="boxed"><pre>
+${form['firstName'].required}
+</pre></div>
+
+
+
+<h3>First Name (.description)</h4>
+<div class="boxed"><pre>
+${form['firstName'].description}
+</pre></div>
+
+<h3>First Name (.description())</h4>
+<div class="boxed"><pre>
+${form['firstName'].description()}
+</pre></div>
     """
 
     
