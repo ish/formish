@@ -7,8 +7,8 @@ formish.forms.Form.validate method introduction.html
 formish.forms.Field.__call__ method introduction.html
 formish.forms.Field.title attribute introduction.html
 formish.forms.Field.description attribute introduction.html
-formish.forms.Form.add_action method introduction.html
 formish.forms.Form.action method introduction.html
+formish.forms.Form.add_action method introduction.html
 formish.forms.Form.fields attribute introduction.html
 formish.forms.Field.classes attribute introduction.html
 formish.forms.Field.value attribute introduction.html

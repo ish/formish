@@ -65,13 +65,13 @@
   <div class="section" id="about-formish">
 <h1>About Formish<a class="headerlink" href="#about-formish" title="Permalink to this headline">¶</a></h1>
 <p>Formish is a templating language agnostic form generation and handling library.</p>
-<p>Have a look at <a class="reference external" href="http://ish.io:8891">http://ish.io:8891</a> for an example - if this isn&#8217;t running, please email <a class="reference external" href="mailto://support&#37;&#52;&#48;ish&#46;io">support<span>&#64;</span>ish<span>&#46;</span>io</a></p>
+<p>Have a look at <a class="reference" href="http://ish.io:8891">http://ish.io:8891</a> for an example - if this isn&#8217;t running, please email <a class="reference" href="mailto://support&#37;&#52;&#48;ish&#46;io">support<span>&#64;</span>ish<span>&#46;</span>io</a></p>
 <div class="section" id="introduction-a-simple-form">
 <h2>Introduction - A Simple Form<a class="headerlink" href="#introduction-a-simple-form" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="creating-a-schema">
 <h3>Creating a schema<a class="headerlink" href="#creating-a-schema" title="Permalink to this headline">¶</a></h3>
 <p>First of all we need to create a data schema to define what types of data we want in the form. Schema&#8217;s use the &#8216;Schemaish&#8217; package which lets you define structures against which you can validate/convert data. Lets take a look at the structure of a Form instance to begin with</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">schemaish</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">schemaish</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myfield&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">()</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">attrs</span>
@@ -82,7 +82,7 @@
 <div class="section" id="creating-a-form">
 <h3>Creating a form<a class="headerlink" href="#creating-a-form" title="Permalink to this headline">¶</a></h3>
 <p>So we now have a single field in our schema which is defined as a string. We can now create a form from this</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">formish</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">formish</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -158,14 +158,14 @@
 </pre></div>
 </div>
 <p>Otherwise the form defaults to &#8216;formish&#8217;.</p>
-<p>The method at the moment is always &#8216;post&#8217; but a future release will implement get forms also. The final two attributes, enctype and accept-charset make the form behave in as consistent a way as possible. Defaulting to content type of &#8216;utf-8&#8217; and handling the form data accoring to <a class="reference external" href="http://www.ietf.org/rfc/rfc2388.txt">http://www.ietf.org/rfc/rfc2388.txt</a> &#8216;multipart/form-data&#8217;.</p>
+<p>The method at the moment is always &#8216;post&#8217; but a future release will implement get forms also. The final two attributes, enctype and accept-charset make the form behave in as consistent a way as possible. Defaulting to content type of &#8216;utf-8&#8217; and handling the form data accoring to <a class="reference" href="http://www.ietf.org/rfc/rfc2388.txt">http://www.ietf.org/rfc/rfc2388.txt</a> &#8216;multipart/form-data&#8217;.</p>
 <div class="section" id="the-form-html-element">
 <h4>The form html element<a class="headerlink" href="#the-form-html-element" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-html"><div class="highlight"><pre><span class="c">&lt;!-- The Form --&gt;</span>
 <span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;formish&quot;</span> <span class="na">action=</span><span class="s">&quot;&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span> <span class="na">accept-charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
 </pre></div>
 </div>
-<p>The first hidden field is &#8216;_charset_ which is a hack to help mozilla handle charsets as described here <a class="reference external" href="https://bugzilla.mozilla.org/show_bug.cgi?id=18643">https://bugzilla.mozilla.org/show_bug.cgi?id=18643</a>. The second is the name of the form, used after submission to work out which form has been returned.</p>
+<p>The first hidden field is &#8216;_charset_ which is a hack to help mozilla handle charsets as described here <a class="reference" href="https://bugzilla.mozilla.org/show_bug.cgi?id=18643">https://bugzilla.mozilla.org/show_bug.cgi?id=18643</a>. The second is the name of the form, used after submission to work out which form has been returned.</p>
 </div>
 <div class="section" id="the-form-configuration-attributes">
 <h4>The form configuration attributes<a class="headerlink" href="#the-form-configuration-attributes" title="Permalink to this headline">¶</a></h4>
@@ -205,7 +205,7 @@
 <div class="section" id="processing-the-submitted-form">
 <h3>Processing the Submitted Form<a class="headerlink" href="#processing-the-submitted-form" title="Permalink to this headline">¶</a></h3>
 <p>Once the form is submitted, we can get the data by calling &#8216;validate&#8217;. In order to simulate this, we&#8217;re going to create a request object by hand using webob..</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">webob</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">webob</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">webob</span><span class="o">.</span><span class="n">Request</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="s">&#39;http://localhost/&#39;</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;REQUEST_METHOD&#39;</span><span class="p">:</span> <span class="s">&#39;POST&#39;</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;myfield&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;myvalue&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
@@ -227,7 +227,7 @@
 <div class="section" id="creating-the-form">
 <h3>Creating the form<a class="headerlink" href="#creating-the-form" title="Permalink to this headline">¶</a></h3>
 <p>For our contrived example, we&#8217;ll build a simple registration form.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">schemaish</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">schemaish</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;firstName&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">()</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;surname&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">()</span> <span class="p">)</span>
@@ -273,7 +273,7 @@
 <div class="section" id="how-does-this-form-work">
 <h3>How does this form work?<a class="headerlink" href="#how-does-this-form-work" title="Permalink to this headline">¶</a></h3>
 <p>Well let&#8217;s give it some default values and look at what we get.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">datetime</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">datetime</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;firstName&#39;</span><span class="p">:</span> <span class="s">&#39;Tim&#39;</span><span class="p">,</span> <span class="s">&#39;surname&#39;</span><span class="p">:</span> <span class="s">&#39;Parkin&#39;</span><span class="p">,</span> <span class="s">&#39;dateOfBirth&#39;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mf">1966</span><span class="p">,</span><span class="mf">12</span><span class="p">,</span><span class="mf">18</span><span class="p">),</span> <span class="s">&#39;streetNumber&#39;</span><span class="p">:</span> <span class="mf">123</span><span class="p">,</span> <span class="s">&#39;country&#39;</span><span class="p">:</span> <span class="s">&#39;UK&#39;</span><span class="p">,</span> <span class="s">&#39;termsAndConditions&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
 </pre></div>
 </div>
@@ -369,7 +369,7 @@
 <div class="section" id="id1">
 <h3>Processing the submitted form<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>Repeating the creation of a request using webob, setting some input values and validating gives us:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">import</span> <span class="nn">webob</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">webob</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">webob</span><span class="o">.</span><span class="n">Request</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="s">&#39;http://localhost/&#39;</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;REQUEST_METHOD&#39;</span><span class="p">:</span> <span class="s">&#39;POST&#39;</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;firstName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Tim&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;surname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Parkin&#39;</span>
@@ -447,7 +447,8 @@
 </div>
 <div class="section" id="validation">
 <h2>Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
-<p>Validation in Formish uses simple callable validators that raise exceptions if validation fails (Either a formish.FieldValidationError or a validatish.Invalid exception.</p>
+<p>Validation in Formish uses simple callable validators that raise an exception,
+validatish.Invalid, if validation fails.</p>
 <div class="section" id="how-validators-work">
 <h3>How Validators Work<a class="headerlink" href="#how-validators-work" title="Permalink to this headline">¶</a></h3>
 <p>There is a library of validators called Validatish that has most of the typical examples you might need. Let&#8217;s take a look at a simple integer validator.</p>
@@ -519,7 +520,7 @@
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myfile&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">File</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">from</span> <span class="nn">formish</span> <span class="k">import</span> <span class="n">filehandler</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">formish</span> <span class="kn">import</span> <span class="n">filehandler</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;myfile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">FileUpload</span><span class="p">(</span><span class="n">filehandler</span><span class="o">=</span><span class="n">filehandler</span><span class="o">.</span><span class="n">TempFileHandlerWeb</span><span class="p">())</span>
 </pre></div>
 </div>
@@ -1105,74 +1106,74 @@ related information.</p>
         <div class="sphinxsidebarwrapper">
             <h3><a href="index.html">Table Of Contents</a></h3>
             <ul>
-<li><a class="reference external" href="">About Formish</a><ul>
-<li><a class="reference external" href="#introduction-a-simple-form">Introduction - A Simple Form</a><ul>
-<li><a class="reference external" href="#creating-a-schema">Creating a schema</a></li>
-<li><a class="reference external" href="#creating-a-form">Creating a form</a><ul>
-<li><a class="reference external" href="#attributes-of-a-form">Attributes of a form</a></li>
-<li><a class="reference external" href="#attributes-of-a-field">Attributes of a field</a></li>
+<li><a class="reference" href="">About Formish</a><ul>
+<li><a class="reference" href="#introduction-a-simple-form">Introduction - A Simple Form</a><ul>
+<li><a class="reference" href="#creating-a-schema">Creating a schema</a></li>
+<li><a class="reference" href="#creating-a-form">Creating a form</a><ul>
+<li><a class="reference" href="#attributes-of-a-form">Attributes of a form</a></li>
+<li><a class="reference" href="#attributes-of-a-field">Attributes of a field</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#how-to-create-html">How to create HTML</a></li>
-<li><a class="reference external" href="#what-s-in-the-html">What&#8217;s in the HTML</a><ul>
-<li><a class="reference external" href="#the-form-html-element">The form html element</a></li>
-<li><a class="reference external" href="#the-form-configuration-attributes">The form configuration attributes</a></li>
-<li><a class="reference external" href="#the-input-field-s">The input field(s)</a></li>
-<li><a class="reference external" href="#the-action-s">The action(s)</a></li>
+<li><a class="reference" href="#how-to-create-html">How to create HTML</a></li>
+<li><a class="reference" href="#what-s-in-the-html">What&#8217;s in the HTML</a><ul>
+<li><a class="reference" href="#the-form-html-element">The form html element</a></li>
+<li><a class="reference" href="#the-form-configuration-attributes">The form configuration attributes</a></li>
+<li><a class="reference" href="#the-input-field-s">The input field(s)</a></li>
+<li><a class="reference" href="#the-action-s">The action(s)</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#processing-the-submitted-form">Processing the Submitted Form</a></li>
+<li><a class="reference" href="#processing-the-submitted-form">Processing the Submitted Form</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#introduction-a-slightly-more-complex-form">Introduction - A Slightly More Complex Form</a><ul>
-<li><a class="reference external" href="#creating-the-form">Creating the form</a></li>
-<li><a class="reference external" href="#how-does-this-form-work">How does this form work?</a><ul>
-<li><a class="reference external" href="#string-fields">String fields</a></li>
-<li><a class="reference external" href="#date-field">Date Field</a></li>
-<li><a class="reference external" href="#integer-field">Integer Field</a></li>
-<li><a class="reference external" href="#select-field">Select Field</a></li>
-<li><a class="reference external" href="#boolean-field">Boolean Field</a></li>
+<li><a class="reference" href="#introduction-a-slightly-more-complex-form">Introduction - A Slightly More Complex Form</a><ul>
+<li><a class="reference" href="#creating-the-form">Creating the form</a></li>
+<li><a class="reference" href="#how-does-this-form-work">How does this form work?</a><ul>
+<li><a class="reference" href="#string-fields">String fields</a></li>
+<li><a class="reference" href="#date-field">Date Field</a></li>
+<li><a class="reference" href="#integer-field">Integer Field</a></li>
+<li><a class="reference" href="#select-field">Select Field</a></li>
+<li><a class="reference" href="#boolean-field">Boolean Field</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#id1">Processing the submitted form</a></li>
-<li><a class="reference external" href="#showing-the-errors">Showing the errors</a></li>
+<li><a class="reference" href="#id1">Processing the submitted form</a></li>
+<li><a class="reference" href="#showing-the-errors">Showing the errors</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#validation">Validation</a><ul>
-<li><a class="reference external" href="#how-validators-work">How Validators Work</a></li>
+<li><a class="reference" href="#validation">Validation</a><ul>
+<li><a class="reference" href="#how-validators-work">How Validators Work</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#file-uploads">File Uploads</a><ul>
-<li><a class="reference external" href="#short-version">Short Version</a><ul>
-<li><a class="reference external" href="#what-does-this-produce">What does this produce?</a></li>
-<li><a class="reference external" href="#how-does-this-return-a-file-to-me">How does this return a file to me?</a></li>
+<li><a class="reference" href="#file-uploads">File Uploads</a><ul>
+<li><a class="reference" href="#short-version">Short Version</a><ul>
+<li><a class="reference" href="#what-does-this-produce">What does this produce?</a></li>
+<li><a class="reference" href="#how-does-this-return-a-file-to-me">How does this return a file to me?</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#longer-version">Longer Version</a><ul>
-<li><a class="reference external" href="#upload-file-temporary-storage">Upload File Temporary Storage</a></li>
-<li><a class="reference external" href="#so-what-happens-when-a-file-is-uploaded">So what happens when a file is uploaded?</a></li>
-<li><a class="reference external" href="#what-else-can-i-configure">What else can I configure?</a></li>
+<li><a class="reference" href="#longer-version">Longer Version</a><ul>
+<li><a class="reference" href="#upload-file-temporary-storage">Upload File Temporary Storage</a></li>
+<li><a class="reference" href="#so-what-happens-when-a-file-is-uploaded">So what happens when a file is uploaded?</a></li>
+<li><a class="reference" href="#what-else-can-i-configure">What else can I configure?</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference external" href="#sequences">Sequences</a><ul>
-<li><a class="reference external" href="#checkbox-multi-choice">Checkbox Multi Choice</a></li>
-<li><a class="reference external" href="#select-multi-choice">Select Multi Choice</a></li>
-<li><a class="reference external" href="#text-area-sequence">Text Area Sequence</a></li>
-<li><a class="reference external" href="#text-area-sequence-of-sequences">Text Area Sequence of Sequences</a></li>
-<li><a class="reference external" href="#multiple-input-fields">Multiple Input Fields</a></li>
+<li><a class="reference" href="#sequences">Sequences</a><ul>
+<li><a class="reference" href="#checkbox-multi-choice">Checkbox Multi Choice</a></li>
+<li><a class="reference" href="#select-multi-choice">Select Multi Choice</a></li>
+<li><a class="reference" href="#text-area-sequence">Text Area Sequence</a></li>
+<li><a class="reference" href="#text-area-sequence-of-sequences">Text Area Sequence of Sequences</a></li>
+<li><a class="reference" href="#multiple-input-fields">Multiple Input Fields</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#nested-form-structures">Nested Form Structures</a><ul>
-<li><a class="reference external" href="#a-structure-of-structures">A Structure of Structures</a></li>
-<li><a class="reference external" href="#other-combinations">Other Combinations</a></li>
-<li><a class="reference external" href="#tuples">Tuples</a></li>
+<li><a class="reference" href="#nested-form-structures">Nested Form Structures</a><ul>
+<li><a class="reference" href="#a-structure-of-structures">A Structure of Structures</a></li>
+<li><a class="reference" href="#other-combinations">Other Combinations</a></li>
+<li><a class="reference" href="#tuples">Tuples</a></li>
 </ul>
 </li>
-<li><a class="reference external" href="#class-documentation">Class Documentation</a><ul>
-<li><a class="reference external" href="#form-class">Form Class</a></li>
-<li><a class="reference external" href="#field-class">Field Class</a></li>
+<li><a class="reference" href="#class-documentation">Class Documentation</a><ul>
+<li><a class="reference" href="#form-class">Form Class</a></li>
+<li><a class="reference" href="#field-class">Field Class</a></li>
 </ul>
 </li>
 </ul>

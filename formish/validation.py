@@ -215,29 +215,4 @@ class NoActionError(FormishError):
     signal that the form (not an individual field) failed to validate.
     """
     pass
-    
-    
-class FieldError(FormishError):
-    """
-    Base class for field-related exceptions. The failure message and the failing
-    field name are stored as attributes.
-    """
-    def __init__(self, message, field_name=None):
-        FormishError.__init__(self, message, field_name)
-        self.field_name = field_name
-
-
-class FieldValidationError(FieldError):
-    """
-    Exception that signals that a field failed to validate.
-    """
-    pass
-    
-    
-class FieldRequiredError(FieldValidationError):
-    """
-    Exception that signals that a field that is marked as required was not
-    entered.
-    """
-    pass
 

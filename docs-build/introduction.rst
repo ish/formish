@@ -439,7 +439,8 @@ Finally, lets see what valid data gives us..
 Validation
 ==========
 
-Validation in Formish uses simple callable validators that raise exceptions if validation fails (Either a formish.FieldValidationError or a validatish.Invalid exception.
+Validation in Formish uses simple callable validators that raise an exception,
+validatish.Invalid, if validation fails.
 
 How Validators Work
 -------------------
