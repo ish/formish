@@ -165,7 +165,7 @@ class Field(object):
     def value(self):
         """Convert the request_data to a value object for the form or None."""
         if '*' in self.name:
-            return ['']
+            return  self.widget.pre_render(self.attr, None)
         return self.form.request_data.get(self.name, None)
 
 

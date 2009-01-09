@@ -288,6 +288,7 @@ formish/tests/testish/testish/lib/extract_function.py
 formish/tests/testish/testish/lib/forms.py
 formish/tests/testish/testish/lib/test_func.py
 formish/tests/testish/testish/lib/test_unittests.py
+formish/tests/testish/testish/lib/xformish.py
 formish/tests/testish/testish/public/css/base.css
 formish/tests/testish/testish/public/css/formish.css
 formish/tests/testish/testish/public/css/pygments.css
@@ -311,6 +312,7 @@ formish/tests/testish/testish/resource/root.py
 formish/tests/testish/testish/templates/base.html
 formish/tests/testish/testish/templates/form.html
 formish/tests/testish/testish/templates/root.html
+formish/tests/testish/testish/templates/formish/widgets/ApproximateDateParts/widget.html
 formish/tests/unittests/base.py
 formish/tests/unittests/test_core.py
 formish/tests/unittests/test_dottedDict.py

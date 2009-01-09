@@ -2,6 +2,11 @@
 Changlelog
 ==========
 
+0.5.6 (2009-01-09)
+------------------
+
+BUG FIX: Fixed bug when using multi part widgets (e.g. Date Parts) inside a sequence. Added example test case.
+
 0.5.5 (2009-01-08)
 ------------------
 

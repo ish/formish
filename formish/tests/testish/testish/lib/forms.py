@@ -23,7 +23,7 @@ def String():
     form = formish.Form(schema, 'form')
     return form
 
-def functest_String(self, sel):
+def functest_String(self, sel):#{{{
     sel.open("/String")
 
     sel.click("form-action-submit")
@@ -43,9 +43,9 @@ def functest_String(self, sel):
     try: self.failUnless(sel.is_text_present("{'myStringField': u'80'}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return
+    return#}}}
 
-def unittest_String(self):
+def unittest_String(self):#{{{
     # Test no data
     f = String()
     self.assertIdHasValue(f, 'form-myStringField', '')
@@ -60,7 +60,7 @@ def unittest_String(self):
     testdata = {'myStringField': '8'}
     f.defaults = testdata
     self.assertIdHasValue(f, 'form-myStringField', '8')
-    self.assertRoundTrip(f, testdata)
+    self.assertRoundTrip(f, testdata)#}}}
 
 
 def Integer():
@@ -72,7 +72,7 @@ def Integer():
     form = formish.Form(schema, 'form')
     return form
 
-def functest_Integer(self,sel):
+def functest_Integer(self,sel):#{{{
     sel.open("/Integer")
 
     sel.click("form-action-submit")
@@ -98,9 +98,9 @@ def functest_Integer(self,sel):
     try: self.failUnless(sel.is_text_present("{'myIntegerField': 8}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return
+    return#}}}
 
-def unittest_Integer(self):
+def unittest_Integer(self):#{{{
     # Test no data
     f = Integer()
     self.assertIdHasValue(f, 'form-myIntegerField', '')
@@ -115,7 +115,7 @@ def unittest_Integer(self):
     testdata = {'myIntegerField': 8}
     f.defaults = testdata
     self.assertIdHasValue(f, 'form-myIntegerField', '8')
-    self.assertRoundTrip(f, testdata)
+    self.assertRoundTrip(f, testdata)#}}}
 
 def Date():
     """
@@ -126,7 +126,7 @@ def Date():
     form = formish.Form(schema, 'form')
     return form
 
-def functest_Date(self, sel):
+def functest_Date(self, sel):#{{{
 
     sel.open("/Date")
 
@@ -153,7 +153,7 @@ def functest_Date(self, sel):
     try: self.failUnless(sel.is_text_present("{'myDateField': datetime.date(2008, 12, 18)}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return
+    return#}}}
 
 def Float():
     """
@@ -164,7 +164,7 @@ def Float():
     form = formish.Form(schema, 'form')
     return form
 
-def functest_Float(self, sel):
+def functest_Float(self, sel):#{{{
     sel.open("/Float")
 
     sel.click("form-action-submit")
@@ -190,7 +190,7 @@ def functest_Float(self, sel):
     try: self.failUnless(sel.is_text_present("{'myFloatField': 12.27}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return
+    return#}}}
 
 
 
@@ -203,7 +203,7 @@ def Boolean():
     form = formish.Form(schema, 'form')
     return form
 
-def functest_Boolean(self, sel):
+def functest_Boolean(self, sel):#{{{
     sel.open("/Boolean")
 
     sel.click("form-action-submit")
@@ -235,7 +235,7 @@ def functest_Boolean(self, sel):
     try: self.failUnless(sel.is_text_present("{'myBooleanField': False}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return
+    return#}}}
 
 
 def Decimal():
@@ -248,7 +248,7 @@ def Decimal():
     return form
 
 
-def functest_Decimal(self, sel):
+def functest_Decimal(self, sel):#{{{
     sel.open("/Decimal")
 
     sel.click("form-action-submit")
@@ -274,7 +274,7 @@ def functest_Decimal(self, sel):
     try: self.failUnless(sel.is_text_present("{'myDecimalField': Decimal(\"18.001\")}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return
+    return#}}}
 
 def RequiredStringAndCheckbox():
     """
@@ -287,7 +287,7 @@ def RequiredStringAndCheckbox():
     form['myBoolean'].widget=formish.Checkbox()
     return form
 
-def functest_RequiredStringAndCheckbox(self, sel):
+def functest_RequiredStringAndCheckbox(self, sel):#{{{
     sel.open("/RequiredStringAndCheckbox")
 
     sel.click("form-action-submit")
@@ -308,7 +308,7 @@ def functest_RequiredStringAndCheckbox(self, sel):
     try: self.failUnless(sel.is_text_present("{'myBoolean': True, 'myString': u'anythingelse'}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return
+    return#}}}
 
 def File():
     """
@@ -320,7 +320,7 @@ def File():
     form['myFileField'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
     return form
 
-def functest_File(self, sel):
+def functest_File(self, sel):#{{{
     sel.open("/File")
 
     sel.click("form-action-submit")
@@ -336,7 +336,7 @@ def functest_File(self, sel):
     try: self.failUnless(sel.is_text_present("{'myFileField': <schemaish.type.File object at"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return
+    return#}}}
 
 #########################
 #
@@ -742,7 +742,7 @@ def SequenceOfUploadStructures():
     form['myList.*.a'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
     return form
 
-def functest_SequenceOfUploadStructures(self, sel):
+def functest_SequenceOfUploadStructures(self, sel):#{{{
 
     sel.open("/SequenceOfUploadStructures")
     sel.wait_for_page_to_load("30000")
@@ -756,7 +756,7 @@ def functest_SequenceOfUploadStructures(self, sel):
     try: self.failUnless(sel.is_text_present("{'myList': [{'a': <schemaish.type.File object at *, 'b': 13}]}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return
+    return#}}}
 
 def SequenceOfStructuresWithSelects():
     """
@@ -777,7 +777,7 @@ def SequenceOfStructuresWithSelects():
     form.defaults = {'myList': [{'a':'foo','b':'b'}]}
     return form
 
-def functest_SequenceOfStructuresWithSelects(self, sel):
+def functest_SequenceOfStructuresWithSelects(self, sel):#{{{
     sel.open("/SequenceOfStructuresWithSelects")
 
     try: self.assertEqual("foo", sel.get_value("form-myList-0-a"))
@@ -793,7 +793,7 @@ def functest_SequenceOfStructuresWithSelects(self, sel):
     try: self.assertEqual("", sel.get_value("form-myList-1-b"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return
+    return#}}}
 
 def SequenceOfDateParts():
     """
@@ -808,6 +808,16 @@ def SequenceOfDateParts():
     form = formish.Form(schema, 'form')
     form['birthdays.*.date'].widget = formish.DateParts()
     return form
+
+def functest_SequenceOfDateParts(self, sel):#{{{
+    sel.open("/SequenceOfDateParts")
+
+    sel.click_at("css=#form-birthdays-field > a", "")
+    try: self.assertEqual("", sel.get_value("form-birthdays-0-date"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    return#}}}
+
 
 def SequenceOfStructures():
     """
@@ -969,4 +979,4 @@ ${form.footer()|n}
 
     """
 
-    
+# vim: fdm=marker:foldclose=all
