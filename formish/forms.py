@@ -55,6 +55,8 @@ def _classes(self):
         classes.append(self.widget.css_class)
     if str(self.error):
         classes.append('error')
+    if getattr(self,'contains_error',None):
+        classes.append('contains-error')
     return ' '.join(classes)
             
 
@@ -184,6 +186,7 @@ class Field(object):
         else: 
             val = ''
         return TemplatedString(self, 'error', val)
+
 
     @property
     def widget(self):
@@ -315,13 +318,10 @@ class Collection(object):
     @property
     def contains_error(self):
         """ Check to see if any child elements have errors """
-        for k,v in self.form.errors.dottedkeys():
+        for k in self.form.errors.keys():
             if k.startswith(self.name):
                 return True
         return False
-
-
-
 
     @property
     def widget(self):
