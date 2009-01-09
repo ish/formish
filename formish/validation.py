@@ -89,39 +89,6 @@ def getNestedProperty(data, dottedkey):
     except (KeyError, IndexError):
         return None
 
-def validate(structure, request_data, errors=None, keyprefix=None):
-    """
-    Take a schemaish structure and use it's validators to return any errors
-    
-    :arg structure: schemaish structure
-    :arg request_data: webob request
-    :arg errors: we can pass in an errors dictionary and any failures will get stored on it (internal - used while recursing)
-    :arg keyprefix: used when recursively validating a structure (internal - used while recursing)
-    """
-    if errors is None:
-        errors = dottedDict()
-    # Validate each field in the schema, return 
-    # a dictionary of errors keyed by field name
-    for attr in structure.attrs:
-        # function is recursive so we have to build up a full key
-        if keyprefix is None:
-            newprefix = attr[0]
-        else:
-            newprefix = '%s.%s'% (keyprefix, attr[0])
-        try:
-            if hasattr(attr[1],'attrs'):
-                # recurse
-                validate(attr[1], request_data,
-                         errors=errors, keyprefix=newprefix)
-            else: 
-                # we only validate data that exists
-                if request_data.has_key(newprefix):
-                    # firstly convert sequences
-                    data = convert_sequences(request_data[newprefix])
-                    attr[1].validate(data)
-        except (Invalid, FieldValidationError), e:
-            errors[newprefix] = e
-    return errors
 
 def convert_data_to_request_data(form_structure, data,
                       request_data=None, errors=None):
