@@ -185,7 +185,6 @@ class Field(object):
             val = ''
         return TemplatedString(self, 'error', val)
 
-
     @property
     def widget(self):
         """ return the fields widget bound with extra params. """
@@ -312,6 +311,16 @@ class Collection(object):
         """ Lazily get the error from the form.errors when needed """
         val = self.form.errors.get(self.name, None)
         return TemplatedString(self, 'error', val)
+
+    @property
+    def contains_error(self):
+        """ Check to see if any child elements have errors """
+        for k,v in self.form.errors.dottedkeys():
+            if k.startswith(self.name):
+                return True
+        return False
+
+
 
 
     @property
