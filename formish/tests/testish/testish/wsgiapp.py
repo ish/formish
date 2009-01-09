@@ -28,7 +28,8 @@ def setup_environ(app, global_conf, app_conf):
     # here. Don't forget to actually include them in the environ though! For
     # example:
     renderer = MakoRenderer(
-        directories=[pkg_resources.resource_filename('testish', 'templates')],
+        directories=[pkg_resources.resource_filename('testish', 'templates'),
+        pkg_resources.resource_filename('formish', 'templates/mako')],
         module_directory=os.path.join(app_conf['cache_dir'], 'templates'),
         input_encoding='utf-8', output_encoding='utf-8',
         default_filters=['unicode', 'h'])

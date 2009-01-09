@@ -67,6 +67,7 @@ class FormResource(resource.Resource):
             tests = '<a href="?show_tests=True">Click here to see tests</a>'
         if form is None:
             form = self.form_getter()
+            form.renderer = request.environ['restish.templating.renderer']
         return {'title': self.title, 'description': self.description,
                 'form': form, 'data': pformat(data),
                 'template': extract_function.extract_docstring('template_%s'%self.id),

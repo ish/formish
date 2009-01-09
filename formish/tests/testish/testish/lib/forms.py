@@ -1,6 +1,7 @@
 import logging, os.path
 import formish, schemaish, validatish
 from formish.filehandler import TempFileHandlerWeb
+from testish.lib import xformish
 
 log = logging.getLogger(__name__)
 
@@ -794,6 +795,39 @@ def functest_SequenceOfStructuresWithSelects(self, sel):
 
     return
 
+def SequenceOfDateParts():
+    """
+    A test of a sequence of more complicated structures
+    """
+    schema = schemaish.Structure()
+    schema.add('birthdays',
+    schemaish.Sequence(
+        schemaish.Structure(
+           [ ('date', schemaish.Date(validator=validatish.Required())), ]
+           ))) 
+    form = formish.Form(schema, 'form')
+    form['birthdays.*.date'].widget = formish.DateParts()
+    return form
+
+def SequenceOfStructures():
+    """
+    A test of a sequence of more complicated structures
+    """
+    schema = schemaish.Structure()
+    schema.add('employment', schemaish.Sequence(schemaish.Structure([
+        ('job_title', schemaish.String(validator=validatish.Required())),
+        ('joined', schemaish.String(validator=validatish.Required())),
+        ('left', schemaish.String(validator=validatish.Required())),
+        ('time_spent', schemaish.String(validator=validatish.Required())),
+        ('num_employees', schemaish.String(validator=validatish.Required())),
+        ('comments', schemaish.String(validator=validatish.Required())),
+        ('primary', schemaish.Boolean())])))
+
+    form = formish.Form(schema, 'form')
+    form['employment.*.primary'].widget=formish.Checkbox()
+    form['employment.*.joined'].widget = xformish.ApproximateDateParts()
+    form['employment.*.left'].widget = xformish.ApproximateDateParts()
+    return form
 
 
 def GranularFormLayout():

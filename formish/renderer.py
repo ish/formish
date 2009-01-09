@@ -11,7 +11,7 @@ If an application completely replaces the form's renderer then it's quite
 possible the application will have to reimplement all of formish's templates.
 """
 
-from pkg_resources import resource_filename #IGNORE:E0611
+from pkg_resources import resource_filename 
 
 try:
     import mako.lookup
