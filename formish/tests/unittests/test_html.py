@@ -27,7 +27,7 @@ class TestHTML(unittest.TestCase):
         try:
             data = f.validate(r)
         except fv.FormError, e:
-            assert isinstance(f.errors['one'], schemaish.attr.Invalid)        
+            assert f.errors['one'] == 'is required'
         soup = BeautifulSoup(f())
         assert soup.find(id='form-one-field').find("span", "error").string == 'is required' , "test that the form error is being created"
         

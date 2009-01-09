@@ -117,9 +117,7 @@ class TestFormBuilding(unittest.TestCase):
         self.assertRaises(formish.FormError, form.validate, request)
 
         # Do we get an error
-        self.assert_( isinstance(form.errors['one.a'], schemaish.attr.Invalid) )
-        # Is the error message correct
-        self.assertEqual( form.errors['one.a'].message, "is required" )
+        self.assert_( form.errors['one.a'], 'is_required') 
 
         
     def test_nested_form_validation_output(self):

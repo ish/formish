@@ -92,7 +92,7 @@ class TemplatedString(object):
     def __str__(self):
         if not self.val:
             return ''
-        return self.val
+        return unicode(self.val)
 
     def __call__(self):
         renderer = self.obj.form.renderer
@@ -740,9 +740,7 @@ class Form(object):
         try:
             self.structure.attr.validate(data)
         except schemaish.attr.Invalid, e:
-            for key, value in e.error_dict.items():
-                if not self.errors.has_key(key):
-                    self.errors[key] = value
+            self.errors = e.error_dict
         if len(self.errors.keys()) > 0:
             err_msg = 'Tried to access data but conversion' \
                     'from request failed with %s errors'

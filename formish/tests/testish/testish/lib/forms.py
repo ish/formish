@@ -538,6 +538,22 @@ def All():
     form = formish.Form(schema, 'form')
     return form
 
+
+def ValidationOnSequenceItem():
+    """
+    A structure witin a sequence, should be enhanced with javascript
+    """
+    substructure = schemaish.Structure()
+    substructure.add( 'a', schemaish.String(validator=validatish.Required()) )
+    substructure.add( 'b', schemaish.Integer() )
+
+    schema = schemaish.Structure()
+    schema.add( 'myList', schemaish.Sequence( substructure ))
+
+    form = formish.Form(schema, 'form')
+    return form
+
+
 ########################
 #
 #   Checkbox
