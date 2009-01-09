@@ -4,30 +4,6 @@ General purpose formish extensions.
 
 from formish import validation, widgets, Form
 
-class DateInput(widgets.Input):
-    """
-    An <input> element that accepts a date in locale format and parses it to a
-    datetime.date instance.
-    """
-
-    def __init__(self, **k):
-        self.l10n = k.pop('l10n')
-        super(DateInput, self).__init__(**k)
-
-    def pre_render(self, schema_type, data):
-        if data is None:
-            return ['']
-        return [self.l10n.format_date(data, format='short')]
-
-    def convert(self, schema_type, data):
-        s = data[0].strip()
-        if not s:
-            return None
-        try:
-            return self.l10n.parse_date(s, format='short')
-        except Exception, e:
-            raise validation.FieldValidationError('Invalid date format')
-
 
 class DateParts(widgets.DateParts):
 
