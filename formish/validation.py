@@ -158,7 +158,7 @@ def convert_request_data_to_data(form_structure,
                 data[field.name] = field.widget.convert(field.attr, \
                                                 request_data.get(field.name,[]))
         except convert.ConvertError, e:
-            errors[field.name] = e
+            errors[field.name] = e.message
     
     data = recursive_convert_sequences(dottedDict(data))
     return data
