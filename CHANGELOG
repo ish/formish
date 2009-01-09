@@ -8,6 +8,7 @@ Changlelog
 BUG FIX: Fixed bug when using multi part widgets (e.g. Date Parts) inside a sequence. Added example test case.
 
 * changes to handle new schemaish Invalid exception format
+* added a contains-error class to container classes that do.
 
 0.5.5 (2009-01-08)
 ------------------
