@@ -78,6 +78,7 @@ class FormResource(resource.Resource):
     @resource.POST()
     def POST(self, request):
         form = self.form_getter()
+        form.renderer = request.environ['restish.templating.renderer']
         try:
             data = form.validate(request)
         except formish.FormError, e:
