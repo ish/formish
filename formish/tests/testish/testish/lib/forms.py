@@ -470,7 +470,9 @@ def MinLengthCheckboxMultiChoice():
     A checkbox multi choice with minimum length 3 (NOT WORKING)
     """
     schema = schemaish.Structure()
-    schema.add('multiChoice', schemaish.Sequence(schemaish.String(validation=validatish.Length(min=2))))
+    schema.add('multiChoice', schemaish.Sequence(
+        schemaish.String(validation=validatish.Length(min=2))
+        ))
     options = [(1,'a'),(2,'b'),(3,'c')]
 
     form = formish.Form(schema, 'form')
@@ -533,7 +535,10 @@ def All():
     Required and Plain Text (alphanum only plus _ and -)
     """
     schema = schemaish.Structure()
-    schema.add('requiredPlainText', schemaish.String(validator=validatish.All(validatish.Required(),validatish.PlainText(extra='-_'))))
+    schema.add('requiredPlainText', 
+           schemaish.String(validator=validatish.All(
+               validatish.Required(),validatish.PlainText(extra='-_')
+           )))
 
     form = formish.Form(schema, 'form')
     return form
@@ -679,7 +684,10 @@ def CheckboxMultiChoiceTree():
     """
     schema = schemaish.Structure()
     schema.add('multiChoice', schemaish.Sequence(schemaish.String()))
-    options = [('a','Top Level A'),('a.x','Second Level X'),('a.y','Second Level Y'),('b','First Level B')]
+    options = [('a','Top Level A'),
+               ('a.x','Second Level X'),
+               ('a.y','Second Level Y'),
+               ('b','First Level B')]
 
     form = formish.Form(schema, 'form')
     form['multiChoice'].widget = formish.CheckboxMultiChoiceTree(options)
@@ -862,7 +870,9 @@ def GranularFormLayout():
     """
 
     schema = schemaish.Structure()
-    schema.add( 'firstName', schemaish.String(title='First Name',description='The name before your last one',validator=validatish.Required()) )
+    schema.add( 'firstName', schemaish.String(title='First Name', \
+                     description='The name before your last one', \
+                     validator=validatish.Required()) )
 
     form = formish.Form(schema, 'form')
 

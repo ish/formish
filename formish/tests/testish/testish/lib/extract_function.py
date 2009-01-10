@@ -17,7 +17,7 @@ def extract(id):
         if '    return' in line:
             in_function = False
 
-        if in_function and not in_quotes and '   """' not in line and 'def %s'%id not in line:
+        if in_function and not in_quotes and '   """' not in line and 'def %s('%id not in line:
             func_def.append( line[4:] )
 
         prev_line = line
@@ -42,15 +42,15 @@ def extract_docstring_highlighted(id):
     for line in lines:
         if 'def %s('%id in line:
             in_function = True
+        elif 'def ' in line:
+            in_function = False
 
         if in_function and not in_quotes and '    """' in line:
             in_quotes = True
         elif in_function and in_quotes and '   """' in line:
             in_quotes = False
-        if '    return' in line:
-            in_function = False
 
-        if in_quotes and in_function and '   """' not in line and 'def %s'%id not in line:
+        if in_quotes and in_function and '   """' not in line and 'def %s('%id not in line:
             docstring.append( line )
 
         prev_line = line
@@ -73,15 +73,15 @@ def extract_docstring(id):
     for line in lines:
         if 'def %s('%id in line:
             in_function = True
+        elif 'def ' in line:
+            in_function = False
 
         if in_function and not in_quotes and '    """' in line:
             in_quotes = True
         elif in_function and in_quotes and '   """' in line:
             in_quotes = False
-        if '    return' in line:
-            in_function = False
 
-        if in_quotes and in_function and '   """' not in line and 'def %s'%id not in line:
+        if in_quotes and in_function and '   """' not in line and 'def %s('%id not in line:
             docstring.append( line )
 
         prev_line = line
