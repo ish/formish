@@ -566,7 +566,7 @@ def RequiredStringAndFile():
     schema.add('required', schemaish.String(validator=validatish.Required()))
     schema.add('myFileField', schemaish.File())
     form = formish.Form(schema, 'form')
-    form['myFileField'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb(),show_image_preview=True)
+    form['myFileField'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb(),show_image_preview=True,originalurl='/images/nouploadyet.png')
     return form
 
 def functest_RequiredStringAndFile(self, sel):#{{{
