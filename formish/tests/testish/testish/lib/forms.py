@@ -558,6 +558,59 @@ def ValidationOnSequenceItem():
     form = formish.Form(schema, 'form')
     return form
 
+def RequiredStringAndFile():
+    """
+    A simple form with a single integer field
+    """
+    schema = schemaish.Structure()
+    schema.add('required', schemaish.String(validator=validatish.Required()))
+    schema.add('myFileField', schemaish.File())
+    form = formish.Form(schema, 'form')
+    form['myFileField'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb(),show_image_preview=True)
+    return form
+
+def functest_RequiredStringAndFile(self, sel):#{{{
+    sel.open("/RequiredStringAndFile")
+
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+        
+    try: self.assertEqual("", sel.get_value("myFileField.default"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    try: self.assertEqual("", sel.get_value("myFileField.name"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+
+    sel.type("form-myFileField", os.path.abspath("testdata/photo.png"))
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+        
+    try: self.assertEqual("", sel.get_value("myFileField.default"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    try: self.assertEqual("-photo.png", sel.get_value("myFileField.name")[-10:])
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+        
+    try: self.assertEqual("", sel.get_value("myFileField.default"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    try: self.assertEqual("-photo.png", sel.get_value("myFileField.name")[-10:])
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    sel.type("form-myFileField", os.path.abspath("testdata/photo.jpg"))
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+        
+    try: self.assertEqual("", sel.get_value("myFileField.default"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    try: self.assertEqual("-photo.jpg", sel.get_value("myFileField.name")[-10:])
+    except AssertionError, e: self.verificationErrors.append(str(e))
+    return#}}}
 
 ########################
 #

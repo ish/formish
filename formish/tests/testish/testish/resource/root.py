@@ -1,6 +1,7 @@
 import logging
 from restish import resource, templating
 import formish
+from formish import fileresource
 
 from pprint import pformat
 
@@ -39,7 +40,7 @@ class Root(resource.Resource):
     
     def resource_child(self, request, segments):
         if segments[0] == 'filehandler':
-            return formish.fileresource.FileResource(), segments[1:]
+            return fileresource.FileResource(), segments[1:]
         return FormResource(segments[0]), segments[1:]
 
 
