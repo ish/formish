@@ -46,6 +46,16 @@ class TempFileHandler(FileHandlerMinimal):
         filename = ''.join( filename[(len(tempdir)+len(prefix)+1):] )
         return filename
 
+    def delete_file(self, filename):
+        """
+        remove the tempfile
+        """
+        prefix = tempfile.gettempprefix()
+        tempdir = tempfile.gettempdir()
+        filename = '%s/%s%s'% (tempdir, prefix, filename)
+        os.remove(filename)
+
+
     def get_path_for_file(self, filename):
         """
         given the filename, get the path for the temporary file

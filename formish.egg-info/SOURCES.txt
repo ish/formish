@@ -209,6 +209,7 @@ formish/dottedDict.py
 formish/filehandler.py
 formish/fileresource.py
 formish/forms.py
+formish/myfileresource.py
 formish/renderer.py
 formish/util.py
 formish/validation.py

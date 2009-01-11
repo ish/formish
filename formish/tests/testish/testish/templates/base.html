@@ -18,6 +18,7 @@
    //<![CDATA[
 $(document).ready(function() {
     formish();
+    setTimeout("$('#uploadedimage img').each( function () { $(this).after('<div>'+$(this).width()+'</div>') ;} );",80)
 });
    //]]>
   </script>

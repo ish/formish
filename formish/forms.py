@@ -743,7 +743,6 @@ class Form(object):
         self._request_data = dottedDict(request_post)
         self.request_data = validation.pre_parse_request_data( \
                     self.structure,dottedDict(request_post))
-        print 'PRE PARSE REQ',self.request_data
         data = self.get_unvalidated_data( \
                     self.request_data, raise_exceptions=False)
         #self._request_data = dottedDict(request_post)

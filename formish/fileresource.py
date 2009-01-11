@@ -3,6 +3,7 @@ The fileresource provides a basic restish fileresource for assets and images
 
 Requires ImageMagick for image resizing
 """
+import tempfile
 from datetime import datetime
 import os.path
 import magic
@@ -18,21 +19,37 @@ from formish.filehandler import TempFileHandler
 IDENTIFY = '/usr/bin/identify'
 CONVERT = '/usr/bin/convert'
 
-class FileAccessor(object):
+class FileAccessor(object): 
     """
     A skeleton class that should be implemented so that the files resource can
     build caches, etc
     """
 
-    def get_mtime(self, identifier):
-        """
-        Get the last modified time
-        """
+    def __init__(self):
+        self.prefix = 'store-%s'%tempfile.gettempprefix()
+        self.tempdir = tempfile.gettempdir()
 
-    def get_file(self, identifier):
+
+    def get_mimetype(self, filename):
+        """
+        Get the mime type of the file with this id
+        """
+        actualfilename = '%s/%s%s'% (self.tempdir, self.prefix, filename)
+        return magic.from_file(actualfilename, mime=True)
+
+
+    def get_mtime(self, filename):
+        actualfilename = '%s/%s%s'% (self.tempdir, self.prefix, filename)
+        return datetime.fromtimestamp( os.path.getmtime(actualfilename) )
+
+
+    def get_file(self, filename):
         """
         Get the file object for this id
         """
+        actualfilename = '%s/%s%s'% (self.tempdir, self.prefix, filename)
+        return open(actualfilename).read()
+
 
 class FileResource(resource.Resource):
     """
@@ -51,7 +68,7 @@ class FileResource(resource.Resource):
         filepath = '/'.join(segments)
         if '.' in filepath:
             splits = filepath.split('.')
-            filename, suffix = '.'.join(splits[:-1]), splits[-1]
+            filename, suffix = '.'.join(splits), splits[-1]
         else:
             filename = filepath
             suffix = ''
