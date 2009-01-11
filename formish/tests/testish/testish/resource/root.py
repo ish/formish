@@ -1,4 +1,5 @@
 import logging
+import tempfile
 from restish import resource, templating
 import formish
 from formish import fileresource
@@ -70,7 +71,7 @@ class FormResource(resource.Resource):
             form = self.form_getter()
             form.renderer = request.environ['restish.templating.renderer']
         return {'title': self.title, 'description': self.description,
-                'form': form, 'data': pformat(data),
+                'form': form, 'data': pformat(data),'rawdata': data,
                 'template': extract_function.extract_docstring('template_%s'%self.id),
                 'template_highlighted': extract_function.extract_docstring_highlighted('template_%s'%self.id),
                 'definition': extract_function.extract(self.id),
@@ -85,4 +86,15 @@ class FormResource(resource.Resource):
         except formish.FormError, e:
             return self.render_form(request, form=form)
         else:
+            if 'myFileField' in data:
+                f = data['myFileField']
+                filedata = f.file.read()
+                prefix = 'store-%s'%tempfile.gettempprefix()
+                tempdir = tempfile.gettempdir()
+                actualfilename = '%s/%s%s'% (tempdir, prefix, f.filename)
+                out = open(actualfilename,'w')
+                out.write(filedata)
+                out.close()
+                form['myFileField'].widget.filehandler.delete_file(f.filename)
+                
             return self.render_form(request, form=None, data=data)

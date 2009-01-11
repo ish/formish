@@ -19,7 +19,17 @@ ${Template(template, input_encoding='utf-8', output_encoding='utf-8', default_fi
   <pre>
 ${data}
   </pre>
+  </div>
+
+  % if rawdata is not None and 'myFileField' in rawdata:
+
+<div id="uploadedimage">
+  <div id="actual"><img src="/filehandler/${rawdata['myFileField'].filename}" /></div>
+  <div id="resized"><img src="/filehandler/${rawdata['myFileField'].filename}?size=100x100" /></div>
 </div>
+
+
+  % endif
 
 <div id="template">
 <h3>Template</h3>

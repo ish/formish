@@ -1,4 +1,4 @@
-import logging, os.path
+import logging, os.path, tempfile
 import formish, schemaish, validatish
 from formish.filehandler import TempFileHandlerWeb
 from testish.lib import xformish
@@ -315,9 +315,9 @@ def File():
     A simple form with a single integer field
     """
     schema = schemaish.Structure()
-    schema.add('myFileField', schemaish.File())
+    schema.add('myFile', schemaish.File())
     form = formish.Form(schema, 'form')
-    form['myFileField'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
+    form['myFile'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
     return form
 
 def functest_File(self, sel):#{{{
@@ -325,15 +325,15 @@ def functest_File(self, sel):#{{{
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myFileField': None}"))
+    try: self.failUnless(sel.is_text_present("{'myFile': None}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    sel.type("form-myFileField", os.path.abspath("testdata/test.txt"))
+    sel.type("form-myFile", os.path.abspath("testdata/test.txt"))
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
     
 
-    try: self.failUnless(sel.is_text_present("{'myFileField': <schemaish.type.File object at"))
+    try: self.failUnless(sel.is_text_present("{'myFile': <schemaish.type.File object at"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
     return#}}}
@@ -560,7 +560,7 @@ def ValidationOnSequenceItem():
 
 def RequiredStringAndFile():
     """
-    A simple form with a single integer field
+    A required string and a file field configured for image upload.
     """
     schema = schemaish.Structure()
     schema.add('required', schemaish.String(validator=validatish.Required()))
@@ -602,14 +602,20 @@ def functest_RequiredStringAndFile(self, sel):#{{{
     except AssertionError, e: self.verificationErrors.append(str(e))
 
     sel.type("form-myFileField", os.path.abspath("testdata/photo.jpg"))
+    sel.type("form-required", 'foo')
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-        
-    try: self.assertEqual("", sel.get_value("myFileField.default"))
+
+    try: self.assertEqual(sel.get_attribute("//div[@id='actual']/img@src")[-9:],"photo.jpg")
+    except AssertionError, e: self.verificationErrors.append(str(e))
+    try: self.assertEqual(sel.get_attribute("//div[@id='resized']/img@src")[-22:-13],"photo.jpg")
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    try: self.assertEqual("-photo.jpg", sel.get_value("myFileField.name")[-10:])
+    try: self.assertEqual("300", sel.get_text("css=#actual div"))
     except AssertionError, e: self.verificationErrors.append(str(e))
+    try: self.assertEqual("100", sel.get_text("css=#resized div"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+          
     return#}}}
 
 ########################
