@@ -190,7 +190,8 @@ function add_mousedown_to_addlinks(o) {
 };
 
 function add_remove_buttons(o) {
-  o.find('.sequence.defaultwidget > div > label').each( function() {
+  o.find('.sequencedefault .remove').remove() 
+  o.find('.sequence.sequencedefault > div > label').each( function() {
     if ($(this).next().text() != 'x') {
       var x = $('<span class="remove">x</span>');
       $(this).after(x);
@@ -201,7 +202,7 @@ function add_remove_buttons(o) {
       });
     };
   });
-  o.find('.sequence.defaultwidget > fieldset > legend').each( function() {
+  o.find('.sequence.sequencedefault > fieldset > legend').each( function() {
     if ($(this).next().text() != 'x') {
       var x = $('<span class="remove">x</span>');
       $(this).after(x);
@@ -220,9 +221,10 @@ function order_changed(e,ui) {
 }
 
 function add_sortables(o) {
-  //o.find('.sequence.defaultwidget > div > label').after('<span class="handle">handle</span>');
-  //o.find('.sequence.defaultwidget > fieldset > legend').after('<span class="handle">handle</span>');
-  o.find('.sequence.defaultwidget').sortable({'items':'> .field','stop':order_changed});
+  o.find('.sequencedefault .handle').remove() 
+  o.find('.sequence.sequencedefault > div > label').after('<div class="handle">drag me</div>');
+  o.find('.sequence.sequencedefault > fieldset > legend').after('<div class="handle">drag me</div>');
+  o.find('.sequence.sequencedefault').sortable({'items':'> .field','stop':order_changed});
   
 }
 
