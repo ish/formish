@@ -8,6 +8,7 @@ NEWS
 README
 TODO
 nose.sh
+release.sh
 setup.py
 docs-build/Makefile
 docs-build/conf.py

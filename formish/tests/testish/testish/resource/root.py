@@ -129,6 +129,9 @@ class FormResource(resource.Resource):
         except formish.FormError, e:
             return self.render_form(request, form=form)
         else:
+            print request.environ
+            print request.headers
+            print '[',request.body,']'
             if 'myFileField' in data:
                 f = data['myFileField']
                 filedata = f.file.read()

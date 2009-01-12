@@ -3,12 +3,12 @@ Commonly needed form widgets.
 """
 
 __all__ = ['Input', 'Password', 'CheckedPassword', 'Hidden', 'TextArea',
-        'Checkbox', 'DateParts', 'FileUpload', 'SelectChoice', 'RadioChoice',
+        'Checkbox', 'DateParts', 'FileUpload', 'SelectChoice','SelectWithOtherChoice','RadioChoice',
         'CheckboxMultiChoice', 'SequenceDefault','CheckboxMultiChoiceTree']
 
 from convertish.convert import string_converter, \
         datetuple_converter,ConvertError
-from schemaish import type
+from schemaish.type import File as SchemaFile
 from formish import dottedDict
 
 
@@ -318,7 +318,7 @@ class FileUpload(Widget):
         as the name. We also store it in the 'default' field so we can check if
         something has been uploaded (the identifier doesn't match the name)
         """
-        if isinstance(data, type.File):
+        if isinstance(data, SchemaFile):
             self.default = self.filehandler.urlfactory(data)
         elif data is not None:
             self.default = data
@@ -353,13 +353,13 @@ class FileUpload(Widget):
         if request_data['name'] == ['']:
             return None
         elif request_data['name'] == request_data['default']:
-            return type.File(None, None, None)
+            return SchemaFile(None, None, None)
         else:
             filename = request_data['name'][0]
             path_for_file = self.filehandler.get_path_for_file(filename)
             filepath = open(path_for_file)
             mimetype = self.filehandler.get_mimetype(filename)
-            filetype = type.File(filepath, filename, mimetype)
+            filetype = SchemaFile(filepath, filename, mimetype)
             return filetype
 
 
@@ -408,6 +408,61 @@ class SelectChoice(Widget):
         return (string_converter(schema_type).from_type(
             self.none_option[0]), self.none_option[1])
     
+class SelectWithOtherChoice(SelectChoice):
+    """
+    Html Select element
+    """
+    _template = 'SelectWithOtherChoice'
+
+    none_option = ('', '- choose -')
+    other_option = ('...', 'Other ...')
+
+    def __init__(self, options, none_option=UNSET, other_option=UNSET, css_class=None):
+        Widget.__init__(self)
+        self.css_class = css_class
+        self.options = _normalise_options(options)
+        if none_option is not UNSET:
+            self.none_option = none_option
+        if other_option is not UNSET:
+            self.other_option = other_option
+
+    def pre_render(self, schema_type, data):
+        """
+        populate the other choice if needed
+        """
+        string_data = string_converter(schema_type).from_type(data)
+        if string_data in [value for value, label in self.options]:
+            return {'select': ['...'], 'other': [string_data]}
+        return {'select': [string_data], 'other': ['']}
+
+    def convert(self, schema_type, request_data):
+        """
+        Check to see if we need to use the 'other' value
+        """
+        if request_data['select'][0] == '...':
+            value = request_data['other'][0]
+        else:
+            value = request_data['select'][0]
+        if value == '':
+            return None
+        return string_converter(schema_type).to_type(value)
+
+    def get_other_option(self, schema_type):
+        """
+        Get the other option
+        """
+        return (string_converter(schema_type).from_type(
+            self.other_option[0]), self.other_option[1])
+            
+    def selected(self, option, value, schema_type):
+        """
+        Check the value passed matches the actual value
+        """
+        if option[0] == '...' and value not in [value for value, label in self.options]:
+            return ' selected="selected"'
+        if option[0] == value:
+            return ' selected="selected"'
+        return ''
 
 class RadioChoice(Widget):
     """

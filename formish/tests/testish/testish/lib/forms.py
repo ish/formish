@@ -1,13 +1,30 @@
 import logging, os.path, tempfile, subprocess
 import formish, schemaish, validatish
+from formish.dottedDict import dottedDict
 from formish.filehandler import TempFileHandlerWeb
 from testish.lib import xformish
+import webob
+from urllib import urlencode
 
 log = logging.getLogger(__name__)
 
 
 
 IDENTIFY = '/usr/bin/identify'
+
+def build_request(formname, data):
+    d = dottedDict(data)
+    e = {'REQUEST_METHOD': 'POST'}
+    request = webob.Request.blank('/',environ=e)
+    fields = []
+    fields.append( ('_charset)','UTF-8') )
+    fields.append( ('__formish_form__','form') )
+    for k, v in d.dotteditems():
+        fields.append( (k,v) )
+    fields.append( ('submit','Submit') )
+    request.body = urlencode( fields )
+    
+    return request
 
 ##
 # Make sure forms have the doc string with triple quotes 
@@ -657,12 +674,21 @@ def SelectChoice():
     A basic select choice
     """
     schema = schemaish.Structure()
-    schema.add('mySelect', schemaish.String())
+    schema.add('mySelect', schemaish.Integer())
     options = [(1,'a'),(2,'b'),(3,'c')]
 
     form = formish.Form(schema, 'form')
     form['mySelect'].widget = formish.SelectChoice(options)
     return form
+
+def unittest_SelectChoice(self):#{{{
+    f = SelectChoice()
+    testdata = {'mySelect': 3}
+    f.defaults = testdata
+    request = build_request('form',testdata)
+    data = f.validate(request)
+    assert data == testdata
+    #}}}
 
 
 def SelectChoiceNoneOption():
@@ -670,7 +696,7 @@ def SelectChoiceNoneOption():
     Setting a None Option on the select choice element
     """
     schema = schemaish.Structure()
-    schema.add('mySelect', schemaish.String())
+    schema.add('mySelect', schemaish.Integer())
     options = [(1,'a'),(2,'b'),(3,'c')]
 
     form = formish.Form(schema, 'form')
@@ -682,7 +708,7 @@ def SelectChoiceCallableOptions():
     Passing in a callable list of options
     """
     schema = schemaish.Structure()
-    schema.add('mySelect', schemaish.String())
+    schema.add('mySelect', schemaish.Integer())
     def _():
         options = [(1,'a'),(2,'b'),(3,'c')]
         for option in options:
@@ -692,12 +718,71 @@ def SelectChoiceCallableOptions():
     form['mySelect'].widget = formish.SelectChoice(_)
     return form
 
+def SelectWithOtherChoice():
+    """
+    A basic select choice
+    """
+    schema = schemaish.Structure()
+    schema.add('mySelect', schemaish.Integer())
+    options = [(1,'a'),(2,'b'),(3,'c')]
+
+    form = formish.Form(schema, 'form')
+    form['mySelect'].widget = formish.SelectWithOtherChoice(options)
+    return form
+
+def functest_SelectWithOtherChoice(self, sel):#{{{
+    sel.open("/SelectWithOtherChoice")
+
+    try: self.assertEqual("", sel.get_value("form-mySelect"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+    sel.select("form-mySelect", "label=a")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'mySelect': 1}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+    sel.select("form-mySelect", "label=Other ...")
+    sel.type("form-mySelect-other", "4")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'mySelect': 4}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+    sel.select("form-mySelect", "label=Other ...")
+    sel.type("form-mySelect-other", "d")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("Not a valid number"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    try: self.assertEqual("...", sel.get_value("form-mySelect"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    return#}}}
+
+def unittest_SelectWithOtherChoice(self):#{{{
+    # Test no data
+    f = SelectWithOtherChoice()
+    testdata = {'mySelect': 4}
+    f.defaults = testdata
+    reqdata = {'mySelect.other':'4','mySelect.select':'...'}
+    request = build_request('form',reqdata)
+    data = f.validate(request)
+    assert data == testdata
+
+    f = SelectWithOtherChoice()
+    testdata = {'mySelect': 2}
+    f.defaults = testdata
+    reqdata = {'mySelect.other':'','mySelect.select':'2'}
+    request = build_request('form',reqdata)
+    data = f.validate(request)
+    assert data == testdata
+    return #}}}
+
 def RadioChoice():
     """
     A basic select choice
     """
     schema = schemaish.Structure()
-    schema.add('myRadio', schemaish.String())
+    schema.add('myRadio', schemaish.Integer())
     options = [(1,'a'),(2,'b'),(3,'c')]
 
     form = formish.Form(schema, 'form')
@@ -710,7 +795,7 @@ def RadioChoiceNoneOption():
     Setting a None Option on the select choice element
     """
     schema = schemaish.Structure()
-    schema.add('myRadio', schemaish.String())
+    schema.add('myRadio', schemaish.Integer())
     options = [(1,'a'),(2,'b'),(3,'c')]
 
     form = formish.Form(schema, 'form')
@@ -722,7 +807,7 @@ def RadioChoiceCallableOptions():
     Passing in a callable list of options
     """
     schema = schemaish.Structure()
-    schema.add('myRadio', schemaish.String())
+    schema.add('myRadio', schemaish.Integer())
     def _():
         options = [(1,'a'),(2,'b'),(3,'c')]
         for option in options:
@@ -848,7 +933,6 @@ def functest_SequenceOfUploadStructures(self, sel):#{{{
     sel.type("form-myList-0-b", "13")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    import time; time.sleep(10)
 
     try: self.failUnless(sel.is_text_present("{'myList': [{'a': <schemaish.type.File"))
     except AssertionError, e: self.verificationErrors.append(str(e))

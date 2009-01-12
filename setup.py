@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys, os, glob
 
-version = '0.5.7'
+version = '0.5.8'
 
 setup(name='formish',
       version=version,
@@ -12,6 +12,11 @@ Formish is a schema backed, templating language agnostic form generation and han
 ==========
 Changlelog
 ==========
+
+0.5.8 (2009-01-12)
+------------------
+
+* added a SelectWithOther choice and enhanced unit and func test capabilities in testish
 
 0.5.7 (2009-01-11)
 ------------------

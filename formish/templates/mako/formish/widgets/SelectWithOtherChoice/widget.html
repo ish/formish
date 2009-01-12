@@ -1,0 +1,18 @@
+<%page args="field" />
+<select id="${field.cssname}" name="${field.name}.select">
+%if field.widget.none_option:
+  <option value="${field.widget.get_none_option(field.attr)[0]}">${field.widget.get_none_option(field.attr)[1]}</option>
+%endif
+%for option in field.widget.get_options(field.attr):
+  <option value="${option[0]}" ${field.widget.selected(option,field.value['select'][0], field.attr)|n}>${option[1]}</option>
+%endfor
+<%
+if field.value['other'][0] != '': 
+    otherselected = ' selected="selected"'
+else:
+    otherselected = ''
+%>
+
+<option value="${field.widget.get_other_option(field.attr)[0]}"${otherselected|n}>${field.widget.get_other_option(field.attr)[1]}</option>
+<input type="text" id="${field.cssname}-other" name="${field.name}.other" value="${field.value['other'][0]}" />
+</select>
