@@ -70,7 +70,7 @@ function convert_id_to_name(s) {
 function renumber_sequences(o) {
   var n = 0;
   var previous_seqid_prefix = '';
-  o.find('.sequence.defaultwidget > div').each( function () {
+  o.find('.sequence.sequencedefault > div').each( function () {
     var seqid = $(this).parent().attr('id');
     var seqid_prefix = seqid.substr(0,seqid.length-5);
     if (seqid_prefix != previous_seqid_prefix) {
@@ -103,7 +103,7 @@ function renumber_sequences(o) {
     });
     previous_seqid_prefix = seqid_prefix;
   });
-  o.find('.sequence.defaultwidget > fieldset').each( function () {
+  o.find('.sequence.sequencedefault > fieldset').each( function () {
     var seqid = $(this).parent().attr('id');
     var seqid_prefix = seqid.substr(0,seqid.length-5);
     if (seqid_prefix != previous_seqid_prefix) {
