@@ -261,6 +261,7 @@ formish/templates/mako/formish/widgets/Input/widget.html
 formish/templates/mako/formish/widgets/Password/widget.html
 formish/templates/mako/formish/widgets/RadioChoice/widget.html
 formish/templates/mako/formish/widgets/SelectChoice/widget.html
+formish/templates/mako/formish/widgets/SelectWithOtherChoice/widget.html
 formish/templates/mako/formish/widgets/TextArea/widget.html
 formish/tests/TODO
 formish/tests/testish/development.ini

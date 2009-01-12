@@ -24,6 +24,26 @@ You will need:
 * schemaish
   http://pypi.python.org/pypi/schemaish
 
+Required(ish)
+-------------
+
+* mako - the inbuild renderer uses mako and we only have mako widgets at the
+         moment so unless you configure your own templates this is fairly required
+  http://pypi.python.org/pypi/Mako
+
+Optional Requirements
+---------------------
+
+* ImageMagick - If you want to use the in built image resizing (and to run the unit tests)
+  http://www.imagemagick.org/script/index.php
+
+* webob - The tests build their own request objects to get things working
+
+* restish - The functional tests use restish as a web framework
+
+* selenium - The functional tests use selenium
+
+
 Installation
 ------------
 
@@ -34,5 +54,24 @@ If you have easy_install, you can run the following
 This will also bring in all of the requirements.
 
   
+Testing
+-------
+
+You can run the standard unittests by running
+
+nosetests formish/tests/unittests
+
+in the formish home directory
+
+We have a larger range of tests for widgets, validation and conversion in formish/tests/testish which can be run as
+
+nosetests testish/lib/test_functests
+nosetests testish/lib/test_unittests
+
+or just 
+
+notsetests if you want to test everything.. 
+
+The functional tests require restish, imagemagick, selenium, webob 
 
 
