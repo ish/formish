@@ -333,7 +333,7 @@ def functest_File(self, sel):#{{{
     sel.wait_for_page_to_load("30000")
     
 
-    try: self.failUnless(sel.is_text_present("{'myFile': <schemaish.type.File object at"))
+    try: self.failUnless(sel.is_text_present("{'myFile': <schemaish.type.File"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
     return#}}}
@@ -835,8 +835,11 @@ def functest_SequenceOfUploadStructures(self, sel):#{{{
     sel.type("form-myList-0-b", "13")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
+    import time; time.sleep(10)
 
-    try: self.failUnless(sel.is_text_present("{'myList': [{'a': <schemaish.type.File object at *, 'b': 13}]}"))
+    try: self.failUnless(sel.is_text_present("{'myList': [{'a': <schemaish.type.File"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+    try: self.failUnless(sel.is_text_present("'b': 13}]}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
     return#}}}

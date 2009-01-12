@@ -50,89 +50,105 @@ class FileAccessor(object):
         actualfilename = '%s/%s%s'% (self.tempdir, self.prefix, filename)
         return open(actualfilename).read()
 
+    def file_exists(self, filename):
+        actualfilename = '%s/%s%s'% (self.tempdir, self.prefix, filename)
+        return os.path.exists(actualfilename)
+       
 
 class FileResource(resource.Resource):
     """
-    Resource for serving files from the database or temporary upload area.
+    A simple file serving utility
     """
 
-    def __init__(self, fileaccessor=FileAccessor(),
-                 filehandler=TempFileHandler(), segments=None):
-        resource.Resource.__init__(self)
-        self.fileaccessor = fileaccessor
-        self.filehandler = filehandler
-        if segments is None:
-            return
-        # If it's a temp file, just return it... 
-        # XXX This it wrong... it should still cache and resize
-        filepath = '/'.join(segments)
-        if '.' in filepath:
-            splits = filepath.split('.')
-            filename, suffix = '.'.join(splits), splits[-1]
+    def __init__(self, fileaccessor=None, filehandler=None, segments=None):
+        if fileaccessor is None:
+            self.fileaccessor = FileAccessor()
         else:
-            filename = filepath
-            suffix = ''
-        self.tempfile = filehandler.get_path_for_file( \
-            urllib.unquote_plus(filepath))
-        if os.path.exists(self.tempfile):
-            return 
-        # Otherwise it must be a resource so check if it needs cacheing
-        self.tempfile =  'cache/%s'% (filename.replace('/','-'))
-        if segments[0] != '':
-            if os.path.exists(self.tempfile):
-                mtime = self.fileaccessor.get_mtime(filename)
-                cache_mtime = datetime.utcfromtimestamp( \
-                                    os.path.getmtime(self.tempfile))
-                if mtime is None or mtime > cache_mtime:
-                    rebuild_cache = True
-                else:
-                    rebuild_cache = False
+            self.fileaccessor = fileaccessor
+        if filehandler is None:
+            self.filehandler = TempFileHandler()
+        else:
+            self.filehandler = filehandler
+        self.segments = segments
+
+    def __call__(self, request):
+        if not self.segments:    
+            return None
+
+        # This is our input filepath
+        requested_filepath = self._get_requested_filepath()
+ 
+        # Get the raw cache file path and mtime
+        raw_cached_filepath = self._get_cachefile_path(requested_filepath)
+        raw_cached_mtime = self._get_file_mtime(raw_cached_filepath)
+
+        # Check to see if fa and temp exist
+        fileaccessor_exists = self.fileaccessor.file_exists(requested_filepath)
+        tempfile_path = self._get_tempfile_path(requested_filepath)
+        tempfile_exists = os.path.exists(tempfile_path)
+
+        if not fileaccessor_exists and not tempfile_exists:
+            return None
+       
+        # work out which has changed most recently (if either is newer than cache)
+        fileaccessor_mtime = self.fileaccessor.get_mtime(requested_filepath)
+        tempfile_mtime = self._get_file_mtime(tempfile_path)
+        source_mtime = max(fileaccessor_mtime, tempfile_mtime)
+        if source_mtime > raw_cached_mtime:
+            if fileaccessor_mtime > tempfile_mtime:
+                filedata = self.fileaccessor.get_file(requested_filepath)
+                mimetype = self.fileaccessor.get_mimetype(requested_filepath)
             else:
-                rebuild_cache = True
-            if rebuild_cache:
-                data = self.fileaccessor.get_file(filename)
-                cache_fp = file(self.tempfile,'w')
-                cache_fp.write(data)
-                cache_fp.close()
+                filedata = open(tempfile_path).read()
+                mimetype = get_mimetype(tempfile_path)
+            open(raw_cached_filepath,'w').write(filedata)
+        else:
+            mimetype = get_mimetype(raw_cached_filepath)
 
-    def resource_child(self, request, segments):
-        """
-        if we have any children, recurse deeper
-        """
-        return FileResource(self.fileaccessor, self.filehandler, segments), ()
+        # If we're trying to resize, check mtime on resized_cache
+        size_suffix = self._get_size_suffix(request)
+        if size_suffix:
+            cached_filepath = self._get_cachefile_path(requested_filepath, size_suffix)
+            cached_mtime = self._get_file_mtime(cached_filepath)
 
-    def make_response(self, filename, request):
-        """
-        build the http response
-        """
+            if not os.path.exists(cached_filepath) or source_mtime > cached_mtime:
+                width, height = get_size_from_dict(request.GET)
+                resize_image(raw_cached_filepath, cached_filepath, width, height)
+        else:
+            cached_filepath = raw_cached_filepath
+
+        return http.ok([('content-type', mimetype )], open(cached_filepath, 'rb').read())
+         
+
+    def _get_requested_suffix(self):
+        if '.' in self.segments[-1]:
+            return self.segments[-1].split('.')[-1]
+        return ''
+
+    def _get_requested_filepath(self):
+        return '/'.join(self.segments)
+
+    def _get_cachefile_path(self,filepath,size_suffix=''):
+        return 'cache/%s%s'% (filepath.replace('/','-'),size_suffix)
+
+    def _get_tempfile_path(self, filepath):
+        return self.filehandler.get_path_for_file(urllib.unquote_plus(filepath))
+
+    def _get_file_mtime(self, filepath,size_suffix=''):
+        if os.path.exists(filepath):
+            return datetime.utcfromtimestamp(os.path.getmtime(filepath))
+        return datetime(1970, 1, 1, 0, 0)
+
+    def _get_fileaccessor_mtime(self, filepath):
+        return self.fileaccessor.get_mtime(filepath)
+
+    def _get_size_suffix(self, request):
         width, height = get_size_from_dict(request.GET)
-        if not (width is None and height is None):
-            mtime = datetime.utcfromtimestamp(os.path.getmtime(filename))
-            filename = '%s-%sx%s'% (filename, width, height)
-            if os.path.isfile(filename):
-                cache_mtime = datetime.utcfromtimestamp( \
-                                    os.path.getmtime(filename))
-                if mtime > cache_mtime:
-                    rebuild_cache = True
-                else:
-                    rebuild_cache = False
-            else:
-                rebuild_cache = True
-            
-            if not os.path.exists(filename) or rebuild_cache:
-                resize_image(self.tempfile, filename, width, height)
-                
-        return http.ok([('content-type', get_mimetype(filename) )], \
-                       open(filename, 'rb').read())
+        if height and width:
+            return '-%sx%s'% (width, height)
+        return ''
 
-    @resource.GET()
-    def get_file(self, request):
-        """
-        Get a http response for this tempfile
-        """
-        return self.make_response(self.tempfile, request)
-    
-
+        
 
 def resize_image(src_path, target_path, width, height, quality=70):
     """

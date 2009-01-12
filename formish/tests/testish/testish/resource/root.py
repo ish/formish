@@ -1,4 +1,7 @@
 import logging
+import os.path
+import magic
+from datetime import datetime
 import tempfile
 from restish import resource, templating
 import formish
@@ -32,6 +35,44 @@ def get_forms(ids):
     return out
 
 
+
+class FileAccessor(object):
+    """
+    A skeleton class that should be implemented so that the files resource can
+    build caches, etc
+    """
+
+    def __init__(self):
+        self.prefix = 'store-%s'%tempfile.gettempprefix()
+        self.tempdir = tempfile.gettempdir()
+
+
+    def get_mimetype(self, filename):
+        """
+        Get the mime type of the file with this id
+        """
+        actualfilename = '%s/%s%s'% (self.tempdir, self.prefix, filename.split('-')[-1])
+        return magic.from_file(actualfilename, mime=True)
+
+
+    def get_mtime(self, filename):
+        actualfilename = '%s/%s%s'% (self.tempdir, self.prefix, filename.split('-')[-1])
+        return datetime.fromtimestamp( os.path.getmtime(actualfilename) )
+
+
+    def get_file(self, filename):
+        """
+        Get the file object for this id
+        """
+        actualfilename = '%s/%s%s'% (self.tempdir, self.prefix, filename.split('-')[-1])
+        return open(actualfilename).read()
+
+    def file_exists(self, filename):
+        actualfilename = '%s/%s%s'% (self.tempdir, self.prefix, filename.split('-')[-1])
+        return os.path.exists(actualfilename)
+
+
+
 class Root(resource.Resource):
 
     @resource.GET()
@@ -41,7 +82,7 @@ class Root(resource.Resource):
     
     def resource_child(self, request, segments):
         if segments[0] == 'filehandler':
-            return fileresource.FileResource(), segments[1:]
+            return fileresource.FileResource(fileaccessor=FileAccessor(),segments=segments[1:]), ()
         return FormResource(segments[0]), segments[1:]
 
 
@@ -91,7 +132,7 @@ class FormResource(resource.Resource):
                 filedata = f.file.read()
                 prefix = 'store-%s'%tempfile.gettempprefix()
                 tempdir = tempfile.gettempdir()
-                actualfilename = '%s/%s%s'% (tempdir, prefix, f.filename)
+                actualfilename = '%s/%s%s'% (tempdir, prefix, f.filename.split('-')[-1])
                 out = open(actualfilename,'w')
                 out.write(filedata)
                 out.close()
