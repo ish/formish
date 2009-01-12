@@ -24,6 +24,7 @@ ${data}
   % if rawdata is not None and 'myFileField' in rawdata:
 
 <div id="uploadedimage">
+<h3>Uploaded Image</h3>
   <div id="actual"><img src="/filehandler/${rawdata['myFileField'].filename}" /></div>
   <div id="resized"><img src="/filehandler/${rawdata['myFileField'].filename}?size=100x100" /></div>
 </div>

@@ -209,7 +209,6 @@ formish/dottedDict.py
 formish/filehandler.py
 formish/fileresource.py
 formish/forms.py
-formish/myfileresource.py
 formish/renderer.py
 formish/util.py
 formish/validation.py
@@ -268,6 +267,9 @@ formish/tests/testish/live.ini
 formish/tests/testish/run.sh
 formish/tests/testish/setup.py
 formish/tests/testish/testish.ini
+formish/tests/testish/cache/.gitignore
+formish/tests/testish/testdata/photo.jpg
+formish/tests/testish/testdata/photo.png
 formish/tests/testish/testdata/test.txt
 formish/tests/testish/testish/__init__.py
 formish/tests/testish/testish/wsgiapp.py
@@ -300,6 +302,7 @@ formish/tests/testish/testish/public/css/tripoli/plugins/tripoli.layout.css
 formish/tests/testish/testish/public/css/tripoli/plugins/tripoli.negative.css
 formish/tests/testish/testish/public/css/tripoli/plugins/tripoli.type.css
 formish/tests/testish/testish/public/css/tripoli/plugins/tripoli.visual.css
+formish/tests/testish/testish/public/images/nouploadyet.png
 formish/tests/testish/testish/public/js/formish.js
 formish/tests/testish/testish/public/js/jquery-1.2.6.min.js
 formish/tests/testish/testish/public/js/jquery-sortable.js

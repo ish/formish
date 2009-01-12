@@ -1,9 +1,13 @@
-import logging, os.path, tempfile
+import logging, os.path, tempfile, subprocess
 import formish, schemaish, validatish
 from formish.filehandler import TempFileHandlerWeb
 from testish.lib import xformish
 
 log = logging.getLogger(__name__)
+
+
+
+IDENTIFY = '/usr/bin/identify'
 
 ##
 # Make sure forms have the doc string with triple quotes 
@@ -611,10 +615,19 @@ def functest_RequiredStringAndFile(self, sel):#{{{
     try: self.assertEqual(sel.get_attribute("//div[@id='resized']/img@src")[-22:-13],"photo.jpg")
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    try: self.assertEqual("300", sel.get_text("css=#actual div"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
-    try: self.assertEqual("100", sel.get_text("css=#resized div"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    filesrc = sel.get_attribute("//div[@id='actual']/img@src")
+    filesrc = filesrc.split('/')[-1]
+    actualfilepath = 'cache/%s'%filesrc
+    assert os.path.exists(actualfilepath)
+    stdout = subprocess.Popen([IDENTIFY, actualfilepath], stdout=subprocess.PIPE).communicate()[0]
+    assert stdout.endswith('photo.jpg JPEG 300x300 300x300+0+0 DirectClass 8-bit 4.36133kb \n')
+    
+    actualfilepath = '%s-100x100'%actualfilepath
+    assert os.path.exists(actualfilepath)
+    stdout = subprocess.Popen([IDENTIFY, actualfilepath], stdout=subprocess.PIPE).communicate()[0]
+    assert stdout.endswith('photo.jpg-100x100 JPEG 100x100 100x100+0+0 DirectClass 8-bit 1.70703kb \n')
+
           
     return#}}}
 
