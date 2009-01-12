@@ -57,7 +57,9 @@ class FileAccessor(object):
 
     def get_mtime(self, filename):
         actualfilename = '%s/%s%s'% (self.tempdir, self.prefix, filename.split('-')[-1])
-        return datetime.fromtimestamp( os.path.getmtime(actualfilename) )
+        if os.path.exists(actualfilename):
+            return datetime.fromtimestamp( os.path.getmtime(actualfilename) )
+        return datetime(1970, 1, 1, 0, 0)
 
 
     def get_file(self, filename):
