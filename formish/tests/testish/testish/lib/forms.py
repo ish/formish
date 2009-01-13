@@ -567,7 +567,7 @@ def All():
 
 def ValidationOnSequenceItem():
     """
-    A structure witin a sequence, should be enhanced with javascript
+    Validation on a sequence item.
     """
     substructure = schemaish.Structure()
     substructure.add( 'a', schemaish.String(validator=validatish.Required()) )
@@ -578,6 +578,21 @@ def ValidationOnSequenceItem():
 
     form = formish.Form(schema, 'form')
     return form
+
+def ValidationOnSequence():
+    """
+    Validation on a collection (sequence).
+    """
+    substructure = schemaish.Structure()
+    substructure.add( 'a', schemaish.String() )
+    substructure.add( 'b', schemaish.Integer() )
+
+    schema = schemaish.Structure()
+    schema.add( 'myList', schemaish.Sequence( substructure, validator=validatish.Length(min=2)))
+
+    form = formish.Form(schema, 'form')
+    return form
+
 
 def RequiredStringAndFile():
     """
@@ -647,6 +662,8 @@ def functest_RequiredStringAndFile(self, sel):#{{{
 
           
     return#}}}
+
+
 
 ########################
 #
@@ -992,16 +1009,6 @@ def SequenceOfDateParts():
     form['birthdays.*.date'].widget = formish.DateParts()
     return form
 
-def SequenceOfSequencesAsTextArea():
-    """
-    A simple text area but representing a csv style data structure
-    """
-    schema = schemaish.Structure()
-    schema.add('table', schemaish.Sequence(schemaish.Tuple( (schemaish.String(), schemaish.Integer(), schemaish.Date()) )))
-    form = formish.Form(schema)
-    form['table'].widget = formish.TextArea()
-    return form
-    
 
 
 def functest_SequenceOfDateParts(self, sel):#{{{
@@ -1013,6 +1020,16 @@ def functest_SequenceOfDateParts(self, sel):#{{{
 
     return#}}}
 
+def SequenceOfSequencesAsTextArea():
+    """
+    A simple text area but representing a csv style data structure
+    """
+    schema = schemaish.Structure()
+    schema.add('table', schemaish.Sequence(schemaish.Tuple( (schemaish.String(), schemaish.Integer(), schemaish.Date()) )))
+    form = formish.Form(schema)
+    form['table'].widget = formish.TextArea()
+    return form
+    
 
 def SequenceOfStructures():
     """

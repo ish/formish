@@ -375,6 +375,11 @@ class SelectChoice(Widget):
     none_option = ('', '- choose -')
 
     def __init__(self, options, none_option=UNSET, css_class=None):
+        """
+        :arg options: either a list of values ``[value,]`` where value is used for the label or a list of tuples of the form ``[(value, label),]``
+        :arg none_option: a tuple of ``(value, label)`` to use as the unselected option
+        :arg css_class: a css class to apply to the field
+        """
         Widget.__init__(self)
         self.css_class = css_class
         self.options = _normalise_options(options)

@@ -536,11 +536,6 @@ class Form(object):
 
     The Form type is the container for all the information a form needs to
     render and validate data.
-
-    :var name: The name of the form, used to namespace classes and ids
-    :var defaults: Property to allow getting and setting of defaults
-    :var error: Used to indicate a non field specific error on the form. None
-                if no error
     """    
 
     renderer = _default_renderer
@@ -572,8 +567,6 @@ class Form(object):
 
         :arg renderer: Something that returns a form serialization when called
         :type renderer: callable
-
-
         """
         # allow a single schema items to be used on a form
         if not isinstance(structure, schemaish.Structure):

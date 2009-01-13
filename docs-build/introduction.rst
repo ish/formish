@@ -1,605 +1,539 @@
-*************
-About Formish
-*************
+*******************
+Introducing Formish
+*******************
 
-Formish is a templating language agnostic form generation and handling library. 
 
-Have a look at `http://ish.io:8891 <http://ish.io:8891>`_ for an example - if this isn't running, please email `support@ish.io <mailto://support@ish.io>`_
+.. note:: this introduction was written for a blog post. Please send any feedback or wishes for expansion to developers@ish.io
 
-Introduction - A Simple Form
-============================
+Matt Goodall and I had previously worked with the Nevow web framework for a lot of our software development work. We had developed a form library, called Formal, that had been reasonably well accepted and that had worked extremely well for most of our applications. However, working with Nevow/Twisted  meant that there were a lot of things we couldn't do that we would have liked.
 
-Creating a schema
------------------
+When we moved over to a new project, one of the things we wanted to bring with us was the way we worked with forms. The library, now called formish, is just about ready for production use and I wanted to demonstrate some of its features and discuss some of the philosophy behind it. 
 
-First of all we need to create a data schema to define what types of data we want in the form. Schema's use the 'Schemaish' package which lets you define structures against which you can validate/convert data. Lets take a look at the structure of a Form instance to begin with
+A big goal for the form library was to break the problem down into it's discrete components. These being
 
+* Templating
+* Validation
+* Data Schema
+* Data Conversion
 
->>> import schemaish
->>> schema = schemaish.Structure()
->>> schema.add( 'myfield', schemaish.String() )
->>> schema.attrs
-[('myfield', <schemaish.attr.String object at 0x...>)]
+A library that addressed each of these should work independently of each other and hopefully could be used in a project that had nothing to do with forms (apart from the templating bit). 
 
-Creating a form
----------------
+Here is a diagram that tries to show the data flow through the widget structure.
 
-So we now have a single field in our schema which is defined as a string. We can now create a form from this
+.. image:: _static/images/graphic/formish-dataflow.png
 
->>> import formish
->>> form = formish.Form(schema)
+We've tried to keep the data flow as layered as possible. In this diagram you can see the rounded boxes represent the changing data representation and the vertical dotted lines the different library code that handles transformations. Don't worry too much about the 'pre_parse_request' but at the moment, its used to pre-munge some aspects request data to make the process as symmetric as possible,
 
-Attributes of a form
-^^^^^^^^^^^^^^^^^^^^
+Data Schema
+-----------
 
-And what can we do with the form? Well at the moment we have a form name and some fields
+Any form has to work on a data structure of some sort and it makes sense for this not to be tied in any way to web data. We built a fairly light weight schema library called `schemaish <http://ish.io/projects/show/schemaish>`_ which defines data structures and allows metadata (such as field titles and descriptions) to be assigned. Validation can also be added to each node in a schema (see later). Here are a few examples of creating schema structures.
 
->>> form.name
-'formish'
+.. code-block:: python
 
->>> for field in form.fields:
-...     print field
-... 
-<formish.forms.Field object at 0x...>
+    import schemaish
 
-Attributes of a field
-^^^^^^^^^^^^^^^^^^^^^
+    schema_item = schemaish.Integer()
 
-And what about our field? Well it's now become a form field, which means it has a few extra attributes to do with creating things like classes, ids, etc.
+    # or 
 
->>> field = form.fields.next()
->>> field.name
-'myfield'
+    my_schema = schemaish.Structure()
+    my_schema.add( 'name', schemaish.String() )
+    my_schema.add( 'age', schemaish.Integer() )
 
-Obviously the name is what we have it.
+    # or 
 
->>> field.widget
-<bound widget name="myfield", widget="Input", type="String">
+    class MyStructure(schemaish.Structure):
+        name = schemaish.String()
+        age = schemaish.Integer()
 
->>> field.title
-'Myfield'
 
-The title, if not specified in the schema field, is derived from the form name by converting camel case into capitalised words.
+Each of these schemas can be validated, however we don't have any validators yet. We looked for a reusable validator library that was simple in execution (i.e. just callable!) but there weren't any that really fitted the bill (we tried FormEncode but it seems to conflate validation and conversion, which we don't think is quite right - personal opinion of course)).
 
->>> field.cssname
-'formish-myfield'
 
-This is the start of the templating stuff.. The cssname is an identifier that can be inserted into forms, used for ids and class names.
+Validatish
+----------
 
-How to create HTML
-------------------
+Validation should be simple, just call a validator with a value and it should either succeed or raise an exception. Obviously some validators need to be configured so you should either pass in some configuration variables to a function or instantiate a validator object that has a ``__call__`` method.
 
-We create our HTML by calling the form as follows..
+In our `validatish <http://ish.io/projects/show/validatish>`_ package, we created two submodules with the function validators in one (validatish.validate) and the class validators (which use the function validatos internally) in another (validatish.validator).
 
->>> form()
-'...<form id="formish" action="" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">...'
-
-I've skipped the majority of this output as it's probably better shown formatted
-
-.. code-block:: html
-
-    <form id="formish" action="" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">
-      <div>
-        <input type="hidden" name="_charset_" />
-        <input type="hidden" name="__formish_form__" value="formish" />
-        <div id="formish-myfield-field" class="field string input">
-          <label for="formish-myfield">Myfield</label>
-          <div class="inputs">
-            <input id="formish-myfield" type="text" name="myfield" value="" />
-          </div>
-        </div>
-        <div class="actions">
-          <input type="submit" id="formish-action-submit" name="submit" value="Submit" />
-        </div>
-      </div>
-    </form>
-
-What's in the HTML
-------------------
-
-Firstly we have the form setup itself. The form name/id can be set by passing it into the Form as follows.
-
->>> named_form = Form(schema,name='myformname')
-
-Otherwise the form defaults to 'formish'. 
-
-The method at the moment is always 'post' but a future release will implement get forms also. The final two attributes, enctype and accept-charset make the form behave in as consistent a way as possible. Defaulting to content type of 'utf-8' and handling the form data accoring to http://www.ietf.org/rfc/rfc2388.txt 'multipart/form-data'. 
-
-The form html element
-^^^^^^^^^^^^^^^^^^^^^
-
-.. code-block:: html
-
-    <!-- The Form -->
-    <form id="formish" action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
-
-The first hidden field is '_charset_ which is a hack to help mozilla handle charsets as described here https://bugzilla.mozilla.org/show_bug.cgi?id=18643. The second is the name of the form, used after submission to work out which form has been returned.
-
-The form configuration attributes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-.. code-block:: html
-
-      <!-- Form Configuration Attributes -->
-      <input type="hidden" name="_charset_" />
-      <input type="hidden" name="__formish_form__" value="formish" />
-
-
-The field itself has an id, using the form name, field name and the suffix '-field' to help with javascript, css, etc. There are also a bunch of classes that allow global css to be applied to different widget types or schema types.
-
-The label points at the field, which in this case is the only input field. In the case of a date parts widget (three input boxes), the label's for attribute would point at the first field.
-
-The 'input's div is a container that holds the widget itself, in this case just a single input field with an id for the label to point at.
-
-The input field(s)
-^^^^^^^^^^^^^^^^^^
-
-.. code-block:: html
-
-      <!-- The String Field -->
-      <div id="formish-myfield-field" class="field string input">
-        <label for="formish-myfield">Myfield</label>
-        <div class="inputs">
-          <input id="formish-myfield" type="text" name="myfield" value="" />
-        </div>
-      </div>
-
-The action(s)
-^^^^^^^^^^^^^
-
-Finally, the actions block contains all of the submit buttons - in this case just a single input with the default 'submit' value.
-
-.. code-block:: html
-
-      <!-- The Action(s) -->
-      <div class="actions">
-        <input type="submit" id="formish-action-submit" name="submit" value="Submit" />
-      </div>
-    </form>
-
-
-Processing the Submitted Form
------------------------------
-
-Once the form is submitted, we can get the data by calling 'validate'. In order to simulate this, we're going to create a request object by hand using webob.. 
-
->>> import webob
->>> r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
->>> r.POST['myfield'] = 'myvalue'
->>> form.validate(r)
-{'myfield': u'myvalue'}
-
-And that is our simple form overview complete. 
-
-Introduction - A Slightly More Complex Form
-===========================================
-
-OK, We're going to put a more things together for this.. 
-
-* A custom form name
-* Different schema types
-* different widgets
-* Form errors
-
-Creating the form
------------------
-
-For our contrived example, we'll build a simple registration form.
-
->>> import schemaish
->>> schema = schemaish.Structure()
->>> schema.add( 'firstName', schemaish.String() )
->>> schema.add( 'surname', schemaish.String() )
->>> schema.add( 'dateOfBirth', schemaish.Date() )
->>> schema.add( 'streetNumber', schemaish.Integer() )
->>> schema.add( 'country', schemaish.String() )
->>> schema.add( 'termsAndConditions', schemaish.Boolean() )
->>> form = formish.Form(schema)
-
-As you can see, we've got strings, an integer, a data and a boolean. 
-
-We could also have built the schema using a declarative style
-
->>> class MySchema(schemaish.Structure):
-...     firstName = schemaish.String()
-...     surname = schemaish.String()
-...     dateOfBirth = schemaish.Date()
-...     streetNumber = schemaish.Integer()
-...     country = schemaish.String()
-...     termsAndConditions = schemaish.Boolean()
->>> form = formish.Form(MySchema())
-
-By default, all of the fields use input boxes with the date asking for isoformat and the boolean asking for True or False. We want to make the form a little friendlier though. 
-
-We'll start with the date widget. Date parts uses three input boxes instead of a single input and, by default, is in US month first format. We're in the UK so we change dayFirst to True
-
->>> form['dateOfBirth'].widget = formish.DateParts(dayFirst=True)
-
-Next we'll make the country a select box. To do this we pass a series of options to the SelectChoice widget.
-
->>> form['country'].widget = formish.SelectChoice(options=['UK','US'])
-
-If we wanted different values for our options we would pass each option in as a tuple of ('value','label'). We could also set a label for the field that appears when there is no input value. This is called the 'none_option'. The none_options defaults to ('', '--choose--') so we could change it to ('','Pick a Country'). Here is an example
-
->>> options = [('UK','I live in the UK'),('US','I live in the US')]
->>> none_option = ('','Where do you live')
->>> form['country'].widget = formish.SelectChoice(options=options, none_option=none_option)
-
-Finally, we'd like a checkbox for the Boolean value
-
->>> form['termsAndConditions'].widget = formish.Checkbox()
-
-How does this form work?
-------------------------
-
-Well let's give it some default values and look at what we get. 
-
->>> import datetime
->>> form.defaults = {'firstName': 'Tim', 'surname': 'Parkin', 'dateOfBirth': datetime.datetime(1966,12,18), 'streetNumber': 123, 'country': 'UK', 'termsAndConditions': False}
-
-If we create the form now, we get the following fields. One thing to note is that most widgets within Formish use strings to serialise their values into forms. The exception here is the date parts widget. 
-
-String fields
-^^^^^^^^^^^^^
-
-This is the same as our first example but note that the label for firstName has been expanded into 'First Name'.
-
-.. code-block:: html
-
-    <div id="formish-firstName-field" class="field string input">
-      <label for="formish-firstName">First Name</label>
-      <div class="inputs">
-        <input id="formish-firstName" type="text" name="firstName" value="Tim" />
-      </div>
-    </div>
-
-    <div id="formish-surname-field" class="field string input">
-      <label for="formish-surname">Surname</label>
-      <div class="inputs">
-        <input id="formish-surname" type="text" name="surname" value="Parkin" />
-      </div>
-    </div>
-
-Date Field
-^^^^^^^^^^
-
-The date field splits the date into three parts, each part indicated using dotted notation.
-
-.. raw:: html
-
-    <div id="formish-dateOfBirth-field" class="field date dateparts">
-      <label for="formish-dateOfBirth">Date Of Birth</label>
-      <div class="inputs">
-        <input id="formish-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
-        <input id="formish-dateOfBirth-month" type="text" name="dateOfBirth.month" value="12" size="2" /> /
-        <input id="formish-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
-      </div>
-    </div>
-
-.. code-block:: html
-
-    <div id="formish-dateOfBirth-field" class="field date dateparts">
-      <label for="formish-dateOfBirth">Date Of Birth</label>
-      <div class="inputs">
-        <input id="formish-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
-        <input id="formish-dateOfBirth-month" type="text" name="dateOfBirth.month" value="12" size="2" /> /
-        <input id="formish-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
-      </div>
-    </div>
-
-Integer Field
-^^^^^^^^^^^^^
-
-.. code-block:: html
-
-    <div id="formish-streetNumber-field" class="field integer input">
-      <label for="formish-streetNumber">Street Number</label>
-      <div class="inputs">
-        <input id="formish-streetNumber" type="text" name="streetNumber" value="123" />
-      </div>
-    </div>
-
-Select Field
-^^^^^^^^^^^^
-
-This uses the 'none_option' value to show 'Where do you live' by default but because we have set a default value, 'I live in the UK' is selected.
-
-.. raw:: html
-
-    <div id="formish-country-field" class="field string selectchoice">
-      <label for="formish-country">Country</label>
-      <div class="inputs">
-        <select id="formish-country" name="country">
-          <option value="">Where do you live</option>
-          <option value="UK" selected="selected" >I live in the UK</option>
-          <option value="US" >I live in the US</option>
-        </select>
-      </div>
-    </div>
-
-.. code-block:: html
-
-    <div id="formish-country-field" class="field string selectchoice">
-      <label for="formish-country">Country</label>
-      <div class="inputs">
-        <select id="formish-country" name="country">
-          <option value="">Where do you live</option>
-          <option value="UK" selected="selected" >I live in the UK</option>
-          <option value="US" >I live in the US</option>
-        </select>
-      </div>
-    </div>
-
-
-Boolean Field
-^^^^^^^^^^^^^
-
-.. code-block:: html
-
-    <div id="formish-termsAndConditions-field" class="field boolean checkbox">
-      <label for="formish-termsAndConditions">Terms And Conditions</label>
-      <div class="inputs">
-        <input id="formish-termsAndConditions" type="checkbox" name="termsAndConditions" value="True" checked="checked"  />
-      </div>
-    </div>
-
-
-Processing the submitted form
------------------------------
-
-Repeating the creation of a request using webob, setting some input values and validating gives us:
-
->>> import webob
->>> r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
->>> r.POST['firstName'] = 'Tim'
->>> r.POST['surname'] = 'Parkin'
->>> r.POST['streetNumber'] = '123'
->>> r.POST['dateOfBirth.day'] = '18'
->>> r.POST['dateOfBirth.month'] = '13'
->>> r.POST['dateOfBirth.year'] = '1966'
->>> r.POST['country'] = 'UK'
->>> r.POST['termsAndConditions'] = 'True'
->>> form.validate(r)
-...formish.validation.FormError: Tried to access data but conversion from request failed with 1 errors
-
-The observant amongst you will notice I put a month of 13 in which has triggered a FormError.
-
-Let's look at some of the error states on the form now
-
->>> form.errors
-{'dateOfBirth': ConvertError('Invalid date: month must be in 1..12',)}
-
-The form has a dictionary of errors on it that map to the field names.
-
->>> field = form.get_field('dateOfBirth')
->>> field.error
-ConvertError('Invalid date: month must be in 1..12',)
-
-The dateOfBirth field shows it's own error.
-
-Showing the errors
-------------------
-
-The whole form is now in an error state and we can interrogate it about the errors. The form will also render itself with these errors.
-
->>> field.classes
-'field date dateparts error'
->>> field()
-
-This produces the following - note the error 'span' below the form field.
-
-.. raw:: html
-
-    <div id="formish-dateOfBirth-field" class="field date dateparts error">
-      <label for="formish-dateOfBirth">Date Of Birth</label>
-      <div class="inputs">
-        <input id="formish-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
-        <input id="formish-dateOfBirth-month" type="text" name="dateOfBirth.month" value="13" size="2" /> /
-        <input id="formish-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
-      </div>
-      <span class="error">Invalid date: month must be in 1..12</span>
-    </div>
-
-.. code-block:: html
-
-    <div id="formish-dateOfBirth-field" class="field date dateparts error">
-      <label for="formish-dateOfBirth">Date Of Birth</label>
-      <div class="inputs">
-        <input id="formish-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
-        <input id="formish-dateOfBirth-month" type="text" name="dateOfBirth.month" value="13" size="2" /> /
-        <input id="formish-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
-      </div>
-      <span class="error">Invalid date: month must be in 1..12</span>
-    </div>
-
-Calling the 'form()' will render the whole form including the error messages.
-
-Let's see what happens if we have an invalid integer - we'll fix the month first
-
->>> r.POST['dateOfBirth.month'] = '12'
->>> r.POST['streetNumber'] = 'aa'
->>> form.validate(r)
-...formish.validation.FormError: Tried to access data but conversion from request failed with 1 errors
->>> field = form.get_field('streetNumber')
->>> field.error
-ConvertError('Not a valid number',)
->>> 
-
-Finally, lets see what valid data gives us.. 
-
->>> r.POST['streetNumber'] = '123'
->>> form.validate(r)
-{'termsAndConditions': True, 'surname': u'Parkin', 'firstName': u'Tim', 'country': u'UK', 'dateOfBirth': datetime.date(1966, 12, 18), 'streetNumber': 123}
-
-
-
-
-
-Validation
-==========
-
-Validation in Formish uses simple callable validators that raise an exception,
-validatish.Invalid, if validation fails.
-
-How Validators Work
--------------------
-
-There is a library of validators called Validatish that has most of the typical examples you might need. Let's take a look at a simple integer validator.
+Here is an example of a function based validator
 
 .. code-block:: python
 
     def is_string(v):
+        """ checks that the value is an instance of basestring """
+        if v is None:
+            return
         msg = "must be a string"
         if not isinstance(v,basestring):
             raise Invalid(msg)
 
-the String validater get's called and raises an exception if the value is not an instance of 'basestring'. Lets take a look at another validator
-
-.. note:: 
-  
-    Actual validators should not raise errors when None is passed. This is to make sure non-required fields don't raise errors if they are left empty.
-
-Here we have an integer validator. This tries to convert the value to an integer and if it fails, raises an exception.
+And here is an example of its matching class based version. We recommend using the class based validators all of the time to keep consistency (you can't use function based validators if the validator needs configuring - schemaish expects a callable that takes a single argument).
 
 .. code-block:: python
 
-    def is_integer(v):
-        if v is None:
-            return
-        msg = "must be an integer"
-        try:
-            if v != int(v):
-                raise Invalid(msg)
-        except (ValueError, TypeError):
-            raise Invalid(msg)
-
-Let's see this one in action
-
->>> schema = schemaish.Structure()
->>> schema.add( 'myfield', schemaish.Integer(validator=validatish.is_integer) )
->>> form = formish.Form(schema)
->>> r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
->>> r.POST['myfield'] = 'aa'
->>> form.validate(r)
-...formish.validation.FormError: Tried to access data but conversion from request failed with 1 errors
-
->>> form.errors
-{'myfield': ConvertError('Not a valid number',)}
-
-Whilst it is perfectly acceptable to use functions for validation, our main library uses classes to aid type checking (for example to find out if our field is required for css styling) and in order to pass validator configuration.
-
-The validatish library is split up into two main modules, validate and validator. Validate contains the functions that do the actual validation. Validators are class wrappers around the functions.
-
-For example, here is our required validation function and validator
-
-
-.. code-block:: python
-
-    def is_required(v):
-        if not v and v != 0:
-            raise Invalid("is required")
-
-.. code-block:: python
-
-    class Required(Validator):
-        """ Checks that the value is not empty """
-
+    class String(Validator):
         def __call__(self, v):
-            validate.is_required(v)
-
-The Required validator is sub-classing Validator but this is just an interface class (i.e. just documents the necessary methods - in this case just __call__)
-
-So the validator is a callable and it uses the python 'non_zero' check so see if we have a value. Obviously we have to let zero through because if we're asking for an integer, zero is a valid answer; However, an empty string, empty list or None is invalid.
-
-.. note:: The Required validator must be sub-classed if you want to create your own required validator. This is to ensure that formish inserts the appropriate css to mark up the required form fields
+            validate.is_string(v)
 
 
-File Uploads 
-============
+.. note:: If a value is None, then the validation is not applied (this would imply a required constraint also).
 
-Short Version
--------------
+So, now we can pass a validator into one of our schema instances
 
-We handle files for you so that all you have to do is process the file handle given to you.. Here is an example using the default filehandlers..
+.. code-block:: python
 
->>> schema = schemaish.Structure()
->>> schema.add( 'myfile', schemaish.File )
->>> form = formish.Form(schema)
->>> from formish import filehandler
->>> form['myfile'].widget = formish.FileUpload(filehandler=filehandler.TempFileHandlerWeb())
+    >>> import schemaish
+    >>> from validatish import validator
 
-What does this produce?
-^^^^^^^^^^^^^^^^^^^^^^^
+    >>> schema = schemaish.String(validator=validator.String()))
+
+    >>> try:
+    ...     schema.validate(10)
+    ...     print 'success!'
+    ... except schemaish.Invalid, e:
+    ...     print 'error',e.error_dict
+    ... 
+    error {'': 'must be a string'}
+
+    >>> try:
+    ...     schema.validate('foo')
+    ...     print 'success!'
+    ... except schemaish.Invalid, e:
+    ...     print 'error',e.error_dict
+    ... 
+    success!
+
+.. note:: Validators do not return any value on success (or more correctly they return None). 
+
+If we apply validators to multiple items in a structure, we can validate them all in one go. 
+
+.. code-block:: python
+
+    >>> import schemaish
+    >>> from validatish import validator
+
+    >>> schema = schemaish.Structure()
+    >>> schema.add('name', schemaish.String(validator=validator.String()))
+    >>> schema.add('age', schemaish.Integer(validator=validator.Range(min=18)))  
+
+    >>> try:
+    ...     schema.validate({'name': 6, 'age': 17})
+    ...     print 'success!'
+    ... except schemaish.Invalid, e:
+    ...     print 'error',e.error_dict
+    ... 
+    error {'age': 'must be greater than 18', 'name': 'must be a string'}
+
+    >>> try:
+    ...     schema.validate({'name': 'John Drake', 'age': 28})
+    ...     print 'success!'
+    ... except schemaish.Invalid, e:
+    ...     print 'error',e.error_dict
+    ... 
+    success!
+
+Because validators are just callables, they are very easy to write and adding validators to groups of items or sequences is simple. We've implemented Any and All validators (thanks Ian!) that work similarly to FormEncode's to allow grouping of rules. We're hoping to expand on the validators but not until we have a requirement (either from ourselves or from someone hoping to use the package). We've learned from experience to plan ahead but not to build ahead of requirements.
+
+The Form and the Widget
+-----------------------
+
+So far, everythig we've shown has had nothing to do with forms.. Let's change that. First of all we need to define the form. This is fairly simple with formish because most of the work has been done in schemaish. 
+
+Using the form definition with age and name from above, we create a form by passing in the schema.
+
+.. code-block:: python
+
+    >>> import formish
+    >>> form = formish.Form(schema)
+
+and that is it... if you want to render the form now, you just call it (we've implemented a default mako renderer for testing).
+
+.. code-block:: python
+
+    >>> form()
+    '\n<form id="formish" action="" class="formish-form" method="post"
+    enctype="multipart/form-data" accept-charset="utf-8">\n\n  <input
+    type="hidden" name="_charset_" />\n  <input type="hidden"
+    name="__formish_form__" value="formish" />\n\n<div id="formish-name-field"
+    class="field string input">\n\n<label
+    for="formish-name">Name</label>\n\n\n<div class="inputs">\n\n<input
+    id="formish-name" type="text" name="name" value="" />\n\n</div>\n\n\n<span
+    class="error"></span>\n\n\n\n</div>\n\n<div id="formish-age-field"
+    class="field integer input">\n\n<label
+    for="formish-age">Age</label>\n\n\n<div class="inputs">\n\n<input
+    id="formish-age" type="text" name="age" value="" />\n\n</div>\n\n\n<span
+    class="error"></span>\n\n\n\n</div>\n\n\n  <div class="actions">\n
+    <input type="submit" id="formish-action-submit" name="submit"
+    value="Submit" />\n  </div>\n\n</form>\n\n'
+
+Lets tidy that up a little
 
 .. code-block:: html
 
-    <div id="formish-myfile-field" class="field type fileupload">
-      <label for="formish-myfile">Myfile</label>
-      <div class="inputs">
-        <input id="formish-myfile-remove" type="checkbox" name="myfile.remove" value="true" />
-        <input id="formish-myfile-id" type="hidden" name="myfile.name" value="" />
-        <input id="formish-myfile-default" type="hidden" name="myfile.default" value="" />
-        <input id="formish-myfile" type="file" name="myfile.file" />
+    <form id="formish" action="" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+      <input type="hidden" name="_charset_" />
+      <input type="hidden" name="__formish_form__" value="formish" />
+      <div id="formish-name-field" class="field string input">
+        <label for="formish-name">Name</label>
+        <div class="inputs">
+          <input id="formish-name" type="text" name="name" value="" />
+        </div>
+        <span class="error"></span>
       </div>
+      <div id="formish-age-field" class="field integer input">
+        <label for="formish-age">Age</label>
+        <div class="inputs">
+          <input id="formish-age" type="text" name="age" value="" />
+        </div>
+        <span class="error"></span>
+      </div>
+      <div class="actions">
+        <input type="submit" id="formish-action-submit" name="submit" value="Submit" />
+      </div>
+    </form>
+ 
+
+Without defining any widgets, formish just uses some defaults. Let's take a look at the default widget to find out what it is doing.
+
+.. code-block:: python   
+
+    class Widget(object):
+
+        _template = None
+
+        def __init__(self, **k):
+            self.converter_options = k.get('converter_options', {})
+            self.css_class = k.get('css_class', None)
+            self.converttostring = True
+            if not self.converter_options.has_key('delimiter'):
+                self.converter_options['delimiter'] = ','
+        
+        def pre_render(self, schema_type, data):
+            string_data = string_converter(schema_type).from_type(data)
+            if string_data is None:
+                return ['']
+            return [string_data]
+
+        def pre_parse_request(self, schema_type, request_data):
+            return request_data
+
+        def convert(self, schema_type, request_data):
+            return string_converter(schema_type).to_type(request_data[0])
+
+        def __call__(self, field):
+            return field.form.renderer('/formish/widgets/%s.html'%self._template, {'f':field})
+
+This is the base class which shows how widgets work. First of all we have a couple of variables to do with converter options (which we'll come back to in a moment). The four class methods are at the hear of formish though.
+
+pre_render
+..........
+
+Before a widget is rendered, the input data is converted from its schema type to raw request data. The data passed to pre_render is just that fields data.
+
+
+convert
+.......
+
+Takes the request data for the field and converts it to the schema type.
+
+__call__
+........
+
+And finally, if you want the widget to render, just call it! That's it..  So we have a path from data -> request data and back from request data > data.. 
+
+
+Oh.. I left out one.. 
+
+pre_parse_request_data
+......................
+
+When a field is submitted, the request data can be munged to try to enforce some sort of symmetry between input request data and output request data. This is only really used for file uploads where the field storage is extracted to a temporary location before passing the request data to convert. So, for most cases just ignore this.
+
+Convertish
+----------
+
+You can see from the example that the main conversion process is done using ``string_converter``. This is one of the converter types in ``convertish`` and maps any of the schemaish types into a consistent string representation. It does so using peak.rules (although we could be convinced otherwise) and each string_converter implements a ``from_type`` and a ``to_type``. For examples
+
+
+.. code-block:: python   
+
+    class IntegerToStringConverter(Converter):
+        cast = int
+        
+        def from_type(self, value, converter_options={}):
+            if value is None:
+                return None
+            return str(value)
+        
+        def to_type(self, value, converter_options={}):
+            if value is None:
+                return None
+            value = value.strip()
+            try:
+                value = self.cast(value)
+            except ValueError:
+                raise ConvertError("Not a valid number")
+            return value
+
+So we short circuit None values, strip the data and cast it to the right type and raise a conversion exception if it fails. 
+
+The widget templates
+--------------------
+
+So we now have a form defined and an example of a simple widget. Let's take a look at how formish renders its widgets, the bits involved in creating a form. We render a form by calling it so ``form()`` produces the templated output. Calling a form just passes the form to the ``form.html`` template which is as follows. We only have mako templates at the minute but we've designed formish with simple templating features in mind so adding other templating langauges should be simple.. 
+
+``form.html``
+
+.. code-block:: mako
+
+    ${form.header()|n}
+    ${form.metadata()|n}
+    ${form.fields()|n}
+    ${form.actions()|n}
+    ${form.footer()|n}
+
+So the form template just calls each individual part. Here are the templates for each part (I've combined them together and separated them by comments to save on space).
+
+
+``form_header.html``
+
+.. code-block:: mako
+
+    <%
+    if form.action_url:
+        action_url = form.action_url
+    else:
+        action_url = ''
+    %>
+    <form id="${form.name}" action="${action_url}" class="formish-form"
+         method="post" enctype="multipart/form-data" accept-charset="utf-8">
+
+``form_metadata.html``
+
+.. code-block:: mako
+
+    <input type="hidden" name="_charset_" />
+    <input type="hidden" name="__formish_form__" value="${form.name}" />
+
+``form_fields.html``
+
+.. code-block:: mako
+
+    %for f in form.fields:
+    ${f()|n}
+    %endfor
+
+``form_actions.html``
+
+.. code-block:: mako
+
+    <div class="actions">
+    %if form._actions == []:
+      <input type="submit" id="${form.name}-action-submit" name="submit" value="Submit" />
+    %else:
+      %for action in form._actions:
+      <input type="submit" id="${form.name}-action-${action.name}" 
+           name="${action.name}" value="${action.label}" />
+      %endfor
+    %endif
     </div>
 
-and looks like
+``form_footer.html``
 
-.. raw:: html 
+.. code-block:: mako
 
-    <div id="formish-myfile-field" class="field type fileupload">
-      <label for="formish-myfile">Myfile</label>
-      <div class="inputs">
-        <input id="formish-myfile-remove" type="checkbox" name="myfile.remove" value="true" />
-        <input id="formish-myfile-id" type="hidden" name="myfile.name" value="" />
-        <input id="formish-myfile-default" type="hidden" name="myfile.default" value="" />
-        <input id="formish-myfile" type="file" name="myfile.file" />
-      </div>
+    </form>
+
+The most complicated part is probably the actions because of the default submit action applied if no explicit actions are give. 
+
+Most values are available as attributes on the form such as ``form.name`` and ``action.label``.
+
+More interesting is how each field is rendered.
+
+.. code-block:: mako
+
+    <div id="${field.cssname}-field" class="${field.classes}">
+    ${field.label()|n}
+    ${field.inputs()|n}
+    ${field.error()|n}
+    ${field.description()|n}
     </div>
 
-The checkbox is included to allow you to remove a file if necessary. 
+So each field is built in the same way as the main form. Here are the parst used.
 
-How does this return a file to me?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+``field_label.html``
 
-You will get a schemaish.type.File object back which looks like this
+.. code-block:: mako
+
+    <%page args="field" />
+    % if field.widget._template != 'Hidden':
+    <label for="${field.cssname}">${field.title}</label>
+    %endif
+
+``field_inputs.html``
+
+.. code-block:: mako
+
+    <%page args="field" />
+    <div class="inputs">
+    ${field.widget()|n}
+    </div>
+
+``field_error.html``
+
+.. code-block:: mako
+
+    <%page args="field" />
+    % if field.error:
+    <span class="error">${unicode(field.error)}</span>
+    % endif
+
+``field_description.html``
+
+.. code-block:: mako
+
+    <%page args="field" />
+    % if str(field.description) != '':
+    <span class="description">${field.description}</span>
+    % endif
+
+Here we can see that each part of the template uses the field attributes and methods to render themselves. Finally, here is the standard Input widget.
+
+
+``Input/widget.html``
+
+.. code-block:: mako
+
+    <%page args="field" />
+    <input id="${field.cssname}" type="text"
+           name="${field.name}" value="${field.value[0]}" />
+
+
+This does seem a little excessive though.. Why have all of these little template components? Doesn't it make things more complicated? (note to self.. stop talking to yourself)
+
+Actually for most users, there will be no exposure to these components. However, as soon as you want to create a custom form template, instead of adding ``${form()}`` to your template to get totally automatic form production, you can do the following.
+
+.. code-block:: mako
+
+    ${form.header()|n}
+    ${form.metadata()|n}
+
+    ${form['firstName']()|n}
+
+    <div id="${form['surname'].cssname}-field" class="${form['surname'].classes}">
+      <strong>${form['surname'].description}</strong>
+      <em>${form['surname'].error}</em>
+      ${form['surname'].widget()|n}
+    </div>
+
+    ${form.actions()|n}
+    ${form.footer()|n}
+
+Allowing you to pick your own level of control from totally automatic, through partial overriding to totally custom form components. 
+
+Each part of the form can be overridden by using a local ``formish`` template directory. Allowing you to provide your own suite of templates.
+
+We're hoping to add the ability to pass in which fields to render and also individual custom templates too.. Something like the following
+
+.. code-block:: mako
+
+    ${form.fields(form.fieldlist[:4])|n}
+
+    <div id="${form['surname'].cssname}-field" class="${form['surname'].classes}">
+      <strong>${form['surname'].description}</strong>
+      <em>${form['surname'].error}</em>
+      ${form['surname'].widget()|n}
+    </div>
+
+
+    ${form.fields(form.fieldlist[6:])|n}
+
+What we're doing here is just passing the names of the fields we want to render to the ``form.fields`` object. In it's most simple form it would be ``form.fields( ['name','age'] )`` but we could easily uselist comprehensions, filters, etc. 
+
+If you want to see a few more examples of formish capabilities, have a look at `http://ish.io:8891 <http://ish.io:8891>`_.
+
+Using your form
+---------------
+
+In order to use the form that you've created, you pass the ``request.POST`` data to it and either check the results or pass a success/failure callback.. Here is an example using the success,failure callback (in this case self.html, self.thanks)
 
 .. code-block:: python
 
-    class File(object):
+    class SimpleSchema(schemaish.Structure):
+        email = schemaish.String(validator=schemaish.All(schemaish.NotEmpty, schemaish.Email))
+        first_names = schemaish.String(validator=schemaish.NotEmpty)
+        last_name = schemaish.String(validator=schemaish.NotEmpty)
+        comments = schemaish.String()
 
-        def __init__(self, file, filename, mimetype):
-            self.file = file
-            self.filename=filename
-            self.mimetype=mimetype
 
-Where file is a file like object, filename is the original filename and the mimetype is worked out from the file suffix. All you have to do is ``.read()`` from the file attribute to get the contents.
+    def get_form():
+        form = formish.Form(SimpleSchema())
+        form['comments'].widget = formish.TextArea()
+        return form  
 
-Longer Version
---------------
+    class Root(resource.Resource):
 
-File uploads are quite often the most difficult aspect of form handling. Formish has tried to make some pragmatic decisions that should ease this process for you. The first of these decisions is what type of data to use to store a file. Because we are using webob, files that arrive in formish do so in FieldStorage representation.
+        @resource.GET()
+        @templating.page('test.html')
+        def html(self, request, form=None):
+            if form is None:
+                form = get_form()
+            return {'form': form}
 
-Upload File Temporary Storage
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        @resource.POST()
+        def POST(self, request):
+            return get_form().validate(request, self.html, self.thanks)
 
-Formish tries to ensure that fields are 'symmetric'. i.e. what goes in comes back out in the same format). For text fields this is quite simple but for a file upload things are a little more difficult. What formish does is to use a temporary store in order to save the file in a secure location for access later. You can implement this store if you wish, using sessions or databaseses, etc. Here is the signature for a filehandler..
+        @templating.page('thanks.html')
+        def thanks(self, request, data):
+            return {'data': data}
 
-.. code-block:: python
+These examples are using the restish wsgi framework but because the form just works with dictionaries it's simple to integrate into any web framework.
 
-    class FileHandlerMinimal(object):
-        """ Example of File handler for formish file upload support. """
 
-        def store_file(self, fs):
-            """ Method to store a file """
+What else is there?
+-------------------
 
-        def get_path_for_file(self, filename):
-            """ Method to get a path for a file on disk """
+Well we've spent a lot of time trying to get file upload fields to work in a friendly fashion so that we can have nested sequences of file uploads with temporary storage, image resizing and caching right out the box. We've worked hard to make sequences work well and have tested nested lists of nested lists of structures and file uploads, selects, etc. etc. If you can think of a data structure made of lists and dictionaries, formish will represent it. Sequences currently use jquery to add, remove and reorder although we'll have non-javascript support in the next few weeks.
 
-As you can see, the two important things are a method to store the file and a method to get the file back off disk given the filename. 
+Anything else interesting?
+--------------------------
 
-Our tempfile handler implements this as follows.
+Date Parts Widget
+.................
+
+Well, a dateparts widget is vaguely interesting as the converter methodology doesn't work using the standard string converter.
+
+The ``widget`` would have to ``convert`` the three fields into a string date representation first before passing it to ``convertish`` to cast it to the correct schema type and then ``valdatish`` for validation.
+
+However we now have a widget doing conversion, which we were hoping to avoid. The only reason we would be forced into doing this is because of the string_converter choice. However, we can use any type of converter we like. For our ``DateParts`` widget we have used a ``DateTupleConverter`` which means that widget just passes the three values as a tuple to ``convertish`` which can raise convert errors against individual widget input boxes if required.
+
+Fancy Converters
+................
+
+Because we can apply a widget to structures or sequences of items, we thought "How about a schema that is a sequence of sequences. This sounds like a csv. Lets map a TextArea to this and apply a SequenceOfSequences Converter". So the following gives you a csv TextArea following the same layered patterns shown in the diagram at the start of this post.
+
+This produces the widget shown here `here <http://localhost:8080/SequenceOfSequencesAsTextArea>`_. In this instance, the field is expecting an isoformat date for the third item in the tuple so the following data would work.. 
+
+.. code-block:: text
+
+   1,2,2008-2-3
+   4,5,2008-1-3
+
+.. note:: I mentioned ``converter_options`` as one of the parameters that each widget can take. This can be used in the conversion process to guide the type of conversion. In the csv parsing case, you can tell the converter what separator to use for instance.
+
+File Upload
+...........
+
+File uploads are notoriously difficult to use in forms. The persistence of uploaded data before the form is finished is messy and a consistent preivew that works for this temporary persistence and also when you've implemented your final store is not straightforward. Formish needs three things for form uploads (and provides defaults for all of them
+
+FileHandler
+^^^^^^^^^^^
+
+The filehandlers job is to persist file uploads up until a form is successfully completed. The FileUpload widget asks the filehandler to store the file and remove it after the process has finished. If you want to access the file then it will also give you a direct path for it and a mimtype.
 
 .. code-block:: python
 
@@ -608,400 +542,135 @@ Our tempfile handler implements this as follows.
         File handler using python tempfile module to store file
         """
 
-        def store_file(self, fs):
-            fileno, filename = tempfile.mkstemp(suffix='%s-%s'%(uuid.uuid4().hex,fs.filename))
-            fp = os.fdopen(fileno, 'wb')
-            fp.write(fs.value)
-            fp.close()
-            prefix = tempfile.gettempprefix()
-            tempdir = tempfile.gettempdir()
-            filename = ''.join( filename[(len(tempdir)+len(prefix)+1):] )
+        def __init__(self):
+            self.prefix = tempfile.gettempprefix()
+            self.tempdir = tempfile.gettempdir()
+
+
+        def store_file(self, fieldstorage):
+            """
+            Given a filehandle, store the file and return an identifier, in this
+            case the original filename
+            """
+            fileno, filename = tempfile.mkstemp( \
+                            suffix='%s-%s'% (uuid.uuid4().hex,fieldstorage.filename))
+            filehandle = os.fdopen(fileno, 'wb')
+            filehandle.write(fieldstorage.value)
+            filehandle.close()
+            filename = ''.join( filename[(len(self.tempdir)+len(self.prefix)+1):] )
             return filename
 
+        def delete_file(self, filename):
+            """
+            remove the tempfile
+            """
+            filename = '%s/%s%s'% (tempdir, self.prefix, self.filename)
+            os.remove(filename)
+
         def get_path_for_file(self, filename):
-            prefix = tempfile.gettempprefix()
-            tempdir = tempfile.gettempdir()
-            return '%s/%s%s'%(tempdir,prefix,filename)
+            """
+            given the filename, get the path for the temporary file
+            """
+            return '%s/%s%s'% (self.tempdir, self.prefix, filename)
 
-.. note:: We also implement a ``get_mimetype`` method that helps in building the schemaish.type.File
+        def get_mimetype(self, filename):
+            """
+            use python-magic to guess the mimetype or use application/octet-stream
+            if no guess
+            """
+            mimetype = magic.from_file('%s/%s%s'%(self.tempdir,self.prefix,filename),mime=True)
+            return mimetype or 'application/octet-stream'
 
-We typically want to access the file again from our widget however (especially in the case of image uploads!). Formish extends the TempFileHandler with a get_url_for_file method as follows..
+
+If you want to server the files in your web apllication (and the default FileUpload widget includes facility for an image_preview box) then you'll need to use TempFileHandlerWeb, which includes a resource_root and a fileaccessor
 
 .. code-block:: python
 
     class TempFileHandlerWeb(TempFileHandler):
+        """
+        Same as the temporary file handler but includes ability to include a resource and a url generator (if you want access to the temporary files on the website, e.g. for previews)
+        """
 
-        def __init__(self, default_url=None,
-                     resource_root='/filehandler',urlfactory=None):
+        def __init__(self, resource_root='/filehandler',urlfactory=None):
+            TempFileHandler.__init__(self)
             self.default_url = default_url
             self.resource_root = resource_root
             self.urlfactory = urlfactory
 
-        def get_url_for_file(self, object):
+        def get_url_for_file(self, identifier):
+            """
+            Generate a url given an identifier
+            """
             if self.urlfactory is not None:
-                return self.urlfactory(object)
-            if id is None:
-                return self.default_url.replace(' ','+')
-            else:
-                return '%s/%s'%(self.resource_root,object)
+                return self.urlfactory(identifier)
+            return '%s/%s'% (self.resource_root, identifier)
 
-This needs configuring with a resource root (where to find files), a default_url (if we have no file, what to use - useful to showing missing images) and a urlfactory (how to convert a object into a url representation). 
+This extends the basic tempfile handler to allow you to pass a urlfactory and a root resource for where your assets are mounted.  
 
-So what happens when a file is uploaded?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urlfactory
+^^^^^^^^^^
 
-If we're using the TempFileHandlerWeb handler the following steps take place.
+When an attribute is stored in a database, an image is often represented by a uuid of somesort. Or possibly a directory and a file. urlfactory is used to take the identifier (lets say 'foo/bar') and convert it unto something that the file system can work with.
 
-.. note:: we'll presume that the first form submit has a missing field and so the form gets redisplayed.
-
-The first time a file is uploaded, formish takes the FieldStorage object and copies the contents of the file to a tempfile using it's ``store_file`` method. 
-
-When the form page is redisplayed, the widget uses the handlers ``get_url_for_file``` method to work out a url for the file. The file can then be displayed.
-
-.. note:: We're not covering how the file is actually displayed. This is framework specific but we'll give an example for restish after this section.
-
-When the users completes the corrections to the form and resubmits, formish processes the file. It first checks to see if the file is new (the widget stores a reference to the old file so it can check) and if it isn't new, it returns a schema.type.File object with None for all of the attributes.
-
-If there is no file (i.e. no file was submitted on a clean form or a file was removed using the checkbox) then a None is returned.
-
-If the file is new or has changed, formish generates the schemaish.type.File object from the data stored in the temporary file.
-
-What else can I configure?
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The formish ``FileUpload`` widget takes the following arguments
-
-.. automethod:: formish.widgets.FileUpload.__init__
-
-
-
-
-
-
-
-
-
-
-
-Sequences
-=========
-
-Formish also handles sequences in fields, the basic example of this is the checkbox and the multi-select. However formish can also handle sequences in text areas and also sequences in separate fields. 
-
-Checkbox Multi Choice
----------------------
-
-Now we've talked through the basics.. I'll skip a lot of the detail and just demonstrate the process.. 
-
->>> schema = schemaish.Structure()
->>> schema.add( 'myfield', schemaish.Sequence(schemaish.Integer()) )
->>> form = formish.Form(schema)
->>> form.defaults = {'myfield': [2,4]}
->>> form['myfield'].widget = formish.CheckboxMultiChoice(options=[1,2,3,4])
-
-Let's take a look at the html that produced.. 
-
-.. raw:: html
-
-    <div id="formish-myfield-field" class="field sequence checkboxmultichoice">
-      <label for="formish-myfield">Myfield</label>
-      <div class="inputs">
-        <input id="formish-myfield-0" name="myfield" type="checkbox" value="1" />
-        <label for="formish-myfield-0">1</label>
-        <br />
-        <input id="formish-myfield-1" name="myfield" type="checkbox" value="2" checked="checked" />
-        <label for="formish-myfield-1">2</label>
-        <br />
-        <input id="formish-myfield-2" name="myfield" type="checkbox" value="3" />
-        <label for="formish-myfield-2">3</label>
-        <br />
-        <input id="formish-myfield-3" name="myfield" type="checkbox" value="4" checked="checked" />
-        <label for="formish-myfield-3">4</label>
-        <br />
-      </div>
-    </div>
-.. code-block:: html
-
-    <div id="formish-myfield-field" class="field sequence checkboxmultichoice">
-      <label for="formish-myfield">Myfield</label>
-      <div class="inputs">
-        <input id="formish-myfield-0" name="myfield" type="checkbox" value="1" />
-        <label for="formish-myfield-0">1</label>
-        <br />
-        <input id="formish-myfield-1" name="myfield" type="checkbox" value="2" checked="checked" />
-        <label for="formish-myfield-1">2</label>
-        <br />
-        <input id="formish-myfield-2" name="myfield" type="checkbox" value="3" />
-        <label for="formish-myfield-2">3</label>
-        <br />
-        <input id="formish-myfield-3" name="myfield" type="checkbox" value="4" checked="checked" />
-        <label for="formish-myfield-3">4</label>
-        <br />
-      </div>
-    </div>
-
-Select Multi Choice
--------------------
-
-.. warning:: Not implemented yet
-
-Text Area Sequence
-------------------
-
-Sometimes it's easier to enter information directly into a textarea
-
->>> form['myfield'].widget = formish.TextArea()
-
-Which produces a simple text area as html. When it processes this textarea, it uses the csv module to get the data (it also uses it to put the default data onto the form). By default, the conversion uses commas for a simple sequence. e.g.
-
->>> form.defaults = {'myfield': [1,3,5,7]}
-
-.. raw:: html
-
-    <div id="formish-myfield-field" class="field sequence textarea">
-      <label for="formish-myfield">Myfield</label>
-      <div class="inputs">
-        <textarea id="formish-myfield" name="myfield">1,3,5,7</textarea>
-      </div>
-    </div>
-
-
-.. code-block:: html
-
-    <div id="formish-myfield-field" class="field sequence textarea">
-      <label for="formish-myfield">Myfield</label>
-      <div class="inputs">
-        <textarea id="formish-myfield" name="myfield">1,3,5,7</textarea>
-      </div>
-    </div>
-
-However you can change this behaviour by passing the Textarea widget a converter_option dictionary value .. e.g.
-
-
->>> form['myfield'].widget = formish.TextArea(converter_options={'delimiter': '\n'})
-
-.. raw:: html
-
-    <textarea id="formish-myfield" name="myfield">1
-  3
-  5
-  7</textarea>
-
-.. code-block:: html
-
-    <textarea id="formish-myfield" name="myfield">1\n3\n5\n7</textarea>
-
-Text Area Sequence of Sequences
--------------------------------
-
-You can also use a textarea to represent a sequence of sequences... 
-
->>> schema = schemaish.Structure()
->>> schema.add( 'myfield', schemaish.Sequence(schemaish.Sequence(schemaish.Integer())))
->>> form = formish.Form(schema)
->>> form.defaults = {'myfield': [[2,4],[6,8]]}
->>> form['myfield'].widget = formish.TextArea()
-
-In this case, the default delimiter is a comma and is used on a row by row basis.
-
-.. raw:: html
-
-    <textarea id="formish-myfield" name="myfield">2,4
-  6,8</textarea>
-
-.. code-block:: html
-
-    <textarea id="formish-myfield" name="myfield">2,4\n6,8</textarea>
-
-Multiple Input Fields
----------------------
-
-.. warning:: This code hasn't settled down yet, please check for updates.
-
-If you just pass a sequence to a form without any widgets, a jquery powered sequence editor will be used. This will allow you to add and remove the fields within the sequence. Check the 'testish' application for more details.
-
-Nested Form Structures
-======================
-
-Formish also allows you to create sub-sections in forms that can contain any other valid form part. We'll use an address and name section to expand out registration form.
-
-A Structure of Structures
--------------------------
-
->>> class MyName(schemaish.Structure):
-...     firstName = schemaish.String()
-...     surname = schemaish.String()
->>> class MyAddress(schemaish.Structure):
-...     streetNumber = schemaish.Integer()
-...     country = schemaish.String()
->>> class MySchema(schemaish.Structure):
-...     name = MyName()
-...     address = MyAddress()
-...     termsAndConditions = schemaish.Boolean()
->>> form = formish.Form(MySchema())
-
-This will create the following
-
-.. raw:: html
-
-
-    <form id="formish" action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
-      <input type="hidden" name="_charset_" />
-      <input type="hidden" name="__formish_form__" value="formish" />
-      <fieldset id="formish-name-field" class="field myname sequencedefault sequencecontrols">
-        <legend>Name</legend>
-        <div id="formish-name-firstName-field" class="field string input">
-          <label for="formish-name-firstName">First Name</label>
-          <div class="inputs">
-            <input id="formish-name-firstName" type="text" name="name.firstName" value="" />
-          </div>
-        </div>
-        <div id="formish-name-surname-field" class="field string input">
-          <label for="formish-name-surname">Surname</label>
-          <div class="inputs">
-            <input id="formish-name-surname" type="text" name="name.surname" value="" />
-          </div>
-        </div>
-      </fieldset>
-      <fieldset id="formish-address-field" class="field myaddress sequencedefault sequencecontrols">
-        <legend>Address</legend>
-        <div id="formish-address-streetNumber-field" class="field integer input">
-          <label for="formish-address-streetNumber">Street Number</label>
-          <div class="inputs">
-            <input id="formish-address-streetNumber" type="text" name="address.streetNumber" value="" />
-          </div>
-        </div>
-        <div id="formish-address-country-field" class="field string input">
-          <label for="formish-address-country">Country</label>
-          <div class="inputs">
-            <input id="formish-address-country" type="text" name="address.country" value="" />
-          </div>
-        </div>
-      </fieldset>
-      <div id="formish-termsAndConditions-field" class="field boolean input">
-        <label for="formish-termsAndConditions">Terms And Conditions</label>
-        <div class="inputs">
-          <input id="formish-termsAndConditions" type="text" name="termsAndConditions" value="" />
-        </div>
-      </div>
-      <div class="actions">
-        <input type="submit" id="formish-action-submit" name="submit" value="Submit" />
-      </div>
-    </form>
-
-.. code-block:: html
-
-    <form id="formish" action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
-      <input type="hidden" name="_charset_" />
-      <input type="hidden" name="__formish_form__" value="formish" />
-      <fieldset id="formish-name-field" class="field myname sequencedefault sequencecontrols">
-        <legend>Name</legend>
-        <div id="formish-name-firstName-field" class="field string input">
-          <label for="formish-name-firstName">First Name</label>
-          <div class="inputs">
-            <input id="formish-name-firstName" type="text" name="name.firstName" value="" />
-          </div>
-        </div>
-        <div id="formish-name-surname-field" class="field string input">
-          <label for="formish-name-surname">Surname</label>
-          <div class="inputs">
-            <input id="formish-name-surname" type="text" name="name.surname" value="" />
-          </div>
-        </div>
-      </fieldset>
-      <fieldset id="formish-address-field" class="field myaddress sequencedefault sequencecontrols">
-        <legend>Address</legend>
-        <div id="formish-address-streetNumber-field" class="field integer input">
-          <label for="formish-address-streetNumber">Street Number</label>
-          <div class="inputs">
-            <input id="formish-address-streetNumber" type="text" name="address.streetNumber" value="" />
-          </div>
-        </div>
-        <div id="formish-address-country-field" class="field string input">
-          <label for="formish-address-country">Country</label>
-          <div class="inputs">
-            <input id="formish-address-country" type="text" name="address.country" value="" />
-          </div>
-        </div>
-      </fieldset>
-      <div id="formish-termsAndConditions-field" class="field boolean input">
-        <label for="formish-termsAndConditions">Terms And Conditions</label>
-        <div class="inputs">
-          <input id="formish-termsAndConditions" type="text" name="termsAndConditions" value="" />
-        </div>
-      </div>
-      <div class="actions">
-        <input type="submit" id="formish-action-submit" name="submit" value="Submit" />
-      </div>
-    </form>
-
-
-This data will come back in dictionary form.. i.e.
+So here is a simple FileUpload widget
 
 .. code-block:: python
 
-  {'name': {'firstName':'Tim', 'surname':'Tim'}, 'address': {'streetNumber': 123, 'country': 'UK'}, 'termsAndConditions': True}
+    schema = schemaish.Structure()
+    schema.add( 'myFile', schemaish.File() )
 
-Other Combinations
-------------------
+    form = formish.Form(schema)
+    form['myFile'].widget = formish.FileUpload(
+                               filehandler=formish.TempFileHandlerWeb(),
+                               originalurl='/images/nouploadyet.png',
+                               show_image_preview=True
+                               )
 
-Formish will also let you build up a sequence of structures and will use it's jquery javascript to allow you to dynamically add and remove sections. This also works when recursively nested so it is perfectly possibly to have a list of addresses, each of which has a list of phone numbers.
-
-Tuples
-------
-
-A tuple can be used to create a list that has different types in it. For instance, if we used the Sequence of Sequence example above, we have no control over how many items are in each row. Using a Sequence of Tuples allows us to define the length of the row and also the types of the items in the row.
-
-Lets see how that works.
-
->>> schema.add( 'myfield', schemaish.Sequence( schemaish.Tuple( schemaish.Integer(), schemaish.Date() ) ) )
->>> form = formish.Form(schema)
->>> form['myfield'].widget=formish.TextArea()
-
-You will now get a textarea that will return validation messages if it is unable to convert to integers or strings and that will output appropriately typed data.
+    
 
 
+To set up a file resource handler at /filehandler, you could use the following (if you are using restish)
+
+.. code-block:: python
+
+    @resource.child()
+    def filehandler(self, request, segments):
+        db = collection.CouchishDB(request)
+        fa = couchish.FileAccessor(db)
+        fh = formish.TempFileHandler()
+        return FileResource(fileaccessor=fa,filehandler=fh)
+
+This looks a little more complicated, and is. This resource needs to serve files that are already in your application's persistent storage (the FileAccessor here) and also provide a way of accessing temporary files that have been uploaded as the form is being possibly posted repeatedly before finally succeeding. Don't worry though, if you're happy with using temporary file storage for a while, your resource could look like this
+
+.. code-block:: python
+
+    @resource.child()
+    def filehandler(self, request, segments):
+        return FileResource()
+
+Then at some point when you get your storage implemented, you could add your own custom fileaccessor. 
+
+We've got a file file examples working at `http://ish.io:8891 <http://ish.io:8891>`_. (Please don't upload any multi megabyte files.. I haven't got a validator on it yet :-)
+
+I don't think I've explained file uploads as well as I could so perhaps I'll refine this at a later date.
+
+The way forward
+---------------
+
+At this point we're using these forms in production code and they are holding up quite well and are very easy to customise. The next steps are probably additional templating customisation options (apply custom template snippets at the template level or at the code level), partial auto filling of forms (like the slicing mentioned above), getting sequences to work  without javascript and then adding another templating language (probably Jinja?)
+
+Slighly bigger pieces of work would be trying to implement some form of wsgi asset inclusion (for js, css, images) and also html injection for js, css snippets. This will take a bit of thinking about but the ToscaWidgets / lxml approach looks interesting. 
+
+Other goals.. 
+
+* Multi page forms.. 
+* relational validation (this required only if that not - is possible now but would like to make more intuitive)
+* GET form submissions
+* immutable and plain html versions of templates
+
+.. note:: Please send any feedback to developers@ish.io
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Class Documentation
-===================
-
-
-Form Class
-----------
-
-.. autoclass:: formish.forms.Form
-  :members: action, add_action, fields, validate,__call__
-
-Field Class
------------
-
-.. autoclass:: formish.forms.Field
-  :members: title, description, cssname, classes, value, required, error, widget,__call__
