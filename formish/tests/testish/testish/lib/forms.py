@@ -992,6 +992,18 @@ def SequenceOfDateParts():
     form['birthdays.*.date'].widget = formish.DateParts()
     return form
 
+def SequenceOfSequencesAsTextArea():
+    """
+    A simple text area but representing a csv style data structure
+    """
+    schema = schemaish.Structure()
+    schema.add('table', schemaish.Sequence(schemaish.Tuple( (schemaish.String(), schemaish.Integer(), schemaish.Date()) )))
+    form = formish.Form(schema)
+    form['table'].widget = formish.TextArea()
+    return form
+    
+
+
 def functest_SequenceOfDateParts(self, sel):#{{{
     sel.open("/SequenceOfDateParts")
 
