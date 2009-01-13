@@ -41,7 +41,10 @@ class FileAccessor(object):
 
     def get_mtime(self, filename):
         actualfilename = '%s/%s%s'% (self.tempdir, self.prefix, filename)
-        return datetime.fromtimestamp( os.path.getmtime(actualfilename) )
+        try:
+            return datetime.fromtimestamp( os.path.getmtime(actualfilename) )
+        except OSError:
+            raise KeyError
 
 
     def get_file(self, filename):
@@ -93,18 +96,18 @@ class FileResource(resource.Resource):
         raw_cached_mtime = self._get_file_mtime(raw_cached_filepath)
 
         # Check to see if fa and temp exist
-        fileaccessor_exists = self.fileaccessor.file_exists(requested_filepath)
         tempfile_path = self._get_tempfile_path(requested_filepath)
         log.debug('formish.FileResource: tempfile_path=%s',tempfile_path)
-        tempfile_exists = os.path.exists(tempfile_path)
 
-        if not fileaccessor_exists and not tempfile_exists:
-            return None
-       
         # work out which has changed most recently (if either is newer than cache)
-        fileaccessor_mtime = self.fileaccessor.get_mtime(requested_filepath)
+        fileaccessor_mtime = self._get_fileaccessor_mtime(requested_filepath)
         tempfile_mtime = self._get_file_mtime(tempfile_path)
         source_mtime = max(fileaccessor_mtime, tempfile_mtime)
+
+        # unfound files return a 1970 timestamp for simplicity, if we don't have files newer than 1971, bugout
+        if source_mtime < datetime(1971,1,1,0,0):
+            return None
+
         if source_mtime > raw_cached_mtime:
             if fileaccessor_mtime > tempfile_mtime:
                 log.debug('formish.FileResource: fileaccessor resource is newer. rebuild raw cache')
@@ -158,11 +161,15 @@ class FileResource(resource.Resource):
         return datetime(1970, 1, 1, 0, 0)
 
     def _get_fileaccessor_mtime(self, filepath):
-        return self.fileaccessor.get_mtime(filepath)
+        try:
+            return self.fileaccessor.get_mtime(filepath)
+        except KeyError:
+            return datetime(1970, 1, 1, 0, 0)
 
     def _get_size_suffix(self, request):
+        log.debug('formish.FileResource: request.GET args=%s',request.GET)
         width, height = get_size_from_dict(request.GET)
-        if height and width:
+        if height or width:
             return '-%sx%s'% (width, height)
         return ''
 
@@ -192,6 +199,7 @@ def get_size_from_dict(data):
     if size is not None:
         width = int(size.split('x')[0])
         height = int(size.split('x')[1])
+        log.debug('formish.FileResource: data[size]=%sx%s'%(width, height))
     else:
         width = data.get('width', None)
         if width is not None:
@@ -199,6 +207,7 @@ def get_size_from_dict(data):
         height = data.get('height', None)
         if height is not None:
             height = int(height)
+        log.debug('formish.FileResource: data[width],data[height]=%s,%s'%(width, height))
     return (width, height)
 
 
