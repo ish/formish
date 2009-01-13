@@ -222,7 +222,6 @@ formish.egg-info/not-zip-safe
 formish.egg-info/requires.txt
 formish.egg-info/top_level.txt
 formish/examples/root-template.html
-formish/templates/main.html
 formish/templates/mako/formish/field.html
 formish/templates/mako/formish/field_description.html
 formish/templates/mako/formish/field_error.html
@@ -262,6 +261,7 @@ formish/templates/mako/formish/widgets/Password/widget.html
 formish/templates/mako/formish/widgets/RadioChoice/widget.html
 formish/templates/mako/formish/widgets/SelectChoice/widget.html
 formish/templates/mako/formish/widgets/SelectWithOtherChoice/widget.html
+formish/templates/mako/formish/widgets/TextArea/sequence.html
 formish/templates/mako/formish/widgets/TextArea/widget.html
 formish/tests/TODO
 formish/tests/testish/development.ini

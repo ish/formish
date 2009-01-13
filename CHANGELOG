@@ -2,6 +2,14 @@
 Changlelog
 ==========
 
+
+0.5.9 (2009-01-13)
+------------------
+
+* added a TextArea csv example and cleaned up fileresource handlers
+
+BUG FIX: resizing when only with or height given was not working
+
 0.5.8 (2009-01-12)
 ------------------
 
