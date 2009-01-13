@@ -13,7 +13,8 @@ from restish import http, resource
 
 
 from formish.filehandler import TempFileHandler
-
+import logging
+log = logging.getLogger('formish')
 
 # Binaries
 IDENTIFY = '/usr/bin/identify'
@@ -61,6 +62,7 @@ class FileResource(resource.Resource):
     """
 
     def __init__(self, fileaccessor=None, filehandler=None, segments=None):
+        log.debug('formish.FileResource: initialising FileResource')
         if fileaccessor is None:
             self.fileaccessor = FileAccessor()
         else:
@@ -71,20 +73,29 @@ class FileResource(resource.Resource):
             self.filehandler = filehandler
         self.segments = segments
 
+    @resource.child(resource.any)
+    def child(self, request, segments):
+        return FileResource(fileaccessor=self.fileaccessor, filehandler=self.filehandler, segments=segments), []
+
+
     def __call__(self, request):
+        log.debug('formish.FileResource: in File Resource')
         if not self.segments:    
             return None
 
         # This is our input filepath
         requested_filepath = self._get_requested_filepath()
+        log.debug('formish.FileResource: requested_filepath=%s',requested_filepath)
  
         # Get the raw cache file path and mtime
         raw_cached_filepath = self._get_cachefile_path(requested_filepath)
+        log.debug('formish.FileResource: raw_cached_filepath=%s',raw_cached_filepath)
         raw_cached_mtime = self._get_file_mtime(raw_cached_filepath)
 
         # Check to see if fa and temp exist
         fileaccessor_exists = self.fileaccessor.file_exists(requested_filepath)
         tempfile_path = self._get_tempfile_path(requested_filepath)
+        log.debug('formish.FileResource: tempfile_path=%s',tempfile_path)
         tempfile_exists = os.path.exists(tempfile_path)
 
         if not fileaccessor_exists and not tempfile_exists:
@@ -96,25 +107,32 @@ class FileResource(resource.Resource):
         source_mtime = max(fileaccessor_mtime, tempfile_mtime)
         if source_mtime > raw_cached_mtime:
             if fileaccessor_mtime > tempfile_mtime:
+                log.debug('formish.FileResource: fileaccessor resource is newer. rebuild raw cache')
                 filedata = self.fileaccessor.get_file(requested_filepath)
                 mimetype = self.fileaccessor.get_mimetype(requested_filepath)
             else:
+                log.debug('formish.FileResource: tempfile resource is newer. rebuilding raw cache')
                 filedata = open(tempfile_path).read()
                 mimetype = get_mimetype(tempfile_path)
             open(raw_cached_filepath,'w').write(filedata)
         else:
+            log.debug('formish.FileResource: raw cache file is valid')
             mimetype = get_mimetype(raw_cached_filepath)
 
         # If we're trying to resize, check mtime on resized_cache
         size_suffix = self._get_size_suffix(request)
         if size_suffix:
+            log.debug('formish.FileResource: size_suffix=%s',size_suffix)
             cached_filepath = self._get_cachefile_path(requested_filepath, size_suffix)
             cached_mtime = self._get_file_mtime(cached_filepath)
+            log.debug('formish.FileResource: cached_filepath=%s',cached_filepath)
 
             if not os.path.exists(cached_filepath) or source_mtime > cached_mtime:
                 width, height = get_size_from_dict(request.GET)
+                log.debug('formish.FileResource: cache invalid. resizing image')
                 resize_image(raw_cached_filepath, cached_filepath, width, height)
         else:
+            log.debug('formish.FileResource: resized cache file is valid.')
             cached_filepath = raw_cached_filepath
 
         return http.ok([('content-type', mimetype )], open(cached_filepath, 'rb').read())
