@@ -1,0 +1,428 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>formish.forms &mdash; Formish v1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Formish v1 documentation" href="index.html" /> 
+
+
+  <link media="screen" href="_static/css/screen.css" type="text/css" rel="stylesheet" />
+  <link media="screen" href="_static/css/images.css" type="text/css" rel="stylesheet" />
+  <link media="screen" href="_static/css/sIFR-screen.css" type="text/css" rel="stylesheet" />
+  <link media="print" href="_static/css/sIFR-print.css" type="text/css" rel="stylesheet" />  
+  <script type="text/javascript" src="_static/js/sifr.js" ></script>
+  <script type="text/javascript" src="_static/js/sifr-config.js" ></script> 
+  <script type="text/javascript" src="_static/js/sifr-debug.js" ></script> 
+
+  </head>
+  <body id="sphinx">
+    <div id="wrapper">
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="index.html">Formish v1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div id="header">
+      <div id="logo"><img src="_static/images/logo/ish.io.png" /></div>
+      <div id="overview"><a href="http://ish.io/projects/show/formish">Overview</a></div>
+    </div>
+
+<div id="main">
+    <div  class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="module-formish.forms">
+<h1>formish.forms<a class="headerlink" href="#module-formish.forms" title="Permalink to this headline">¶</a></h1>
+<p>The form module contains the main form, field, group and sequence classes</p>
+<dl class="class">
+<dt id="formish.forms.Form">
+<!--[formish.forms.Form]-->class <tt class="descclassname">formish.forms.</tt><tt class="descname">Form</tt><big>(</big><em>structure</em>, <em>name=None</em>, <em>defaults=None</em>, <em>errors=None</em>, <em>action_url=None</em>, <em>renderer=None</em><big>)</big><a class="headerlink" href="#formish.forms.Form" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/dev/library/functions.html#object"><tt class="xref docutils literal"><span class="pre">object</span></tt></a></p>
+<p>The definition of a form</p>
+<p>The Form type is the container for all the information a form needs to
+render and validate data.</p>
+<p>Create a new form instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>structure</em> (schemaish.Structure) &#8211; Schema Structure attribute to bind to the the form</li>
+<li><em>name</em> (str &#8220;valid html id&#8221;) &#8211; Optional form name used to identify multiple forms on the same page</li>
+<li><em>defaults</em> (dict) &#8211; Default values for the form</li>
+<li><em>errors</em> (dict) &#8211; Errors to store on the form for redisplay</li>
+<li><em>action_url</em> (string &#8220;url or path&#8221;) &#8211; Use if you don&#8217;t want the form to post to itself</li>
+<li><em>renderer</em> (callable) &#8211; Something that returns a form serialization when called</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="formish.forms.Form.action">
+<!--[formish.forms.Form.action]--><tt class="descname">action</tt><big>(</big><em>request</em>, <em>*args</em><big>)</big><a class="headerlink" href="#formish.forms.Form.action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find and call the action callback for the action found in the request</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>request</em> (webob.Request) &#8211; request which is used to find the action and also passed through to
+the callback</li>
+<li><em>args</em> &#8211; list of arguments Pass through to the callback</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Form.actions">
+<!--[formish.forms.Form.actions]--><tt class="descname">actions</tt><big>(</big><big>)</big><a class="headerlink" href="#formish.forms.Form.actions" title="Permalink to this definition">¶</a></dt>
+<dd>Return just the actions part of the template</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Form.add_action">
+<!--[formish.forms.Form.add_action]--><tt class="descname">add_action</tt><big>(</big><em>callback</em>, <em>name='submit'</em>, <em>label=None</em><big>)</big><a class="headerlink" href="#formish.forms.Form.add_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an action callable to the form</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>callback</em> (callable) &#8211; A function to call if this action is triggered</li>
+<li><em>name</em> (string) &#8211; The identifier for this action</li>
+<li><em>label</em> (string) &#8211; Use this label instead of the form.name for the value of
+the action (for buttons, the value is used as the text on the button)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Form.defaults">
+<!--[formish.forms.Form.defaults]--><tt class="descname">defaults</tt><a class="headerlink" href="#formish.forms.Form.defaults" title="Permalink to this definition">¶</a></dt>
+<dd>Get the raw default data</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Form.element_name">
+<!--[formish.forms.Form.element_name]--><tt class="descname">element_name</tt><a class="headerlink" href="#formish.forms.Form.element_name" title="Permalink to this definition">¶</a></dt>
+<dd>Set the element name</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Form.fields">
+<!--[formish.forms.Form.fields]--><tt class="descname">fields</tt><a class="headerlink" href="#formish.forms.Form.fields" title="Permalink to this definition">¶</a></dt>
+<dd>Return a generator that yields all of the fields at the top level of
+the form (e.g. if a field is a subsection or sequence, it will be up to
+the application to iterate that field&#8217;s fields.</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Form.footer">
+<!--[formish.forms.Form.footer]--><tt class="descname">footer</tt><big>(</big><big>)</big><a class="headerlink" href="#formish.forms.Form.footer" title="Permalink to this definition">¶</a></dt>
+<dd>Return just the footer part of the template</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Form.get_field">
+<!--[formish.forms.Form.get_field]--><tt class="descname">get_field</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#formish.forms.Form.get_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a field by dotted field name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>name</em> &#8211; Dotted name e.g. names.0.firstname</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Form.get_item_data">
+<!--[formish.forms.Form.get_item_data]--><tt class="descname">get_item_data</tt><big>(</big><em>key</em>, <em>name</em><big>)</big><a class="headerlink" href="#formish.forms.Form.get_item_data" title="Permalink to this definition">¶</a></dt>
+<dd>Access item data associates with a field key and an attribute name
+(e.g. title, widget, description&#8217;)</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Form.get_item_data_values">
+<!--[formish.forms.Form.get_item_data_values]--><tt class="descname">get_item_data_values</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#formish.forms.Form.get_item_data_values" title="Permalink to this definition">¶</a></dt>
+<dd>get all of the item data values</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Form.get_unvalidated_data">
+<!--[formish.forms.Form.get_unvalidated_data]--><tt class="descname">get_unvalidated_data</tt><big>(</big><em>request_data</em>, <em>raise_exceptions=True</em><big>)</big><a class="headerlink" href="#formish.forms.Form.get_unvalidated_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the request object into a nested dict in the correct structure
+of the schema but without applying the schema&#8217;s validation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>request_data</em> &#8211; Webob style request data</li>
+<li><em>raise_exceptions</em> &#8211; Whether to raise exceptions or return errors</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Form.header">
+<!--[formish.forms.Form.header]--><tt class="descname">header</tt><big>(</big><big>)</big><a class="headerlink" href="#formish.forms.Form.header" title="Permalink to this definition">¶</a></dt>
+<dd>Return just the header part of the template</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Form.metadata">
+<!--[formish.forms.Form.metadata]--><tt class="descname">metadata</tt><big>(</big><big>)</big><a class="headerlink" href="#formish.forms.Form.metadata" title="Permalink to this definition">¶</a></dt>
+<dd>Return just the metada part of the template</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Form.name">
+<!--[formish.forms.Form.name]--><tt class="descname">name</tt><a class="headerlink" href="#formish.forms.Form.name" title="Permalink to this definition">¶</a></dt>
+<dd>Get the name of the form, default to <cite>formish</cite></dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Form.renderer">
+<!--[formish.forms.Form.renderer]--><tt class="descname">renderer</tt><big>(</big><big>)</big><a class="headerlink" href="#formish.forms.Form.renderer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Form.request_data">
+<!--[formish.forms.Form.request_data]--><tt class="descname">request_data</tt><a class="headerlink" href="#formish.forms.Form.request_data" title="Permalink to this definition">¶</a></dt>
+<dd>Retrieve previously set request_data or return the defaults in
+request_data format.</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Form.set_item_data">
+<!--[formish.forms.Form.set_item_data]--><tt class="descname">set_item_data</tt><big>(</big><em>key</em>, <em>name</em>, <em>value</em><big>)</big><a class="headerlink" href="#formish.forms.Form.set_item_data" title="Permalink to this definition">¶</a></dt>
+<dd>Allow the setting os certain attributes on item_data, a dictionary used
+to associates data with fields.</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Form.validate">
+<!--[formish.forms.Form.validate]--><tt class="descname">validate</tt><big>(</big><em>request</em>, <em>failure_callable=None</em>, <em>success_callable=None</em><big>)</big><a class="headerlink" href="#formish.forms.Form.validate" title="Permalink to this definition">¶</a></dt>
+<dd>Get the data without raising exceptions and then validate the data. If
+there are errors, raise them; otherwise return the data</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="formish.forms.Action">
+<!--[formish.forms.Action]-->class <tt class="descclassname">formish.forms.</tt><tt class="descname">Action</tt><big>(</big><em>callback</em>, <em>name</em>, <em>label</em><big>)</big><a class="headerlink" href="#formish.forms.Action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/dev/library/functions.html#object"><tt class="xref docutils literal"><span class="pre">object</span></tt></a></p>
+<p>An action that that can added to a form.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>callback</em> &#8211; A callable with the signature (request, form, <a href="#id1"><span class="problematic" id="id2">*</span></a>args)</li>
+<li><em>name</em> &#8211; an valid html id used to lookup an action</li>
+<li><em>label</em> &#8211; The &#8216;value&#8217; of the submit button and hence the text that people see</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="formish.forms.Field">
+<!--[formish.forms.Field]-->class <tt class="descclassname">formish.forms.</tt><tt class="descname">Field</tt><big>(</big><em>name</em>, <em>attr</em>, <em>form</em><big>)</big><a class="headerlink" href="#formish.forms.Field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="(in Python v2.7)" class="reference external" href="http://docs.python.org/dev/library/functions.html#object"><tt class="xref docutils literal"><span class="pre">object</span></tt></a></p>
+<p>A wrapper for a schema field type that includes form information.</p>
+<p>The Schema Type Atribute does not have any bindings to the form library, it can be
+used on it&#8217;s own. We bind the Schema Attribute to a Field in order to include form
+related information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name" colspan="2">Method __call__:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body"><p class="first">returns a serialisation for this field using the form&#8217;s renderer - read only</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>name</em> &#8211; Name for the field</li>
+<li><em>attr</em> (schemaish.attr.*) &#8211; Schema attr to bind to the field</li>
+<li><em>form</em> (formish.Form instance.) &#8211; The form the field belongs to.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="formish.forms.Field.classes">
+<!--[formish.forms.Field.classes]--><tt class="descname">classes</tt><a class="headerlink" href="#formish.forms.Field.classes" title="Permalink to this definition">¶</a></dt>
+<dd>Works out a list of classes that should be applied to the field</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.cssname">
+<!--[formish.forms.Field.cssname]--><tt class="descname">cssname</tt><a class="headerlink" href="#formish.forms.Field.cssname" title="Permalink to this definition">¶</a></dt>
+<dd>cssname identifier for the field</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.description">
+<!--[formish.forms.Field.description]--><tt class="descname">description</tt><a class="headerlink" href="#formish.forms.Field.description" title="Permalink to this definition">¶</a></dt>
+<dd>The Field schema&#8217;s description</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.error">
+<!--[formish.forms.Field.error]--><tt class="descname">error</tt><a class="headerlink" href="#formish.forms.Field.error" title="Permalink to this definition">¶</a></dt>
+<dd>Lazily get the error from the form.errors when needed</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Field.inputs">
+<!--[formish.forms.Field.inputs]--><tt class="descname">inputs</tt><big>(</big><big>)</big><a class="headerlink" href="#formish.forms.Field.inputs" title="Permalink to this definition">¶</a></dt>
+<dd>returns the templated widget</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Field.label">
+<!--[formish.forms.Field.label]--><tt class="descname">label</tt><big>(</big><big>)</big><a class="headerlink" href="#formish.forms.Field.label" title="Permalink to this definition">¶</a></dt>
+<dd>returns the templated title</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.required">
+<!--[formish.forms.Field.required]--><tt class="descname">required</tt><a class="headerlink" href="#formish.forms.Field.required" title="Permalink to this definition">¶</a></dt>
+<dd>Does this field have a Not Empty validator of some sort</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.title">
+<!--[formish.forms.Field.title]--><tt class="descname">title</tt><a class="headerlink" href="#formish.forms.Field.title" title="Permalink to this definition">¶</a></dt>
+<dd>The Field schema&#8217;s title</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.value">
+<!--[formish.forms.Field.value]--><tt class="descname">value</tt><a class="headerlink" href="#formish.forms.Field.value" title="Permalink to this definition">¶</a></dt>
+<dd>Convert the request_data to a value object for the form or None.</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.widget">
+<!--[formish.forms.Field.widget]--><tt class="descname">widget</tt><a class="headerlink" href="#formish.forms.Field.widget" title="Permalink to this definition">¶</a></dt>
+<dd>return the fields widget bound with extra params.</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="formish.forms.Group">
+<!--[formish.forms.Group]-->class <tt class="descclassname">formish.forms.</tt><tt class="descname">Group</tt><big>(</big><em>name</em>, <em>attr</em>, <em>form</em><big>)</big><a class="headerlink" href="#formish.forms.Group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">formish.forms.Collection</span></tt></p>
+<p>A group is a basic collection with a different template</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>name</em> &#8211; Name for the Collection</li>
+<li><em>attr</em> (schemaish.attr.*) &#8211; Schema attr to bind to the field</li>
+<li><em>form</em> (formish.Form instance.) &#8211; The form the field belongs to.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="formish.forms.Sequence">
+<!--[formish.forms.Sequence]-->class <tt class="descclassname">formish.forms.</tt><tt class="descname">Sequence</tt><big>(</big><em>name</em>, <em>attr</em>, <em>form</em><big>)</big><a class="headerlink" href="#formish.forms.Sequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">formish.forms.Collection</span></tt></p>
+<p>A sequence is a collection with a variable number of fields depending on request data, data or min/max values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>name</em> &#8211; Name for the Collection</li>
+<li><em>attr</em> (schemaish.attr.*) &#8211; Schema attr to bind to the field</li>
+<li><em>form</em> (formish.Form instance.) &#8211; The form the field belongs to.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="formish.forms.Sequence.collection_fields">
+<!--[formish.forms.Sequence.collection_fields]--><tt class="descname">collection_fields</tt><big>(</big><big>)</big><a class="headerlink" href="#formish.forms.Sequence.collection_fields" title="Permalink to this definition">¶</a></dt>
+<dd>For sequences we check to see if the name is numeric. As names cannot be numeric normally, the first iteration loops 
+on a fields values and spits out a</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Sequence.template">
+<!--[formish.forms.Sequence.template]--><tt class="descname">template</tt><a class="headerlink" href="#formish.forms.Sequence.template" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/formish.forms.txt">Show Source</a></li>
+            </ul>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="index.html">Formish v1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Tim Parkin, Matt Goodall.
+    </div>
+  </div> 
+  </div>
+  </body>
+</html>

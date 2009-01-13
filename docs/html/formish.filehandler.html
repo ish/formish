@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>formish.filehandler &mdash; Formish v1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Formish v1 documentation" href="index.html" /> 
+
+
+  <link media="screen" href="_static/css/screen.css" type="text/css" rel="stylesheet" />
+  <link media="screen" href="_static/css/images.css" type="text/css" rel="stylesheet" />
+  <link media="screen" href="_static/css/sIFR-screen.css" type="text/css" rel="stylesheet" />
+  <link media="print" href="_static/css/sIFR-print.css" type="text/css" rel="stylesheet" />  
+  <script type="text/javascript" src="_static/js/sifr.js" ></script>
+  <script type="text/javascript" src="_static/js/sifr-config.js" ></script> 
+  <script type="text/javascript" src="_static/js/sifr-debug.js" ></script> 
+
+  </head>
+  <body id="sphinx">
+    <div id="wrapper">
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="index.html">Formish v1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div id="header">
+      <div id="logo"><img src="_static/images/logo/ish.io.png" /></div>
+      <div id="overview"><a href="http://ish.io/projects/show/formish">Overview</a></div>
+    </div>
+
+<div id="main">
+    <div  class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="module-formish.filehandler">
+<h1>formish.filehandler<a class="headerlink" href="#module-formish.filehandler" title="Permalink to this headline">¶</a></h1>
+<p>Standard filehandlers for temporary storage of file uploads. Uses tempfile to
+make temporary files</p>
+<dl class="class">
+<dt id="formish.filehandler.TempFileHandler">
+<!--[formish.filehandler.TempFileHandler]-->class <tt class="descclassname">formish.filehandler.</tt><tt class="descname">TempFileHandler</tt><a class="headerlink" href="#formish.filehandler.TempFileHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <tt class="xref docutils literal"><span class="pre">formish.filehandler.FileHandlerMinimal</span></tt></p>
+<p>File handler using python tempfile module to store file</p>
+<dl class="method">
+<dt id="formish.filehandler.TempFileHandler.delete_file">
+<!--[formish.filehandler.TempFileHandler.delete_file]--><tt class="descname">delete_file</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#formish.filehandler.TempFileHandler.delete_file" title="Permalink to this definition">¶</a></dt>
+<dd>remove the tempfile</dd></dl>
+
+<dl class="method">
+<dt id="formish.filehandler.TempFileHandler.get_mimetype">
+<!--[formish.filehandler.TempFileHandler.get_mimetype]--><tt class="descname">get_mimetype</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#formish.filehandler.TempFileHandler.get_mimetype" title="Permalink to this definition">¶</a></dt>
+<dd>use python-magic to guess the mimetype or use application/octet-stream
+if no guess</dd></dl>
+
+<dl class="method">
+<dt id="formish.filehandler.TempFileHandler.get_path_for_file">
+<!--[formish.filehandler.TempFileHandler.get_path_for_file]--><tt class="descname">get_path_for_file</tt><big>(</big><em>filename</em><big>)</big><a class="headerlink" href="#formish.filehandler.TempFileHandler.get_path_for_file" title="Permalink to this definition">¶</a></dt>
+<dd>given the filename, get the path for the temporary file</dd></dl>
+
+<dl class="method">
+<dt id="formish.filehandler.TempFileHandler.store_file">
+<!--[formish.filehandler.TempFileHandler.store_file]--><tt class="descname">store_file</tt><big>(</big><em>fieldstorage</em><big>)</big><a class="headerlink" href="#formish.filehandler.TempFileHandler.store_file" title="Permalink to this definition">¶</a></dt>
+<dd>Given a filehandle, store the file and return an identifier, in this
+case the original filename</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="formish.filehandler.TempFileHandlerWeb">
+<!--[formish.filehandler.TempFileHandlerWeb]-->class <tt class="descclassname">formish.filehandler.</tt><tt class="descname">TempFileHandlerWeb</tt><big>(</big><em>default_url=None</em>, <em>resource_root='/filehandler'</em>, <em>urlfactory=None</em><big>)</big><a class="headerlink" href="#formish.filehandler.TempFileHandlerWeb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a title="formish.filehandler.TempFileHandler" class="reference internal" href="#formish.filehandler.TempFileHandler"><tt class="xref docutils literal"><span class="pre">formish.filehandler.TempFileHandler</span></tt></a></p>
+<p>Same as the temporary file handler but includes ability to include a resource and a url generator (if you want access to the temporary files on the website, e.g. for previews)</p>
+<dl class="method">
+<dt id="formish.filehandler.TempFileHandlerWeb.get_url_for_file">
+<!--[formish.filehandler.TempFileHandlerWeb.get_url_for_file]--><tt class="descname">get_url_for_file</tt><big>(</big><em>identifier</em><big>)</big><a class="headerlink" href="#formish.filehandler.TempFileHandlerWeb.get_url_for_file" title="Permalink to this definition">¶</a></dt>
+<dd>Generate a url given an identifier</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/formish.filehandler.txt">Show Source</a></li>
+            </ul>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li><a href="index.html">Formish v1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Tim Parkin, Matt Goodall.
+    </div>
+  </div> 
+  </div>
+  </body>
+</html>

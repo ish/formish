@@ -11,7 +11,9 @@ Contents:
    :maxdepth: 2
 
    introduction
+   walkthrough
    restish
+   modules
 
 Indices and tables
 ==================
