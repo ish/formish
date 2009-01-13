@@ -84,7 +84,7 @@ class Root(resource.Resource):
     
     def resource_child(self, request, segments):
         if segments[0] == 'filehandler':
-            return fileresource.FileResource(fileaccessor=FileAccessor(),segments=segments[1:]), ()
+            return fileresource.FileResource(fileaccessor=FileAccessor()), segments[1:]
         return FormResource(segments[0]), segments[1:]
 
 
@@ -129,9 +129,6 @@ class FormResource(resource.Resource):
         except formish.FormError, e:
             return self.render_form(request, form=form)
         else:
-            print request.environ
-            print request.headers
-            print '[',request.body,']'
             if 'myFileField' in data:
                 f = data['myFileField']
                 filedata = f.file.read()
