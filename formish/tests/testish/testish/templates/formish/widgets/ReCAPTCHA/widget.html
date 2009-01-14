@@ -1,0 +1,17 @@
+<%page args="field" />
+<%
+if field.error:
+    args = "k=%s&amp;error=incorrect-captcha-sol"%field.widget.publickey
+else: 
+    args = "k=%s"%field.widget.publickey
+if field.widget.use_ssl:
+    apiserver = field.widget.API_SSL_SERVER
+else:
+    apiserver = field.widget.API_SERVER
+%>
+<script type="text/javascript" src="${apiserver}/challenge?${args|n}"></script>
+<noscript>
+  <iframe src="${apiserver}/noscript?${args|n}" height="300" width="500" frameborder="0"></iframe><br />
+  <textarea name="${field.name}.recaptcha_challenge_field" rows="3" cols="40"></textarea>
+  <input type="hidden" name="${field.name}.recaptcha_response_field" value="manual_challenge" />
+</noscript>

@@ -42,7 +42,7 @@ class Widget(object):
         return [string_data]
 
 
-    def pre_parse_request(self, schema_type, request_data):
+    def pre_parse_request(self, schema_type, request_data, full_request_data):
         """
         Prior to convert being run, we have a chance to munge the data. This is
         only used by file upload at the moment
@@ -326,7 +326,7 @@ class FileUpload(Widget):
             self.default = ''
         return {'name': [self.default], 'default':[self.default]}
     
-    def pre_parse_request(self, schema_type, data):
+    def pre_parse_request(self, schema_type, data, full_request_data):
         """
         File uploads are wierd; in out case this means assymetric. We store the
         file in a temporary location and just store an identifier in the field.

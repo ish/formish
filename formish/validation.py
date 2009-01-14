@@ -180,7 +180,7 @@ def pre_parse_request_data(form_structure, request_data, data=None):
         else: 
             # This needs to be cleverer...
             item_data = request_data.get(field.name, [])
-            data[field.name] = field.widget.pre_parse_request(field.attr, item_data)
+            data[field.name] = field.widget.pre_parse_request(field.attr, item_data, full_request_data=request_data)
 
     return dottedDict(data)
 
