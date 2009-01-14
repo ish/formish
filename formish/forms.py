@@ -96,6 +96,12 @@ class TemplatedString(object):
             return ''
         return unicode(self.val)
 
+    def __nonzero__(self):
+        if self.val:
+            return True
+        else:
+            return False
+
     def __call__(self):
         renderer = self.obj.form.renderer
         name = '%s_%s'%(self.obj.type,self.attr_name)

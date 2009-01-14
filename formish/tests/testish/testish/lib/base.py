@@ -53,7 +53,7 @@ def load_config(**defaults):
 
 class TestCase(unittest.TestCase):
 
-    http_port = os.environ.get('HTTP_PORT', '8080')
+    http_port = os.environ.get('HTTP_PORT', '8891')
 
     config = load_config(HTTP_PORT=http_port)
     

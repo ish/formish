@@ -168,6 +168,11 @@
   padding:0;
 }
 
+#recaptcha_widget_div div {
+    padding-bottom: 0;
+}
+
+
 /*--- CLEARFIX  ----------------------------------------------------------*/
 .formish-form div.field:after {
   content:".";
