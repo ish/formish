@@ -44,7 +44,8 @@ def String(request):
     form = formish.Form(schema, 'form')
     return form
 
-def functest_String(self, sel):#{{{
+def functest_String(self):#{{{
+    sel = self.selenium
     sel.open("/String")
 
     sel.click("form-action-submit")
@@ -93,7 +94,8 @@ def Integer(request):
     form = formish.Form(schema, 'form')
     return form
 
-def functest_Integer(self,sel):#{{{
+def functest_Integer(self):#{{{
+    sel = self.selenium
     sel.open("/Integer")
 
     sel.click("form-action-submit")
@@ -147,7 +149,8 @@ def Date(request):
     form = formish.Form(schema, 'form')
     return form
 
-def functest_Date(self, sel):#{{{
+def functest_Date(self):#{{{
+    sel = self.selenium
 
     sel.open("/Date")
 
@@ -185,7 +188,8 @@ def Float(request):
     form = formish.Form(schema, 'form')
     return form
 
-def functest_Float(self, sel):#{{{
+def functest_Float(self):#{{{
+    sel = self.selenium
     sel.open("/Float")
 
     sel.click("form-action-submit")
@@ -224,7 +228,8 @@ def Boolean(request):
     form = formish.Form(schema, 'form')
     return form
 
-def functest_Boolean(self, sel):#{{{
+def functest_Boolean(self):#{{{
+    sel = self.selenium
     sel.open("/Boolean")
 
     sel.click("form-action-submit")
@@ -269,7 +274,8 @@ def Decimal(request):
     return form
 
 
-def functest_Decimal(self, sel):#{{{
+def functest_Decimal(self):#{{{
+    sel = self.selenium
     sel.open("/Decimal")
 
     sel.click("form-action-submit")
@@ -308,7 +314,8 @@ def RequiredStringAndCheckbox(request):
     form['myBoolean'].widget=formish.Checkbox()
     return form
 
-def functest_RequiredStringAndCheckbox(self, sel):#{{{
+def functest_RequiredStringAndCheckbox(self):#{{{
+    sel = self.selenium
     sel.open("/RequiredStringAndCheckbox")
 
     sel.click("form-action-submit")
@@ -341,7 +348,8 @@ def File(request):
     form['myFile'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
     return form
 
-def functest_File(self, sel):#{{{
+def functest_File(self):#{{{
+    sel = self.selenium
     sel.open("/File")
 
     sel.click("form-action-submit")
@@ -617,7 +625,8 @@ def RequiredStringAndFile(request):
     form['myFileField'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb(),show_image_preview=True,originalurl='/images/nouploadyet.png')
     return form
 
-def functest_RequiredStringAndFile(self, sel):#{{{
+def functest_RequiredStringAndFile(self):#{{{
+    sel = self.selenium
     sel.open("/RequiredStringAndFile")
 
     sel.click("form-action-submit")
@@ -759,7 +768,8 @@ def SelectWithOtherChoice(request):
     form['mySelect'].widget = formish.SelectWithOtherChoice(options)
     return form
 
-def functest_SelectWithOtherChoice(self, sel):#{{{
+def functest_SelectWithOtherChoice(self):#{{{
+    sel = self.selenium
     sel.open("/SelectWithOtherChoice")
 
     try: self.assertEqual("", sel.get_value("form-mySelect"))
@@ -952,7 +962,8 @@ def SequenceOfUploadStructures(request):
     form['myList.*.a'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
     return form
 
-def functest_SequenceOfUploadStructures(self, sel):#{{{
+def functest_SequenceOfUploadStructures(self):#{{{
+    sel = self.selenium
 
     sel.open("/SequenceOfUploadStructures")
     sel.wait_for_page_to_load("30000")
@@ -989,7 +1000,8 @@ def SequenceOfStructuresWithSelects(request):
     form.defaults = {'myList': [{'a':'foo','b':'b'}]}
     return form
 
-def functest_SequenceOfStructuresWithSelects(self, sel):#{{{
+def functest_SequenceOfStructuresWithSelects(self):#{{{
+    sel = self.selenium
     sel.open("/SequenceOfStructuresWithSelects")
 
     try: self.assertEqual("foo", sel.get_value("form-myList-0-a"))
@@ -1023,7 +1035,8 @@ def SequenceOfDateParts(request):
 
 
 
-def functest_SequenceOfDateParts(self, sel):#{{{
+def functest_SequenceOfDateParts(self):#{{{
+    sel = self.selenium
     sel.open("/SequenceOfDateParts")
 
     sel.click_at("css=#form-birthdays-field > a", "")
