@@ -14,7 +14,7 @@ class TestTogether(TestCase):
                 getattr(forms,attr)(self)
 
 
-class TestSeparately(TestCase):
+class Separately(TestCase):
     """
     Run each test in a separate browser session.
 
@@ -28,8 +28,8 @@ class TestSeparately(TestCase):
 # truly horrible hack.
 for attr in dir(forms):
     if attr.startswith('functest_'):
-        func_name = 'test_%s'%attr[9:]
+        func_name = 'est_%s'%attr[9:]
         func = getattr(forms, attr)
         func.__name__ = func_name
-        setattr(TestSeparately, func_name, func)
+        setattr(Separately, func_name, func)
 
