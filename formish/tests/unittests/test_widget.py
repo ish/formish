@@ -149,7 +149,7 @@ class TestErrorRendering(base.TestCase):
         ERROR_TEXT = '!!!WOOP!!!WOOP!!!WOOP!!!'
         form = formish.Form(schema, errors={attr: ERROR_TEXT})
         html = form()
-        element = BeautifulSoup(html).find(id='formish-%s-field'%(attr.replace('.', '-'),))
+        element = BeautifulSoup(html).find(id='form-%s-field'%(attr.replace('.', '-'),))
         div_error = element.find('div',{'class': 'error'})
         span_error = element.find('span',{'class': 'error'})
         assert div_error or span_error
