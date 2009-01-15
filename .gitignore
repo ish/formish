@@ -10,3 +10,4 @@ export.sh
 *.html.py
 *.swp
 *.swo
+*.noseids
