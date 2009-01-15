@@ -674,12 +674,12 @@ def functest_RequiredStringAndFile(self):#{{{
     actualfilepath = 'cache/%s'%filesrc
     assert os.path.exists(actualfilepath)
     stdout = subprocess.Popen([IDENTIFY, actualfilepath], stdout=subprocess.PIPE).communicate()[0]
-    assert stdout.endswith('photo.jpg JPEG 300x300 300x300+0+0 DirectClass 8-bit 4.36133kb \n')
+    assert 'photo.jpg JPEG 300x300' in stdout
     
     actualfilepath = '%s-100x100'%actualfilepath
     assert os.path.exists(actualfilepath)
     stdout = subprocess.Popen([IDENTIFY, actualfilepath], stdout=subprocess.PIPE).communicate()[0]
-    assert stdout.endswith('photo.jpg-100x100 JPEG 100x100 100x100+0+0 DirectClass 8-bit 1.70703kb \n')
+    assert 'photo.jpg-100x100 JPEG 100x100' in stdout
 
           
     return#}}}

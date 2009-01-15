@@ -1,0 +1,2 @@
+nosetests formish/tests/unittests
+cd formish/tests/testish && ./unittest && cd ../../../
