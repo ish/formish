@@ -611,7 +611,7 @@ class Form(object):
             return self._element_name
         if self._name is not None:
             return self._name
-        return 'formish'
+        return 'form'
 
     def _name_set(self, name):
         """ Set the form name """ 
