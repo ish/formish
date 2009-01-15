@@ -1,0 +1,2 @@
+# requires selenium
+nosetests testish/lib/test_func.py:TestTogether
