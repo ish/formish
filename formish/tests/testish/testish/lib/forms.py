@@ -743,11 +743,11 @@ def SelectChoiceNoneOption(request):
 
 def SelectChoiceCallableOptions(request):
     """
-    Passing in a callable list of options
+    Passing in a callable list of options (sorry about the bug XXX)
     """
     schema = schemaish.Structure()
     schema.add('mySelect', schemaish.Integer())
-    def _(request):
+    def _():
         options = [(1,'a'),(2,'b'),(3,'c')]
         for option in options:
             yield option
