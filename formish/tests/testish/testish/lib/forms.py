@@ -847,7 +847,7 @@ def RadioChoiceCallableOptions(request):
     """
     schema = schemaish.Structure()
     schema.add('myRadio', schemaish.Integer())
-    def _(request):
+    def _():
         options = [(1,'a'),(2,'b'),(3,'c')]
         for option in options:
             yield option
