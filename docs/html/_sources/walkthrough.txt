@@ -72,24 +72,24 @@ How to create HTML
 We create our HTML by calling the form as follows..
 
 >>> form()
-'...<form id="formish" action="" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">...'
+'...<form id="form" action="" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">...'
 
 I've skipped the majority of this output as it's probably better shown formatted
 
 .. code-block:: html
 
-    <form id="formish" action="" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+    <form id="form" action="" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">
       <div>
         <input type="hidden" name="_charset_" />
-        <input type="hidden" name="__formish_form__" value="formish" />
-        <div id="formish-myfield-field" class="field string input">
-          <label for="formish-myfield">Myfield</label>
+        <input type="hidden" name="__formish_form__" value="form" />
+        <div id="form-myfield-field" class="field string input">
+          <label for="form-myfield">Myfield</label>
           <div class="inputs">
-            <input id="formish-myfield" type="text" name="myfield" value="" />
+            <input id="form-myfield" type="text" name="myfield" value="" />
           </div>
         </div>
         <div class="actions">
-          <input type="submit" id="formish-action-submit" name="submit" value="Submit" />
+          <input type="submit" id="form-action-submit" name="submit" value="Submit" />
         </div>
       </div>
     </form>
@@ -111,7 +111,7 @@ The form html element
 .. code-block:: html
 
     <!-- The Form -->
-    <form id="formish" action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+    <form id="form" action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
 
 The first hidden field is '_charset_ which is a hack to help mozilla handle charsets as described here https://bugzilla.mozilla.org/show_bug.cgi?id=18643. The second is the name of the form, used after submission to work out which form has been returned.
 
@@ -123,7 +123,7 @@ The form configuration attributes
 
       <!-- Form Configuration Attributes -->
       <input type="hidden" name="_charset_" />
-      <input type="hidden" name="__formish_form__" value="formish" />
+      <input type="hidden" name="__formish_form__" value="form" />
 
 
 The field itself has an id, using the form name, field name and the suffix '-field' to help with javascript, css, etc. There are also a bunch of classes that allow global css to be applied to different widget types or schema types.
@@ -138,10 +138,10 @@ The input field(s)
 .. code-block:: html
 
       <!-- The String Field -->
-      <div id="formish-myfield-field" class="field string input">
-        <label for="formish-myfield">Myfield</label>
+      <div id="form-myfield-field" class="field string input">
+        <label for="form-myfield">Myfield</label>
         <div class="inputs">
-          <input id="formish-myfield" type="text" name="myfield" value="" />
+          <input id="form-myfield" type="text" name="myfield" value="" />
         </div>
       </div>
 
@@ -154,7 +154,7 @@ Finally, the actions block contains all of the submit buttons - in this case jus
 
       <!-- The Action(s) -->
       <div class="actions">
-        <input type="submit" id="formish-action-submit" name="submit" value="Submit" />
+        <input type="submit" id="form-action-submit" name="submit" value="Submit" />
       </div>
     </form>
 
@@ -247,17 +247,17 @@ This is the same as our first example but note that the label for firstName has 
 
 .. code-block:: html
 
-    <div id="formish-firstName-field" class="field string input">
-      <label for="formish-firstName">First Name</label>
+    <div id="form-firstName-field" class="field string input">
+      <label for="form-firstName">First Name</label>
       <div class="inputs">
-        <input id="formish-firstName" type="text" name="firstName" value="Tim" />
+        <input id="form-firstName" type="text" name="firstName" value="Tim" />
       </div>
     </div>
 
-    <div id="formish-surname-field" class="field string input">
-      <label for="formish-surname">Surname</label>
+    <div id="form-surname-field" class="field string input">
+      <label for="form-surname">Surname</label>
       <div class="inputs">
-        <input id="formish-surname" type="text" name="surname" value="Parkin" />
+        <input id="form-surname" type="text" name="surname" value="Parkin" />
       </div>
     </div>
 
@@ -268,23 +268,23 @@ The date field splits the date into three parts, each part indicated using dotte
 
 .. raw:: html
 
-    <div id="formish-dateOfBirth-field" class="field date dateparts">
-      <label for="formish-dateOfBirth">Date Of Birth</label>
+    <div id="form-dateOfBirth-field" class="field date dateparts">
+      <label for="form-dateOfBirth">Date Of Birth</label>
       <div class="inputs">
-        <input id="formish-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
-        <input id="formish-dateOfBirth-month" type="text" name="dateOfBirth.month" value="12" size="2" /> /
-        <input id="formish-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
+        <input id="form-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
+        <input id="form-dateOfBirth-month" type="text" name="dateOfBirth.month" value="12" size="2" /> /
+        <input id="form-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
       </div>
     </div>
 
 .. code-block:: html
 
-    <div id="formish-dateOfBirth-field" class="field date dateparts">
-      <label for="formish-dateOfBirth">Date Of Birth</label>
+    <div id="form-dateOfBirth-field" class="field date dateparts">
+      <label for="form-dateOfBirth">Date Of Birth</label>
       <div class="inputs">
-        <input id="formish-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
-        <input id="formish-dateOfBirth-month" type="text" name="dateOfBirth.month" value="12" size="2" /> /
-        <input id="formish-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
+        <input id="form-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
+        <input id="form-dateOfBirth-month" type="text" name="dateOfBirth.month" value="12" size="2" /> /
+        <input id="form-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
       </div>
     </div>
 
@@ -293,10 +293,10 @@ Integer Field
 
 .. code-block:: html
 
-    <div id="formish-streetNumber-field" class="field integer input">
-      <label for="formish-streetNumber">Street Number</label>
+    <div id="form-streetNumber-field" class="field integer input">
+      <label for="form-streetNumber">Street Number</label>
       <div class="inputs">
-        <input id="formish-streetNumber" type="text" name="streetNumber" value="123" />
+        <input id="form-streetNumber" type="text" name="streetNumber" value="123" />
       </div>
     </div>
 
@@ -307,10 +307,10 @@ This uses the 'none_option' value to show 'Where do you live' by default but bec
 
 .. raw:: html
 
-    <div id="formish-country-field" class="field string selectchoice">
-      <label for="formish-country">Country</label>
+    <div id="form-country-field" class="field string selectchoice">
+      <label for="form-country">Country</label>
       <div class="inputs">
-        <select id="formish-country" name="country">
+        <select id="form-country" name="country">
           <option value="">Where do you live</option>
           <option value="UK" selected="selected" >I live in the UK</option>
           <option value="US" >I live in the US</option>
@@ -320,10 +320,10 @@ This uses the 'none_option' value to show 'Where do you live' by default but bec
 
 .. code-block:: html
 
-    <div id="formish-country-field" class="field string selectchoice">
-      <label for="formish-country">Country</label>
+    <div id="form-country-field" class="field string selectchoice">
+      <label for="form-country">Country</label>
       <div class="inputs">
-        <select id="formish-country" name="country">
+        <select id="form-country" name="country">
           <option value="">Where do you live</option>
           <option value="UK" selected="selected" >I live in the UK</option>
           <option value="US" >I live in the US</option>
@@ -337,10 +337,10 @@ Boolean Field
 
 .. code-block:: html
 
-    <div id="formish-termsAndConditions-field" class="field boolean checkbox">
-      <label for="formish-termsAndConditions">Terms And Conditions</label>
+    <div id="form-termsAndConditions-field" class="field boolean checkbox">
+      <label for="form-termsAndConditions">Terms And Conditions</label>
       <div class="inputs">
-        <input id="formish-termsAndConditions" type="checkbox" name="termsAndConditions" value="True" checked="checked"  />
+        <input id="form-termsAndConditions" type="checkbox" name="termsAndConditions" value="True" checked="checked"  />
       </div>
     </div>
 
@@ -391,24 +391,24 @@ This produces the following - note the error 'span' below the form field.
 
 .. raw:: html
 
-    <div id="formish-dateOfBirth-field" class="field date dateparts error">
-      <label for="formish-dateOfBirth">Date Of Birth</label>
+    <div id="form-dateOfBirth-field" class="field date dateparts error">
+      <label for="form-dateOfBirth">Date Of Birth</label>
       <div class="inputs">
-        <input id="formish-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
-        <input id="formish-dateOfBirth-month" type="text" name="dateOfBirth.month" value="13" size="2" /> /
-        <input id="formish-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
+        <input id="form-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
+        <input id="form-dateOfBirth-month" type="text" name="dateOfBirth.month" value="13" size="2" /> /
+        <input id="form-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
       </div>
       <span class="error">Invalid date: month must be in 1..12</span>
     </div>
 
 .. code-block:: html
 
-    <div id="formish-dateOfBirth-field" class="field date dateparts error">
-      <label for="formish-dateOfBirth">Date Of Birth</label>
+    <div id="form-dateOfBirth-field" class="field date dateparts error">
+      <label for="form-dateOfBirth">Date Of Birth</label>
       <div class="inputs">
-        <input id="formish-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
-        <input id="formish-dateOfBirth-month" type="text" name="dateOfBirth.month" value="13" size="2" /> /
-        <input id="formish-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
+        <input id="form-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
+        <input id="form-dateOfBirth-month" type="text" name="dateOfBirth.month" value="13" size="2" /> /
+        <input id="form-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
       </div>
       <span class="error">Invalid date: month must be in 1..12</span>
     </div>
@@ -534,13 +534,13 @@ What does this produce?
 
 .. code-block:: html
 
-    <div id="formish-myfile-field" class="field type fileupload">
-      <label for="formish-myfile">Myfile</label>
+    <div id="form-myfile-field" class="field type fileupload">
+      <label for="form-myfile">Myfile</label>
       <div class="inputs">
-        <input id="formish-myfile-remove" type="checkbox" name="myfile.remove" value="true" />
-        <input id="formish-myfile-id" type="hidden" name="myfile.name" value="" />
-        <input id="formish-myfile-default" type="hidden" name="myfile.default" value="" />
-        <input id="formish-myfile" type="file" name="myfile.file" />
+        <input id="form-myfile-remove" type="checkbox" name="myfile.remove" value="true" />
+        <input id="form-myfile-id" type="hidden" name="myfile.name" value="" />
+        <input id="form-myfile-default" type="hidden" name="myfile.default" value="" />
+        <input id="form-myfile" type="file" name="myfile.file" />
       </div>
     </div>
 
@@ -548,13 +548,13 @@ and looks like
 
 .. raw:: html 
 
-    <div id="formish-myfile-field" class="field type fileupload">
-      <label for="formish-myfile">Myfile</label>
+    <div id="form-myfile-field" class="field type fileupload">
+      <label for="form-myfile">Myfile</label>
       <div class="inputs">
-        <input id="formish-myfile-remove" type="checkbox" name="myfile.remove" value="true" />
-        <input id="formish-myfile-id" type="hidden" name="myfile.name" value="" />
-        <input id="formish-myfile-default" type="hidden" name="myfile.default" value="" />
-        <input id="formish-myfile" type="file" name="myfile.file" />
+        <input id="form-myfile-remove" type="checkbox" name="myfile.remove" value="true" />
+        <input id="form-myfile-id" type="hidden" name="myfile.name" value="" />
+        <input id="form-myfile-default" type="hidden" name="myfile.default" value="" />
+        <input id="form-myfile" type="file" name="myfile.file" />
       </div>
     </div>
 
@@ -703,39 +703,39 @@ Let's take a look at the html that produced..
 
 .. raw:: html
 
-    <div id="formish-myfield-field" class="field sequence checkboxmultichoice">
-      <label for="formish-myfield">Myfield</label>
+    <div id="form-myfield-field" class="field sequence checkboxmultichoice">
+      <label for="form-myfield">Myfield</label>
       <div class="inputs">
-        <input id="formish-myfield-0" name="myfield" type="checkbox" value="1" />
-        <label for="formish-myfield-0">1</label>
+        <input id="form-myfield-0" name="myfield" type="checkbox" value="1" />
+        <label for="form-myfield-0">1</label>
         <br />
-        <input id="formish-myfield-1" name="myfield" type="checkbox" value="2" checked="checked" />
-        <label for="formish-myfield-1">2</label>
+        <input id="form-myfield-1" name="myfield" type="checkbox" value="2" checked="checked" />
+        <label for="form-myfield-1">2</label>
         <br />
-        <input id="formish-myfield-2" name="myfield" type="checkbox" value="3" />
-        <label for="formish-myfield-2">3</label>
+        <input id="form-myfield-2" name="myfield" type="checkbox" value="3" />
+        <label for="form-myfield-2">3</label>
         <br />
-        <input id="formish-myfield-3" name="myfield" type="checkbox" value="4" checked="checked" />
-        <label for="formish-myfield-3">4</label>
+        <input id="form-myfield-3" name="myfield" type="checkbox" value="4" checked="checked" />
+        <label for="form-myfield-3">4</label>
         <br />
       </div>
     </div>
 .. code-block:: html
 
-    <div id="formish-myfield-field" class="field sequence checkboxmultichoice">
-      <label for="formish-myfield">Myfield</label>
+    <div id="form-myfield-field" class="field sequence checkboxmultichoice">
+      <label for="form-myfield">Myfield</label>
       <div class="inputs">
-        <input id="formish-myfield-0" name="myfield" type="checkbox" value="1" />
-        <label for="formish-myfield-0">1</label>
+        <input id="form-myfield-0" name="myfield" type="checkbox" value="1" />
+        <label for="form-myfield-0">1</label>
         <br />
-        <input id="formish-myfield-1" name="myfield" type="checkbox" value="2" checked="checked" />
-        <label for="formish-myfield-1">2</label>
+        <input id="form-myfield-1" name="myfield" type="checkbox" value="2" checked="checked" />
+        <label for="form-myfield-1">2</label>
         <br />
-        <input id="formish-myfield-2" name="myfield" type="checkbox" value="3" />
-        <label for="formish-myfield-2">3</label>
+        <input id="form-myfield-2" name="myfield" type="checkbox" value="3" />
+        <label for="form-myfield-2">3</label>
         <br />
-        <input id="formish-myfield-3" name="myfield" type="checkbox" value="4" checked="checked" />
-        <label for="formish-myfield-3">4</label>
+        <input id="form-myfield-3" name="myfield" type="checkbox" value="4" checked="checked" />
+        <label for="form-myfield-3">4</label>
         <br />
       </div>
     </div>
@@ -758,20 +758,20 @@ Which produces a simple text area as html. When it processes this textarea, it u
 
 .. raw:: html
 
-    <div id="formish-myfield-field" class="field sequence textarea">
-      <label for="formish-myfield">Myfield</label>
+    <div id="form-myfield-field" class="field sequence textarea">
+      <label for="form-myfield">Myfield</label>
       <div class="inputs">
-        <textarea id="formish-myfield" name="myfield">1,3,5,7</textarea>
+        <textarea id="form-myfield" name="myfield">1,3,5,7</textarea>
       </div>
     </div>
 
 
 .. code-block:: html
 
-    <div id="formish-myfield-field" class="field sequence textarea">
-      <label for="formish-myfield">Myfield</label>
+    <div id="form-myfield-field" class="field sequence textarea">
+      <label for="form-myfield">Myfield</label>
       <div class="inputs">
-        <textarea id="formish-myfield" name="myfield">1,3,5,7</textarea>
+        <textarea id="form-myfield" name="myfield">1,3,5,7</textarea>
       </div>
     </div>
 
@@ -782,14 +782,14 @@ However you can change this behaviour by passing the Textarea widget a converter
 
 .. raw:: html
 
-    <textarea id="formish-myfield" name="myfield">1
+    <textarea id="form-myfield" name="myfield">1
   3
   5
   7</textarea>
 
 .. code-block:: html
 
-    <textarea id="formish-myfield" name="myfield">1\n3\n5\n7</textarea>
+    <textarea id="form-myfield" name="myfield">1\n3\n5\n7</textarea>
 
 Text Area Sequence of Sequences
 -------------------------------
@@ -806,12 +806,12 @@ In this case, the default delimiter is a comma and is used on a row by row basis
 
 .. raw:: html
 
-    <textarea id="formish-myfield" name="myfield">2,4
+    <textarea id="form-myfield" name="myfield">2,4
   6,8</textarea>
 
 .. code-block:: html
 
-    <textarea id="formish-myfield" name="myfield">2,4\n6,8</textarea>
+    <textarea id="form-myfield" name="myfield">2,4\n6,8</textarea>
 
 Multiple Input Fields
 ---------------------
@@ -845,93 +845,93 @@ This will create the following
 .. raw:: html
 
 
-    <form id="formish" action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+    <form id="form" action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
       <input type="hidden" name="_charset_" />
-      <input type="hidden" name="__formish_form__" value="formish" />
-      <fieldset id="formish-name-field" class="field myname sequencedefault sequencecontrols">
+      <input type="hidden" name="__formish_form__" value="form" />
+      <fieldset id="form-name-field" class="field myname sequencedefault sequencecontrols">
         <legend>Name</legend>
-        <div id="formish-name-firstName-field" class="field string input">
-          <label for="formish-name-firstName">First Name</label>
+        <div id="form-name-firstName-field" class="field string input">
+          <label for="form-name-firstName">First Name</label>
           <div class="inputs">
-            <input id="formish-name-firstName" type="text" name="name.firstName" value="" />
+            <input id="form-name-firstName" type="text" name="name.firstName" value="" />
           </div>
         </div>
-        <div id="formish-name-surname-field" class="field string input">
-          <label for="formish-name-surname">Surname</label>
+        <div id="form-name-surname-field" class="field string input">
+          <label for="form-name-surname">Surname</label>
           <div class="inputs">
-            <input id="formish-name-surname" type="text" name="name.surname" value="" />
+            <input id="form-name-surname" type="text" name="name.surname" value="" />
           </div>
         </div>
       </fieldset>
-      <fieldset id="formish-address-field" class="field myaddress sequencedefault sequencecontrols">
+      <fieldset id="form-address-field" class="field myaddress sequencedefault sequencecontrols">
         <legend>Address</legend>
-        <div id="formish-address-streetNumber-field" class="field integer input">
-          <label for="formish-address-streetNumber">Street Number</label>
+        <div id="form-address-streetNumber-field" class="field integer input">
+          <label for="form-address-streetNumber">Street Number</label>
           <div class="inputs">
-            <input id="formish-address-streetNumber" type="text" name="address.streetNumber" value="" />
+            <input id="form-address-streetNumber" type="text" name="address.streetNumber" value="" />
           </div>
         </div>
-        <div id="formish-address-country-field" class="field string input">
-          <label for="formish-address-country">Country</label>
+        <div id="form-address-country-field" class="field string input">
+          <label for="form-address-country">Country</label>
           <div class="inputs">
-            <input id="formish-address-country" type="text" name="address.country" value="" />
+            <input id="form-address-country" type="text" name="address.country" value="" />
           </div>
         </div>
       </fieldset>
-      <div id="formish-termsAndConditions-field" class="field boolean input">
-        <label for="formish-termsAndConditions">Terms And Conditions</label>
+      <div id="form-termsAndConditions-field" class="field boolean input">
+        <label for="form-termsAndConditions">Terms And Conditions</label>
         <div class="inputs">
-          <input id="formish-termsAndConditions" type="text" name="termsAndConditions" value="" />
+          <input id="form-termsAndConditions" type="text" name="termsAndConditions" value="" />
         </div>
       </div>
       <div class="actions">
-        <input type="submit" id="formish-action-submit" name="submit" value="Submit" />
+        <input type="submit" id="form-action-submit" name="submit" value="Submit" />
       </div>
     </form>
 
 .. code-block:: html
 
-    <form id="formish" action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+    <form id="form" action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
       <input type="hidden" name="_charset_" />
-      <input type="hidden" name="__formish_form__" value="formish" />
-      <fieldset id="formish-name-field" class="field myname sequencedefault sequencecontrols">
+      <input type="hidden" name="__formish_form__" value="form" />
+      <fieldset id="form-name-field" class="field myname sequencedefault sequencecontrols">
         <legend>Name</legend>
-        <div id="formish-name-firstName-field" class="field string input">
-          <label for="formish-name-firstName">First Name</label>
+        <div id="form-name-firstName-field" class="field string input">
+          <label for="form-name-firstName">First Name</label>
           <div class="inputs">
-            <input id="formish-name-firstName" type="text" name="name.firstName" value="" />
+            <input id="form-name-firstName" type="text" name="name.firstName" value="" />
           </div>
         </div>
-        <div id="formish-name-surname-field" class="field string input">
-          <label for="formish-name-surname">Surname</label>
+        <div id="form-name-surname-field" class="field string input">
+          <label for="form-name-surname">Surname</label>
           <div class="inputs">
-            <input id="formish-name-surname" type="text" name="name.surname" value="" />
+            <input id="form-name-surname" type="text" name="name.surname" value="" />
           </div>
         </div>
       </fieldset>
-      <fieldset id="formish-address-field" class="field myaddress sequencedefault sequencecontrols">
+      <fieldset id="form-address-field" class="field myaddress sequencedefault sequencecontrols">
         <legend>Address</legend>
-        <div id="formish-address-streetNumber-field" class="field integer input">
-          <label for="formish-address-streetNumber">Street Number</label>
+        <div id="form-address-streetNumber-field" class="field integer input">
+          <label for="form-address-streetNumber">Street Number</label>
           <div class="inputs">
-            <input id="formish-address-streetNumber" type="text" name="address.streetNumber" value="" />
+            <input id="form-address-streetNumber" type="text" name="address.streetNumber" value="" />
           </div>
         </div>
-        <div id="formish-address-country-field" class="field string input">
-          <label for="formish-address-country">Country</label>
+        <div id="form-address-country-field" class="field string input">
+          <label for="form-address-country">Country</label>
           <div class="inputs">
-            <input id="formish-address-country" type="text" name="address.country" value="" />
+            <input id="form-address-country" type="text" name="address.country" value="" />
           </div>
         </div>
       </fieldset>
-      <div id="formish-termsAndConditions-field" class="field boolean input">
-        <label for="formish-termsAndConditions">Terms And Conditions</label>
+      <div id="form-termsAndConditions-field" class="field boolean input">
+        <label for="form-termsAndConditions">Terms And Conditions</label>
         <div class="inputs">
-          <input id="formish-termsAndConditions" type="text" name="termsAndConditions" value="" />
+          <input id="form-termsAndConditions" type="text" name="termsAndConditions" value="" />
         </div>
       </div>
       <div class="actions">
-        <input type="submit" id="formish-action-submit" name="submit" value="Submit" />
+        <input type="submit" id="form-action-submit" name="submit" value="Submit" />
       </div>
     </form>
 

@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Future Developments.. For Discussion &mdash; Formish v1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Formish v1 documentation" href="index.html" />
+    <link rel="next" title="Core formish Modules" href="modules.html" />
+    <link rel="prev" title="Using Formish within Restish" href="restish.html" /> 
+
+
+  <link media="screen" href="_static/css/screen.css" type="text/css" rel="stylesheet" />
+  <link media="screen" href="_static/css/images.css" type="text/css" rel="stylesheet" />
+  <link media="screen" href="_static/css/sIFR-screen.css" type="text/css" rel="stylesheet" />
+  <link media="print" href="_static/css/sIFR-print.css" type="text/css" rel="stylesheet" />  
+  <script type="text/javascript" src="_static/js/sifr.js" ></script>
+  <script type="text/javascript" src="_static/js/sifr-config.js" ></script> 
+  <script type="text/javascript" src="_static/js/sifr-debug.js" ></script> 
+
+  </head>
+  <body id="sphinx">
+    <div id="wrapper">
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="Core formish Modules"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="restish.html" title="Using Formish within Restish"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Formish v1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div id="header">
+      <div id="logo"><img src="_static/images/logo/ish.io.png" /></div>
+      <div id="overview"><a href="http://ish.io/projects/show/formish">Overview</a></div>
+    </div>
+
+<div id="main">
+    <div  class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  
+  <div class="section" id="future-developments-for-discussion">
+<h1>Future Developments.. For Discussion<a class="headerlink" href="#future-developments-for-discussion" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="customising-templates">
+<h2>Customising Templates<a class="headerlink" href="#customising-templates" title="Permalink to this headline">¶</a></h2>
+<p>Although we can override a widgets html by including an identically named widget in a projects local template directory (for any templating language that provides template lookup facilites), we need a way of making template customisation able to be used in an ad-hoc way (i.e. not replacing ALL textarea elements).</p>
+<p>At the moment the template for a widget is defined by a widgets <tt class="docutils literal"><span class="pre">_template</span></tt> attribute. The first way of overriding templates would be to provide a way of substituting this value. Simply adding an <tt class="docutils literal"><span class="pre">id</span></tt> keyword argument would allow this. Using this you would be able to do the following.</p>
+<div class="section" id="during-form-creation">
+<h3>During form creation<a class="headerlink" href="#during-form-creation" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;firstName&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;surname&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">())</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;firstName&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="o">=</span><span class="n">TextArea</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;firstName&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="s">&#39;TextAreaCustom&#39;</span>
+</pre></div>
+</div>
+<p>This first example would look inside the <tt class="docutils literal"><span class="pre">formish/widgets/TextAreaCustom</span></tt> for its template parts.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;firstName&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;surname&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">())</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;firstName&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="o">=</span><span class="n">TextArea</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s">&#39;TextAreaCustom&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Because both of these override the folder for the widget, any of the field parts can also be overriden. So if you include <tt class="docutils literal"><span class="pre">field_label.html</span></tt> in your folder then just this part will be override</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If a template is overridden but the directory only contains a <tt class="docutils literal"><span class="pre">field_label.html</span></tt> (for instance) should the widget default back to using the standard location?</p>
+</div>
+</div>
+<div class="section" id="at-rendering-time">
+<h3>At rendering time..<a class="headerlink" href="#at-rendering-time" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-mako"><div class="highlight"><pre><span class="x">&lt;%</span>
+
+<span class="x">temporary_template = &quot;&quot;&quot;</span>
+<span class="x">&lt;div id=&quot;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">cssname</span><span class="cp">}</span><span class="x">-field&quot; class=&quot;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">classes</span><span class="cp">}</span><span class="x">&quot;&gt;</span>
+<span class="cp">%</span> <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">_template</span> <span class="o">!=</span> <span class="s">&#39;Hidden&#39;</span><span class="p">:</span><span class="x"></span>
+<span class="x">  &lt;label for=&quot;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">cssname</span><span class="cp">}</span><span class="x">&quot;&gt;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">title</span><span class="cp">}</span><span class="x">&lt;/label&gt;</span>
+<span class="cp">%</span><span class="k">endif</span><span class="x"></span>
+<span class="x">  &lt;div class=&quot;inputs&quot;&gt;</span>
+<span class="x">    &lt;input id=&quot;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">cssname</span><span class="cp">}</span><span class="x">&quot; type=&quot;text&quot; name=&quot;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="cp">}</span><span class="x">&quot; value=&quot;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="cp">}</span><span class="x">&quot; /&gt;</span>
+<span class="x">  &lt;/div&gt;</span>
+<span class="cp">%</span> <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">error</span><span class="p">:</span><span class="x"></span>
+<span class="x">  &lt;span class=&quot;error&quot;&gt;</span><span class="cp">${</span><span class="nb">unicode</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">error</span><span class="p">)</span><span class="cp">}</span><span class="x">&lt;/span&gt;</span>
+<span class="cp">%</span><span class="k"> endif</span><span class="x"></span>
+<span class="cp">%</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">description</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span><span class="p">:</span><span class="x"></span>
+<span class="x">  &lt;span class=&quot;description&quot;&gt;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">description</span><span class="cp">}</span><span class="x">&lt;/span&gt;</span>
+<span class="cp">%</span><span class="k"> endif</span><span class="x"></span>
+<span class="x">&lt;/div&gt;</span>
+<span class="x">&quot;&quot;&quot;</span>
+
+<span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">header</span><span class="p">()</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x"></span>
+<span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">metadata</span><span class="p">()</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x"></span>
+
+<span class="cp">${</span><span class="n">form</span><span class="p">[</span><span class="s">&#39;firstName&#39;</span><span class="p">](</span><span class="n">template</span><span class="o">=</span><span class="n">temporary_template</span><span class="p">)</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x"></span>
+
+<span class="x">&lt;div id=&quot;</span><span class="cp">${</span><span class="n">form</span><span class="p">[</span><span class="s">&#39;surname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cssname</span><span class="cp">}</span><span class="x">-field&quot; class=&quot;</span><span class="cp">${</span><span class="n">form</span><span class="p">[</span><span class="s">&#39;surname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">classes</span><span class="cp">}</span><span class="x">&quot;&gt;</span>
+<span class="x">  &lt;strong&gt;</span><span class="cp">${</span><span class="n">form</span><span class="p">[</span><span class="s">&#39;surname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">description</span><span class="cp">}</span><span class="x">&lt;/strong&gt;</span>
+<span class="x">  &lt;em&gt;</span><span class="cp">${</span><span class="n">form</span><span class="p">[</span><span class="s">&#39;surname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">error</span><span class="cp">}</span><span class="x">&lt;/em&gt;</span>
+<span class="x">  </span><span class="cp">${</span><span class="n">form</span><span class="p">[</span><span class="s">&#39;surname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x"></span>
+<span class="x">&lt;/div&gt;</span>
+
+<span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">actions</span><span class="p">()</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x"></span>
+<span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">footer</span><span class="p">()</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>Obviously a big widget like this is silly inline so you could/should/may/might..</p>
+<p><tt class="docutils literal"><span class="pre">temporary_template.html</span></tt></p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="x">&lt;div id=&quot;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">cssname</span><span class="cp">}</span><span class="x">-field&quot; class=&quot;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">classes</span><span class="cp">}</span><span class="x">&quot;&gt;</span>
+<span class="cp">%</span> <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">_template</span> <span class="o">!=</span> <span class="s">&#39;Hidden&#39;</span><span class="p">:</span><span class="x"></span>
+<span class="x">  &lt;label for=&quot;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">cssname</span><span class="cp">}</span><span class="x">&quot;&gt;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">title</span><span class="cp">}</span><span class="x">&lt;/label&gt;</span>
+<span class="cp">%</span><span class="k">endif</span><span class="x"></span>
+<span class="x">  &lt;div class=&quot;inputs&quot;&gt;</span>
+<span class="x">    &lt;input id=&quot;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">cssname</span><span class="cp">}</span><span class="x">&quot; type=&quot;text&quot; name=&quot;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="cp">}</span><span class="x">&quot; value=&quot;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="cp">}</span><span class="x">&quot; /&gt;</span>
+<span class="x">  &lt;/div&gt;</span>
+<span class="cp">%</span> <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">error</span><span class="p">:</span><span class="x"></span>
+<span class="x">  &lt;span class=&quot;error&quot;&gt;</span><span class="cp">${</span><span class="nb">unicode</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">error</span><span class="p">)</span><span class="cp">}</span><span class="x">&lt;/span&gt;</span>
+<span class="cp">%</span><span class="k"> endif</span><span class="x"></span>
+<span class="cp">%</span> <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">description</span><span class="p">)</span> <span class="o">!=</span> <span class="s">&#39;&#39;</span><span class="p">:</span><span class="x"></span>
+<span class="x">  &lt;span class=&quot;description&quot;&gt;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">description</span><span class="cp">}</span><span class="x">&lt;/span&gt;</span>
+<span class="cp">%</span><span class="k"> endif</span><span class="x"></span>
+<span class="x">&lt;/div&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-mako"><div class="highlight"><pre><span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">header</span><span class="p">()</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x"></span>
+<span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">metadata</span><span class="p">()</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x"></span>
+
+<span class="cp">${</span><span class="n">form</span><span class="p">[</span><span class="s">&#39;firstName&#39;</span><span class="p">](</span><span class="n">template</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="s">&#39;temporary_template.html&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">())</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x"></span>
+
+<span class="x">&lt;div id=&quot;</span><span class="cp">${</span><span class="n">form</span><span class="p">[</span><span class="s">&#39;surname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">cssname</span><span class="cp">}</span><span class="x">-field&quot; class=&quot;</span><span class="cp">${</span><span class="n">form</span><span class="p">[</span><span class="s">&#39;surname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">classes</span><span class="cp">}</span><span class="x">&quot;&gt;</span>
+<span class="x">  &lt;strong&gt;</span><span class="cp">${</span><span class="n">form</span><span class="p">[</span><span class="s">&#39;surname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">description</span><span class="cp">}</span><span class="x">&lt;/strong&gt;</span>
+<span class="x">  &lt;em&gt;</span><span class="cp">${</span><span class="n">form</span><span class="p">[</span><span class="s">&#39;surname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">error</span><span class="cp">}</span><span class="x">&lt;/em&gt;</span>
+<span class="x">  </span><span class="cp">${</span><span class="n">form</span><span class="p">[</span><span class="s">&#39;surname&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="p">()</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x"></span>
+<span class="x">&lt;/div&gt;</span>
+
+<span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">actions</span><span class="p">()</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x"></span>
+<span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">footer</span><span class="p">()</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>Depending on your templating language you may be able to get that string into the call in a better way.</p>
+</div>
+</div>
+<div class="section" id="filtering-field-emission">
+<h2>Filtering Field Emission<a class="headerlink" href="#filtering-field-emission" title="Permalink to this headline">¶</a></h2>
+<p>It would be nice to be able to emit a bunch of fields by passing their ids to the fields() callable</p>
+<div class="highlight-mako"><pre>${form.header()|n}
+${form.metadata()|n}
+
+${form.fields( ['title','firstname'] )|n}
+
+&lt;div id="${form['surname'].cssname}-field" class="${form['surname'].classes}"&gt;
+  &lt;strong&gt;${form['surname'].description}&lt;/strong&gt;
+  &lt;em&gt;${form['surname'].error}&lt;/em&gt;
+  ${form['surname'].widget()|n}
+&lt;/div&gt;
+
+${form.fields( ['surname','comments'] )
+
+${form.actions()|n}
+${form.footer()|n}</pre>
+</div>
+<p>If we have a bunch of form fields we want to render with one custom one in the middle, we may want to spit out a slice of the fields.. e.g. fields[:4], then our custom one, then fields[5:]. If we can pass <tt class="docutils literal"><span class="pre">form.fields.keys</span></tt> to form.fields callable, we get lots of stuff for free.. We can apply filters, reductions, slices, etc, etc..</p>
+<div class="section" id="alternate-syntaxes">
+<h3>alternate syntaxes<a class="headerlink" href="#alternate-syntaxes" title="Permalink to this headline">¶</a></h3>
+<p>personally I think using form.fields is OK.. Obviously the fields iterable is on one level though so we need a <tt class="docutils literal"><span class="pre">walk</span></tt> version of some sort.. Being as we are using dotted dicts omething like <tt class="docutils literal"><span class="pre">.dottedkeys</span></tt> which could then be reduced using different functions..</p>
+<p>e.g.</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="x">form.fields( form.fields.dottedkeys[1:4] )</span>
+<span class="x">form.fields( form.fields.keys[-1] )</span>
+</pre></div>
+</div>
+<p>I think adding the simple &#8216;pass in a bunch of keys&#8217; version is OK for most of what we&#8217;d like I&#8217;m sure..</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">Future Developments.. For Discussion</a><ul>
+<li><a class="reference external" href="#customising-templates">Customising Templates</a><ul>
+<li><a class="reference external" href="#during-form-creation">During form creation</a></li>
+<li><a class="reference external" href="#at-rendering-time">At rendering time..</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#filtering-field-emission">Filtering Field Emission</a><ul>
+<li><a class="reference external" href="#alternate-syntaxes">alternate syntaxes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="restish.html" title="previous chapter">Using Formish within Restish</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="modules.html" title="next chapter">Core formish Modules</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/future.txt">Show Source</a></li>
+            </ul>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="Core formish Modules"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="restish.html" title="Using Formish within Restish"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Formish v1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Tim Parkin, Matt Goodall.
+    </div>
+  </div> 
+  </div>
+  </body>
+</html>
