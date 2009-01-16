@@ -132,22 +132,22 @@
 <h3>How to create HTML<a class="headerlink" href="#how-to-create-html" title="Permalink to this headline">¶</a></h3>
 <p>We create our HTML by calling the form as follows..</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">()</span>
-<span class="go">&#39;...&lt;form id=&quot;formish&quot; action=&quot;&quot; class=&quot;formish-form&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot; accept-charset=&quot;utf-8&quot;&gt;...&#39;</span>
+<span class="go">&#39;...&lt;form id=&quot;form&quot; action=&quot;&quot; class=&quot;formish-form&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot; accept-charset=&quot;utf-8&quot;&gt;...&#39;</span>
 </pre></div>
 </div>
 <p>I&#8217;ve skipped the majority of this output as it&#8217;s probably better shown formatted</p>
-<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;formish&quot;</span> <span class="na">action=</span><span class="s">&quot;&quot;</span> <span class="na">class=</span><span class="s">&quot;formish-form&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span> <span class="na">accept-charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;form&quot;</span> <span class="na">action=</span><span class="s">&quot;&quot;</span> <span class="na">class=</span><span class="s">&quot;formish-form&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span> <span class="na">accept-charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;div&gt;</span>
     <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;_charset_&quot;</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;__formish_form__&quot;</span> <span class="na">value=</span><span class="s">&quot;formish&quot;</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-myfield-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
-      <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-myfield&quot;</span><span class="nt">&gt;</span>Myfield<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;__formish_form__&quot;</span> <span class="na">value=</span><span class="s">&quot;form&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-myfield-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-myfield&quot;</span><span class="nt">&gt;</span>Myfield<span class="nt">&lt;/label&gt;</span>
       <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-        <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-myfield&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-myfield&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
       <span class="nt">&lt;/div&gt;</span>
     <span class="nt">&lt;/div&gt;</span>
     <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;actions&quot;</span><span class="nt">&gt;</span>
-      <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">id=</span><span class="s">&quot;formish-action-submit&quot;</span> <span class="na">name=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Submit&quot;</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">id=</span><span class="s">&quot;form-action-submit&quot;</span> <span class="na">name=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Submit&quot;</span> <span class="nt">/&gt;</span>
     <span class="nt">&lt;/div&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/form&gt;</span>
@@ -165,7 +165,7 @@
 <div class="section" id="the-form-html-element">
 <h4>The form html element<a class="headerlink" href="#the-form-html-element" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-html"><div class="highlight"><pre><span class="c">&lt;!-- The Form --&gt;</span>
-<span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;formish&quot;</span> <span class="na">action=</span><span class="s">&quot;&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span> <span class="na">accept-charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;form&quot;</span> <span class="na">action=</span><span class="s">&quot;&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span> <span class="na">accept-charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
 </pre></div>
 </div>
 <p>The first hidden field is &#8216;_charset_ which is a hack to help mozilla handle charsets as described here <a class="reference external" href="https://bugzilla.mozilla.org/show_bug.cgi?id=18643">https://bugzilla.mozilla.org/show_bug.cgi?id=18643</a>. The second is the name of the form, used after submission to work out which form has been returned.</p>
@@ -174,7 +174,7 @@
 <h4>The form configuration attributes<a class="headerlink" href="#the-form-configuration-attributes" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-html"><div class="highlight"><pre><span class="c">&lt;!-- Form Configuration Attributes --&gt;</span>
 <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;_charset_&quot;</span> <span class="nt">/&gt;</span>
-<span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;__formish_form__&quot;</span> <span class="na">value=</span><span class="s">&quot;formish&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;__formish_form__&quot;</span> <span class="na">value=</span><span class="s">&quot;form&quot;</span> <span class="nt">/&gt;</span>
 </pre></div>
 </div>
 <p>The field itself has an id, using the form name, field name and the suffix &#8216;-field&#8217; to help with javascript, css, etc. There are also a bunch of classes that allow global css to be applied to different widget types or schema types.</p>
@@ -184,10 +184,10 @@
 <div class="section" id="the-input-field-s">
 <h4>The input field(s)<a class="headerlink" href="#the-input-field-s" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-html"><div class="highlight"><pre><span class="c">&lt;!-- The String Field --&gt;</span>
-<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-myfield-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-myfield&quot;</span><span class="nt">&gt;</span>Myfield<span class="nt">&lt;/label&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-myfield-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-myfield&quot;</span><span class="nt">&gt;</span>Myfield<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-myfield&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-myfield&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/div&gt;</span>
 </pre></div>
@@ -198,7 +198,7 @@
 <p>Finally, the actions block contains all of the submit buttons - in this case just a single input with the default &#8216;submit&#8217; value.</p>
 <div class="highlight-html"><div class="highlight"><pre>  <span class="c">&lt;!-- The Action(s) --&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;actions&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">id=</span><span class="s">&quot;formish-action-submit&quot;</span> <span class="na">name=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Submit&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">id=</span><span class="s">&quot;form-action-submit&quot;</span> <span class="na">name=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Submit&quot;</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/form&gt;</span>
 </pre></div>
@@ -284,17 +284,17 @@
 <div class="section" id="string-fields">
 <h4>String fields<a class="headerlink" href="#string-fields" title="Permalink to this headline">¶</a></h4>
 <p>This is the same as our first example but note that the label for firstName has been expanded into &#8216;First Name&#8217;.</p>
-<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-firstName-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-firstName&quot;</span><span class="nt">&gt;</span>First Name<span class="nt">&lt;/label&gt;</span>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-firstName-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-firstName&quot;</span><span class="nt">&gt;</span>First Name<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-firstName&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;firstName&quot;</span> <span class="na">value=</span><span class="s">&quot;Tim&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-firstName&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;firstName&quot;</span> <span class="na">value=</span><span class="s">&quot;Tim&quot;</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/div&gt;</span>
 
-<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-surname-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-surname&quot;</span><span class="nt">&gt;</span>Surname<span class="nt">&lt;/label&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-surname-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-surname&quot;</span><span class="nt">&gt;</span>Surname<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-surname&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;surname&quot;</span> <span class="na">value=</span><span class="s">&quot;Parkin&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-surname&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;surname&quot;</span> <span class="na">value=</span><span class="s">&quot;Parkin&quot;</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/div&gt;</span>
 </pre></div>
@@ -303,19 +303,19 @@
 <div class="section" id="date-field">
 <h4>Date Field<a class="headerlink" href="#date-field" title="Permalink to this headline">¶</a></h4>
 <p>The date field splits the date into three parts, each part indicated using dotted notation.</p>
-<div id="formish-dateOfBirth-field" class="field date dateparts">
-  <label for="formish-dateOfBirth">Date Of Birth</label>
+<div id="form-dateOfBirth-field" class="field date dateparts">
+  <label for="form-dateOfBirth">Date Of Birth</label>
   <div class="inputs">
-    <input id="formish-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
-    <input id="formish-dateOfBirth-month" type="text" name="dateOfBirth.month" value="12" size="2" /> /
-    <input id="formish-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
+    <input id="form-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
+    <input id="form-dateOfBirth-month" type="text" name="dateOfBirth.month" value="12" size="2" /> /
+    <input id="form-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
   </div>
-</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-dateOfBirth-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field date dateparts&quot;</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-dateOfBirth&quot;</span><span class="nt">&gt;</span>Date Of Birth<span class="nt">&lt;/label&gt;</span>
+</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-dateOfBirth-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field date dateparts&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-dateOfBirth&quot;</span><span class="nt">&gt;</span>Date Of Birth<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-dateOfBirth&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth.day&quot;</span> <span class="na">value=</span><span class="s">&quot;18&quot;</span> <span class="na">size=</span><span class="s">&quot;2&quot;</span> <span class="nt">/&gt;</span> /
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-dateOfBirth-month&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth.month&quot;</span> <span class="na">value=</span><span class="s">&quot;12&quot;</span> <span class="na">size=</span><span class="s">&quot;2&quot;</span> <span class="nt">/&gt;</span> /
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-dateOfBirth-year&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth.year&quot;</span> <span class="na">value=</span><span class="s">&quot;1966&quot;</span> <span class="na">size=</span><span class="s">&quot;4&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-dateOfBirth&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth.day&quot;</span> <span class="na">value=</span><span class="s">&quot;18&quot;</span> <span class="na">size=</span><span class="s">&quot;2&quot;</span> <span class="nt">/&gt;</span> /
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-dateOfBirth-month&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth.month&quot;</span> <span class="na">value=</span><span class="s">&quot;12&quot;</span> <span class="na">size=</span><span class="s">&quot;2&quot;</span> <span class="nt">/&gt;</span> /
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-dateOfBirth-year&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth.year&quot;</span> <span class="na">value=</span><span class="s">&quot;1966&quot;</span> <span class="na">size=</span><span class="s">&quot;4&quot;</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/div&gt;</span>
 </pre></div>
@@ -323,10 +323,10 @@
 </div>
 <div class="section" id="integer-field">
 <h4>Integer Field<a class="headerlink" href="#integer-field" title="Permalink to this headline">¶</a></h4>
-<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-streetNumber-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field integer input&quot;</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-streetNumber&quot;</span><span class="nt">&gt;</span>Street Number<span class="nt">&lt;/label&gt;</span>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-streetNumber-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field integer input&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-streetNumber&quot;</span><span class="nt">&gt;</span>Street Number<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-streetNumber&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;streetNumber&quot;</span> <span class="na">value=</span><span class="s">&quot;123&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-streetNumber&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;streetNumber&quot;</span> <span class="na">value=</span><span class="s">&quot;123&quot;</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/div&gt;</span>
 </pre></div>
@@ -335,19 +335,19 @@
 <div class="section" id="select-field">
 <h4>Select Field<a class="headerlink" href="#select-field" title="Permalink to this headline">¶</a></h4>
 <p>This uses the &#8216;none_option&#8217; value to show &#8216;Where do you live&#8217; by default but because we have set a default value, &#8216;I live in the UK&#8217; is selected.</p>
-<div id="formish-country-field" class="field string selectchoice">
-  <label for="formish-country">Country</label>
+<div id="form-country-field" class="field string selectchoice">
+  <label for="form-country">Country</label>
   <div class="inputs">
-    <select id="formish-country" name="country">
+    <select id="form-country" name="country">
       <option value="">Where do you live</option>
       <option value="UK" selected="selected" >I live in the UK</option>
       <option value="US" >I live in the US</option>
     </select>
   </div>
-</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-country-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string selectchoice&quot;</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-country&quot;</span><span class="nt">&gt;</span>Country<span class="nt">&lt;/label&gt;</span>
+</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-country-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string selectchoice&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-country&quot;</span><span class="nt">&gt;</span>Country<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;select</span> <span class="na">id=</span><span class="s">&quot;formish-country&quot;</span> <span class="na">name=</span><span class="s">&quot;country&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;select</span> <span class="na">id=</span><span class="s">&quot;form-country&quot;</span> <span class="na">name=</span><span class="s">&quot;country&quot;</span><span class="nt">&gt;</span>
       <span class="nt">&lt;option</span> <span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">&gt;</span>Where do you live<span class="nt">&lt;/option&gt;</span>
       <span class="nt">&lt;option</span> <span class="na">value=</span><span class="s">&quot;UK&quot;</span> <span class="na">selected=</span><span class="s">&quot;selected&quot;</span> <span class="nt">&gt;</span>I live in the UK<span class="nt">&lt;/option&gt;</span>
       <span class="nt">&lt;option</span> <span class="na">value=</span><span class="s">&quot;US&quot;</span> <span class="nt">&gt;</span>I live in the US<span class="nt">&lt;/option&gt;</span>
@@ -359,10 +359,10 @@
 </div>
 <div class="section" id="boolean-field">
 <h4>Boolean Field<a class="headerlink" href="#boolean-field" title="Permalink to this headline">¶</a></h4>
-<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-termsAndConditions-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field boolean checkbox&quot;</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-termsAndConditions&quot;</span><span class="nt">&gt;</span>Terms And Conditions<span class="nt">&lt;/label&gt;</span>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-termsAndConditions-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field boolean checkbox&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-termsAndConditions&quot;</span><span class="nt">&gt;</span>Terms And Conditions<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-termsAndConditions&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">name=</span><span class="s">&quot;termsAndConditions&quot;</span> <span class="na">value=</span><span class="s">&quot;True&quot;</span> <span class="na">checked=</span><span class="s">&quot;checked&quot;</span>  <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-termsAndConditions&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">name=</span><span class="s">&quot;termsAndConditions&quot;</span> <span class="na">value=</span><span class="s">&quot;True&quot;</span> <span class="na">checked=</span><span class="s">&quot;checked&quot;</span>  <span class="nt">/&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/div&gt;</span>
 </pre></div>
@@ -409,20 +409,20 @@
 </pre></div>
 </div>
 <p>This produces the following - note the error &#8216;span&#8217; below the form field.</p>
-<div id="formish-dateOfBirth-field" class="field date dateparts error">
-  <label for="formish-dateOfBirth">Date Of Birth</label>
+<div id="form-dateOfBirth-field" class="field date dateparts error">
+  <label for="form-dateOfBirth">Date Of Birth</label>
   <div class="inputs">
-    <input id="formish-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
-    <input id="formish-dateOfBirth-month" type="text" name="dateOfBirth.month" value="13" size="2" /> /
-    <input id="formish-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
+    <input id="form-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
+    <input id="form-dateOfBirth-month" type="text" name="dateOfBirth.month" value="13" size="2" /> /
+    <input id="form-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
   </div>
   <span class="error">Invalid date: month must be in 1..12</span>
-</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-dateOfBirth-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field date dateparts error&quot;</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-dateOfBirth&quot;</span><span class="nt">&gt;</span>Date Of Birth<span class="nt">&lt;/label&gt;</span>
+</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-dateOfBirth-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field date dateparts error&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-dateOfBirth&quot;</span><span class="nt">&gt;</span>Date Of Birth<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-dateOfBirth&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth.day&quot;</span> <span class="na">value=</span><span class="s">&quot;18&quot;</span> <span class="na">size=</span><span class="s">&quot;2&quot;</span> <span class="nt">/&gt;</span> /
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-dateOfBirth-month&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth.month&quot;</span> <span class="na">value=</span><span class="s">&quot;13&quot;</span> <span class="na">size=</span><span class="s">&quot;2&quot;</span> <span class="nt">/&gt;</span> /
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-dateOfBirth-year&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth.year&quot;</span> <span class="na">value=</span><span class="s">&quot;1966&quot;</span> <span class="na">size=</span><span class="s">&quot;4&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-dateOfBirth&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth.day&quot;</span> <span class="na">value=</span><span class="s">&quot;18&quot;</span> <span class="na">size=</span><span class="s">&quot;2&quot;</span> <span class="nt">/&gt;</span> /
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-dateOfBirth-month&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth.month&quot;</span> <span class="na">value=</span><span class="s">&quot;13&quot;</span> <span class="na">size=</span><span class="s">&quot;2&quot;</span> <span class="nt">/&gt;</span> /
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-dateOfBirth-year&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth.year&quot;</span> <span class="na">value=</span><span class="s">&quot;1966&quot;</span> <span class="na">size=</span><span class="s">&quot;4&quot;</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
   <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">&quot;error&quot;</span><span class="nt">&gt;</span>Invalid date: month must be in 1..12<span class="nt">&lt;/span&gt;</span>
 <span class="nt">&lt;/div&gt;</span>
@@ -529,25 +529,25 @@ validatish.Invalid, if validation fails.</p>
 </div>
 <div class="section" id="what-does-this-produce">
 <h4>What does this produce?<a class="headerlink" href="#what-does-this-produce" title="Permalink to this headline">¶</a></h4>
-<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-myfile-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type fileupload&quot;</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-myfile&quot;</span><span class="nt">&gt;</span>Myfile<span class="nt">&lt;/label&gt;</span>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-myfile-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type fileupload&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-myfile&quot;</span><span class="nt">&gt;</span>Myfile<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-myfile-remove&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">name=</span><span class="s">&quot;myfile.remove&quot;</span> <span class="na">value=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-myfile-id&quot;</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;myfile.name&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-myfile-default&quot;</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;myfile.default&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-myfile&quot;</span> <span class="na">type=</span><span class="s">&quot;file&quot;</span> <span class="na">name=</span><span class="s">&quot;myfile.file&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-myfile-remove&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">name=</span><span class="s">&quot;myfile.remove&quot;</span> <span class="na">value=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-myfile-id&quot;</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;myfile.name&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-myfile-default&quot;</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;myfile.default&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-myfile&quot;</span> <span class="na">type=</span><span class="s">&quot;file&quot;</span> <span class="na">name=</span><span class="s">&quot;myfile.file&quot;</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/div&gt;</span>
 </pre></div>
 </div>
 <p>and looks like</p>
-<div id="formish-myfile-field" class="field type fileupload">
-  <label for="formish-myfile">Myfile</label>
+<div id="form-myfile-field" class="field type fileupload">
+  <label for="form-myfile">Myfile</label>
   <div class="inputs">
-    <input id="formish-myfile-remove" type="checkbox" name="myfile.remove" value="true" />
-    <input id="formish-myfile-id" type="hidden" name="myfile.name" value="" />
-    <input id="formish-myfile-default" type="hidden" name="myfile.default" value="" />
-    <input id="formish-myfile" type="file" name="myfile.file" />
+    <input id="form-myfile-remove" type="checkbox" name="myfile.remove" value="true" />
+    <input id="form-myfile-id" type="hidden" name="myfile.name" value="" />
+    <input id="form-myfile-default" type="hidden" name="myfile.default" value="" />
+    <input id="form-myfile" type="file" name="myfile.file" />
   </div>
 </div><p>The checkbox is included to allow you to remove a file if necessary.</p>
 </div>
@@ -694,36 +694,36 @@ thumbnail with the widget</li>
 </pre></div>
 </div>
 <p>Let&#8217;s take a look at the html that produced..</p>
-<div id="formish-myfield-field" class="field sequence checkboxmultichoice">
-  <label for="formish-myfield">Myfield</label>
+<div id="form-myfield-field" class="field sequence checkboxmultichoice">
+  <label for="form-myfield">Myfield</label>
   <div class="inputs">
-    <input id="formish-myfield-0" name="myfield" type="checkbox" value="1" />
-    <label for="formish-myfield-0">1</label>
+    <input id="form-myfield-0" name="myfield" type="checkbox" value="1" />
+    <label for="form-myfield-0">1</label>
     <br />
-    <input id="formish-myfield-1" name="myfield" type="checkbox" value="2" checked="checked" />
-    <label for="formish-myfield-1">2</label>
+    <input id="form-myfield-1" name="myfield" type="checkbox" value="2" checked="checked" />
+    <label for="form-myfield-1">2</label>
     <br />
-    <input id="formish-myfield-2" name="myfield" type="checkbox" value="3" />
-    <label for="formish-myfield-2">3</label>
+    <input id="form-myfield-2" name="myfield" type="checkbox" value="3" />
+    <label for="form-myfield-2">3</label>
     <br />
-    <input id="formish-myfield-3" name="myfield" type="checkbox" value="4" checked="checked" />
-    <label for="formish-myfield-3">4</label>
+    <input id="form-myfield-3" name="myfield" type="checkbox" value="4" checked="checked" />
+    <label for="form-myfield-3">4</label>
     <br />
   </div>
-</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-myfield-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field sequence checkboxmultichoice&quot;</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-myfield&quot;</span><span class="nt">&gt;</span>Myfield<span class="nt">&lt;/label&gt;</span>
+</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-myfield-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field sequence checkboxmultichoice&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-myfield&quot;</span><span class="nt">&gt;</span>Myfield<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-myfield-0&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">value=</span><span class="s">&quot;1&quot;</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-myfield-0&quot;</span><span class="nt">&gt;</span>1<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-myfield-0&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">value=</span><span class="s">&quot;1&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-myfield-0&quot;</span><span class="nt">&gt;</span>1<span class="nt">&lt;/label&gt;</span>
     <span class="nt">&lt;br</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-myfield-1&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">value=</span><span class="s">&quot;2&quot;</span> <span class="na">checked=</span><span class="s">&quot;checked&quot;</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-myfield-1&quot;</span><span class="nt">&gt;</span>2<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-myfield-1&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">value=</span><span class="s">&quot;2&quot;</span> <span class="na">checked=</span><span class="s">&quot;checked&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-myfield-1&quot;</span><span class="nt">&gt;</span>2<span class="nt">&lt;/label&gt;</span>
     <span class="nt">&lt;br</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-myfield-2&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">value=</span><span class="s">&quot;3&quot;</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-myfield-2&quot;</span><span class="nt">&gt;</span>3<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-myfield-2&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">value=</span><span class="s">&quot;3&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-myfield-2&quot;</span><span class="nt">&gt;</span>3<span class="nt">&lt;/label&gt;</span>
     <span class="nt">&lt;br</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-myfield-3&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">value=</span><span class="s">&quot;4&quot;</span> <span class="na">checked=</span><span class="s">&quot;checked&quot;</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-myfield-3&quot;</span><span class="nt">&gt;</span>4<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-myfield-3&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">value=</span><span class="s">&quot;4&quot;</span> <span class="na">checked=</span><span class="s">&quot;checked&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-myfield-3&quot;</span><span class="nt">&gt;</span>4<span class="nt">&lt;/label&gt;</span>
     <span class="nt">&lt;br</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/div&gt;</span>
@@ -747,15 +747,15 @@ thumbnail with the widget</li>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;myfield&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">5</span><span class="p">,</span><span class="mf">7</span><span class="p">]}</span>
 </pre></div>
 </div>
-<div id="formish-myfield-field" class="field sequence textarea">
-  <label for="formish-myfield">Myfield</label>
+<div id="form-myfield-field" class="field sequence textarea">
+  <label for="form-myfield">Myfield</label>
   <div class="inputs">
-    <textarea id="formish-myfield" name="myfield">1,3,5,7</textarea>
+    <textarea id="form-myfield" name="myfield">1,3,5,7</textarea>
   </div>
-</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-myfield-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field sequence textarea&quot;</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-myfield&quot;</span><span class="nt">&gt;</span>Myfield<span class="nt">&lt;/label&gt;</span>
+</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-myfield-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field sequence textarea&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-myfield&quot;</span><span class="nt">&gt;</span>Myfield<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;textarea</span> <span class="na">id=</span><span class="s">&quot;formish-myfield&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span><span class="nt">&gt;</span>1,3,5,7<span class="nt">&lt;/textarea&gt;</span>
+    <span class="nt">&lt;textarea</span> <span class="na">id=</span><span class="s">&quot;form-myfield&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span><span class="nt">&gt;</span>1,3,5,7<span class="nt">&lt;/textarea&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/div&gt;</span>
 </pre></div>
@@ -764,10 +764,10 @@ thumbnail with the widget</li>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;myfield&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">TextArea</span><span class="p">(</span><span class="n">converter_options</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;delimiter&#39;</span><span class="p">:</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">})</span>
 </pre></div>
 </div>
-  <textarea id="formish-myfield" name="myfield">1
+  <textarea id="form-myfield" name="myfield">1
 3
 5
-7</textarea><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;textarea</span> <span class="na">id=</span><span class="s">&quot;formish-myfield&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span><span class="nt">&gt;</span>1\n3\n5\n7<span class="nt">&lt;/textarea&gt;</span>
+7</textarea><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;textarea</span> <span class="na">id=</span><span class="s">&quot;form-myfield&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span><span class="nt">&gt;</span>1\n3\n5\n7<span class="nt">&lt;/textarea&gt;</span>
 </pre></div>
 </div>
 </div>
@@ -782,8 +782,8 @@ thumbnail with the widget</li>
 </pre></div>
 </div>
 <p>In this case, the default delimiter is a comma and is used on a row by row basis.</p>
-  <textarea id="formish-myfield" name="myfield">2,4
-6,8</textarea><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;textarea</span> <span class="na">id=</span><span class="s">&quot;formish-myfield&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span><span class="nt">&gt;</span>2,4\n6,8<span class="nt">&lt;/textarea&gt;</span>
+  <textarea id="form-myfield" name="myfield">2,4
+6,8</textarea><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;textarea</span> <span class="na">id=</span><span class="s">&quot;form-myfield&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span><span class="nt">&gt;</span>2,4\n6,8<span class="nt">&lt;/textarea&gt;</span>
 </pre></div>
 </div>
 </div>
@@ -815,89 +815,89 @@ thumbnail with the widget</li>
 </pre></div>
 </div>
 <p>This will create the following</p>
-<form id="formish" action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+<form id="form" action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
   <input type="hidden" name="_charset_" />
-  <input type="hidden" name="__formish_form__" value="formish" />
-  <fieldset id="formish-name-field" class="field myname sequencedefault sequencecontrols">
+  <input type="hidden" name="__formish_form__" value="form" />
+  <fieldset id="form-name-field" class="field myname sequencedefault sequencecontrols">
     <legend>Name</legend>
-    <div id="formish-name-firstName-field" class="field string input">
-      <label for="formish-name-firstName">First Name</label>
+    <div id="form-name-firstName-field" class="field string input">
+      <label for="form-name-firstName">First Name</label>
       <div class="inputs">
-        <input id="formish-name-firstName" type="text" name="name.firstName" value="" />
+        <input id="form-name-firstName" type="text" name="name.firstName" value="" />
       </div>
     </div>
-    <div id="formish-name-surname-field" class="field string input">
-      <label for="formish-name-surname">Surname</label>
+    <div id="form-name-surname-field" class="field string input">
+      <label for="form-name-surname">Surname</label>
       <div class="inputs">
-        <input id="formish-name-surname" type="text" name="name.surname" value="" />
+        <input id="form-name-surname" type="text" name="name.surname" value="" />
       </div>
     </div>
   </fieldset>
-  <fieldset id="formish-address-field" class="field myaddress sequencedefault sequencecontrols">
+  <fieldset id="form-address-field" class="field myaddress sequencedefault sequencecontrols">
     <legend>Address</legend>
-    <div id="formish-address-streetNumber-field" class="field integer input">
-      <label for="formish-address-streetNumber">Street Number</label>
+    <div id="form-address-streetNumber-field" class="field integer input">
+      <label for="form-address-streetNumber">Street Number</label>
       <div class="inputs">
-        <input id="formish-address-streetNumber" type="text" name="address.streetNumber" value="" />
+        <input id="form-address-streetNumber" type="text" name="address.streetNumber" value="" />
       </div>
     </div>
-    <div id="formish-address-country-field" class="field string input">
-      <label for="formish-address-country">Country</label>
+    <div id="form-address-country-field" class="field string input">
+      <label for="form-address-country">Country</label>
       <div class="inputs">
-        <input id="formish-address-country" type="text" name="address.country" value="" />
+        <input id="form-address-country" type="text" name="address.country" value="" />
       </div>
     </div>
   </fieldset>
-  <div id="formish-termsAndConditions-field" class="field boolean input">
-    <label for="formish-termsAndConditions">Terms And Conditions</label>
+  <div id="form-termsAndConditions-field" class="field boolean input">
+    <label for="form-termsAndConditions">Terms And Conditions</label>
     <div class="inputs">
-      <input id="formish-termsAndConditions" type="text" name="termsAndConditions" value="" />
+      <input id="form-termsAndConditions" type="text" name="termsAndConditions" value="" />
     </div>
   </div>
   <div class="actions">
-    <input type="submit" id="formish-action-submit" name="submit" value="Submit" />
+    <input type="submit" id="form-action-submit" name="submit" value="Submit" />
   </div>
-</form><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;formish&quot;</span> <span class="na">action=</span><span class="s">&quot;&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span> <span class="na">accept-charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+</form><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;form&quot;</span> <span class="na">action=</span><span class="s">&quot;&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span> <span class="na">accept-charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;_charset_&quot;</span> <span class="nt">/&gt;</span>
-  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;__formish_form__&quot;</span> <span class="na">value=</span><span class="s">&quot;formish&quot;</span> <span class="nt">/&gt;</span>
-  <span class="nt">&lt;fieldset</span> <span class="na">id=</span><span class="s">&quot;formish-name-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field myname sequencedefault sequencecontrols&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;__formish_form__&quot;</span> <span class="na">value=</span><span class="s">&quot;form&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;fieldset</span> <span class="na">id=</span><span class="s">&quot;form-name-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field myname sequencedefault sequencecontrols&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;legend&gt;</span>Name<span class="nt">&lt;/legend&gt;</span>
-    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-name-firstName-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
-      <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-name-firstName&quot;</span><span class="nt">&gt;</span>First Name<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-name-firstName-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-name-firstName&quot;</span><span class="nt">&gt;</span>First Name<span class="nt">&lt;/label&gt;</span>
       <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-        <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-name-firstName&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;name.firstName&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-name-firstName&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;name.firstName&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
       <span class="nt">&lt;/div&gt;</span>
     <span class="nt">&lt;/div&gt;</span>
-    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-name-surname-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
-      <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-name-surname&quot;</span><span class="nt">&gt;</span>Surname<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-name-surname-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-name-surname&quot;</span><span class="nt">&gt;</span>Surname<span class="nt">&lt;/label&gt;</span>
       <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-        <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-name-surname&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;name.surname&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-name-surname&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;name.surname&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
       <span class="nt">&lt;/div&gt;</span>
     <span class="nt">&lt;/div&gt;</span>
   <span class="nt">&lt;/fieldset&gt;</span>
-  <span class="nt">&lt;fieldset</span> <span class="na">id=</span><span class="s">&quot;formish-address-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field myaddress sequencedefault sequencecontrols&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;fieldset</span> <span class="na">id=</span><span class="s">&quot;form-address-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field myaddress sequencedefault sequencecontrols&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;legend&gt;</span>Address<span class="nt">&lt;/legend&gt;</span>
-    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-address-streetNumber-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field integer input&quot;</span><span class="nt">&gt;</span>
-      <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-address-streetNumber&quot;</span><span class="nt">&gt;</span>Street Number<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-address-streetNumber-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field integer input&quot;</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-address-streetNumber&quot;</span><span class="nt">&gt;</span>Street Number<span class="nt">&lt;/label&gt;</span>
       <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-        <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-address-streetNumber&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;address.streetNumber&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-address-streetNumber&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;address.streetNumber&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
       <span class="nt">&lt;/div&gt;</span>
     <span class="nt">&lt;/div&gt;</span>
-    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-address-country-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
-      <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-address-country&quot;</span><span class="nt">&gt;</span>Country<span class="nt">&lt;/label&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-address-country-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-address-country&quot;</span><span class="nt">&gt;</span>Country<span class="nt">&lt;/label&gt;</span>
       <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-        <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-address-country&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;address.country&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-address-country&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;address.country&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
       <span class="nt">&lt;/div&gt;</span>
     <span class="nt">&lt;/div&gt;</span>
   <span class="nt">&lt;/fieldset&gt;</span>
-  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-termsAndConditions-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field boolean input&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-termsAndConditions&quot;</span><span class="nt">&gt;</span>Terms And Conditions<span class="nt">&lt;/label&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-termsAndConditions-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field boolean input&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-termsAndConditions&quot;</span><span class="nt">&gt;</span>Terms And Conditions<span class="nt">&lt;/label&gt;</span>
     <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-      <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-termsAndConditions&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;termsAndConditions&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-termsAndConditions&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;termsAndConditions&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
     <span class="nt">&lt;/div&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;actions&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">id=</span><span class="s">&quot;formish-action-submit&quot;</span> <span class="na">name=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Submit&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">id=</span><span class="s">&quot;form-action-submit&quot;</span> <span class="na">name=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Submit&quot;</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/form&gt;</span>
 </pre></div>

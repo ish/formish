@@ -194,42 +194,29 @@
 </div>
 <p>and that is it... if you want to render the form now, you just call it (we&#8217;ve implemented a default mako renderer for testing).</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">()</span>
-<span class="go">&#39;\n&lt;form id=&quot;formish&quot; action=&quot;&quot; class=&quot;formish-form&quot; method=&quot;post&quot;</span>
-<span class="go">enctype=&quot;multipart/form-data&quot; accept-charset=&quot;utf-8&quot;&gt;\n\n  &lt;input</span>
-<span class="go">type=&quot;hidden&quot; name=&quot;_charset_&quot; /&gt;\n  &lt;input type=&quot;hidden&quot;</span>
-<span class="go">name=&quot;__formish_form__&quot; value=&quot;formish&quot; /&gt;\n\n&lt;div id=&quot;formish-name-field&quot;</span>
-<span class="go">class=&quot;field string input&quot;&gt;\n\n&lt;label</span>
-<span class="go">for=&quot;formish-name&quot;&gt;Name&lt;/label&gt;\n\n\n&lt;div class=&quot;inputs&quot;&gt;\n\n&lt;input</span>
-<span class="go">id=&quot;formish-name&quot; type=&quot;text&quot; name=&quot;name&quot; value=&quot;&quot; /&gt;\n\n&lt;/div&gt;\n\n\n&lt;span</span>
-<span class="go">class=&quot;error&quot;&gt;&lt;/span&gt;\n\n\n\n&lt;/div&gt;\n\n&lt;div id=&quot;formish-age-field&quot;</span>
-<span class="go">class=&quot;field integer input&quot;&gt;\n\n&lt;label</span>
-<span class="go">for=&quot;formish-age&quot;&gt;Age&lt;/label&gt;\n\n\n&lt;div class=&quot;inputs&quot;&gt;\n\n&lt;input</span>
-<span class="go">id=&quot;formish-age&quot; type=&quot;text&quot; name=&quot;age&quot; value=&quot;&quot; /&gt;\n\n&lt;/div&gt;\n\n\n&lt;span</span>
-<span class="go">class=&quot;error&quot;&gt;&lt;/span&gt;\n\n\n\n&lt;/div&gt;\n\n\n  &lt;div class=&quot;actions&quot;&gt;\n</span>
-<span class="go">&lt;input type=&quot;submit&quot; id=&quot;formish-action-submit&quot; name=&quot;submit&quot;</span>
-<span class="go">value=&quot;Submit&quot; /&gt;\n  &lt;/div&gt;\n\n&lt;/form&gt;\n\n&#39;</span>
+<span class="go">&#39;\n&lt;form id=&quot;form&quot; action=&quot;&quot; class=&quot;formish-form&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot; accept-charset=&quot;utf-8&quot;&gt;\n\n  &lt;input type=&quot;hidden&quot; name=&quot;_charset_&quot; /&gt;\n  &lt;input type=&quot;hidden&quot; name=&quot;__formish_form__&quot; value=&quot;form&quot; /&gt;\n\n&lt;div id=&quot;form-name-field&quot; class=&quot;field string input&quot;&gt;\n\n&lt;label for=&quot;form-name&quot;&gt;Name&lt;/label&gt;\n\n\n&lt;div class=&quot;inputs&quot;&gt;\n\n&lt;input id=&quot;form-name&quot; type=&quot;text&quot; name=&quot;name&quot; value=&quot;&quot; /&gt;\n\n&lt;/div&gt;\n\n\n\n\n\n&lt;/div&gt;\n\n&lt;div id=&quot;form-age-field&quot; class=&quot;field integer input&quot;&gt;\n\n&lt;label for=&quot;form-age&quot;&gt;Age&lt;/label&gt;\n\n\n&lt;div class=&quot;inputs&quot;&gt;\n\n&lt;input id=&quot;form-age&quot; type=&quot;text&quot; name=&quot;age&quot; value=&quot;&quot; /&gt;\n\n&lt;/div&gt;\n\n\n\n\n\n&lt;/div&gt;\n\n\n  &lt;div class=&quot;actions&quot;&gt;\n      &lt;input type=&quot;submit&quot; id=&quot;form-action-submit&quot; name=&quot;submit&quot; value=&quot;Submit&quot; /&gt;\n  &lt;/div&gt;\n\n&lt;/form&gt;\n\n&#39;</span>
+<span class="go">Lets tidy that up a little</span>
 </pre></div>
 </div>
-<p>Lets tidy that up a little</p>
-<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;formish&quot;</span> <span class="na">action=</span><span class="s">&quot;&quot;</span> <span class="na">class=</span><span class="s">&quot;formish-form&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span> <span class="na">accept-charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;form&quot;</span> <span class="na">action=</span><span class="s">&quot;&quot;</span> <span class="na">class=</span><span class="s">&quot;form-form&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span> <span class="na">accept-charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;_charset_&quot;</span> <span class="nt">/&gt;</span>
-  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;__formish_form__&quot;</span> <span class="na">value=</span><span class="s">&quot;formish&quot;</span> <span class="nt">/&gt;</span>
-  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-name-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-name&quot;</span><span class="nt">&gt;</span>Name<span class="nt">&lt;/label&gt;</span>
+  <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;__formish_form__&quot;</span> <span class="na">value=</span><span class="s">&quot;form&quot;</span> <span class="nt">/&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-name-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-name&quot;</span><span class="nt">&gt;</span>Name<span class="nt">&lt;/label&gt;</span>
     <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-      <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-name&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-name&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;name&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
     <span class="nt">&lt;/div&gt;</span>
     <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">&quot;error&quot;</span><span class="nt">&gt;&lt;/span&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
-  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;formish-age-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field integer input&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;formish-age&quot;</span><span class="nt">&gt;</span>Age<span class="nt">&lt;/label&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-age-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field integer input&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-age&quot;</span><span class="nt">&gt;</span>Age<span class="nt">&lt;/label&gt;</span>
     <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
-      <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;formish-age&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;age&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+      <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-age&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;age&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
     <span class="nt">&lt;/div&gt;</span>
     <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">&quot;error&quot;</span><span class="nt">&gt;&lt;/span&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;actions&quot;</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">id=</span><span class="s">&quot;formish-action-submit&quot;</span> <span class="na">name=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Submit&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">id=</span><span class="s">&quot;form-action-submit&quot;</span> <span class="na">name=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;Submit&quot;</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/form&gt;</span>
 </pre></div>

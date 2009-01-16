@@ -13,6 +13,7 @@ Contents:
    introduction
    walkthrough
    restish
+   future
    modules
 
 Indices and tables

@@ -154,44 +154,30 @@ and that is it... if you want to render the form now, you just call it (we've im
 .. code-block:: python
 
     >>> form()
-    '\n<form id="formish" action="" class="formish-form" method="post"
-    enctype="multipart/form-data" accept-charset="utf-8">\n\n  <input
-    type="hidden" name="_charset_" />\n  <input type="hidden"
-    name="__formish_form__" value="formish" />\n\n<div id="formish-name-field"
-    class="field string input">\n\n<label
-    for="formish-name">Name</label>\n\n\n<div class="inputs">\n\n<input
-    id="formish-name" type="text" name="name" value="" />\n\n</div>\n\n\n<span
-    class="error"></span>\n\n\n\n</div>\n\n<div id="formish-age-field"
-    class="field integer input">\n\n<label
-    for="formish-age">Age</label>\n\n\n<div class="inputs">\n\n<input
-    id="formish-age" type="text" name="age" value="" />\n\n</div>\n\n\n<span
-    class="error"></span>\n\n\n\n</div>\n\n\n  <div class="actions">\n
-    <input type="submit" id="formish-action-submit" name="submit"
-    value="Submit" />\n  </div>\n\n</form>\n\n'
-
-Lets tidy that up a little
+    '\n<form id="form" action="" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">\n\n  <input type="hidden" name="_charset_" />\n  <input type="hidden" name="__formish_form__" value="form" />\n\n<div id="form-name-field" class="field string input">\n\n<label for="form-name">Name</label>\n\n\n<div class="inputs">\n\n<input id="form-name" type="text" name="name" value="" />\n\n</div>\n\n\n\n\n\n</div>\n\n<div id="form-age-field" class="field integer input">\n\n<label for="form-age">Age</label>\n\n\n<div class="inputs">\n\n<input id="form-age" type="text" name="age" value="" />\n\n</div>\n\n\n\n\n\n</div>\n\n\n  <div class="actions">\n      <input type="submit" id="form-action-submit" name="submit" value="Submit" />\n  </div>\n\n</form>\n\n'
+    Lets tidy that up a little
 
 .. code-block:: html
 
-    <form id="formish" action="" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">
+    <form id="form" action="" class="form-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">
       <input type="hidden" name="_charset_" />
-      <input type="hidden" name="__formish_form__" value="formish" />
-      <div id="formish-name-field" class="field string input">
-        <label for="formish-name">Name</label>
+      <input type="hidden" name="__formish_form__" value="form" />
+      <div id="form-name-field" class="field string input">
+        <label for="form-name">Name</label>
         <div class="inputs">
-          <input id="formish-name" type="text" name="name" value="" />
+          <input id="form-name" type="text" name="name" value="" />
         </div>
         <span class="error"></span>
       </div>
-      <div id="formish-age-field" class="field integer input">
-        <label for="formish-age">Age</label>
+      <div id="form-age-field" class="field integer input">
+        <label for="form-age">Age</label>
         <div class="inputs">
-          <input id="formish-age" type="text" name="age" value="" />
+          <input id="form-age" type="text" name="age" value="" />
         </div>
         <span class="error"></span>
       </div>
       <div class="actions">
-        <input type="submit" id="formish-action-submit" name="submit" value="Submit" />
+        <input type="submit" id="form-action-submit" name="submit" value="Submit" />
       </div>
     </form>
  
