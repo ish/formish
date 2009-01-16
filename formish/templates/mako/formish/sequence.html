@@ -1,11 +1,15 @@
 <%page args="field" />
 <%
 if field.widget.addremove is True:
-    addremoveclass = ' sequencecontrols'
+    addremoveclass = ' addremove'
 else:
     addremoveclass = ''
+if field.widget.sortable is True:
+    sortableclass = ' sortable'
+else:
+    sortableclass = ''
 %>
-<fieldset id="${field.cssname}-field" class="${field.classes}">
+<fieldset id="${field.cssname}-field" class="${field.classes}${addremoveclass}${sortableclass}">
 ${field.label()|n}
 ${field.error()|n}
 ${field.fields()|n}

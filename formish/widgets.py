@@ -168,6 +168,7 @@ class SequenceDefault(Widget):
         self.max = k.get('max')
         self.min = k.get('min')
         self.addremove = k.get('addremove', True)
+        self.sortable = k.get('sortable', True)
         self.converttostring = False
 
     def pre_render(self, schema_type, data):
