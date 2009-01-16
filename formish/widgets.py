@@ -391,7 +391,7 @@ class SelectChoice(Widget):
         """
         Check the value passed matches the actual value
         """
-        if option[0] == value:
+        if value and option[0] == self.convert(schema_type, [value]):
             return ' selected="selected"'
         else:
             return ''
@@ -498,7 +498,7 @@ class RadioChoice(Widget):
         """
         Check if the currently rendering input is the same as the value
         """
-        if option[0] == self.convert(schema_type, [value]):
+        if value and option[0] == self.convert(schema_type, [value]):
             return ' checked="checked"'
         else:
             return ''
