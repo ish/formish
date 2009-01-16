@@ -3,7 +3,7 @@ import os.path
 import magic
 from datetime import datetime
 import tempfile
-from restish import resource, templating
+from restish import resource, templating, http
 import formish
 from formish import fileresource
 
@@ -93,7 +93,10 @@ class FormResource(resource.Resource):
     def __init__(self, id):
         self.id = id
         self.title = formish.util.title_from_name(id)
-        self.form_getter = getattr(form_defs,id)
+        try: 
+            self.form_getter = getattr(form_defs,id)
+        except AttributeError:
+            raise http.NotFoundError()
         self.description = _format(self.form_getter.func_doc)
     
     @resource.GET()
