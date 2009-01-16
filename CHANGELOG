@@ -2,6 +2,15 @@
 Changlelog
 ==========
 
+0.6 (2009-01-16)
+----------------
+
+Hopefully we're over the backward incompatible api changes. 
+
+* added ``sortable`` option to sequence widget
+* renamed the default form id back to 'form' (it temporarily got set as 'formish'). js and css might need changing in your projects..
+* Added ReCAPTCHA widget and enhanced the testish self documenting site 
+* big introduction page to docs
 
 0.5.9 (2009-01-13)
 ------------------
