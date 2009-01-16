@@ -1,0 +1,9 @@
+#!/usr/bin/env python
+
+import os, sys, subprocess
+
+args = sys.argv[1:]
+env = dict(os.environ)
+env['PYTHONPATH'] = '../../../../../git/restish:../../../../../git/schemaish:../../../../../git/formish:../../../../../git/secret:../../../../../git/notification:../../../../../git/pollen:../../../../../git/formishbuilder:../../../../../git/validatish:../../../../../git/convertish:../../../../../git/clevercss:../../../../../git/wsgiapptools'
+subprocess.call(args, env=env)
+
