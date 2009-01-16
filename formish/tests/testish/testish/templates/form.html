@@ -21,7 +21,7 @@ ${data}
   </pre>
   </div>
 
-  % if rawdata is not None and 'myFileField' in rawdata:
+  % if rawdata is not None and 'myFileField' in rawdata and rawdata['myFileField'] is not None:
 
 <div id="uploadedimage">
 <h3>Uploaded Image</h3>

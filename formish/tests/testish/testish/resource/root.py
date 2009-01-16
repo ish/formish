@@ -129,7 +129,7 @@ class FormResource(resource.Resource):
         except formish.FormError, e:
             return self.render_form(request, form=form)
         else:
-            if 'myFileField' in data:
+            if 'myFileField' in data and data['myFileField'] is not None:
                 f = data['myFileField']
                 filedata = f.file.read()
                 prefix = 'store-%s'%tempfile.gettempprefix()
