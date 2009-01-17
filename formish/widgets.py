@@ -407,12 +407,12 @@ class SelectChoice(Widget):
             )
         return options
     
-    def get_none_option(self, schema_type):
+    def get_none_option_value(self, schema_type):
         """
         Get the default option (the 'unselected' option)
         """
-        return (string_converter(schema_type).from_type(
-            self.none_option[0]), self.none_option[1])
+        return string_converter(schema_type).from_type(
+            self.none_option[0])
     
 class SelectWithOtherChoice(SelectChoice):
     """
@@ -503,6 +503,12 @@ class RadioChoice(Widget):
         else:
             return ''
     
+    def get_none_option_value(self, schema_type):
+        """
+        Get the default option (the 'unselected' option)
+        """
+        return string_converter(schema_type).from_type(
+            self.none_option[0])
     
 class CheckboxMultiChoice(Widget):
     """

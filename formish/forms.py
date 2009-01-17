@@ -1,17 +1,18 @@
 """
 The form module contains the main form, field, group and sequence classes
 """
-import schemaish, validatish
 
+import re
+
+from peak.util.proxies import ObjectWrapper
 from webob import UnicodeMultiDict
 
+import schemaish, validatish
 from formish import util
 from formish.dottedDict import dottedDict, is_int
 from formish import validation
 from formish import widgets
 from formish.renderer import _default_renderer
-
-from peak.util.proxies import ObjectWrapper
 
 
 
@@ -43,6 +44,7 @@ def _classes(self):
     """ Works out a list of classes that should be applied to the field """
     classes = [
         'field',
+        re.sub('[0-9\*]+','n',_cssname(self)),
         self.attr.__class__.__name__.lower(),
         ]
     if self.widget is not None:

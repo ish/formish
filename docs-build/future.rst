@@ -160,8 +160,204 @@ e.g.
     form.fields( form.fields.dottedkeys[1:4] )
     form.fields( form.fields.keys[-1] )
 
+This would be a **lot** nicer as slices on key names soo... 
+
+.. code-block:: mako
+
+    form.fields( form.fields.keys[:'address'] )
+    form.fields( form.fields.keys['title':'address.country'] )
+
+But we have a problem in that we may want to have 'inclusive' slices??  I suppose you could just  
+
 I think adding the simple 'pass in a bunch of keys' version is OK for most of what we'd like I'm sure.. 
 
+
+Further possible example syntax
+-------------------------------
+
+Given this form (just listing a structure for now)
+
+.. code-block:: yaml
+
+   personal_details:
+      title:
+      firstName:
+      surname:
+      age:
+      sex:
+      fancywidget:
+
+    address:
+      street1:
+      street2:
+      city:
+      county:
+      postcode:
+      country:
+      continent:
+
+    survey:
+      question1:
+      question2:
+      question3:
+      question4:
+      question5:
+      spam_me_please:
+      terms_and_conditions:
+
+
+The folllowing should render the whole form (i.e. they are all equivalent)
+
+.. code-block:: python
+
+   form()
+
+   # or 
+
+   form.header()
+   form.metadata()
+
+   form.fields( form.fields.keys )
+
+   form.actions()
+   form.footer()
+
+
+we'll skip the header and footer for concisity (great word!)
+
+.. code-block:: python
+
+   form.fields( form.fields.keys )
+
+   # or
+
+   form.fields['personal_details']()
+   form.fields['address']()
+   form.fields['survey']()
+
+   # or 
+
+   form.fields['personal_details']()
+
+   address = form['address']
+   address.header()
+   address.fields[:'county']()     # or address.fields( address.fields.keys[:'county'] )
+   address.fields['county']() 
+   address.fields['postcode':]()
+   address.footer()
+
+   form.fields['survey']()
+
+The reason to split something up like this is to allow a single field to be tweaked.. e.g. the county field may want some custom html?
+
+It's nice to be able to treat each sub template bit as it's own virtual form (from a templating point of view) but that all rendered id's and classes are correct. 
+
+
+Matt was suggesting using some form of 'select' method on the form or fields.. e.g. 
+
+
+.. code-block:: python
+
+   form.fields['personal_details']()
+
+   address = form['address']
+   address.header()
+   address.fields.select(':-county')()
+   address.fields.select('county')()
+   address.fields.select('-county:')()
+   address.footer()
+
+   form.fields['survey']()
+
+This works as a slice operator but allowing us to be clever and use '-' as an inclusive or exclusive operator.. hence the following would be equivalent
+
+.. code-block:: python
+
+   form.fields['personal_details']()
+
+   address = form['address']
+   address.header()
+   address.fields.select(':+city')()
+   address.fields.select('county')()
+   address.fields.select('+postcode:')()
+   address.footer()
+
+   form.fields['survey']()
+
+I'm not sure whether the inclusive/exclusive operator should go at the front or back ... 
+
+Having our own syntax at least allows us to do things like
+
+.. code-block:: python
+
+   form.fields['personal_details']()
+
+   address = form['address']
+   address.header()
+   address.fields.select('street1,street2,street3,city')()
+   address.fields.select('county')()
+   address.fields.select('postcode,country,continent')()
+   address.footer()
+
+   form.fields['survey']()
+
+   # and 
+
+   address.fields.select('*,city')()
+   address.fields.select('county')()
+   address.fields.select('postcode,*')()
+   
+
+
+
+
+Deriving CSS class names from schemaish types and formish widgets
+=================================================================
+
+We need a consistent way of naming classes applied to elements when types of subclassed. The following show some possible examples?
+
+Schemaish Types
+---------------
+
++-----------------------------------------+---------------------------------------------------------+
+|Declaration                              |  class output                                           |
++=========================================+=========================================================+
+|'name': Structure(...)                   |  class="structure"                                      |
++-----------------------------------------+---------------------------------------------------------+
+|class Name(Structure):                   |  class="structure name"                                 |
+|    ...                                  |                                                         |
++-----------------------------------------+---------------------------------------------------------+
+|'todo': Sequence(String())               |  class="sequence sequence-string"                       |
++-----------------------------------------+---------------------------------------------------------+
+|'people': Sequence(Structure())          |  class="sequence sequence-structure"                    |
++-----------------------------------------+---------------------------------------------------------+
+|'people': Sequence(Person())             |  class="sequence sequence-structure sequence-person"    |
++-----------------------------------------+---------------------------------------------------------+
+
+
+Formish Widgets
+---------------
+
++-----------------------------------------+---------------------------------------------------------+
+|Declaration                              |  class output                                           | 
++=========================================+=========================================================+
+|.widget = TextArea()                     |  class="textarea"                                       | 
++-----------------------------------------+---------------------------------------------------------+
+|class RichTextArea(TextArea):            |                                                         | 
+|    pass                                 |                                                         | 
++-----------------------------------------+---------------------------------------------------------+
+|.widget = RichTextArea()                 |  class="textarea"                                       | 
++-----------------------------------------+---------------------------------------------------------+
+|class RichTextArea(TextArea):            |                                                         | 
+|    _type = 'richtextarea'               |                                                         | 
++-----------------------------------------+---------------------------------------------------------+
+|.widget = RichTextArea()                 |  class="textarea richtextarea"                          | 
++-----------------------------------------+---------------------------------------------------------+
+|class RichTextArea(TextArea):            |                                                         | 
+|    _type = 'richtextarea'               |                                                         | 
++-----------------------------------------+---------------------------------------------------------+
+|.widget = RichTextArea(type='special')   |  class="textarea richtextarea special"                  | 
++-----------------------------------------+---------------------------------------------------------+
 
 
 

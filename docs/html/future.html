@@ -197,7 +197,217 @@ ${form.footer()|n}</pre>
 <span class="x">form.fields( form.fields.keys[-1] )</span>
 </pre></div>
 </div>
+<p>This would be a <strong>lot</strong> nicer as slices on key names soo...</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="x">form.fields( form.fields.keys[:&#39;address&#39;] )</span>
+<span class="x">form.fields( form.fields.keys[&#39;title&#39;:&#39;address.country&#39;] )</span>
+</pre></div>
+</div>
+<p>But we have a problem in that we may want to have &#8216;inclusive&#8217; slices??  I suppose you could just</p>
 <p>I think adding the simple &#8216;pass in a bunch of keys&#8217; version is OK for most of what we&#8217;d like I&#8217;m sure..</p>
+</div>
+<div class="section" id="further-possible-example-syntax">
+<h3>Further possible example syntax<a class="headerlink" href="#further-possible-example-syntax" title="Permalink to this headline">¶</a></h3>
+<p>Given this form (just listing a structure for now)</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="l-Scalar-Plain">personal_details</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">title</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">firstName</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">surname</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">age</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">sex</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">fancywidget</span><span class="p-Indicator">:</span>
+
+<span class="-Error"> </span><span class="l-Scalar-Plain">address</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">street1</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">street2</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">city</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">county</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">postcode</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">country</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">continent</span><span class="p-Indicator">:</span>
+
+ <span class="l-Scalar-Plain">survey</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">question1</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">question2</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">question3</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">question4</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">question5</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">spam_me_please</span><span class="p-Indicator">:</span>
+   <span class="l-Scalar-Plain">terms_and_conditions</span><span class="p-Indicator">:</span>
+</pre></div>
+</div>
+<p>The folllowing should render the whole form (i.e. they are all equivalent)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">form</span><span class="p">()</span>
+
+<span class="c"># or</span>
+
+<span class="n">form</span><span class="o">.</span><span class="n">header</span><span class="p">()</span>
+<span class="n">form</span><span class="o">.</span><span class="n">metadata</span><span class="p">()</span>
+
+<span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">(</span> <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">keys</span> <span class="p">)</span>
+
+<span class="n">form</span><span class="o">.</span><span class="n">actions</span><span class="p">()</span>
+<span class="n">form</span><span class="o">.</span><span class="n">footer</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>we&#8217;ll skip the header and footer for concisity (great word!)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">(</span> <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">keys</span> <span class="p">)</span>
+
+<span class="c"># or</span>
+
+<span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;personal_details&#39;</span><span class="p">]()</span>
+<span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;address&#39;</span><span class="p">]()</span>
+<span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;survey&#39;</span><span class="p">]()</span>
+
+<span class="c"># or</span>
+
+<span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;personal_details&#39;</span><span class="p">]()</span>
+
+<span class="n">address</span> <span class="o">=</span> <span class="n">form</span><span class="p">[</span><span class="s">&#39;address&#39;</span><span class="p">]</span>
+<span class="n">address</span><span class="o">.</span><span class="n">header</span><span class="p">()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">fields</span><span class="p">[:</span><span class="s">&#39;county&#39;</span><span class="p">]()</span>     <span class="c"># or address.fields( address.fields.keys[:&#39;county&#39;] )</span>
+<span class="n">address</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;county&#39;</span><span class="p">]()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;postcode&#39;</span><span class="p">:]()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">footer</span><span class="p">()</span>
+
+<span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;survey&#39;</span><span class="p">]()</span>
+</pre></div>
+</div>
+<p>The reason to split something up like this is to allow a single field to be tweaked.. e.g. the county field may want some custom html?</p>
+<p>It&#8217;s nice to be able to treat each sub template bit as it&#8217;s own virtual form (from a templating point of view) but that all rendered id&#8217;s and classes are correct.</p>
+<p>Matt was suggesting using some form of &#8216;select&#8217; method on the form or fields.. e.g.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;personal_details&#39;</span><span class="p">]()</span>
+
+<span class="n">address</span> <span class="o">=</span> <span class="n">form</span><span class="p">[</span><span class="s">&#39;address&#39;</span><span class="p">]</span>
+<span class="n">address</span><span class="o">.</span><span class="n">header</span><span class="p">()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s">&#39;:-county&#39;</span><span class="p">)()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s">&#39;county&#39;</span><span class="p">)()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s">&#39;-county:&#39;</span><span class="p">)()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">footer</span><span class="p">()</span>
+
+<span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;survey&#39;</span><span class="p">]()</span>
+</pre></div>
+</div>
+<p>This works as a slice operator but allowing us to be clever and use &#8216;-&#8216; as an inclusive or exclusive operator.. hence the following would be equivalent</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;personal_details&#39;</span><span class="p">]()</span>
+
+<span class="n">address</span> <span class="o">=</span> <span class="n">form</span><span class="p">[</span><span class="s">&#39;address&#39;</span><span class="p">]</span>
+<span class="n">address</span><span class="o">.</span><span class="n">header</span><span class="p">()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s">&#39;:+city&#39;</span><span class="p">)()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s">&#39;county&#39;</span><span class="p">)()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s">&#39;+postcode:&#39;</span><span class="p">)()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">footer</span><span class="p">()</span>
+
+<span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;survey&#39;</span><span class="p">]()</span>
+</pre></div>
+</div>
+<p>I&#8217;m not sure whether the inclusive/exclusive operator should go at the front or back ...</p>
+<p>Having our own syntax at least allows us to do things like</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;personal_details&#39;</span><span class="p">]()</span>
+
+<span class="n">address</span> <span class="o">=</span> <span class="n">form</span><span class="p">[</span><span class="s">&#39;address&#39;</span><span class="p">]</span>
+<span class="n">address</span><span class="o">.</span><span class="n">header</span><span class="p">()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s">&#39;street1,street2,street3,city&#39;</span><span class="p">)()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s">&#39;county&#39;</span><span class="p">)()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s">&#39;postcode,country,continent&#39;</span><span class="p">)()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">footer</span><span class="p">()</span>
+
+<span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;survey&#39;</span><span class="p">]()</span>
+
+<span class="c"># and</span>
+
+<span class="n">address</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s">&#39;*,city&#39;</span><span class="p">)()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s">&#39;county&#39;</span><span class="p">)()</span>
+<span class="n">address</span><span class="o">.</span><span class="n">fields</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s">&#39;postcode,*&#39;</span><span class="p">)()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="deriving-css-class-names-from-schemaish-types-and-formish-widgets">
+<h2>Deriving CSS class names from schemaish types and formish widgets<a class="headerlink" href="#deriving-css-class-names-from-schemaish-types-and-formish-widgets" title="Permalink to this headline">¶</a></h2>
+<p>We need a consistent way of naming classes applied to elements when types of subclassed. The following show some possible examples?</p>
+<div class="section" id="schemaish-types">
+<h3>Schemaish Types<a class="headerlink" href="#schemaish-types" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Declaration</th>
+<th class="head">class output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>&#8216;name&#8217;: Structure(...)</td>
+<td>class=&#8221;structure&#8221;</td>
+</tr>
+<tr><td><dl class="first last docutils">
+<dt>class Name(Structure):</dt>
+<dd>...</dd>
+</dl>
+</td>
+<td>class=&#8221;structure name&#8221;</td>
+</tr>
+<tr><td>&#8216;todo&#8217;: Sequence(String())</td>
+<td>class=&#8221;sequence sequence-string&#8221;</td>
+</tr>
+<tr><td>&#8216;people&#8217;: Sequence(Structure())</td>
+<td>class=&#8221;sequence sequence-structure&#8221;</td>
+</tr>
+<tr><td>&#8216;people&#8217;: Sequence(Person())</td>
+<td>class=&#8221;sequence sequence-structure sequence-person&#8221;</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="formish-widgets">
+<h3>Formish Widgets<a class="headerlink" href="#formish-widgets" title="Permalink to this headline">¶</a></h3>
+<table border="1" class="docutils">
+<colgroup>
+<col width="42%" />
+<col width="58%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Declaration</th>
+<th class="head">class output</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>.widget = TextArea()</td>
+<td>class=&#8221;textarea&#8221;</td>
+</tr>
+<tr><td><dl class="first last docutils">
+<dt>class RichTextArea(TextArea):</dt>
+<dd>pass</dd>
+</dl>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr><td>.widget = RichTextArea()</td>
+<td>class=&#8221;textarea&#8221;</td>
+</tr>
+<tr><td><dl class="first last docutils">
+<dt>class RichTextArea(TextArea):</dt>
+<dd>_type = &#8216;richtextarea&#8217;</dd>
+</dl>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr><td>.widget = RichTextArea()</td>
+<td>class=&#8221;textarea richtextarea&#8221;</td>
+</tr>
+<tr><td><dl class="first last docutils">
+<dt>class RichTextArea(TextArea):</dt>
+<dd>_type = &#8216;richtextarea&#8217;</dd>
+</dl>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr><td>.widget = RichTextArea(type=&#8217;special&#8217;)</td>
+<td>class=&#8221;textarea richtextarea special&#8221;</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>
@@ -218,6 +428,12 @@ ${form.footer()|n}</pre>
 </li>
 <li><a class="reference external" href="#filtering-field-emission">Filtering Field Emission</a><ul>
 <li><a class="reference external" href="#alternate-syntaxes">alternate syntaxes</a></li>
+<li><a class="reference external" href="#further-possible-example-syntax">Further possible example syntax</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#deriving-css-class-names-from-schemaish-types-and-formish-widgets">Deriving CSS class names from schemaish types and formish widgets</a><ul>
+<li><a class="reference external" href="#schemaish-types">Schemaish Types</a></li>
+<li><a class="reference external" href="#formish-widgets">Formish Widgets</a></li>
 </ul>
 </li>
 </ul>
