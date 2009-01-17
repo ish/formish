@@ -86,7 +86,7 @@ def unittest_String(self):#{{{
 
 def StringDifferentEmpty(request):
     """
-    Simple field but making an empty value equal the empty string (instead of None)
+    Simple field but setting the ``empty`` value equal an empty string (instead of None)
     """
     schema = schemaish.Structure()
     schema.add('myStringField', schemaish.String())
@@ -175,7 +175,7 @@ def IntegerNoneDefault(request):
 
 def Date(request):
     """
-    A simple form with a single integer field
+    A simple form with a single date field
     """
     schema = schemaish.Structure()
     schema.add('myDateField', schemaish.Date())
@@ -214,7 +214,7 @@ def functest_Date(self):#{{{
 
 def DateDifferentEmpty(request):
     """
-    A simple date field but with the empty value set to todays date
+    A simple date field but with the ``empty`` attribute value set to todays date
     """
     schema = schemaish.Structure()
     schema.add('myDateField', schemaish.Date())
@@ -231,10 +231,11 @@ def unittest_DateDifferentEmpty(self):#{{{
     self.assertIdHasValue(f, 'form-myStringField', '')
     expected = {'myDateField': datetime.date.today()}
     self.assertRoundTrip(f, expected)
+    return #}}}
 
 def Float(request):
     """
-    A simple form with a single integer field
+    A simple form with a single float field
     """
     schema = schemaish.Structure()
     schema.add('myFloatField', schemaish.Float())
@@ -358,7 +359,7 @@ def functest_Decimal(self):#{{{
 
 def RequiredStringAndCheckbox(request):
     """
-    Testing that a checkbox is working properly when another required field is missing
+    Testing that a checkbox is working properly when another required field is missing (i.e. when the form round trips on error)
     """
     schema = schemaish.Structure()
     schema.add('myString', schemaish.String(validator=validatish.Required()))
@@ -393,7 +394,7 @@ def functest_RequiredStringAndCheckbox(self):#{{{
 
 def File(request):
     """
-    A simple form with a single integer field
+    A simple form with a single file field
     """
     schema = schemaish.Structure()
     schema.add('myFile', schemaish.File())
@@ -450,7 +451,7 @@ def Hidden(request):
 
 def Password(request):
     """
-    Using a password html element
+    Password html widget with string
     """
     schema = schemaish.Structure()
     schema.add('Password', schemaish.String())
@@ -461,7 +462,7 @@ def Password(request):
 
 def CheckedPassword(request):
     """
-    Simple input field with a strip parameter
+    Checked Password widget
     """
     schema = schemaish.Structure()
     schema.add('CheckedPassword', schemaish.String())
@@ -494,7 +495,7 @@ def TextAreaColsAndRows(request):
 
 def TextAreaStrip(request):
     """
-    Stripping text area input
+    Text area input with strip true
     """
     schema = schemaish.Structure()
     schema.add('textAreaStrip', schemaish.String())
@@ -669,7 +670,7 @@ def ValidationOnSequence(request):
 
 def RequiredStringAndFile(request):
     """
-    A required string and a file field configured for image upload.
+    A required string and a file field configured for image upload. (so that we can check roundtripping temp file)
     """
     schema = schemaish.Structure()
     schema.add('required', schemaish.String(validator=validatish.Required()))
@@ -796,7 +797,7 @@ def SelectChoiceNoneOption(request):
 
 def SelectChoiceCallableOptions(request):
     """
-    Passing in a callable list of options (sorry about the bug XXX)
+    Passing in a callable list of options
     """
     schema = schemaish.Structure()
     schema.add('mySelect', schemaish.Integer())
@@ -811,7 +812,7 @@ def SelectChoiceCallableOptions(request):
 
 def SelectWithOtherChoice(request):
     """
-    A basic select choice
+    A basic select choice with input option
     """
     schema = schemaish.Structure()
     schema.add('mySelect', schemaish.Integer())
@@ -871,7 +872,7 @@ def unittest_SelectWithOtherChoice(self):#{{{
 
 def RadioChoice(request):
     """
-    A basic select choice
+    A basic radio choice
     """
     schema = schemaish.Structure()
     schema.add('myRadio', schemaish.Integer())
@@ -884,7 +885,7 @@ def RadioChoice(request):
 
 def RadioChoiceNoneOption(request):
     """
-    Setting a None Option on the select choice element
+    Setting a None Option on the radio choice element
     """
     schema = schemaish.Structure()
     schema.add('myRadio', schemaish.Integer())
@@ -931,7 +932,7 @@ def functest_RadioChoiceNoneOption(self):#{{{
 
 def RadioChoiceNoneOptionNoneDefault(request):
     """
-    Setting a None Option on the select choice element - default value of None
+    Setting a None Option on the radio choice element - default value of None
     """
     schema = schemaish.Structure()
     schema.add('myRadio', schemaish.Integer())
@@ -944,7 +945,7 @@ def RadioChoiceNoneOptionNoneDefault(request):
 
 def RadioChoiceNoneOptionWithDefault(request):
     """
-    Setting a None Option on the select choice element - default value of 1
+    Setting a None Option on the radio choice element - default value of 1
     """
     schema = schemaish.Structure()
     schema.add('myRadio', schemaish.Integer())
@@ -990,7 +991,7 @@ def CheckboxMultiChoice(request):
 
 def CheckboxMultiChoiceTree(request):
     """
-    A checkbox representing a set of values
+    A checkbox representing a set of values displayed as tree (using dots for depth)
     """
     schema = schemaish.Structure()
     schema.add('multiChoice', schemaish.Sequence(schemaish.String()))
