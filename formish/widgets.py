@@ -570,17 +570,17 @@ class CheckboxMultiChoiceTree(Widget):
         self.optiontree = dottedDict._getDictFromDottedKeyDict(dict(options),noexcept=True) 
         Widget.__init__(self,cssClass=cssClass)
             
-    def pre_render(self, schemaType, data):
+    def pre_render(self, schema_type, data):
         if data is None: 
             return []
-        return [string_converter(schemaType.attr).fromType(d) for d in data]
+        return [string_converter(schema_type.attr).from_type(d) for d in data]
     
-    def convert(self, schemaType, data):
-        return [string_converter(schemaType.attr).toType(d) for d in data]
+    def convert(self, schema_type, data):
+        return [string_converter(schema_type.attr).to_type(d) for d in data]
 
-    def checked(self, option, values, schemaType):
+    def checked(self, option, values, schema_type):
         if values is not None:
-            typed_values = self.convert(schemaType,values)
+            typed_values = self.convert(schema_type,values)
         if values is not None and option[0] in typed_values:
             return ' checked="checked"'
         else:
