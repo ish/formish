@@ -276,11 +276,11 @@
 
     <span class="k">def</span> <span class="nf">from_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">converter_options</span><span class="o">=</span><span class="p">{}):</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">None</span>
+            <span class="k">return</span> <span class="s">&#39;&#39;</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">converter_options</span><span class="o">=</span><span class="p">{}):</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">None</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
@@ -290,7 +290,7 @@
         <span class="k">return</span> <span class="n">value</span>
 </pre></div>
 </div>
-<p>So we short circuit None values, strip the data and cast it to the right type and raise a conversion exception if it fails.</p>
+<p>So we short circuit None values <a class="footnote-reference" href="#f1" id="id2">[1]</a>, strip the data and cast it to the right type and raise a conversion exception if it fails.</p>
 </div>
 <div class="section" id="the-widget-templates">
 <h2>The widget templates<a class="headerlink" href="#the-widget-templates" title="Permalink to this headline">¶</a></h2>
@@ -610,6 +610,13 @@
 <p class="first admonition-title">Note</p>
 <p class="last">Please send any feedback to <a class="reference external" href="mailto:developers&#37;&#52;&#48;ish&#46;io">developers<span>&#64;</span>ish<span>&#46;</span>io</a></p>
 </div>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="f1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[1]</a></td><td>By default the formish widgets equate the empty string with None. This means if you put a default value of &#8216;&#8217; into a form, you will get None back. If you want to override this behaviour, set the <tt class="docutils literal"><span class="pre">empty</span></tt> widget attribute to something else (e.g. for a date field you might set the widget value to <tt class="docutils literal"><span class="pre">datetime.date.today()</span></tt></td></tr>
+</tbody>
+</table>
 </div>
 </div>
 

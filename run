@@ -1,0 +1,9 @@
+#!/usr/bin/env python
+
+import os, sys, subprocess
+
+args = sys.argv[1:]
+env = dict(os.environ)
+env['PYTHONPATH'] = '.:../schemaish:../validatish:../convertish'
+subprocess.call(args, env=env)
+

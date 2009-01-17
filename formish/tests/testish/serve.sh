@@ -56,7 +56,6 @@ case "$1" in
     ;;
   run-dev)
     ./run /home/tim/py/bin/paster serve --reload \
-        --log-file=$GITDIR/formish/formish/tests/testish/log/development.log \
                    $GITDIR/formish/formish/tests/testish/development.ini
     ;;
   *)
