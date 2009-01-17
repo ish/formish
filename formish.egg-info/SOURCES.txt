@@ -293,7 +293,9 @@ formish/tests/TODO
 formish/tests/testish/development.ini
 formish/tests/testish/functest
 formish/tests/testish/live.ini
+formish/tests/testish/run
 formish/tests/testish/run.sh
+formish/tests/testish/serve.sh
 formish/tests/testish/setup.py
 formish/tests/testish/testish.ini
 formish/tests/testish/unittest

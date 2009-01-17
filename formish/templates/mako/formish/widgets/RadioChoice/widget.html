@@ -1,7 +1,7 @@
 <%page args="field" />
 %if field.widget.none_option:
 <div class="radiobutton">
-  <input type="radio" name="${field.name}" id="${field.cssname}-noneoption" value="${field.widget.none_option[0]}" />
+  <input type="radio" name="${field.name}" id="${field.cssname}-noneoption" value="${field.widget.get_none_option_value(field.attr)}" />
   <label for="${field.cssname}-noneoption">${field.widget.none_option[1]}</label>
 </div>
 %endif

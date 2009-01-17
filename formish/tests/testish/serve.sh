@@ -2,7 +2,7 @@ export GITDIR=$HOME/git
 cd $GITDIR/formish/formish/tests/testish/
 case "$1" in
   start)
-    ./run paster serve \
+    ./run /home/tim/py/bin/paster serve \
         --daemon \
         --pid-file=$GITDIR/formish/formish/tests/testish/log/live.pid \
         --log-file=$GITDIR/formish/formish/tests/testish/log/live.log \
@@ -10,7 +10,7 @@ case "$1" in
         start
     ;;
   stop)
-    ./run paster serve \
+    ./run /home/tim/py/bin/paster serve \
         --daemon \
         --pid-file=$GITDIR/formish/formish/tests/testish/log/live.pid \
         --log-file=$GITDIR/formish/formish/tests/testish/log/live.log \
@@ -18,15 +18,20 @@ case "$1" in
         stop
     ;;
   restart)
-    ./run paster serve \
+    ./run /home/tim/py/bin/paster serve \
         --daemon \
         --pid-file=$GITDIR/formish/formish/tests/testish/log/live.pid \
         --log-file=$GITDIR/formish/formish/tests/testish/log/live.log \
                    $GITDIR/formish/formish/tests/testish/live.ini \
         restart
     ;;
+  run)
+    ./run /home/tim/py/bin/paster serve \
+        --log-file=$GITDIR/formish/formish/tests/testish/log/live.log \
+                   $GITDIR/formish/formish/tests/testish/live.ini
+    ;;
   start-dev)
-    ./run paster serve \
+    ./run /home/tim/py/bin/paster serve \
         --daemon \
         --pid-file=$GITDIR/formish/formish/tests/testish/log/development.pid \
         --log-file=$GITDIR/formish/formish/tests/testish/log/development.log \
@@ -34,7 +39,7 @@ case "$1" in
         start
     ;;
   stop-dev)
-    ./run paster serve \
+    ./run /home/tim/py/bin/paster serve \
         --daemon \
         --pid-file=$GITDIR/formish/formish/tests/testish/log/development.pid \
         --log-file=$GITDIR/formish/formish/tests/testish/log/development.log \
@@ -42,15 +47,20 @@ case "$1" in
         stop
     ;;
   restart-dev)
-    ./run paster serve \
+    ./run /home/tim/py/bin/paster serve \
         --daemon \
         --pid-file=$GITDIR/formish/formish/tests/testish/log/development.pid \
         --log-file=$GITDIR/formish/formish/tests/testish/log/development.log \
                    $GITDIR/formish/formish/tests/testish/development.ini \
         restart
     ;;
+  run-dev)
+    ./run /home/tim/py/bin/paster serve --reload \
+        --log-file=$GITDIR/formish/formish/tests/testish/log/development.log \
+                   $GITDIR/formish/formish/tests/testish/development.ini
+    ;;
   *)
-    echo $"Usage: $0 {start|stop|restart|start-dev|stop-dev|restart-dev}"
+    echo $"Usage: $0 {start|stop|restart|run|start-dev|stop-dev|restart-dev|run-dev}"
     exit 1
 esac
 
