@@ -26,6 +26,7 @@ class Widget(object):
         self.converter_options = k.get('converter_options', {})
         self.css_class = k.get('css_class', None)
         self.converttostring = True
+        self.empty = k.get('empty', None)
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
     
@@ -36,9 +37,9 @@ class Widget(object):
         format.If the data is None then we return an empty string. The sequence
         is request data representation.
         """
-        string_data = string_converter(schema_type).from_type(data)
-        if string_data is None:
+        if data is None:
             return ['']
+        string_data = string_converter(schema_type).from_type(data)
         return [string_data]
 
 
@@ -55,7 +56,10 @@ class Widget(object):
         after the form has been submitted, the request data is converted into
         to the schema type.
         """
-        return string_converter(schema_type).to_type(request_data[0])
+        string_data = request_data[0]
+        if string_data == '':
+            return self.empty
+        return string_converter(schema_type).to_type(string_data)
 
     def __repr__(self):
         return '<widget "%s">'% (self._template)
@@ -83,12 +87,11 @@ class Input(Widget):
         """
         Default to stripping whitespace
         """
+        string_data = request_data[0]
         if self.strip is True:
-            string_data = request_data[0].strip()
-        else:
-            string_data = request_data[0]
-        if not string_data:
-            string_data = None
+            string_data = string_data.strip()
+        if string_data == '':
+            return self.empty
         return string_converter(schema_type).to_type(string_data)
 
 
@@ -132,13 +135,11 @@ class CheckedPassword(Input):
         confirm = request_data['confirm'][0]
         if self.strip is True:
             password = password.strip()
-            if not password:
-                password = None
             confirm = confirm.strip()
-            if not confirm:
-                confirm = None
         if password != confirm:
             raise ConvertError('Password did not match')
+        if password == '':
+            return self.empty
         return string_converter(schema_type).to_type(password)
 
 
@@ -213,12 +214,11 @@ class TextArea(Input):
         We're using the converter options to allow processing sequence data
         using the csv module
         """
+        string_data = request_data[0]
         if self.strip is True:
-            string_data = request_data[0].strip()
-        else:
-            string_data = request_data[0]
-        if not string_data:
-            string_data = None
+            string_data = string_data.strip()
+        if string_data == '':
+            return self.empty
         return string_converter(schema_type).to_type(string_data,
             converter_options=self.converter_options)
 
@@ -277,7 +277,7 @@ class DateParts(Widget):
         if year or month or day:
             date_parts = (year, month, day)
         else:
-            date_parts = None
+            return self.empty
         return datetuple_converter(schema_type).to_type(date_parts)
         
 
@@ -375,17 +375,17 @@ class SelectChoice(Widget):
 
     none_option = ('', '- choose -')
 
-    def __init__(self, options, none_option=UNSET, css_class=None):
+    def __init__(self, options, **k):
         """
         :arg options: either a list of values ``[value,]`` where value is used for the label or a list of tuples of the form ``[(value, label),]``
         :arg none_option: a tuple of ``(value, label)`` to use as the unselected option
         :arg css_class: a css class to apply to the field
         """
-        Widget.__init__(self)
-        self.css_class = css_class
-        self.options = _normalise_options(options)
+        none_option = k.pop('none_option', UNSET)
         if none_option is not UNSET:
             self.none_option = none_option
+        Widget.__init__(self, **k)
+        self.options = _normalise_options(options)
             
     def selected(self, option, value, schema_type):
         """
@@ -420,17 +420,14 @@ class SelectWithOtherChoice(SelectChoice):
     """
     _template = 'SelectWithOtherChoice'
 
-    none_option = ('', '- choose -')
     other_option = ('...', 'Other ...')
 
-    def __init__(self, options, none_option=UNSET, other_option=UNSET, css_class=None):
-        Widget.__init__(self)
-        self.css_class = css_class
-        self.options = _normalise_options(options)
-        if none_option is not UNSET:
-            self.none_option = none_option
+    def __init__(self, options, **k):
+        other_option = k.pop('other_option', UNSET)
         if other_option is not UNSET:
             self.other_option = other_option
+        self.strip = k.pop('strip',True)
+        SelectChoice.__init__(self, options, **k)
 
     def pre_render(self, schema_type, data):
         """
@@ -445,12 +442,18 @@ class SelectWithOtherChoice(SelectChoice):
         """
         Check to see if we need to use the 'other' value
         """
-        if request_data['select'][0] == '...':
-            value = request_data['other'][0]
+        select = request_data['select'][0]
+        other = request_data['other'][0]
+        if self.strip:
+            other = other.strip()
+        if select == '...':
+            value = other
         else:
-            value = request_data['select'][0]
+            if other != '':
+                raise ConvertError('You entered text in the box but had not selected "%s" in the drop down. We have now selected it for you. please check and resubmit'%self.other_option[1])
+            value = select
         if value == '':
-            return None
+            return self.empty
         return string_converter(schema_type).to_type(value)
 
     def get_other_option(self, schema_type):
@@ -479,20 +482,27 @@ class RadioChoice(Widget):
 
     none_option = ('', '- choose -')
 
-    def __init__(self, options, none_option=UNSET, css_class=None):
-        Widget.__init__(self)
-        self.css_class = css_class
-        self.options = _normalise_options(options)
+    def __init__(self, options, **k):
+        none_option = k.pop('none_option', UNSET)
         if none_option is not UNSET:
             self.none_option = none_option
+        Widget.__init__(self, **k)
+        self.options = _normalise_options(options)
             
     def convert(self, schema_type, request_data):
         """
         If we don't have a choice, set a blank value
         """
+
         if not request_data:
-            request_data = ['']
-        return super(RadioChoice, self).convert(schema_type, request_data)
+            string_data = ''
+        else:
+            string_data = request_data[0]
+
+        if string_data == '':
+            return self.empty
+
+        return super(RadioChoice, self).convert(schema_type, string_data)
 
     def selected(self, option, value, schema_type):
         """
@@ -507,8 +517,9 @@ class RadioChoice(Widget):
         """
         Get the default option (the 'unselected' option)
         """
-        return string_converter(schema_type).from_type(
+        none_val = string_converter(schema_type).from_type(
             self.none_option[0])
+        return none_val
     
 class CheckboxMultiChoice(Widget):
     """

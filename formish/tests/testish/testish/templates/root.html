@@ -12,6 +12,12 @@ ids = ['String','Integer','Boolean','Float','Decimal','Date']
 links(ids)
 %>
 
+<h3>Simple Fields with some options</h3>
+<%
+ids = ['StringDifferentEmpty','DateDifferentEmpty']
+links(ids)
+%>
+
 <h3>File Fields</h3>
 <%
 ids = ['File']
@@ -21,6 +27,12 @@ links(ids)
 <h3>Simple Widgets</h3>
 <%
 ids = ['Input','Hidden','Password','CheckedPassword','TextAreaSimple','TextAreaColsAndRows','TextAreaStrip']
+links(ids)
+%>
+
+<h3>Default Values</h3>
+<%
+ids = ['IntegerNoneDefault']
 links(ids)
 %>
 
@@ -40,7 +52,7 @@ links(ids)
 
 <h3>Select Widgets</h3>
 <%
-ids = ['SelectChoice','SelectChoiceNoneOption','SelectChoiceCallableOptions','SelectWithOtherChoice','RadioChoice','RadioChoiceNoneOption','RadioChoiceCallableOptions']
+ids = ['SelectChoice','SelectChoiceNoneOption','SelectChoiceCallableOptions','SelectWithOtherChoice','RadioChoice','RadioChoiceNoneOption','RadioChoiceNoneOptionNoneDefault','RadioChoiceCallableOptions']
 links(ids)
 %>
 

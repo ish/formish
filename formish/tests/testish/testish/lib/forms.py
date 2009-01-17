@@ -84,6 +84,29 @@ def unittest_String(self):#{{{
     self.assertIdHasValue(f, 'form-myStringField', '8')
     self.assertRoundTrip(f, testdata)#}}}
 
+def StringDifferentEmpty(request):
+    """
+    Simple field but making an empty value equal the empty string (instead of None)
+    """
+    schema = schemaish.Structure()
+    schema.add('myStringField', schemaish.String())
+    form = formish.Form(schema, 'form')
+    form['myStringField'].widget = formish.Input(empty='')
+    return form
+
+def unittest_StringDifferentEmpty(self):#{{{
+    # Test None data
+    f = StringDifferentEmpty(None)
+    testdata = {'myStringField': ''}
+    f.defaults = testdata
+    self.assertIdHasValue(f, 'form-myStringField', '')
+    self.assertRoundTrip(f, testdata)
+    # Test sample data
+    f = String(None)
+    testdata = {'myStringField': '8'}
+    f.defaults = testdata
+    self.assertIdHasValue(f, 'form-myStringField', '8')
+    self.assertRoundTrip(f, testdata)#}}}
 
 def Integer(request):
     """
@@ -140,6 +163,16 @@ def unittest_Integer(self):#{{{
     self.assertIdHasValue(f, 'form-myIntegerField', '8')
     self.assertRoundTrip(f, testdata)#}}}
 
+def IntegerNoneDefault(request):
+    """
+    An integer field defaulting to None
+    """
+    schema = schemaish.Structure()
+    schema.add('myIntegerField', schemaish.Integer())
+    form = formish.Form(schema, 'form')
+    form.defaults = {'myIntegerField':None}
+    return form
+
 def Date(request):
     """
     A simple form with a single integer field
@@ -178,6 +211,26 @@ def functest_Date(self):#{{{
     except AssertionError, e: self.verificationErrors.append(str(e))
 
     return#}}}
+
+def DateDifferentEmpty(request):
+    """
+    A simple date field but with the empty value set to todays date
+    """
+    schema = schemaish.Structure()
+    schema.add('myDateField', schemaish.Date())
+    form = formish.Form(schema, 'form')
+    import datetime
+    form['myDateField'].widget = formish.Input(empty=datetime.date.today())
+    return form
+
+def unittest_DateDifferentEmpty(self):#{{{
+    # Test None data
+    f = DateDifferentEmpty(None)
+    testdata = {'myDateField': ''}
+    f.defaults = testdata
+    self.assertIdHasValue(f, 'form-myStringField', '')
+    expected = {'myDateField': datetime.date.today()}
+    self.assertRoundTrip(f, expected)
 
 def Float(request):
     """
@@ -838,6 +891,67 @@ def RadioChoiceNoneOption(request):
     options = [(1,'a'),(2,'b'),(3,'c')]
 
     form = formish.Form(schema, 'form')
+    form['myRadio'].widget = formish.RadioChoice(options,none_option=(None, '--select--'))
+    return form
+
+def unittest_RadioChoiceNoneOption(self):#{{{
+    # Test no data
+    f = RadioChoiceNoneOption(None)
+    self.assertIdHasValue(f, 'form-myRadio-noneoption', '')
+    # Test None data
+    f = RadioChoiceNoneOption(None)
+    testdata = {'myRadio': None}
+    f.defaults = testdata
+    self.assertIdAttrHasNoValue(f, 'form-myRadio-noneoption','selected')
+    self.assertIdAttrHasNoValue(f, 'form-myRadio-0','selected')
+    self.assertIdAttrHasNoValue(f, 'form-myRadio-1','selected')
+    self.assertIdAttrHasNoValue(f, 'form-myRadio-2','selected')
+    self.assertRoundTrip(f, testdata)#}}}
+
+def functest_RadioChoiceNoneOption(self):#{{{
+    sel = self.selenium
+    sel.open("/RadioChoiceNoneOption")
+
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myRadio': None}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+    sel.click("form-myRadio-noneoption")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myRadio': None}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+    sel.click("form-myRadio-0")
+    sel.click("form-action-submit")
+    sel.wait_for_page_to_load("30000")
+    try: self.failUnless(sel.is_text_present("{'myRadio': 1}"))
+    except AssertionError, e: self.verificationErrors.append(str(e))
+
+    return#}}}
+
+def RadioChoiceNoneOptionNoneDefault(request):
+    """
+    Setting a None Option on the select choice element - default value of None
+    """
+    schema = schemaish.Structure()
+    schema.add('myRadio', schemaish.Integer())
+    options = [(1,'a'),(2,'b'),(3,'c')]
+
+    form = formish.Form(schema, 'form')
+    form.defaults = {'myRadio':None}
+    form['myRadio'].widget = formish.RadioChoice(options,none_option=(None, '--select--'))
+    return form
+
+def RadioChoiceNoneOptionWithDefault(request):
+    """
+    Setting a None Option on the select choice element - default value of 1
+    """
+    schema = schemaish.Structure()
+    schema.add('myRadio', schemaish.Integer())
+    options = [(1,'a'),(2,'b'),(3,'c')]
+
+    form = formish.Form(schema, 'form')
+    form.defaults = {'myRadio':1}
     form['myRadio'].widget = formish.RadioChoice(options,none_option=(None, '--select--'))
     return form
 

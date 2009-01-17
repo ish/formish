@@ -38,7 +38,16 @@ class Test(unittest.TestCase):
         soup = BeautifulSoup(f())
         self.assertEquals(soup.find(id=id)['value'],v)
         
+    def assertIdAttrHasValue(self, f, id, attr, v):
+        soup = BeautifulSoup(f())
+        s = soup.find(id=id)
+        assert 'attr' in s
+        self.assertEquals(s['attr'],v)
 
+    def assertIdAttrHasNoValue(self, f, id, attr):
+        soup = BeautifulSoup(f())
+        s = soup.find(id=id)
+        assert 'attr' not in s
 
     
 if __name__ == '__main__':

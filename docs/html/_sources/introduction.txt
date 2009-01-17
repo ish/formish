@@ -251,11 +251,11 @@ You can see from the example that the main conversion process is done using ``st
         
         def from_type(self, value, converter_options={}):
             if value is None:
-                return None
+                return ''
             return str(value)
         
         def to_type(self, value, converter_options={}):
-            if value is None:
+            if value == '':
                 return None
             value = value.strip()
             try:
@@ -264,7 +264,7 @@ You can see from the example that the main conversion process is done using ``st
                 raise ConvertError("Not a valid number")
             return value
 
-So we short circuit None values, strip the data and cast it to the right type and raise a conversion exception if it fails. 
+So we short circuit None values [#f1]_, strip the data and cast it to the right type and raise a conversion exception if it fails. 
 
 The widget templates
 --------------------
@@ -659,4 +659,7 @@ Other goals..
 
 
 
+.. rubric:: Footnotes
+
+.. [#f1] By default the formish widgets equate the empty string with None. This means if you put a default value of '' into a form, you will get None back. If you want to override this behaviour, set the ``empty`` widget attribute to something else (e.g. for a date field you might set the widget value to ``datetime.date.today()``
 

@@ -2,6 +2,16 @@
 Changlelog
 ==========
 
+
+0.6.1 (2009-01-17)
+----------------
+
+* Added the 'empty' attribute to allow empty values to come back as anything you like (normally they return None)
+* Reviewed the way conversion works and added extra tests.. picked up on a couple of edge cases
+
+BUG FIX:  bugs in the conversion of none_option values
+
+
 0.6 (2009-01-16)
 ----------------
 

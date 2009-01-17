@@ -10,6 +10,7 @@ TODO
 functests
 nose.sh
 release.sh
+run
 setup.py
 unittests
 docs-build/Makefile
