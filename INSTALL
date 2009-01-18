@@ -39,9 +39,22 @@ Optional Requirements
 
 * webob - The tests build their own request objects to get things working
 
+* python-magic - for image upload suffix recognitiion
+
+for testing
+...........
+
+unittests
+
+* nose - for functionaal tests
 * restish - The functional tests use restish as a web framework
 
+functional tests and testish test site
+
 * selenium - The functional tests use selenium
+* paste & pastescript - for running servers and creating templates
+* markdown - for styling bits of content
+* pygments - code highlighting for testish
 
 
 Installation
@@ -51,27 +64,75 @@ If you have easy_install, you can run the following
 
   easy_install formish
 
-This will also bring in all of the requirements.
+This will also bring in all of the core requirements.
 
   
 Testing
 -------
 
-You can run the standard unittests by running
-
-nosetests formish/tests/unittests
-
-in the formish home directory
-
 We have a larger range of tests for widgets, validation and conversion in formish/tests/testish which can be run as
 
-nosetests testish/lib/test_functests
-nosetests testish/lib/test_unittests
+./functests
+./unittests
 
-or just 
+You may have to tweak the scripts to get them going.. 
 
-notsetests if you want to test everything.. 
+Last Ditch installs
+-------------------
 
-The functional tests require restish, imagemagick, selenium, webob 
+If you want to make sure you have everything that may be used, try this.. 
+
+easy_install -U setuptools
+easy_install webob
+easy_install peak-rules
+easy_install proxytypes
+easy_install mako
+easy_install paste
+easy_install pastescript
+easy_install nose
+easy_install python-magic
+easy_install beautifulsoup
+easy_install decorator
+easy_install markdown
+easy_install pygments
+easy_install restish
+easy_install validatish
+easy_install convertish
+easy_install schemaish
+easy_install formish
+
+The functional also require imagemagick and selenium which will need installing via some other method (aptitude, download etc)
+
+Selenium can be found at 
+
+http://seleniumhq.org/ - http://release.seleniumhq.org/selenium-remote-control/1.0-beta-2/selenium-remote-control-1.0-beta-2-dist.zip - http://release.seleniumhq.org/selenium-remote-control/1.0-beta-2/selenium-remote-control-1.0-beta-2-dist.zip
+
+Download this and place the following scripts in the selenium-remote-control-1.0-beta-2/selenium-server-1.0-beta-2 directory
+
+and here is a script to listen in for tests
+
+.. code-block:: bash
+    
+    # Display we'll run Xnest on.
+    XNEST_DISPLAY=:10
+    
+    # Start Xnest and capture its pid.
+    Xnest $XNEST_DISPLAY -ac &
+    xnest_pid=$!
+    
+    # From now on we want all X11 apps to start on Xnest's display.
+    DISPLAY=$XNEST_DISPLAY
+    
+    # Let's run a nice, light window manager on it.
+    openbox-session &
+    
+    # Start selenium server.
+    java -jar selenium-server.jar -forcedBrowserMode "*firefox3 /usr/lib/firefox-3.0.5/firefox"
+    
+    # Shutdown Xnest
+    kill $xnest_pid
+
+When you run this script it should set up a listening selenium server that will pick up on the func tests you might run. Check the path to firefox as the version changes regularly. Different versions of java play differently too...  
+
 
 
