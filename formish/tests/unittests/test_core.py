@@ -156,6 +156,28 @@ class TestFormBuilding(unittest.TestCase):
         self.assertEqual( validation.convert_request_data_to_data(form.structure, dottedDict(request.POST)) , {'a': 3, 'b': '4'})
         # Does the convert data to request work
         self.assert_( validation.convert_data_to_request_data(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == reqr)
+
+def success(request, data):
+    return 'success'
+
+def failure(request, form):
+    return 'failure'
+
+    def test_failure_and_success_callables(self):
+
+
+        schema_flat = schemaish.Structure([("a", schemaish.Integer(validator=validatish.Range(min=10))), ("b", schemaish.String())])
+        name = "Integer Form"
+        form = formish.Form(schema_flat, name)
+
+        r = {'a':'2','b': '4'}
+        request = Request(name, r)
+        self.assertEquals(form.validate(request, success, failure), 'failure')
+
+        r = {'a': '12', 'b': '4'}
+        request = Request(name, r)
+        form = formish.Form(schema_flat, name)
+        self.assertEquals(form.validate(request, success, failure), 'success')
         
           
     def test_datetuple_type(self):
