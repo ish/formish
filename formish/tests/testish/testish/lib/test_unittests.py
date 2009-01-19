@@ -3,6 +3,23 @@ import unittest
 import webob
 import urllib
 from BeautifulSoup import BeautifulSoup
+from formish.dottedDict import dottedDict
+import webob
+from urllib import urlencode
+
+def build_request(formname, data):
+    d = dottedDict(data)
+    e = {'REQUEST_METHOD': 'POST'}
+    request = webob.Request.blank('/',environ=e)
+    fields = []
+    fields.append( ('_charset)','UTF-8') )
+    fields.append( ('__formish_form__','form') )
+    for k, v in d.dotteditems():
+        fields.append( (k,v) )
+    fields.append( ('submit','Submit') )
+    request.body = urlencode( fields )
+
+    return request
 
 class Test(unittest.TestCase):
 
@@ -26,8 +43,26 @@ class Test(unittest.TestCase):
 
     def test_unit(self):
         for attr in dir(forms):
-            if attr.startswith('unittest_'):
-                getattr(forms,attr)(self)
+            if attr in ['form_ReCAPTCHA']:
+                continue
+            def default_unittest(formdef):
+                """ We just make sure we can build the form """
+                f = formdef(None)    
+                return
+                ## I'd like to do an automatic check on validation but how?
+                #f.defaults = {}
+                #request = build_request('form',f.request_data)
+                #f.validate(request)
+
+
+            if attr.startswith('form_'):
+                formdef = getattr(forms,attr)
+                unittest_attr = attr.replace('form_','unittest_')
+                if hasattr(forms,unittest_attr):
+                    # Pass the formdef into the unittest
+                    getattr(forms,unittest_attr)(self,formdef)
+                else:
+                    default_unittest(formdef)
 
     def assertRoundTrip(self, f, testdata):
         r = self.request(f._get_request_data())

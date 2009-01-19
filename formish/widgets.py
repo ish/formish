@@ -502,7 +502,7 @@ class RadioChoice(Widget):
         if string_data == '':
             return self.empty
 
-        return super(RadioChoice, self).convert(schema_type, string_data)
+        return string_converter(schema_type).to_type(string_data)
 
     def selected(self, option, value, schema_type):
         """

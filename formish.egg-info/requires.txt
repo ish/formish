@@ -1,6 +1,6 @@
-PEAK-Rules
-ProxyTypes
-schemaish
-validatish
-convertish
-webob
+PEAK-Rules >= 0.5a1.dev_r2582
+ProxyTypes >= 0.9
+schemaish >= 0.5.2
+validatish >= 0.5.1
+convertish >= 0.5.2
+webob >= 0.9.5

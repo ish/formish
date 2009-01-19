@@ -5,6 +5,7 @@ from formish.filehandler import TempFileHandlerWeb
 from testish.lib import xformish
 import webob
 from urllib import urlencode
+from datetime import datetime
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ def build_request(formname, data):
 #
 #  Simple Types
 
-def String(request):
+def form_String(request):
     """
     A simple form with a single string field
     """
@@ -67,24 +68,24 @@ def functest_String(self):#{{{
 
     return#}}}
 
-def unittest_String(self):#{{{
+def unittest_String(self, formdef):#{{{
     # Test no data
-    f = String(None)
+    f = formdef(None)
     self.assertIdHasValue(f, 'form-myStringField', '')
     # Test None data
-    f = String(None)
+    f = formdef(None)
     testdata = {'myStringField': None}
     f.defaults = testdata
     self.assertIdHasValue(f, 'form-myStringField', '')
     self.assertRoundTrip(f, testdata)
     # Test sample data
-    f = String(None)
+    f = formdef(None)
     testdata = {'myStringField': '8'}
     f.defaults = testdata
     self.assertIdHasValue(f, 'form-myStringField', '8')
     self.assertRoundTrip(f, testdata)#}}}
 
-def StringDifferentEmpty(request):
+def form_StringDifferentEmpty(request):
     """
     Simple field but setting the ``empty`` value equal an empty string (instead of None)
     """
@@ -94,21 +95,21 @@ def StringDifferentEmpty(request):
     form['myStringField'].widget = formish.Input(empty='')
     return form
 
-def unittest_StringDifferentEmpty(self):#{{{
+def unittest_StringDifferentEmpty(self, formdef):#{{{
     # Test None data
-    f = StringDifferentEmpty(None)
+    f = formdef(None)
     testdata = {'myStringField': ''}
     f.defaults = testdata
     self.assertIdHasValue(f, 'form-myStringField', '')
     self.assertRoundTrip(f, testdata)
     # Test sample data
-    f = String(None)
+    f =  formdef(None)
     testdata = {'myStringField': '8'}
     f.defaults = testdata
     self.assertIdHasValue(f, 'form-myStringField', '8')
     self.assertRoundTrip(f, testdata)#}}}
 
-def Integer(request):
+def form_Integer(request):
     """
     A simple form with a single integer field
     """
@@ -146,24 +147,24 @@ def functest_Integer(self):#{{{
 
     return#}}}
 
-def unittest_Integer(self):#{{{
+def unittest_Integer(self, formdef):#{{{
     # Test no data
-    f = Integer(None)
+    f =  formdef(None)
     self.assertIdHasValue(f, 'form-myIntegerField', '')
     # Test None data
-    f = Integer(None)
+    f = formdef(None)
     testdata = {'myIntegerField': None}
     f.defaults = testdata
     self.assertIdHasValue(f, 'form-myIntegerField', '')
     self.assertRoundTrip(f, testdata)
     # Test sample data
-    f = Integer(None)
+    f = formdef(None)
     testdata = {'myIntegerField': 8}
     f.defaults = testdata
     self.assertIdHasValue(f, 'form-myIntegerField', '8')
     self.assertRoundTrip(f, testdata)#}}}
 
-def IntegerNoneDefault(request):
+def form_IntegerNoneDefault(request):
     """
     An integer field defaulting to None
     """
@@ -173,7 +174,7 @@ def IntegerNoneDefault(request):
     form.defaults = {'myIntegerField':None}
     return form
 
-def Date(request):
+def form_Date(request):
     """
     A simple form with a single date field
     """
@@ -212,7 +213,7 @@ def functest_Date(self):#{{{
 
     return#}}}
 
-def DateDifferentEmpty(request):
+def form_DateDifferentEmpty(request):
     """
     A simple date field but with the ``empty`` attribute value set to todays date
     """
@@ -223,17 +224,18 @@ def DateDifferentEmpty(request):
     form['myDateField'].widget = formish.Input(empty=datetime.date.today())
     return form
 
-def unittest_DateDifferentEmpty(self):#{{{
+def unittest_DateDifferentEmpty(self, formdef):#{{{
     # Test None data
-    f = DateDifferentEmpty(None)
-    testdata = {'myDateField': ''}
+    import datetime
+    f = formdef(None)
+    testdata = {'myDateField': None}
     f.defaults = testdata
-    self.assertIdHasValue(f, 'form-myStringField', '')
+    self.assertIdHasValue(f, 'form-myDateField', '')
     expected = {'myDateField': datetime.date.today()}
     self.assertRoundTrip(f, expected)
     return #}}}
 
-def Float(request):
+def form_Float(request):
     """
     A simple form with a single float field
     """
@@ -273,7 +275,7 @@ def functest_Float(self):#{{{
 
 
 
-def Boolean(request):
+def form_Boolean(request):
     """
     A simple form with a single boolean field
     """
@@ -317,8 +319,19 @@ def functest_Boolean(self):#{{{
 
     return#}}}
 
+def form_BooleanWithDefaults(request):
+    """
+    A simple form with a single boolean field
+    """
+    schema = schemaish.Structure()
+    schema.add('myBooleanTrue', schemaish.Boolean())
+    schema.add('myBooleanFalse', schemaish.Boolean())
+    form = formish.Form(schema, 'form')
+    form.defaults = {'myBooleanTrue':True,'myBooleanFalse':False}
+    return form
 
-def Decimal(request):
+
+def form_Decimal(request):
     """
     A simple form with a single decimal field
     """
@@ -357,7 +370,7 @@ def functest_Decimal(self):#{{{
 
     return#}}}
 
-def RequiredStringAndCheckbox(request):
+def form_RequiredStringAndCheckbox(request):
     """
     Testing that a checkbox is working properly when another required field is missing (i.e. when the form round trips on error)
     """
@@ -392,7 +405,7 @@ def functest_RequiredStringAndCheckbox(self):#{{{
 
     return#}}}
 
-def File(request):
+def form_File(request):
     """
     A simple form with a single file field
     """
@@ -426,7 +439,7 @@ def functest_File(self):#{{{
 #   String Widgets
 #
 
-def Input(request):
+def form_Input(request):
     """
     Simple input field with a strip parameter
     """
@@ -437,7 +450,7 @@ def Input(request):
     form['inputStrip'].widget = formish.Input(strip=True)
     return form
 
-def Hidden(request):
+def form_Hidden(request):
     """
     Hidden Field with a visible friend.. 
     """
@@ -449,7 +462,7 @@ def Hidden(request):
     form['Hidden'].widget = formish.Hidden()
     return form
 
-def Password(request):
+def form_Password(request):
     """
     Password html widget with string
     """
@@ -460,7 +473,7 @@ def Password(request):
     form['Password'].widget = formish.Password()
     return form
 
-def CheckedPassword(request):
+def form_CheckedPassword(request):
     """
     Checked Password widget
     """
@@ -471,7 +484,7 @@ def CheckedPassword(request):
     form['CheckedPassword'].widget = formish.CheckedPassword()
     return form
 
-def TextAreaSimple(request):
+def form_TextAreaSimple(request):
     """
     Simple text area
     """
@@ -482,7 +495,7 @@ def TextAreaSimple(request):
     form['textArea'].widget = formish.TextArea()
     return form
 
-def TextAreaColsAndRows(request):
+def form_TextAreaColsAndRows(request):
     """
     Passing cols and rows to a text area
     """
@@ -493,7 +506,7 @@ def TextAreaColsAndRows(request):
     form['textAreaCustom'].widget = formish.TextArea(cols=20,rows=4)
     return form
 
-def TextAreaStrip(request):
+def form_TextAreaStrip(request):
     """
     Text area input with strip true
     """
@@ -508,7 +521,7 @@ def TextAreaStrip(request):
 #
 #   Validation
 
-def Required(request):
+def form_Required(request):
     """
     Required Fields
     """
@@ -518,7 +531,7 @@ def Required(request):
     form = formish.Form(schema, 'form')
     return form
 
-def MinLength(request):
+def form_MinLength(request):
     """
     Minimum Length fields - this one is min length four chars
     """
@@ -528,7 +541,7 @@ def MinLength(request):
     form = formish.Form(schema, 'form')
     return form
 
-def MaxLength(request):
+def form_MaxLength(request):
     """
     Maximum Length fields - this one is max length eight chars
     """
@@ -538,7 +551,7 @@ def MaxLength(request):
     form = formish.Form(schema, 'form')
     return form
 
-def MinMaxLength(request):
+def form_MinMaxLength(request):
     """
     Minimum and maximum length
     """
@@ -548,7 +561,7 @@ def MinMaxLength(request):
     form = formish.Form(schema, 'form')
     return form
 
-def MinLengthCheckboxMultiChoice(request):
+def form_MinLengthCheckboxMultiChoice(request):
     """
     A checkbox multi choice with minimum length 3 (NOT WORKING)
     """
@@ -562,7 +575,7 @@ def MinLengthCheckboxMultiChoice(request):
     form['multiChoice'].widget = formish.CheckboxMultiChoice(options)
     return form
 
-def MinRange(request):
+def form_MinRange(request):
     """
     Minimum Value fields - this one is min value of 4
     """
@@ -572,7 +585,7 @@ def MinRange(request):
     form = formish.Form(schema, 'form')
     return form
 
-def MaxRange(request):
+def form_MaxRange(request):
     """
     Maximum value for a field - this one is max of 8
     """
@@ -582,7 +595,7 @@ def MaxRange(request):
     form = formish.Form(schema, 'form')
     return form
 
-def MinMaxRange(request):
+def form_MinMaxRange(request):
     """
     Minimum and maximum value
     """
@@ -592,7 +605,7 @@ def MinMaxRange(request):
     form = formish.Form(schema, 'form')
     return form
 
-def PlainText(request):
+def form_PlainText(request):
     """
     Plain Text (alphanum only)
     """
@@ -602,7 +615,7 @@ def PlainText(request):
     form = formish.Form(schema, 'form')
     return form
 
-def OneOf(request):
+def form_OneOf(request):
     """
     One of a set of
     """
@@ -613,7 +626,7 @@ def OneOf(request):
     form = formish.Form(schema, 'form')
     return form
 
-def All(request):
+def form_All(request):
     """
     Required and Plain Text (alphanum only plus _ and -)
     """
@@ -626,7 +639,7 @@ def All(request):
     form = formish.Form(schema, 'form')
     return form
 
-def ReCAPTCHA(request):
+def form_ReCAPTCHA(request):
     """
     ReCAPTCHA widget
     """
@@ -639,7 +652,7 @@ def ReCAPTCHA(request):
     form['recaptcha'].widget = xformish.ReCAPTCHA(publickey, privatekey, request.environ)
     return form
 
-def ValidationOnSequenceItem(request):
+def form_ValidationOnSequenceItem(request):
     """
     Validation on a sequence item.
     """
@@ -653,7 +666,7 @@ def ValidationOnSequenceItem(request):
     form = formish.Form(schema, 'form')
     return form
 
-def ValidationOnSequence(request):
+def form_ValidationOnSequence(request):
     """
     Validation on a collection (sequence).
     """
@@ -668,7 +681,7 @@ def ValidationOnSequence(request):
     return form
 
 
-def RequiredStringAndFile(request):
+def form_RequiredStringAndFile(request):
     """
     A required string and a file field configured for image upload. (so that we can check roundtripping temp file)
     """
@@ -744,7 +757,7 @@ def functest_RequiredStringAndFile(self):#{{{
 #
 #   Checkbox
 
-def Checkbox(request):
+def form_Checkbox(request):
     """
     Simple Boolean Checkbox
     """
@@ -755,13 +768,27 @@ def Checkbox(request):
     form['checkbox'].widget = formish.Checkbox()
     return form
 
+def form_CheckboxWithDefaults(request):
+    """
+    Simple Boolean Checkbox
+    """
+    schema = schemaish.Structure()
+    schema.add('checkboxTrue', schemaish.Boolean())
+    schema.add('checkboxFalse', schemaish.Boolean())
+
+    form = formish.Form(schema, 'form')
+    form['checkboxTrue'].widget = formish.Checkbox()
+    form['checkboxFalse'].widget = formish.Checkbox()
+    form.defaults = {'checkboxTrue':True,'checkboxFalse':False}
+    return form
+
 
 #########################
 #
 #   Select Widgets
 #
 
-def SelectChoice(request):
+def form_SelectChoice(request):
     """
     A basic select choice
     """
@@ -773,8 +800,8 @@ def SelectChoice(request):
     form['mySelect'].widget = formish.SelectChoice(options)
     return form
 
-def unittest_SelectChoice(self):#{{{
-    f = SelectChoice(None)
+def unittest_SelectChoice(self, formdef):#{{{
+    f = formdef(None)
     testdata = {'mySelect': 3}
     f.defaults = testdata
     request = build_request('form',testdata)
@@ -783,7 +810,7 @@ def unittest_SelectChoice(self):#{{{
     #}}}
 
 
-def SelectChoiceNoneOption(request):
+def form_SelectChoiceNoneOption(request):
     """
     Setting a None Option on the select choice element
     """
@@ -795,7 +822,7 @@ def SelectChoiceNoneOption(request):
     form['mySelect'].widget = formish.SelectChoice(options,none_option=(None, '--select--'))
     return form
 
-def SelectChoiceCallableOptions(request):
+def form_SelectChoiceCallableOptions(request):
     """
     Passing in a callable list of options
     """
@@ -810,7 +837,7 @@ def SelectChoiceCallableOptions(request):
     form['mySelect'].widget = formish.SelectChoice(_)
     return form
 
-def SelectWithOtherChoice(request):
+def form_SelectWithOtherChoice(request):
     """
     A basic select choice with input option
     """
@@ -851,9 +878,9 @@ def functest_SelectWithOtherChoice(self):#{{{
 
     return#}}}
 
-def unittest_SelectWithOtherChoice(self):#{{{
+def unittest_SelectWithOtherChoice(self, formdef):#{{{
     # Test no data
-    f = SelectWithOtherChoice(None)
+    f = formdef(None)
     testdata = {'mySelect': 4}
     f.defaults = testdata
     reqdata = {'mySelect.other':'4','mySelect.select':'...'}
@@ -861,7 +888,7 @@ def unittest_SelectWithOtherChoice(self):#{{{
     data = f.validate(request)
     assert data == testdata
 
-    f = SelectWithOtherChoice(None)
+    f = formdef(None)
     testdata = {'mySelect': 2}
     f.defaults = testdata
     reqdata = {'mySelect.other':'','mySelect.select':'2'}
@@ -870,7 +897,7 @@ def unittest_SelectWithOtherChoice(self):#{{{
     assert data == testdata
     return #}}}
 
-def RadioChoice(request):
+def form_RadioChoice(request):
     """
     A basic radio choice
     """
@@ -883,7 +910,7 @@ def RadioChoice(request):
     return form
 
 
-def RadioChoiceNoneOption(request):
+def form_RadioChoiceNoneOption(request):
     """
     Setting a None Option on the radio choice element
     """
@@ -895,12 +922,12 @@ def RadioChoiceNoneOption(request):
     form['myRadio'].widget = formish.RadioChoice(options,none_option=(None, '--select--'))
     return form
 
-def unittest_RadioChoiceNoneOption(self):#{{{
+def unittest_RadioChoiceNoneOption(self, formdef):#{{{
     # Test no data
-    f = RadioChoiceNoneOption(None)
+    f = formdef(None)
     self.assertIdHasValue(f, 'form-myRadio-noneoption', '')
     # Test None data
-    f = RadioChoiceNoneOption(None)
+    f = formdef(None)
     testdata = {'myRadio': None}
     f.defaults = testdata
     self.assertIdAttrHasNoValue(f, 'form-myRadio-noneoption','selected')
@@ -930,7 +957,7 @@ def functest_RadioChoiceNoneOption(self):#{{{
 
     return#}}}
 
-def RadioChoiceNoneOptionNoneDefault(request):
+def form_RadioChoiceNoneOptionNoneDefault(request):
     """
     Setting a None Option on the radio choice element - default value of None
     """
@@ -943,7 +970,7 @@ def RadioChoiceNoneOptionNoneDefault(request):
     form['myRadio'].widget = formish.RadioChoice(options,none_option=(None, '--select--'))
     return form
 
-def RadioChoiceNoneOptionWithDefault(request):
+def form_RadioChoiceNoneOptionWithDefault(request):
     """
     Setting a None Option on the radio choice element - default value of 1
     """
@@ -956,7 +983,7 @@ def RadioChoiceNoneOptionWithDefault(request):
     form['myRadio'].widget = formish.RadioChoice(options,none_option=(None, '--select--'))
     return form
 
-def RadioChoiceCallableOptions(request):
+def form_RadioChoiceCallableOptions(request):
     """
     Passing in a callable list of options
     """
@@ -971,12 +998,26 @@ def RadioChoiceCallableOptions(request):
     form['myRadio'].widget = formish.RadioChoice(_)
     return form
 
+def form_RadioChoiceWithDefaults(request):
+    """
+    Simple Radio Choice boolean with defaults
+    """
+    schema = schemaish.Structure()
+    schema.add('radiochoiceTrue', schemaish.Boolean())
+    schema.add('radiochoiceFalse', schemaish.Boolean())
+
+    form = formish.Form(schema, 'form')
+    form['radiochoiceTrue'].widget =  formish.RadioChoice(((True,'yes'),(False,'no')), none_option=None)
+    form['radiochoiceFalse'].widget =  formish.RadioChoice(((True,'yes'),(False,'no')), none_option=None)
+    form.defaults = {'radiochoiceTrue':True,'radiochoiceFalse':False}
+    return form
+
 #########################
 #
 #   Multi Select Widgets
 #
 
-def CheckboxMultiChoice(request):
+def form_CheckboxMultiChoice(request):
     """
     A checkbox representing a set of values
     """
@@ -989,7 +1030,7 @@ def CheckboxMultiChoice(request):
     return form
 
 
-def CheckboxMultiChoiceTree(request):
+def form_CheckboxMultiChoiceTree(request):
     """
     A checkbox representing a set of values displayed as tree (using dots for depth)
     """
@@ -1009,7 +1050,7 @@ def CheckboxMultiChoiceTree(request):
 #   Structures
 #
 
-def SimpleStructure(request):
+def form_SimpleStructure(request):
     """
     A simple structure
     """
@@ -1023,7 +1064,7 @@ def SimpleStructure(request):
     form = formish.Form(schema, 'form')
     return form
   
-def UploadStructure(request):
+def form_UploadStructure(request):
     """
     A structure with a file upload
     """
@@ -1047,7 +1088,7 @@ def UploadStructure(request):
 #
 
 
-def SequenceOfSimpleStructures(request):
+def form_SequenceOfSimpleStructures(request):
     """
     A structure witin a sequence, should be enhanced with javascript
     """
@@ -1061,7 +1102,7 @@ def SequenceOfSimpleStructures(request):
     form = formish.Form(schema, 'form')
     return form
   
-def SequenceOfUploadStructures(request):
+def form_SequenceOfUploadStructures(request):
     """
     A structure witin a sequence, should be enhanced with javascript
     """
@@ -1096,7 +1137,7 @@ def functest_SequenceOfUploadStructures(self):#{{{
 
     return#}}}
 
-def SequenceOfStructuresWithSelects(request):
+def form_SequenceOfStructuresWithSelects(request):
     """
     A sequence including selects
     """
@@ -1134,7 +1175,7 @@ def functest_SequenceOfStructuresWithSelects(self):#{{{
 
     return#}}}
 
-def SequenceOfDateParts(request):
+def form_SequenceOfDateParts(request):
     """
     A test of a sequence of more complicated structures
     """
@@ -1160,7 +1201,7 @@ def functest_SequenceOfDateParts(self):#{{{
 
     return#}}}
 
-def SequenceOfSequencesAsTextArea(request):
+def form_SequenceOfSequencesAsTextArea(request):
     """
     A simple text area but representing a csv style data structure
     """
@@ -1171,7 +1212,7 @@ def SequenceOfSequencesAsTextArea(request):
     return form
     
 
-def SequenceOfStructures(request):
+def form_SequenceOfStructures(request):
     """
     A test of a sequence of more complicated structures
     """
@@ -1192,7 +1233,7 @@ def SequenceOfStructures(request):
     return form
 
 
-def GranularFormLayout(request):
+def form_GranularFormLayout(request):
     """
     A simple demonstration of partial rendering of parts of forms.
     """
@@ -1300,7 +1341,7 @@ ${form['firstName'].description()}
     """
 
     
-def CustomisedFormLayout(request):
+def form_CustomisedFormLayout(request):
     """
     A custom form
     """

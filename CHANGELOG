@@ -2,6 +2,12 @@
 Changlelog
 ==========
 
+0.6.2 (2009-01-19)
+----------------
+
+* Added testish tests for default values using radio choice and check box as booleans
+
+BUG FIX:  Radio choice type conversion was broken
 
 0.6.1 (2009-01-17)
 ----------------

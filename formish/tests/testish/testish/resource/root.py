@@ -27,7 +27,8 @@ except ImportError:
 def get_forms(ids):
     out = []
     for f in ids:
-        form_def = getattr(form_defs, f)
+        form_attr = 'form_%s'%f
+        form_def = getattr(form_defs, form_attr)
         out.append( {'name': f,
         'title': formish.util.title_from_name(f),
         'description': _format(form_def.func_doc),
@@ -93,8 +94,9 @@ class FormResource(resource.Resource):
     def __init__(self, id):
         self.id = id
         self.title = formish.util.title_from_name(id)
+        self.form_attr = 'form_%s'%id
         try: 
-            self.form_getter = getattr(form_defs,id)
+            self.form_getter = getattr(form_defs,self.form_attr)
         except AttributeError:
             raise http.NotFoundError()
         self.description = _format(self.form_getter.func_doc)
@@ -120,7 +122,7 @@ class FormResource(resource.Resource):
                 'form': form, 'data': pformat(data),'rawdata': data,
                 'template': extract_function.extract_docstring('template_%s'%self.id),
                 'template_highlighted': extract_function.extract_docstring_highlighted('template_%s'%self.id),
-                'definition': extract_function.extract(self.id).replace('6LcSqgQAAAAAAGn0bfmasP0pGhKgF7ugn72Hi2va','6LcSqgQA......................ugn72Hi2va'),
+                'definition': extract_function.extract(self.form_attr).replace('6LcSqgQAAAAAAGn0bfmasP0pGhKgF7ugn72Hi2va','6LcSqgQA......................ugn72Hi2va'),
                 'tests': tests}
     
     @resource.POST()
