@@ -426,6 +426,19 @@ Let's see what happens if we have an invalid integer - we'll fix the month first
 ConvertError('Not a valid number',)
 >>> 
 
+Customising Errors
+------------------
+
+The errors attribute is available for you to change if you like. You can add your own error to a form by updating or setting the dictionary.
+
+>>> form.errors['country'] = 'You must be outside the UK'
+
+This will automatically add the appropriate error messages in your form just as if you had used a schema validator
+
+
+Success!
+--------
+
 Finally, lets see what valid data gives us.. 
 
 >>> r.POST['streetNumber'] = '123'
