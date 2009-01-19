@@ -440,6 +440,17 @@
 <span class="go">&gt;&gt;&gt;</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="customising-errors">
+<h3>Customising Errors<a class="headerlink" href="#customising-errors" title="Permalink to this headline">¶</a></h3>
+<p>The errors attribute is available for you to change if you like. You can add your own error to a form by updating or setting the dictionary.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">errors</span><span class="p">[</span><span class="s">&#39;country&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;You must be outside the UK&#39;</span>
+</pre></div>
+</div>
+<p>This will automatically add the appropriate error messages in your form just as if you had used a schema validator</p>
+</div>
+<div class="section" id="success">
+<h3>Success!<a class="headerlink" href="#success" title="Permalink to this headline">¶</a></h3>
 <p>Finally, lets see what valid data gives us..</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;streetNumber&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;123&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
@@ -944,6 +955,8 @@ validatish.Invalid, if validation fails.</p>
 </li>
 <li><a class="reference external" href="#id1">Processing the submitted form</a></li>
 <li><a class="reference external" href="#showing-the-errors">Showing the errors</a></li>
+<li><a class="reference external" href="#customising-errors">Customising Errors</a></li>
+<li><a class="reference external" href="#success">Success!</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#validation">Validation</a><ul>
