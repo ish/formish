@@ -2,6 +2,11 @@
 Changlelog
 ==========
 
+0.6.3 (2009-01-19)
+----------------
+
+BUG FIX:  Success and Failure callbacks didn't work
+
 0.6.2 (2009-01-19)
 ----------------
 

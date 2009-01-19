@@ -725,7 +725,7 @@ class Form(object):
         # first
         if failure_callable is not None and success_callable is not None:
             return self._validate_and_call(request, \
-                          failure_callable=None, success_callable=None)
+                          failure_callable, success_callable)
         self.errors = {}
         # Check this request was POSTed by this form.
         if not request.method =='POST' and \
@@ -759,8 +759,7 @@ class Form(object):
             raise validation.FormError(err_msg% (len(self.errors.keys())))
         return data
 
-    def _validate_and_call(self, request, \
-                    failure_callable=None, success_callable=None):
+    def _validate_and_call(self, request, failure_callable, success_callable):
         try: 
             data = self.validate(request)
         except validation.FormError, e:
