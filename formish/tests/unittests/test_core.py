@@ -8,7 +8,7 @@ from webob import MultiDict
 import validatish
 
 
-class DummyObject():
+class DummyObject(object):
     pass
 
 
