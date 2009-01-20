@@ -25,7 +25,7 @@ Formish is a schema backed, templating language agnostic form generation and han
           "Topic :: Software Development :: Libraries :: Python Modules",
           "Topic :: Software Development :: Widget Sets",
       ], 
-      keywords='form,forms,widgets,form library, ',
+      keywords='form forms widgets form library',
       author='Tim Parkin, Matt Goodall',
       author_email='developers@ish.io',
       url='http://ish.io/projects/show/formish',

@@ -373,7 +373,7 @@ class SelectChoice(Widget):
 
     _template = 'SelectChoice'
 
-    none_option = ('', '- choose -')
+    none_option = (None, '- choose -')
 
     def __init__(self, options, **k):
         """
