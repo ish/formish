@@ -2,7 +2,7 @@ import unittest
 from formish.dottedDict import dottedDict, _setDict, _get, _setdefault
 
 
-class DummyObject():
+class DummyObject(object):
     pass
 
 class TestDottedDict(unittest.TestCase):
