@@ -13,15 +13,19 @@ log = logging.getLogger(__name__)
 
 IDENTIFY = '/usr/bin/identify'
 
-def build_request(formname, data):
-    d = dottedDict(data)
+def build_request(formname, data, rawdata=False):
     e = {'REQUEST_METHOD': 'POST'}
     request = webob.Request.blank('/',environ=e)
     fields = []
     fields.append( ('_charset)','UTF-8') )
     fields.append( ('__formish_form__','form') )
-    for k, v in d.dotteditems():
-        fields.append( (k,v) )
+    if rawdata is True:
+        for d in data:
+            fields.append(d) 
+    else:
+        d = dottedDict(data)
+        for k, v in d.dotteditems():
+            fields.append( (k,v) )
     fields.append( ('submit','Submit') )
     request.body = urlencode( fields )
     
@@ -45,7 +49,7 @@ def form_String(request):
     form = formish.Form(schema, 'form')
     return form
 
-def functest_String(self):#{{{
+def functest_String(self):
     sel = self.selenium
     sel.open("/String")
 
@@ -66,9 +70,9 @@ def functest_String(self):#{{{
     try: self.failUnless(sel.is_text_present("{'myStringField': u'80'}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return#}}}
+    return
 
-def unittest_String(self, formdef):#{{{
+def unittest_String(self, formdef):
     # Test no data
     f = formdef(None)
     self.assertIdHasValue(f, 'form-myStringField', '')
@@ -83,7 +87,7 @@ def unittest_String(self, formdef):#{{{
     testdata = {'myStringField': '8'}
     f.defaults = testdata
     self.assertIdHasValue(f, 'form-myStringField', '8')
-    self.assertRoundTrip(f, testdata)#}}}
+    self.assertRoundTrip(f, testdata)
 
 def form_StringDifferentEmpty(request):
     """
@@ -95,7 +99,7 @@ def form_StringDifferentEmpty(request):
     form['myStringField'].widget = formish.Input(empty='')
     return form
 
-def unittest_StringDifferentEmpty(self, formdef):#{{{
+def unittest_StringDifferentEmpty(self, formdef):
     # Test None data
     f = formdef(None)
     testdata = {'myStringField': ''}
@@ -107,7 +111,7 @@ def unittest_StringDifferentEmpty(self, formdef):#{{{
     testdata = {'myStringField': '8'}
     f.defaults = testdata
     self.assertIdHasValue(f, 'form-myStringField', '8')
-    self.assertRoundTrip(f, testdata)#}}}
+    self.assertRoundTrip(f, testdata)
 
 def form_Integer(request):
     """
@@ -118,7 +122,7 @@ def form_Integer(request):
     form = formish.Form(schema, 'form')
     return form
 
-def functest_Integer(self):#{{{
+def functest_Integer(self):
     sel = self.selenium
     sel.open("/Integer")
 
@@ -145,9 +149,9 @@ def functest_Integer(self):#{{{
     try: self.failUnless(sel.is_text_present("{'myIntegerField': 8}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return#}}}
+    return
 
-def unittest_Integer(self, formdef):#{{{
+def unittest_Integer(self, formdef):
     # Test no data
     f =  formdef(None)
     self.assertIdHasValue(f, 'form-myIntegerField', '')
@@ -162,7 +166,7 @@ def unittest_Integer(self, formdef):#{{{
     testdata = {'myIntegerField': 8}
     f.defaults = testdata
     self.assertIdHasValue(f, 'form-myIntegerField', '8')
-    self.assertRoundTrip(f, testdata)#}}}
+    self.assertRoundTrip(f, testdata)
 
 def form_IntegerNoneDefault(request):
     """
@@ -183,7 +187,7 @@ def form_Date(request):
     form = formish.Form(schema, 'form')
     return form
 
-def functest_Date(self):#{{{
+def functest_Date(self):
     sel = self.selenium
 
     sel.open("/Date")
@@ -211,7 +215,7 @@ def functest_Date(self):#{{{
     try: self.failUnless(sel.is_text_present("{'myDateField': datetime.date(2008, 12, 18)}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return#}}}
+    return
 
 def form_DateDifferentEmpty(request):
     """
@@ -224,7 +228,7 @@ def form_DateDifferentEmpty(request):
     form['myDateField'].widget = formish.Input(empty=datetime.date.today())
     return form
 
-def unittest_DateDifferentEmpty(self, formdef):#{{{
+def unittest_DateDifferentEmpty(self, formdef):
     # Test None data
     import datetime
     f = formdef(None)
@@ -233,7 +237,7 @@ def unittest_DateDifferentEmpty(self, formdef):#{{{
     self.assertIdHasValue(f, 'form-myDateField', '')
     expected = {'myDateField': datetime.date.today()}
     self.assertRoundTrip(f, expected)
-    return #}}}
+    return 
 
 def form_Float(request):
     """
@@ -244,7 +248,7 @@ def form_Float(request):
     form = formish.Form(schema, 'form')
     return form
 
-def functest_Float(self):#{{{
+def functest_Float(self):
     sel = self.selenium
     sel.open("/Float")
 
@@ -271,7 +275,7 @@ def functest_Float(self):#{{{
     try: self.failUnless(sel.is_text_present("{'myFloatField': 12.27}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return#}}}
+    return
 
 
 
@@ -284,7 +288,7 @@ def form_Boolean(request):
     form = formish.Form(schema, 'form')
     return form
 
-def functest_Boolean(self):#{{{
+def functest_Boolean(self):
     sel = self.selenium
     sel.open("/Boolean")
 
@@ -317,7 +321,7 @@ def functest_Boolean(self):#{{{
     try: self.failUnless(sel.is_text_present("{'myBooleanField': False}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return#}}}
+    return
 
 def form_BooleanWithDefaults(request):
     """
@@ -341,7 +345,7 @@ def form_Decimal(request):
     return form
 
 
-def functest_Decimal(self):#{{{
+def functest_Decimal(self):
     sel = self.selenium
     sel.open("/Decimal")
 
@@ -368,7 +372,7 @@ def functest_Decimal(self):#{{{
     try: self.failUnless(sel.is_text_present("{'myDecimalField': Decimal(\"18.001\")}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return#}}}
+    return
 
 def form_RequiredStringAndCheckbox(request):
     """
@@ -381,7 +385,7 @@ def form_RequiredStringAndCheckbox(request):
     form['myBoolean'].widget=formish.Checkbox()
     return form
 
-def functest_RequiredStringAndCheckbox(self):#{{{
+def functest_RequiredStringAndCheckbox(self):
     sel = self.selenium
     sel.open("/RequiredStringAndCheckbox")
 
@@ -403,7 +407,7 @@ def functest_RequiredStringAndCheckbox(self):#{{{
     try: self.failUnless(sel.is_text_present("{'myBoolean': True, 'myString': u'anythingelse'}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return#}}}
+    return
 
 def form_File(request):
     """
@@ -415,7 +419,7 @@ def form_File(request):
     form['myFile'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
     return form
 
-def functest_File(self):#{{{
+def functest_File(self):
     sel = self.selenium
     sel.open("/File")
 
@@ -432,7 +436,7 @@ def functest_File(self):#{{{
     try: self.failUnless(sel.is_text_present("{'myFile': <schemaish.type.File"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return#}}}
+    return
 
 #########################
 #
@@ -692,7 +696,7 @@ def form_RequiredStringAndFile(request):
     form['myFileField'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb(),show_image_preview=True,originalurl='/images/nouploadyet.png')
     return form
 
-def functest_RequiredStringAndFile(self):#{{{
+def functest_RequiredStringAndFile(self):
     sel = self.selenium
     sel.open("/RequiredStringAndFile")
 
@@ -749,7 +753,7 @@ def functest_RequiredStringAndFile(self):#{{{
     assert 'photo.jpg-100x100 JPEG 100x100' in stdout
 
           
-    return#}}}
+    return
 
 
 
@@ -800,14 +804,14 @@ def form_SelectChoice(request):
     form['mySelect'].widget = formish.SelectChoice(options)
     return form
 
-def unittest_SelectChoice(self, formdef):#{{{
+def unittest_SelectChoice(self, formdef):
     f = formdef(None)
     testdata = {'mySelect': 3}
     f.defaults = testdata
     request = build_request('form',testdata)
     data = f.validate(request)
     assert data == testdata
-    #}}}
+    
 
 
 def form_SelectChoiceNoneOption(request):
@@ -849,7 +853,7 @@ def form_SelectWithOtherChoice(request):
     form['mySelect'].widget = formish.SelectWithOtherChoice(options)
     return form
 
-def functest_SelectWithOtherChoice(self):#{{{
+def functest_SelectWithOtherChoice(self):
     sel = self.selenium
     sel.open("/SelectWithOtherChoice")
 
@@ -876,9 +880,9 @@ def functest_SelectWithOtherChoice(self):#{{{
     try: self.assertEqual("...", sel.get_value("form-mySelect"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return#}}}
+    return
 
-def unittest_SelectWithOtherChoice(self, formdef):#{{{
+def unittest_SelectWithOtherChoice(self, formdef):
     # Test no data
     f = formdef(None)
     testdata = {'mySelect': 4}
@@ -895,7 +899,7 @@ def unittest_SelectWithOtherChoice(self, formdef):#{{{
     request = build_request('form',reqdata)
     data = f.validate(request)
     assert data == testdata
-    return #}}}
+    return 
 
 def form_RadioChoice(request):
     """
@@ -922,7 +926,7 @@ def form_RadioChoiceNoneOption(request):
     form['myRadio'].widget = formish.RadioChoice(options,none_option=(None, '--select--'))
     return form
 
-def unittest_RadioChoiceNoneOption(self, formdef):#{{{
+def unittest_RadioChoiceNoneOption(self, formdef):
     # Test no data
     f = formdef(None)
     self.assertIdHasValue(f, 'form-myRadio-noneoption', '')
@@ -934,9 +938,9 @@ def unittest_RadioChoiceNoneOption(self, formdef):#{{{
     self.assertIdAttrHasNoValue(f, 'form-myRadio-0','selected')
     self.assertIdAttrHasNoValue(f, 'form-myRadio-1','selected')
     self.assertIdAttrHasNoValue(f, 'form-myRadio-2','selected')
-    self.assertRoundTrip(f, testdata)#}}}
+    self.assertRoundTrip(f, testdata)
 
-def functest_RadioChoiceNoneOption(self):#{{{
+def functest_RadioChoiceNoneOption(self):
     sel = self.selenium
     sel.open("/RadioChoiceNoneOption")
 
@@ -955,7 +959,7 @@ def functest_RadioChoiceNoneOption(self):#{{{
     try: self.failUnless(sel.is_text_present("{'myRadio': 1}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return#}}}
+    return
 
 def form_RadioChoiceNoneOptionNoneDefault(request):
     """
@@ -1011,6 +1015,49 @@ def form_RadioChoiceWithDefaults(request):
     form['radiochoiceFalse'].widget =  formish.RadioChoice(((True,'yes'),(False,'no')), none_option=None)
     form.defaults = {'radiochoiceTrue':True,'radiochoiceFalse':False}
     return form
+
+def form_SelectChoiceDate(request):
+    """
+    A select choice that uses dates for values
+    """
+    from datetime import date
+    schema = schemaish.Structure()
+    schema.add('myDateSelect', schemaish.Date())
+    options = [(date(1970,1,1),'a'),(date(1980,1,1),'b'),(datetime(1990,1,1),'c')]
+
+    form = formish.Form(schema, 'form')
+    form['myDateSelect'].widget = formish.SelectChoice(options)
+    return form
+
+def unittest_SelectChoiceDate(self, formdef):
+    from datetime import date
+    f = formdef(None)
+    testdata = {'myDateSelect': date(1980,1,1)}
+    f.defaults = testdata
+    request = build_request('form',testdata)
+    data = f.validate(request)
+    assert data == testdata
+
+def form_SelectChoiceSequenceInteger(request):
+    """
+    A select choice that uses dates for values
+    """
+    schema = schemaish.Structure()
+    schema.add('mySelect', schemaish.Sequence(schemaish.Integer()))
+    options = [([1,2,3],'a'),([4,5,6],'b'),([7,8,9],'c')]
+
+    form = formish.Form(schema, 'form')
+    form['mySelect'].widget = formish.SelectChoice(options)
+    return form
+
+def unittest_SelectChoiceSequenceInteger(self, formdef):
+    f = formdef(None)
+    testdata = {'mySelect': [4,5,6]}
+    rawdata = [('mySelect', '4,5,6'),]
+    f.defaults = testdata
+    request = build_request('form',rawdata, rawdata=True)
+    data = f.validate(request)
+    assert data == testdata
 
 #########################
 #
@@ -1118,7 +1165,7 @@ def form_SequenceOfUploadStructures(request):
     form['myList.*.a'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
     return form
 
-def functest_SequenceOfUploadStructures(self):#{{{
+def functest_SequenceOfUploadStructures(self):
     sel = self.selenium
 
     sel.open("/SequenceOfUploadStructures")
@@ -1135,7 +1182,7 @@ def functest_SequenceOfUploadStructures(self):#{{{
     try: self.failUnless(sel.is_text_present("'b': 13}]}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return#}}}
+    return
 
 def form_SequenceOfStructuresWithSelects(request):
     """
@@ -1156,7 +1203,7 @@ def form_SequenceOfStructuresWithSelects(request):
     form.defaults = {'myList': [{'a':'foo','b':'b'}]}
     return form
 
-def functest_SequenceOfStructuresWithSelects(self):#{{{
+def functest_SequenceOfStructuresWithSelects(self):
     sel = self.selenium
     sel.open("/SequenceOfStructuresWithSelects")
 
@@ -1173,7 +1220,7 @@ def functest_SequenceOfStructuresWithSelects(self):#{{{
     try: self.assertEqual("", sel.get_value("form-myList-1-b"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return#}}}
+    return
 
 def form_SequenceOfDateParts(request):
     """
@@ -1191,7 +1238,7 @@ def form_SequenceOfDateParts(request):
 
 
 
-def functest_SequenceOfDateParts(self):#{{{
+def functest_SequenceOfDateParts(self):
     sel = self.selenium
     sel.open("/SequenceOfDateParts")
 
@@ -1199,7 +1246,7 @@ def functest_SequenceOfDateParts(self):#{{{
     try: self.assertEqual("", sel.get_value("form-birthdays-0-date"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    return#}}}
+    return
 
 def form_SequenceOfSequencesAsTextArea(request):
     """
@@ -1374,4 +1421,3 @@ ${form.footer()|n}
 
     """
 
-# vim: fdm=marker:foldclose=all
