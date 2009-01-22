@@ -2,14 +2,9 @@
 case "$1" in
   one)
       ./run nosetests testish/lib/test_func.py:TestSeparately.test_$2
-        --daemon \
-        --pid-file=$GITDIR/formish/formish/tests/testish/log/live.pid \
-        --log-file=$GITDIR/formish/formish/tests/testish/log/live.log \
-                   $GITDIR/formish/formish/tests/testish/live.ini \
-        start
     ;;
   *)
-      ./run nosetests testish/lib/test_func.py:TestTogether
+      ./run nosetests testish/lib/test_func.py:TestTogether 
     ;;
 esac
 

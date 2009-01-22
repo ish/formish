@@ -2,6 +2,16 @@
 Changlelog
 ==========
 
+0.6.4 (2009-01-22)
+----------------
+
+ * Added object base class to enable 2.4 comptibility
+
+BUG FIX: made sure the 'empty' attribute worked symettrically (goes with
+    removing empty string checking from convertish)
+BUG FIX: none_option default was empty string which broke when using datetype.
+BUG FIX: sequences could not be used as values in select choice
+
 0.6.3 (2009-01-19)
 ----------------
 
@@ -10,15 +20,18 @@ BUG FIX:  Success and Failure callbacks didn't work
 0.6.2 (2009-01-19)
 ----------------
 
-* Added testish tests for default values using radio choice and check box as booleans
+* Added testish tests for default values using radio choice and check box as
+  booleans
 
 BUG FIX:  Radio choice type conversion was broken
 
 0.6.1 (2009-01-17)
 ----------------
 
-* Added the 'empty' attribute to allow empty values to come back as anything you like (normally they return None)
-* Reviewed the way conversion works and added extra tests.. picked up on a couple of edge cases
+* Added the 'empty' attribute to allow empty values to come back as anything
+  you like (normally they return None)
+* Reviewed the way conversion works and added extra tests.. picked up on a
+  couple of edge cases
 
 BUG FIX:  bugs in the conversion of none_option values
 
@@ -29,7 +42,8 @@ BUG FIX:  bugs in the conversion of none_option values
 Hopefully we're over the backward incompatible api changes. 
 
 * added ``sortable`` option to sequence widget
-* renamed the default form id back to 'form' (it temporarily got set as 'formish'). js and css might need changing in your projects..
+* renamed the default form id back to 'form' (it temporarily got set as
+  'formish'). js and css might need changing in your projects..
 * Added ReCAPTCHA widget and enhanced the testish self documenting site 
 * big introduction page to docs
 
@@ -43,19 +57,22 @@ BUG FIX: resizing when only with or height given was not working
 0.5.8 (2009-01-12)
 ------------------
 
-* added a SelectWithOther choice and enhanced unit and func test capabilities in testish
+* added a SelectWithOther choice and enhanced unit and func test capabilities
+  in testish
 
 0.5.7 (2009-01-11)
 ------------------
 
 BUG FIX: Fixed various problems with File uploads.
 
-* added a default file acccessor that uses python tempfile with a 'store-' file prefix.
+* added a default file acccessor that uses python tempfile with a 'store-' file
+  prefix.
 
 0.5.6 (2009-01-09)
 ------------------
 
-BUG FIX: Fixed bug when using multi part widgets (e.g. Date Parts) inside a sequence. Added example test case.
+BUG FIX: Fixed bug when using multi part widgets (e.g. Date Parts) inside a
+  sequence. Added example test case.
 
 * changes to handle new schemaish Invalid exception format
 * added a contains-error class to container classes that do.
@@ -63,12 +80,14 @@ BUG FIX: Fixed bug when using multi part widgets (e.g. Date Parts) inside a sequ
 0.5.5 (2009-01-08)
 ------------------
 
-Add a granular template rendering system (have a look at http://ish.io:8891/CustomisedFormLayout)
+* Add a granular template rendering system (have a look at
+  http://ish.io:8891/CustomisedFormLayout)
 
 0.5.4 (2009-01-06)
 ------------------
 
-Removed all * imports apart from those at the module level. Checked against pyflakes.
+* Removed all * imports apart from those at the module level. Checked against
+  pyflakes.
 
 0.5.3 (2009-01-06)
 ------------------
