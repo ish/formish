@@ -482,7 +482,7 @@ class SelectWithOtherChoice(SelectChoice):
         except ConvertError:
             return ''
         # Check for selected
-        if option[0] == cv
+        if option[0] == cv:
             return ' selected="selected"'
         else:
             return ''
