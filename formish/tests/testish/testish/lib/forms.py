@@ -134,13 +134,13 @@ def functest_Integer(self):
     sel.type("form-myIntegerField", "a")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("Not a valid number"))
+    try: self.failUnless(sel.is_text_present("Not a valid integer"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
     sel.type("form-myIntegerField", "8.0")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("Not a valid number"))
+    try: self.failUnless(sel.is_text_present("Not a valid integer"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
     sel.type("form-myIntegerField", "8")
@@ -632,12 +632,25 @@ def form_OneOf(request):
 
 def form_All(request):
     """
-    Required and Plain Text (alphanum only plus _ and -)
+    Required, Integer and Value >= 18
     """
     schema = schemaish.Structure()
-    schema.add('requiredPlainText', 
-           schemaish.String(validator=validatish.All(
-               validatish.Required(),validatish.PlainText(extra='-_')
+    schema.add('minAge', 
+           schemaish.Integer(validator=validatish.All(
+               validatish.Required(), validatish.Integer(), validatish.Range(min=18) 
+           )))
+
+    form = formish.Form(schema, 'form')
+    return form
+
+def form_Any(request):
+    """
+    Any of the validators passing will mean a pass - implements 'no teenagers please'
+    """
+    schema = schemaish.Structure()
+    schema.add('noTeenagers', 
+           schemaish.Integer(validator=validatish.Any(
+               validatish.Range(max=12), validatish.Range(min=20),
            )))
 
     form = formish.Form(schema, 'form')
@@ -874,7 +887,7 @@ def functest_SelectWithOtherChoice(self):
     sel.type("form-mySelect-other", "d")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("Not a valid number"))
+    try: self.failUnless(sel.is_text_present("Not a valid integer"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
     try: self.assertEqual("...", sel.get_value("form-mySelect"))

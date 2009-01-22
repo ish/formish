@@ -391,7 +391,11 @@ class SelectChoice(Widget):
         """
         Check the value passed matches the actual value
         """
-        if value and option[0] == self.convert(schema_type, [value]):
+        if value == '':
+            v = self.empty
+        else:
+            v = value
+        if option[0] == self.convert(schema_type, [v]):
             return ' selected="selected"'
         else:
             return ''
@@ -402,17 +406,20 @@ class SelectChoice(Widget):
         """
         options = []
         for value, label in self.options:
-            options.append(
-        (string_converter(schema_type).from_type(value),label)
-            )
+            if value == self.empty:
+                options.append( ('',label) )
+            else:
+                options.append( (string_converter(schema_type).from_type(value),label) )
         return options
     
     def get_none_option_value(self, schema_type):
         """
         Get the default option (the 'unselected' option)
         """
-        return string_converter(schema_type).from_type(
-            self.none_option[0])
+        none_option =  string_converter(schema_type).from_type(self.none_option[0])
+        if none_option is self.empty:
+            return ''
+        return none_option
     
 class SelectWithOtherChoice(SelectChoice):
     """
@@ -457,21 +464,28 @@ class SelectWithOtherChoice(SelectChoice):
         return string_converter(schema_type).to_type(value)
 
     def get_other_option(self, schema_type):
-        """
-        Get the other option
-        """
-        return (string_converter(schema_type).from_type(
-            self.other_option[0]), self.other_option[1])
+        """ Get the other option """
+        return (string_converter(schema_type).from_type( self.other_option[0]), self.other_option[1] )
             
     def selected(self, option, value, schema_type):
-        """
-        Check the value passed matches the actual value
-        """
-        if option[0] == '...' and value not in [value for value, label in self.options]:
+        """ Check the value passed matches the actual value """
+        if option[0] == '...' and value not in [value for value, label in self.get_options(schema_type)]:
             return ' selected="selected"'
-        if option[0] == value:
+        # Map the empty value
+        if value == '':
+            v = self.empty
+        else:
+            v = value
+        # Convert or raise
+        try:
+            cv = string_converter(schema_type).to_type(v)
+        except ConvertError:
+            return ''
+        # Check for selected
+        if option[0] == cv
             return ' selected="selected"'
-        return ''
+        else:
+            return ''
 
 class RadioChoice(Widget):
     """
@@ -480,7 +494,7 @@ class RadioChoice(Widget):
 
     _template = 'RadioChoice'
 
-    none_option = ('', '- choose -')
+    none_option = (None, '- choose -')
 
     def __init__(self, options, **k):
         none_option = k.pop('none_option', UNSET)
@@ -508,7 +522,11 @@ class RadioChoice(Widget):
         """
         Check if the currently rendering input is the same as the value
         """
-        if value and option[0] == self.convert(schema_type, [value]):
+        if value == '':
+            v = self.empty
+        else:
+            v = value
+        if option[0] == self.convert(schema_type, [v]):
             return ' checked="checked"'
         else:
             return ''
@@ -517,9 +535,10 @@ class RadioChoice(Widget):
         """
         Get the default option (the 'unselected' option)
         """
-        none_val = string_converter(schema_type).from_type(
-            self.none_option[0])
-        return none_val
+        none_option =  string_converter(schema_type).from_type(self.none_option[0])
+        if none_option is self.empty:
+            return ''
+        return none_option
     
 class CheckboxMultiChoice(Widget):
     """

@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys, os, glob
 
-version = '0.6.3'
+version = '0.6.4'
 
 setup(name='formish',
       version=version,
@@ -38,8 +38,8 @@ Formish is a schema backed, templating language agnostic form generation and han
           'PEAK-Rules >= 0.5a1.dev_r2582',
           'ProxyTypes >= 0.9',
           'schemaish >= 0.5.2',
-          'validatish >= 0.5.1',
-          'convertish >= 0.5.2',
+          'validatish >= 0.5.4',
+          'convertish >= 0.5.3',
           'webob >= 0.9.5',
       ],
       entry_points="""
