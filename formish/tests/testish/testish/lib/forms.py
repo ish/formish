@@ -1036,7 +1036,7 @@ def form_SelectChoiceDate(request):
     from datetime import date
     schema = schemaish.Structure()
     schema.add('myDateSelect', schemaish.Date())
-    options = [(date(1970,1,1),'a'),(date(1980,1,1),'b'),(datetime(1990,1,1),'c')]
+    options = [(date(1970,1,1),'a'),(date(1980,1,1),'b'),(date(1990,1,1),'c')]
 
     form = formish.Form(schema, 'form')
     form['myDateSelect'].widget = formish.SelectChoice(options)
