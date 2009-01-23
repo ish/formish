@@ -395,7 +395,11 @@ class SelectChoice(Widget):
             v = self.empty
         else:
             v = value
-        if option[0] == self.convert(schema_type, [v]):
+        try:
+            cv = string_converter(schema_type).to_type(v)
+        except ConvertError:
+            return ''
+        if option[0] == cv:
             return ' selected="selected"'
         else:
             return ''
@@ -526,7 +530,11 @@ class RadioChoice(Widget):
             v = self.empty
         else:
             v = value
-        if option[0] == self.convert(schema_type, [v]):
+        try:
+            cv = string_converter(schema_type).to_type(v)
+        except ConvertError:
+            return ''
+        if option[0] == cv:
             return ' checked="checked"'
         else:
             return ''
@@ -570,9 +578,15 @@ class CheckboxMultiChoice(Widget):
         """
         For each value, convert it and check to see if it matches the input data
         """
-        if values is not None:
-            typed_values = self.convert(schema_type, values)
-        if values is not None and option[0] in typed_values:
+        if values is None:
+            return ''
+        cvs = []
+        for v in values:
+            try:
+                cvs.append( string_converter(schema_type.attr).to_type(v) )
+            except ConvertError:
+                continue
+        if option[0] in cvs:
             return ' checked="checked"'
         else:
             return ''
