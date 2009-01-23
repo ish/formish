@@ -2,6 +2,11 @@
 Changlelog
 ==========
 
+0.6.5 (2009-01-23)
+----------------
+
+BUG FIX: convert error if a choice type is given bad request data.
+
 0.6.4a (2009-01-22)
 ----------------
 
