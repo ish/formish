@@ -229,6 +229,19 @@ def failure(request, form):
         assert form.request_data == {'field': ['default value']}
         assert 'name="field" value="default value"' in form()
 
+
+class TestBugs(unittest.TestCase):
+
+    def test_date_conversion(self):
+        from datetime import date, datetime
+        schema = schemaish.Structure([('date', schemaish.Date())])
+        form = formish.Form(schema)
+        form['date'].widget = formish.SelectChoice([(date(1970,1,1),'a'),
+                                                       (date(1980,1,1),'b'),
+                                                       (datetime(1990,1,1),'c')])
+        self.assertRaises(formish.FormError, form.validate, Request('form', {'date': '1990-01-01T00:00:00'}))
+        rendered = form()
+
                
 if __name__ == "__main__":
     unittest.main()
