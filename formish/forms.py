@@ -232,6 +232,14 @@ class Field(object):
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
 
+    def __repr__(self):
+        attrclassstr = str(self.attr.__class__)
+        if attrclassstr[8:22] == 'schemaish.attr':
+            attrname = attrclassstr[23:-2]
+        else:
+            attrname = attrclassstr[8:-2]
+        return '<formish %s name="%s" attr="%s">'% (self.type, self.name, attrname)
+
 
 class CollectionFieldsWrapper(ObjectWrapper):
     """
@@ -248,6 +256,7 @@ class CollectionFieldsWrapper(ObjectWrapper):
         widget = self.collection.widget._template
         vars = {'field':self.collection}
         return fall_back_renderer(renderer, name, widget, vars)
+
 
 class Collection(object):
     """
@@ -404,8 +413,6 @@ class Collection(object):
 
 
 
-    def __repr__(self):
-        return '<formish %s name="%s">'% (self.type, self.name)
 
 
     def __call__(self):
@@ -439,6 +446,14 @@ class Collection(object):
         widget = self.widget._template
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
+
+    def __repr__(self):
+        attrclassstr = str(self.attr.__class__)
+        if attrclassstr[8:22] == 'schemaish.attr':
+            attrname = attrclassstr[23:-2]
+        else:
+            attrname = attrclassstr[8:-2]
+        return '<formish %s name="%s" attr="%s">'% (self.type, self.name, attrname)
 
 class Group(Collection):
     """
@@ -773,7 +788,6 @@ class Form(object):
         Allow the setting os certain attributes on item_data, a dictionary used
         to associates data with fields.
         """
-        
         allowed = ['title', 'widget', 'description']
         if name in allowed:
             self.item_data.setdefault(key, {})[name] = value
@@ -789,14 +803,16 @@ class Form(object):
         return self.item_data.get(key, {})[name]
 
 
-    def get_item_data_values(self, name):
+    def get_item_data_values(self, name=None):
         """
         get all of the item data values
         """
         data = dottedDict({})
-        for key, value in self.item_data:
-            if value.has_key(name):
+        for key, value in self.item_data.items():
+            if name is not None and value.has_key(name):
                 data[key] = value[name]
+            else:
+                data[key] = value
         return data
 
 
@@ -825,7 +841,7 @@ class Form(object):
         segments = name.split('.')
         for field in self.fields:
             if field.name.split('.')[-1] == segments[0]:
-                if isinstance(field, Field):
+                if len(segments) == 1:
                     return field
                 else:
                     return field.get_field(segments[1:])
