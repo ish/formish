@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys, os, glob
 
-version = '0.6.5'
+version = '0.7rev'
 
 setup(name='formish',
       version=version,
