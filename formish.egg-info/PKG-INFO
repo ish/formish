@@ -1,12 +1,12 @@
 Metadata-Version: 1.0
 Name: formish
-Version: 0.6.5
+Version: 0.6.6
 Summary: Formish is a schema backed, templating language agnostic form generation and handling library.
-Home-page: http://ish.io/projects/show/formish
+Home-page: http://form.ish.io
 Author: Tim Parkin, Matt Goodall
 Author-email: developers@ish.io
 License: BSD
-Description: Formish is a schema backed, templating language agnostic form generation and handling library. It's main features are its granular components and its ability to create quite complex forms (including sequences, groups, sequences of groups, groups of sequences, etc). It has a built in mako templating library but should be straightforward to add other templating systems. It also has strong support for file uploads with a default tempfile storage handler. It uses schemaish for its schema, validatish for validation and convertish for type coercion.
+Description: Formish is a schema backed, templating language agnostic form generation and handling library. It's main features are its granular components and its ability to create quite complex forms (including sequences, groups, sequences of groups, groups of sequences, etc). It has a built in mako templating library but should be straightforward to add other templating systems. It also has strong support for file uploads with a default tempfile storage handler. It uses `schemaish <http://schema.ish.io>`_ for its schema, `validatish <http://validat.ish.io>`_ for validation and `convertish <http://convert.ish.io>`_ for type coercion. Have a look at some examples at `http://test.ish.io <http://test.ish.io>`_ or view the project site at `http://form.ish.io <http://form.ish.io>`_
         
         Changlog at `http://github.com/ish/formish/raw/master/CHANGELOG <http://github.com/ish/formish/raw/master/CHANGELOG>`_
         

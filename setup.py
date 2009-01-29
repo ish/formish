@@ -1,13 +1,13 @@
 from setuptools import setup, find_packages
 import sys, os, glob
 
-version = '0.6.5'
+version = '0.6.6'
 
 setup(name='formish',
       version=version,
       description="Formish is a schema backed, templating language agnostic form generation and handling library.",
       long_description="""\
-Formish is a schema backed, templating language agnostic form generation and handling library. It's main features are its granular components and its ability to create quite complex forms (including sequences, groups, sequences of groups, groups of sequences, etc). It has a built in mako templating library but should be straightforward to add other templating systems. It also has strong support for file uploads with a default tempfile storage handler. It uses schemaish for its schema, validatish for validation and convertish for type coercion. 
+Formish is a schema backed, templating language agnostic form generation and handling library. It's main features are its granular components and its ability to create quite complex forms (including sequences, groups, sequences of groups, groups of sequences, etc). It has a built in mako templating library but should be straightforward to add other templating systems. It also has strong support for file uploads with a default tempfile storage handler. It uses `schemaish <http://schema.ish.io>`_ for its schema, `validatish <http://validat.ish.io>`_ for validation and `convertish <http://convert.ish.io>`_ for type coercion. Have a look at some examples at `http://test.ish.io <http://test.ish.io>`_ or view the project site at `http://form.ish.io <http://form.ish.io>`_
 
       Changlog at `http://github.com/ish/formish/raw/master/CHANGELOG <http://github.com/ish/formish/raw/master/CHANGELOG>`_
 
@@ -28,7 +28,7 @@ Formish is a schema backed, templating language agnostic form generation and han
       keywords='form forms widgets form library',
       author='Tim Parkin, Matt Goodall',
       author_email='developers@ish.io',
-      url='http://ish.io/projects/show/formish',
+      url='http://form.ish.io',
       license='BSD',
       packages=find_packages(exclude=['ez_setup', 'examples', 'tests']),
       include_package_data=True,
@@ -37,8 +37,8 @@ Formish is a schema backed, templating language agnostic form generation and han
           # -*- Extra requirements: -*-
           'PEAK-Rules >= 0.5a1.dev_r2582',
           'ProxyTypes >= 0.9',
-          'schemaish >= 0.5.2',
-          'validatish >= 0.5.4',
+          'schemaish >= 0.5.3',
+          'validatish >= 0.6',
           'convertish >= 0.5.3',
           'webob >= 0.9.5',
       ],

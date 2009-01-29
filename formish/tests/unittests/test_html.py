@@ -27,7 +27,7 @@ class TestHTML(unittest.TestCase):
         try:
             data = f.validate(r)
         except fv.FormError, e:
-            assert f.errors['one'] == 'is required'
+            assert str(f.errors['one']) == 'is required'
         soup = BeautifulSoup(f())
         assert soup.find(id='form-one-field').find("span", "error").string == 'is required' , "test that the form error is being created"
         
@@ -54,6 +54,58 @@ class TestHTML(unittest.TestCase):
         #open('formish/tests/expectations/test_complex_form.html','w').write(html)
         expectedSoup = BeautifulSoup( open('formish/tests/unittests/expectations/test_complex_form.html').read())
         #assert soup == expectedSoup
+
+
+    def test_complex_error_all(self):
+        
+        schema = schemaish.Structure([("one", schemaish.Integer(validator=v.All(
+                       v.Required(), v.Integer(), v.Range(min=18), v.Range(min=20), 
+                   ))),])
+        f = formish.Form(schema,name="form")
+
+        f.add_action(lambda x: x, 'submit', label="Submit Me")
+        r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
+        r.POST['one'] = '9'
+        try:
+            data = f.validate(r)
+        except fv.FormError, e:
+            print '---',f.errors['one']
+            assert str(f.errors['one']) == 'must be greater than 18; must be greater than 20'
+            assert str(f['one'].field.errors.exceptions[0]) == 'must be greater than 18'
+
+    def test_complex_error_all_required(self):
+        
+        schema = schemaish.Structure([("one", schemaish.Integer(validator=v.All(
+                       v.Required(), v.Integer(), v.Range(min=18), v.Range(min=20), 
+                   ))),])
+        f = formish.Form(schema,name="form")
+
+        f.add_action(lambda x: x, 'submit', label="Submit Me")
+        r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
+        r.POST['one'] = ''
+        try:
+            data = f.validate(r)
+        except fv.FormError, e:
+            print '---',f.errors['one']
+            assert str(f.errors['one']) == 'is required; must be greater than 18; must be greater than 20'
+            assert str(f['one'].field.errors.exceptions[0]) == 'is required'
+
+    def test_complex_error_all_required(self):
+        
+        schema = schemaish.Structure([("one", schemaish.Integer(validator=v.All(
+                       v.Required(), v.Integer(), v.Any(v.Range(min=18), v.Range(min=20)), 
+                   ))),])
+        f = formish.Form(schema,name="form")
+
+        f.add_action(lambda x: x, 'submit', label="Submit Me")
+        r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
+        r.POST['one'] = ''
+        try:
+            data = f.validate(r)
+        except fv.FormError, e:
+            assert str(f.errors['one']) == 'is required; Please fix any of: must be greater than 18; must be greater than 20'
+            assert str(f['one'].field.errors.exceptions[1].exceptions[1]) == 'must be greater than 20'
+
 
 
 if __name__ == '__main__':
