@@ -2,6 +2,11 @@
 Changlelog
 ==========
 
+0.6.6 (2009-01-29)
+------------------
+
+ * Added the errors property to allow a user to get hold of the full list of errors (including the original validator settings)
+
 0.6.5 (2009-01-23)
 ----------------
 
