@@ -1,16 +1,3 @@
 # Sphinx inventory version 1
 # Project: Formish
 # Version: 0.1
-formish.filehandler mod formish.filehandler.html
-formish.fileresource mod formish.fileresource.html
-formish.fileresource.FileAccessor.get_mimetype method formish.fileresource.html
-formish.filehandler.TempFileHandler.get_mimetype method formish.filehandler.html
-formish.fileresource.FileAccessor class formish.fileresource.html
-formish.filehandler.TempFileHandlerWeb class formish.filehandler.html
-formish.filehandler.TempFileHandlerWeb.get_url_for_file method formish.filehandler.html
-formish.fileresource.FileResource class formish.fileresource.html
-formish.filehandler.TempFileHandler.get_path_for_file method formish.filehandler.html
-formish.filehandler.TempFileHandler class formish.filehandler.html
-formish.filehandler.TempFileHandler.store_file method formish.filehandler.html
-formish.filehandler.TempFileHandler.delete_file method formish.filehandler.html
-formish.fileresource.FileAccessor.get_file method formish.fileresource.html
