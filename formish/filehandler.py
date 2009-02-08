@@ -9,7 +9,7 @@ from datetime import datetime
 
 
 
-class FileHandlerMinimal(object):
+class FileHandlerInterface(object):
     """ Example of File handler for formish file upload support. """
 
     def store_file(self, fieldstorage):
@@ -19,19 +19,16 @@ class FileHandlerMinimal(object):
         """ Method to delete a file """
 
     def get_file(self, filename):
-        """ Method to delete a file """
-
-    def file_exists(self, filename):
-        """ Method to delete a file """
+        """ Method to get a file """
 
     def get_path_for_file(self, filename):
         """ Method to get a path for a file on disk """
 
     def cacheattr(self, filename):
-        """ Method to get the mimetype of a file on disk """
+        """ Method to get some cache freshness attribute """
 
 
-class FileHandlerWeb(FileHandlerMinimal):
+class FileHandlerWeb(FileHandlerInterface):
     """ include a url accessor """
 
     def get_url_for_file(self, identifier):
@@ -46,6 +43,7 @@ class TempFileHandler(object):
     def __init__(self):
         self.prefix = tempfile.gettempprefix()
         self.tempdir = tempfile.gettempdir()
+        self.mtime_cache = True
 
     def _abs(self, filename):
         return '%s/%s%s'% (self.tempdir, self.prefix, filename)
@@ -62,27 +60,18 @@ class TempFileHandler(object):
     def delete_file(self, filename):
         os.remove(self._abs(filename))
 
-    def get_mimetype(self, filename):
-        """ not required but might be handy """
-        mimetype = magic.from_file(self._abs(filename), mime=True)
-        return mimetype or 'application/octet-stream'
+    def get_file(self, filename):
+        return open(self._abs(filename),'rb').read()
 
     def cacheattr(self, filename):
         try:
             mtime = datetime.fromtimestamp( os.path.getmtime(self._abs(filename)) )
         except OSError:
-            raise KeyError
+            raise KeyError()
         return mtime
 
     def get_path_for_file(self, filename):
         return self._abs(filename)
-
-    def get_file(self, filename):
-        return open(self._abs(filename),'rb').read()
-
-    def file_exists(self, filename):
-        return os.path.exists(self._abs(filename))
-    
 
 class TempFileHandlerWeb(TempFileHandler):
     """

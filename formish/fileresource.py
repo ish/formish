@@ -21,20 +21,15 @@ IDENTIFY = '/usr/bin/identify'
 CONVERT = '/usr/bin/convert'
 
 
-class FileAccessor(object):
+class FileAccessorInterface(object):
     """
     A skeleton class that should be implemented so that the files resource can
     deliver files and operate a cache
     """
+    mtime_cache = True
 
     def get_file(self, filename):
         """ Get the file contents """
-
-    def file_exists(self, filename):
-        """ return true if the file exists """
-
-    def get_mimetype(self, filename):
-        """ get the mimetype of a file on disk """
 
     def cacheattr(self, filename, attr):
         """ get an attr on which the cache can base freshness """
@@ -46,6 +41,7 @@ class FileAccessor(object):
     def __init__(self):
         self.prefix = 'store-%s'%tempfile.gettempprefix()
         self.tempdir = tempfile.gettempdir()
+        self.mtime_cache = True
 
     def _abs(self, filename):
         return '%s/%s%s'% (self.tempdir, self.prefix, filename)
@@ -53,14 +49,11 @@ class FileAccessor(object):
     def get_file(self, filename):
         return open(self._abs(filename)).read()
 
-    def file_exists(self, filename):
-        return os.path.exists(self._abs(filename))
-
     def cacheattr(self, filename):
         try:
             mtime = datetime.fromtimestamp( os.path.getmtime(self._abs(filename)) )
         except OSError:
-            raise KeyError
+            raise KeyError()
         return mtime
 
 
@@ -88,45 +81,50 @@ class FileResource(resource.Resource):
             self.cache = Cache()
 
 
-
     @resource.child(resource.any)
     def child(self, request, segments):
         return FileResource(fileaccessor=self.fileaccessor, filehandler=self.filehandler, segments=segments, cache=self.cache), []
 
 
-
     def __call__(self, request):
         """
         Find the appropriate image to return including cacheing and resizing
-        XXX Check for properly locked file operations
+        XXX ERROR CHECKING AND LOCKING NEEDED
         """
         if not self.segments:
             return None
 
         # get the requested filepath from the segments
         filename = self._get_requested_filename()
-        if self.fileaccessor.file_exists(filename):
-            return self.get_file(request, filename, self.fileaccessor)
-        if self.filehandler.file_exists(filename):
-            return self.get_file(request, filename, self.filehandler)
+        f = self.get_file(request, filename, self.fileaccessor)
+        if f:
+            return f
+        f = self.get_file(request, filename, self.filehandler)
+        if f:
+            return f
 
 
     def get_file(self, request, filename, fileaccessor):
         """ get the file through the cache and possibly resizing """
+        mtime_cache = fileaccessor.mtime_cache
         # Check the file is up to date
-        attr = fileaccessor.cacheattr(filename)
-        if not self.cache.cache_ok(filename, attr):
+        try:
+            attr = fileaccessor.cacheattr(filename)
+        except KeyError:
+            return
+        if attr is None or not self.cache.cache_ok(filename, attr, mtime=mtime_cache):
             data = fileaccessor.get_file(filename)
-            self.cache.store(filename, data)
+            self.cache.store(filename, data, attr, mtime=mtime_cache)
 
         # If we're trying to resize, check mtime on resized_cache
         size = get_size_from_dict(request.GET)
         size_suffix = self.get_size_suffix(size)
         if size:
-            if not self.cache.cache_ok(filename, attr, size_suffix):
+            if attr is None or not self.cache.cache_ok(filename, attr, size_suffix, mtime=mtime_cache):
                 resize_image(self.cache._abs(filename),
                              self.cache._abs(filename, size_suffix),
                              size, self.cache.resize_quality)
+                self.cache.store_cacheattr(filename, attr, size_suffix, mtime=mtime_cache)
 
         data = self.cache.contents(filename, size_suffix)
         mimetype = self.cache.get_mimetype(filename, size_suffix)
@@ -165,6 +163,7 @@ def getmtime(f):
 
 
 class Cache(object):
+    # XXX ERROR CHECKING AND LOCKING NEEDED I THINK.. 
 
     def __init__(self,dir='cache', resize_quality=70):
         self.dir = dir
@@ -173,22 +172,41 @@ class Cache(object):
     def contents(self, filename, size_suffix=''):
         return open(self._abs(filename,size_suffix=size_suffix), 'rb').read()
 
-    def cacheattr(self, filename, size_suffix=''):
-        # override this method and change the 'mtime' to 'etag' if
-        # you want to create a non temporal cache marker
-        return 'mtime', getmtime(self._abs(filename, size_suffix=size_suffix))
+
+    def cacheattr(self, filename, size_suffix='', mtime=True):
+        # By default the system uses the file mtime but if you set
+        # a mtime_cache of false
+        # you want to create a non temporal cache markerk
+        if mtime == True:
+            return getmtime(self._abs(filename, size_suffix=size_suffix))
+        else:
+            try:
+                return open(self._abs('.%s-attrfile'%filename, size_suffix=size_suffix)).read()
+            except IOError:
+                return None
+
 
     def _abs(self, filename, size_suffix=''):
         return '%s/%s%s'% (self.dir, filename.replace('/','-'),size_suffix)
 
-    def store(self, filename, data, size_suffix=''):
-        open(self._abs(filename,size_suffix=size_suffix),'w').write(data)
 
-    def cache_ok(self, filename, attr, size_suffix=''):
-        type, cacheattr = self.cacheattr(filename, size_suffix=size_suffix)
-        if type == 'mtime':
+    def store(self, filename, data, attr, size_suffix='', mtime=True):
+        open(self._abs(filename,size_suffix=size_suffix),'w').write(data)
+        if mtime == False:
+            # if we're not using mtimes for caching info, store with an attr file
+            self.store_cacheattr(filename, attr, size_suffix='', mtime=mtime)
+
+
+    def store_cacheattr(self, filename, attr, size_suffix='', mtime=True):
+        open(self._abs('.%s-attrfile'%filename, size_suffix=size_suffix),'w').write(attr)
+
+
+    def cache_ok(self, filename, attr, size_suffix='', mtime=True):
+        cacheattr = self.cacheattr(filename, size_suffix=size_suffix, mtime=mtime)
+        if mtime==True:
             return cacheattr >= attr
         return cacheattr == attr
+
 
     def get_mimetype(self, filename, size_suffix=''):
         return get_mimetype(self._abs(filename, size_suffix=size_suffix))

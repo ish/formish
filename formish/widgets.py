@@ -10,6 +10,7 @@ from convertish.convert import string_converter, \
         datetuple_converter,ConvertError
 from schemaish.type import File as SchemaFile
 from formish import dottedDict
+import magic
 
 
 UNSET = object()
@@ -359,10 +360,16 @@ class FileUpload(Widget):
             filename = request_data['name'][0]
             path_for_file = self.filehandler.get_path_for_file(filename)
             filepath = open(path_for_file)
-            mimetype = self.filehandler.get_mimetype(filename)
+            mimetype = get_mimetype(path_for_file)
             filetype = SchemaFile(filepath, filename, mimetype)
             return filetype
 
+def get_mimetype(filename):
+    """ 
+    use python-magic to guess the mimetype
+    """
+    mimetype = magic.from_file(filename, mime=True)
+    return mimetype or 'application/octet-stream' 
 
 
     
