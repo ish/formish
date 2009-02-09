@@ -4,6 +4,6 @@ import os, sys, subprocess
 
 args = sys.argv[1:]
 env = dict(os.environ)
-env['PYTHONPATH'] = '../../../../../git/restish:../../../../../git/schemaish:../../../../../git/formish:../../../../../git/validatish:../../../../../git/convertish'
+env['PYTHONPATH'] = '../../../../../git/dottedish:../../../../../git/restish:../../../../../git/schemaish:../../../../../git/formish:../../../../../git/validatish:../../../../../git/convertish'
 subprocess.call(args, env=env)
 

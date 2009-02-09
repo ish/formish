@@ -9,7 +9,7 @@ else:
 %>
 % if field.widget.show_image_preview is True:
 %   if value_name != '':
-<img src="${field.widget.filehandler.resource_root}/${value_name}" />
+<img src="${field.widget.urlfactory(value_name)}" />
 %   else:
 <img src="${field.widget.originalurl}" />
 %   endif

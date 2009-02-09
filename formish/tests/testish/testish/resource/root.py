@@ -5,7 +5,7 @@ from datetime import datetime
 import tempfile
 from restish import resource, templating, http
 import formish
-from formish import fileresource
+from formish import fileresource, filestore
 
 from pprint import pformat
 
@@ -42,6 +42,7 @@ class FileAccessor(object):
     def __init__(self):
         self.prefix = 'store-%s'%tempfile.gettempprefix()
         self.tempdir = tempfile.gettempdir()
+        self.mtime_cache = True
 
     def _abs(self, filename):
         return '%s/%s%s'% (self.tempdir, self.prefix, filename.split('-')[-1])
@@ -69,7 +70,7 @@ class Root(resource.Resource):
 
     def resource_child(self, request, segments):
         if segments[0] == 'filehandler':
-            return fileresource.FileResource(fileaccessor=FileAccessor()), segments[1:]
+            return fileresource.FileResource(readable_file_stores=[filestore.TempFileWritableFileStore(),FileAccessor()]), segments[1:]
         return FormResource(segments[0]), segments[1:]
 
 

@@ -1,7 +1,7 @@
 import logging, os.path, tempfile, subprocess
 import formish, schemaish, validatish
 from formish.dottedDict import dottedDict
-from formish.filehandler import TempFileHandlerWeb
+from formish.filestore import TempFileWritableFileStore
 from testish.lib import xformish
 import webob
 from urllib import urlencode
@@ -416,7 +416,7 @@ def form_File(request):
     schema = schemaish.Structure()
     schema.add('myFile', schemaish.File())
     form = formish.Form(schema, 'form')
-    form['myFile'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
+    form['myFile'].widget = formish.FileUpload(filehandler=TempFileWritableFileStore())
     return form
 
 def functest_File(self):
@@ -706,7 +706,7 @@ def form_RequiredStringAndFile(request):
     schema.add('required', schemaish.String(validator=validatish.Required()))
     schema.add('myFileField', schemaish.File())
     form = formish.Form(schema, 'form')
-    form['myFileField'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb(),show_image_preview=True,originalurl='/images/nouploadyet.png')
+    form['myFileField'].widget = formish.FileUpload(filehandler=TempFileWritableFileStore(),show_image_preview=True,originalurl='/images/nouploadyet.png')
     return form
 
 def functest_RequiredStringAndFile(self):
@@ -1137,7 +1137,7 @@ def form_UploadStructure(request):
 
     form = formish.Form(schema, 'form')
 
-    form['myStruct.a'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
+    form['myStruct.a'].widget = formish.FileUpload(filehandler=TempFileWritableFileStore())
     return form
 
 
@@ -1175,7 +1175,7 @@ def form_SequenceOfUploadStructures(request):
 
     form = formish.Form(schema, 'form')
 
-    form['myList.*.a'].widget = formish.FileUpload(filehandler=TempFileHandlerWeb())
+    form['myList.*.a'].widget = formish.FileUpload(filehandler=TempFileWritableFileStore())
     return form
 
 def functest_SequenceOfUploadStructures(self):

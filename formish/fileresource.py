@@ -12,7 +12,7 @@ import urllib
 from restish import http, resource
 
 
-from formish.filehandler import TempFileHandler
+from formish.filestore import TempFileWritableFileStore
 import logging
 log = logging.getLogger('formish')
 
@@ -21,7 +21,7 @@ IDENTIFY = '/usr/bin/identify'
 CONVERT = '/usr/bin/convert'
 
 
-class FileAccessorInterface(object):
+class ReadableFileStoreInterface(object):
     """
     A skeleton class that should be implemented so that the files resource can
     deliver files and operate a cache
@@ -36,7 +36,7 @@ class FileAccessorInterface(object):
 
 
 
-class FileAccessor(object):
+class ReadableFileStore(object):
 
     def __init__(self):
         self.prefix = 'store-%s'%tempfile.gettempprefix()
@@ -56,34 +56,30 @@ class FileAccessor(object):
             raise KeyError()
         return mtime
 
-
-
-
 class FileResource(resource.Resource):
     """
     A simple file serving utility
     """
 
-    def __init__(self, fileaccessor=None, filehandler=None, segments=None, cache=None):
+    def __init__(self, readable_file_stores=None, readable_file_store=None, segments=None, cache=None):
         log.debug('formish.FileResource: initialising FileResource')
-        if fileaccessor:
-            self.fileaccessor = fileaccessor
+        if readable_file_store is not None:
+            self.readable_file_stores = [readable_file_store]
+        elif readable_file_stores is not None:
+            self.readable_file_stores = readable_file_stores
         else:
-            self.fileaccessor = FileAccessor()
-        if filehandler:
-            self.filehandler = filehandler
-        else:
-            self.filehandler = TempFileHandler()
-        self.segments = segments
+            self.readable_file_stores = [ReadableFileStore(), TempFileWritableFileStore()]
         if cache:
             self.cache = cache
         else:
             self.cache = Cache()
+        self.segments = segments
+        print 'rfs',self.readable_file_stores
 
 
     @resource.child(resource.any)
     def child(self, request, segments):
-        return FileResource(fileaccessor=self.fileaccessor, filehandler=self.filehandler, segments=segments, cache=self.cache), []
+        return FileResource(readable_file_stores=self.readable_file_stores, segments=segments, cache=self.cache), []
 
 
     def __call__(self, request):
@@ -96,24 +92,23 @@ class FileResource(resource.Resource):
 
         # get the requested filepath from the segments
         filename = self._get_requested_filename()
-        f = self.get_file(request, filename, self.fileaccessor)
-        if f:
-            return f
-        f = self.get_file(request, filename, self.filehandler)
-        if f:
-            return f
+        for file_store in self.readable_file_stores:
+            f = self.get_file(request, filename, file_store)
+            print 'fs',file_store,'f',
+            if f:
+                return f
 
 
-    def get_file(self, request, filename, fileaccessor):
+    def get_file(self, request, filename, readable_file_store):
         """ get the file through the cache and possibly resizing """
-        mtime_cache = fileaccessor.mtime_cache
+        mtime_cache = readable_file_store.mtime_cache
         # Check the file is up to date
         try:
-            attr = fileaccessor.cacheattr(filename)
+            attr = readable_file_store.cacheattr(filename)
         except KeyError:
             return
         if attr is None or not self.cache.cache_ok(filename, attr, mtime=mtime_cache):
-            data = fileaccessor.get_file(filename)
+            data = readable_file_store.get_file(filename)
             self.cache.store(filename, data, attr, mtime=mtime_cache)
 
         # If we're trying to resize, check mtime on resized_cache
@@ -149,12 +144,6 @@ class FileResource(resource.Resource):
         return '/'.join(self.segments)
 
 
-    def _get_tempfile_path(self, filepath):
-        return self.filehandler.get_path_for_file(urllib.unquote_plus(filepath))
-
-
-
-
 def getmtime(f):
     if os.path.exists(f):
         return datetime.utcfromtimestamp(os.path.getmtime(f))
@@ -183,7 +172,7 @@ class Cache(object):
             try:
                 return open(self._abs('.%s-attrfile'%filename, size_suffix=size_suffix)).read()
             except IOError:
-                return None
+                raise KeyError()
 
 
     def _abs(self, filename, size_suffix=''):
@@ -202,7 +191,10 @@ class Cache(object):
 
 
     def cache_ok(self, filename, attr, size_suffix='', mtime=True):
-        cacheattr = self.cacheattr(filename, size_suffix=size_suffix, mtime=mtime)
+        try:
+            cacheattr = self.cacheattr(filename, size_suffix=size_suffix, mtime=mtime)
+        except KeyError:
+            return False
         if mtime==True:
             return cacheattr >= attr
         return cacheattr == attr

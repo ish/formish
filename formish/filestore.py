@@ -8,9 +8,8 @@ import uuid, magic
 from datetime import datetime
 
 
-
-class FileHandlerInterface(object):
-    """ Example of File handler for formish file upload support. """
+class WritableFileStoreInterface(object):
+    """ Example of file store for formish file upload support. """
 
     def store_file(self, fieldstorage):
         """ Method to store a file """
@@ -28,16 +27,9 @@ class FileHandlerInterface(object):
         """ Method to get some cache freshness attribute """
 
 
-class FileHandlerWeb(FileHandlerInterface):
-    """ include a url accessor """
-
-    def get_url_for_file(self, identifier):
-        """ return a url that can access the file """
-
-
-class TempFileHandler(object):
+class TempFileWritableFileStore(object):
     """
-    File handler using python tempfile module to store file
+    Writable file store using python tempfile module to store file
     """
 
     def __init__(self):
@@ -73,27 +65,6 @@ class TempFileHandler(object):
     def get_path_for_file(self, filename):
         return self._abs(filename)
 
-class TempFileHandlerWeb(TempFileHandler):
-    """
-    Same as the temporary file handler but includes ability to include a resource and a url generator (if you want access to the temporary files on the website, e.g. for previews)
-    """
-
-    def __init__(self, default_url=None, resource_root='/filehandler',urlfactory=None):
-        TempFileHandler.__init__(self)
-        self.default_url = default_url
-        self.resource_root = resource_root
-        self.urlfactory = urlfactory
-
-    def _urlfactory(self, identifier):
-        return '%s/%s'% (self.resource_root, identifier)
-
-    def get_url_for_file(self, identifier):
-        """ Generate a url given an identifier """
-        if identifier is None:
-            return self.default_url.replace(' ', '+')
-        if self.urlfactory:
-            return self.urlfactory(identifier)
-        return self._urlfactory(identifier)
 
 
         

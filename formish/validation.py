@@ -4,7 +4,7 @@ calls the converters that do so) and also converts dotted numeric formats into
 sequences (e.g. a.0 and a.1 onto a[0] and a[1]). It also includes some
 validation exceptions.
 """
-from formish.dottedDict import dottedDict
+from dottedish import dotted
 from validatish import Invalid
 from convertish import convert
 
@@ -22,7 +22,7 @@ def convert_sequences(data):
     try:
         int(data.keys()[0])
     except ValueError:
-        return dottedDict(data)
+        return dotted(data)
     # collect the keys as sorted integers
     intkeys = []
     for key in data.keys():
@@ -105,9 +105,9 @@ def convert_data_to_request_data(form_structure, data,
     
     """
     if request_data is None:
-        request_data = dottedDict()
+        request_data = dotted()
     if errors is None:
-        errors = dottedDict()
+        errors = dotted()
     for field in form_structure.fields:
         try:
             if field.type is 'group' or \
@@ -160,7 +160,7 @@ def convert_request_data_to_data(form_structure,
         except convert.ConvertError, e:
             errors[field.name] = e.message
     
-    data = recursive_convert_sequences(dottedDict(data))
+    data = recursive_convert_sequences(dotted(data))
     return data
 
 def pre_parse_request_data(form_structure, request_data, data=None):
@@ -182,7 +182,7 @@ def pre_parse_request_data(form_structure, request_data, data=None):
             item_data = request_data.get(field.name, [])
             data[field.name] = field.widget.pre_parse_request(field.attr, item_data, full_request_data=request_data)
 
-    return dottedDict(data)
+    return dotted(data)
 
 
 class FormishError(Exception):

@@ -9,7 +9,7 @@ __all__ = ['Input', 'Password', 'CheckedPassword', 'Hidden', 'TextArea',
 from convertish.convert import string_converter, \
         datetuple_converter,ConvertError
 from schemaish.type import File as SchemaFile
-from formish import dottedDict
+from dottedish import dotted, get_dict_from_dotted_dict
 import magic
 
 
@@ -290,17 +290,12 @@ class FileUpload(Widget):
     _template = 'FileUpload'
     
     def __init__(self, filehandler, show_image_preview=False, \
-                 allow_clear=True, css_class=None, originalurl=None):
+                 allow_clear=True, css_class=None, originalurl=None, urlfactory=None):
         """
         :arg filehandler: filehandler is any object with the following methods:
 
             storeFile(self, f)
                 where f is a file instance
-
-            getUrlForFile(self, data)
-                where data is the form item data or a path to a temporary file
-                and is expected to return a URL to access the persisted or
-                temporary data.
 
         :arg show_image_preview: a boolean that, if set, will include an image
             thumbnail with the widget
@@ -313,6 +308,14 @@ class FileUpload(Widget):
         self.show_image_preview = show_image_preview
         self.allow_clear = allow_clear
         self.originalurl = originalurl
+        if urlfactory is not None:
+            self.urlfactory = urlfactory
+        else:
+            self.urlfactory = self._urlfactory
+          
+
+    def _urlfactory(self, identifier):
+        return '/filehandler/%s'% identifier
     
     def pre_render(self, schema_type, data):
         """
@@ -321,7 +324,7 @@ class FileUpload(Widget):
         something has been uploaded (the identifier doesn't match the name)
         """
         if isinstance(data, SchemaFile):
-            self.default = self.filehandler.urlfactory(data)
+            self.default = self.urlfactory(data)
         elif data is not None:
             self.default = data
         else:
@@ -607,7 +610,7 @@ class CheckboxMultiChoiceTree(Widget):
 
     def __init__(self, options, cssClass=None):
         self.options = options
-        self.optiontree = dottedDict._getDictFromDottedKeyDict(dict(options),noexcept=True) 
+        self.optiontree = get_dict_from_dotted_dict(dict(options),noexcept=True) 
         Widget.__init__(self,cssClass=cssClass)
             
     def pre_render(self, schema_type, data):

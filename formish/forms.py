@@ -9,7 +9,7 @@ from webob import UnicodeMultiDict
 
 import schemaish, validatish
 from formish import util
-from formish.dottedDict import dottedDict, is_int
+from dottedish import dotted, is_int
 from formish import validation
 from formish import widgets
 from formish.renderer import _default_renderer
@@ -611,7 +611,7 @@ class Form(object):
         if errors is None:
             errors = {}
         self.defaults = defaults
-        self.errors = dottedDict(errors)
+        self.errors = dotted(errors)
         self.error = None
         self._actions = []
         self.action_url = action_url
@@ -709,7 +709,7 @@ class Form(object):
         if self._request_data is not None:
             return self._request_data
         self._request_data = validation.convert_data_to_request_data(self.structure, \
-                                dottedDict(self.defaults))
+                                dotted(self.defaults))
         return self._request_data
 
 
@@ -718,9 +718,9 @@ class Form(object):
         Assign raw request data to the form
         
         :arg request_data: raw request data (e.g. request.POST)
-        :type request_data: Dictionary (dotted or nested or dottedDict or MultiDict)
+        :type request_data: Dictionary (dotted or nested or dotted or MultiDict)
         """
-        self._request_data = dottedDict(request_data)
+        self._request_data = dotted(request_data)
 
 
     request_data = property(_get_request_data, _set_request_data)
@@ -728,7 +728,7 @@ class Form(object):
     
     def _get_defaults(self):
         """ Get the raw default data """
-        return dottedDict(self._defaults)
+        return dotted(self._defaults)
    
 
     def _set_defaults(self, data):
@@ -765,12 +765,12 @@ class Form(object):
         # We need the _request_data to be populated so sequences know how many
         # items they have (i.e. .fields method on a sequence uses the number of
         # values on the _request_data)
-        self._request_data = dottedDict(request_post)
+        self._request_data = dotted(request_post)
         self.request_data = validation.pre_parse_request_data( \
-                    self.structure,dottedDict(request_post))
+                    self.structure,dotted(request_post))
         data = self.get_unvalidated_data( \
                     self.request_data, raise_exceptions=False)
-        #self._request_data = dottedDict(request_post)
+        #self._request_data = dotted(request_post)
         try:
             self.structure.attr.validate(data)
         except schemaish.attr.Invalid, e:
@@ -816,7 +816,7 @@ class Form(object):
         """
         get all of the item data values
         """
-        data = dottedDict({})
+        data = dotted({})
         for key, value in self.item_data.items():
             if name is not None and value.has_key(name):
                 data[key] = value[name]
