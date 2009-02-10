@@ -1,7 +1,7 @@
 import logging, os.path, tempfile, subprocess
 import formish, schemaish, validatish
 from formish.dottedDict import dottedDict
-from formish.filestore import TempFileWritableFileStore
+from formish.filestore import CacheAwareWritableFileStore
 from testish.lib import xformish
 import webob
 from urllib import urlencode
@@ -416,7 +416,7 @@ def form_File(request):
     schema = schemaish.Structure()
     schema.add('myFile', schemaish.File())
     form = formish.Form(schema, 'form')
-    form['myFile'].widget = formish.FileUpload(filehandler=TempFileWritableFileStore())
+    form['myFile'].widget = formish.FileUpload(filestore=CacheAwareWritableFileStore())
     return form
 
 def functest_File(self):
@@ -706,10 +706,14 @@ def form_RequiredStringAndFile(request):
     schema.add('required', schemaish.String(validator=validatish.Required()))
     schema.add('myFileField', schemaish.File())
     form = formish.Form(schema, 'form')
-    form['myFileField'].widget = formish.FileUpload(filehandler=TempFileWritableFileStore(),show_image_preview=True,originalurl='/images/nouploadyet.png')
+    form['myFileField'].widget = formish.FileUpload(filestore=CacheAwareWritableFileStore(),show_image_preview=True,originalurl='/images/nouploadyet.png')
     return form
 
 def functest_RequiredStringAndFile(self):
+    from formish import safefilename
+    from formish import filestore
+    import shutil
+
     sel = self.selenium
     sel.open("/RequiredStringAndFile")
 
@@ -754,16 +758,30 @@ def functest_RequiredStringAndFile(self):
 
 
     filesrc = sel.get_attribute("//div[@id='actual']/img@src")
+
     filesrc = filesrc.split('/')[-1]
-    actualfilepath = 'cache/%s'%filesrc
-    assert os.path.exists(actualfilepath)
-    stdout = subprocess.Popen([IDENTIFY, actualfilepath], stdout=subprocess.PIPE).communicate()[0]
-    assert 'photo.jpg JPEG 300x300' in stdout
+
+    fs = filestore.FileSystemHeaderedFileStore(root_dir='store')
+    headers, fp = fs.get(filesrc)
+    actualfilepath = safefilename.encode(filesrc)
+    assert os.path.exists(os.path.abspath('store/%s'%actualfilepath))
+    f = open('/tmp/testish-functest','wb')
+    shutil.copyfileobj(fp, f)
+    f.close()
+
+    stdout = subprocess.Popen([IDENTIFY, '/tmp/testish-functest'], stdout=subprocess.PIPE).communicate()[0]
+    assert '/tmp/testish-functest JPEG 300x300' in stdout
     
-    actualfilepath = '%s-100x100'%actualfilepath
-    assert os.path.exists(actualfilepath)
-    stdout = subprocess.Popen([IDENTIFY, actualfilepath], stdout=subprocess.PIPE).communicate()[0]
-    assert 'photo.jpg-100x100 JPEG 100x100' in stdout
+    actualfilepath = 'store_%s-100x100'%filesrc
+    actualfilepath = safefilename.encode(actualfilepath)
+    assert os.path.exists('cache/%s'%actualfilepath)
+    fs = filestore.FileSystemHeaderedFileStore(root_dir='cache')
+    headers, fp = fs.get('store_%s-100x100'%filesrc)
+    f = open('/tmp/testish-functest','wb')
+    shutil.copyfileobj(fp, f)
+    f.close()
+    stdout = subprocess.Popen([IDENTIFY, '/tmp/testish-functest'], stdout=subprocess.PIPE).communicate()[0]
+    assert '/tmp/testish-functest JPEG 100x100' in stdout
 
           
     return
@@ -1137,7 +1155,7 @@ def form_UploadStructure(request):
 
     form = formish.Form(schema, 'form')
 
-    form['myStruct.a'].widget = formish.FileUpload(filehandler=TempFileWritableFileStore())
+    form['myStruct.a'].widget = formish.FileUpload(filestore=CacheAwareWritableFileStore())
     return form
 
 
@@ -1175,7 +1193,7 @@ def form_SequenceOfUploadStructures(request):
 
     form = formish.Form(schema, 'form')
 
-    form['myList.*.a'].widget = formish.FileUpload(filehandler=TempFileWritableFileStore())
+    form['myList.*.a'].widget = formish.FileUpload(filestore=CacheAwareWritableFileStore())
     return form
 
 def functest_SequenceOfUploadStructures(self):

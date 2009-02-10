@@ -10,7 +10,7 @@ from convertish.convert import string_converter, \
         datetuple_converter,ConvertError
 from schemaish.type import File as SchemaFile
 from dottedish import dotted, get_dict_from_dotted_dict
-import magic
+import uuid
 
 
 UNSET = object()
@@ -289,10 +289,10 @@ class FileUpload(Widget):
 
     _template = 'FileUpload'
     
-    def __init__(self, filehandler, show_image_preview=False, \
+    def __init__(self, filestore, show_image_preview=False, \
                  allow_clear=True, css_class=None, originalurl=None, urlfactory=None):
         """
-        :arg filehandler: filehandler is any object with the following methods:
+        :arg filestore: filestore is any object with the following methods:
 
             storeFile(self, f)
                 where f is a file instance
@@ -304,18 +304,24 @@ class FileUpload(Widget):
         """
         Widget.__init__(self)
         self.css_class = css_class
-        self.filehandler = filehandler
+        self.filestore = filestore
         self.show_image_preview = show_image_preview
         self.allow_clear = allow_clear
         self.originalurl = originalurl
         if urlfactory is not None:
-            self.urlfactory = urlfactory
+            self._urlfactory = urlfactory
         else:
-            self.urlfactory = self._urlfactory
+            self._urlfactory = lambda i: i.filename
           
 
-    def _urlfactory(self, identifier):
-        return '/filehandler/%s'% identifier
+    def urlfactory(self, data):
+        if data == '':
+            return self.originalurl
+        if isinstance(data, SchemaFile):
+            ident = self._urlfactory(data)
+        elif data is not None:
+            ident = data
+        return '/filehandler/%s'% ident
     
     def pre_render(self, schema_type, data):
         """
@@ -324,7 +330,7 @@ class FileUpload(Widget):
         something has been uploaded (the identifier doesn't match the name)
         """
         if isinstance(data, SchemaFile):
-            self.default = self.urlfactory(data)
+            self.default = data.filename
         elif data is not None:
             self.default = data
         else:
@@ -338,15 +344,14 @@ class FileUpload(Widget):
         This at least makes the file look symmetric.
         """
         if data.get('remove', [None])[0] is not None:
-            # Removing the file
             data['name'] = ['']
             return data
 
         fieldstorage = data.get('file', [''])[0]
-        if fieldstorage is not u'':
-            # Storing an uploaded file
-            name = self.filehandler.store_file(fieldstorage)
-            data['name'] = [name]
+        if getattr(fieldstorage,'file',None):
+            filename = '%s-%s'%(uuid.uuid4().hex,fieldstorage.filename)
+            self.filestore.put(filename, fieldstorage.file, fieldstorage.type, uuid.uuid4().hex)
+            data['name'] = [filename]
         return data
     
     def convert(self, schema_type, request_data):
@@ -361,19 +366,11 @@ class FileUpload(Widget):
             return SchemaFile(None, None, None)
         else:
             filename = request_data['name'][0]
-            path_for_file = self.filehandler.get_path_for_file(filename)
-            filepath = open(path_for_file)
-            mimetype = get_mimetype(path_for_file)
-            filetype = SchemaFile(filepath, filename, mimetype)
-            return filetype
-
-def get_mimetype(filename):
-    """ 
-    use python-magic to guess the mimetype
-    """
-    mimetype = magic.from_file(filename, mime=True)
-    return mimetype or 'application/octet-stream' 
-
+            try:
+                content_type, cache_tag, f = self.filestore.get(filename)
+            except KeyError:
+                return None
+            return SchemaFile(f, filename, content_type)
 
     
 class SelectChoice(Widget):

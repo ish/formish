@@ -1,8 +1,8 @@
 import logging
 import os.path
-import magic
 from datetime import datetime
 import tempfile
+import uuid
 from restish import resource, templating, http
 import formish
 from formish import fileresource, filestore
@@ -70,7 +70,7 @@ class Root(resource.Resource):
 
     def resource_child(self, request, segments):
         if segments[0] == 'filehandler':
-            return fileresource.FileResource(readable_file_stores=[filestore.TempFileWritableFileStore(),FileAccessor()]), segments[1:]
+            return fileresource.FileResource(), segments[1:]
         return FormResource(segments[0]), segments[1:]
 
 
@@ -85,11 +85,11 @@ class FormResource(resource.Resource):
         except AttributeError:
             raise http.NotFoundError()
         self.description = _format(self.form_getter.func_doc)
+        self.filestore = filestore.CacheAwareWritableFileStore('store')
 
     @resource.GET()
     def GET(self, request):
         return self.render_form(request)
-
     @templating.page('form.html')
     def render_form(self, request, form=None, data=None):
         if request.GET.get('show_tests','False') == 'True':
@@ -121,13 +121,7 @@ class FormResource(resource.Resource):
         else:
             if 'myFileField' in data and data['myFileField'] is not None:
                 f = data['myFileField']
-                filedata = f.file.read()
-                prefix = 'store-%s'%tempfile.gettempprefix()
-                tempdir = tempfile.gettempdir()
-                actualfilename = '%s/%s%s'% (tempdir, prefix, f.filename.split('-')[-1])
-                out = open(actualfilename,'w')
-                out.write(filedata)
-                out.close()
-                form['myFileField'].widget.filehandler.delete_file(f.filename)
+                self.filestore.put(f.filename, f.file, f.mimetype, uuid.uuid4().hex)
+                form['myFileField'].widget.filestore.delete(f.filename)
 
             return self.render_form(request, form=None, data=data)

@@ -6,13 +6,14 @@ Requires ImageMagick for image resizing
 import tempfile
 from datetime import datetime
 import os.path
-import magic
 import subprocess
 import urllib
 from restish import http, resource
+import uuid
+import shutil
 
 
-from formish.filestore import TempFileWritableFileStore
+from formish.filestore import CacheAwareWritableFileStore
 import logging
 log = logging.getLogger('formish')
 
@@ -21,197 +22,119 @@ IDENTIFY = '/usr/bin/identify'
 CONVERT = '/usr/bin/convert'
 
 
-class ReadableFileStoreInterface(object):
-    """
-    A skeleton class that should be implemented so that the files resource can
-    deliver files and operate a cache
-    """
-    mtime_cache = True
-
-    def get_file(self, filename):
-        """ Get the file contents """
-
-    def cacheattr(self, filename, attr):
-        """ get an attr on which the cache can base freshness """
-
-
-
-class ReadableFileStore(object):
-
-    def __init__(self):
-        self.prefix = 'store-%s'%tempfile.gettempprefix()
-        self.tempdir = tempfile.gettempdir()
-        self.mtime_cache = True
-
-    def _abs(self, filename):
-        return '%s/%s%s'% (self.tempdir, self.prefix, filename)
-
-    def get_file(self, filename):
-        return open(self._abs(filename)).read()
-
-    def cacheattr(self, filename):
-        try:
-            mtime = datetime.fromtimestamp( os.path.getmtime(self._abs(filename)) )
-        except OSError:
-            raise KeyError()
-        return mtime
-
 class FileResource(resource.Resource):
     """
     A simple file serving utility
     """
 
-    def __init__(self, readable_file_stores=None, readable_file_store=None, segments=None, cache=None):
-        log.debug('formish.FileResource: initialising FileResource')
-        if readable_file_store is not None:
-            self.readable_file_stores = [readable_file_store]
-        elif readable_file_stores is not None:
-            self.readable_file_stores = readable_file_stores
-        else:
-            self.readable_file_stores = [ReadableFileStore(), TempFileWritableFileStore()]
+    def __init__(self, readable_filestores=None, readable_filestore=None, segments=None, cache=None):
         if cache:
             self.cache = cache
         else:
-            self.cache = Cache()
+            self.cache =  CacheAwareWritableFileStore(root_dir='cache')
+        if readable_filestore is not None:
+            self.readable_filestores = [readable_filestore]
+        elif readable_filestores is not None:
+            self.readable_filestores = readable_filestores
+        else:
+            tempfilestore = CacheAwareWritableFileStore(name='tmp')
+            filestore = CacheAwareWritableFileStore(root_dir='store', name='store')
+            self.readable_filestores = [filestore, tempfilestore]
+        self.readable_filestores.append(self.cache)
         self.segments = segments
-        print 'rfs',self.readable_file_stores
+        self.resize_quality = 70
 
 
     @resource.child(resource.any)
     def child(self, request, segments):
-        return FileResource(readable_file_stores=self.readable_file_stores, segments=segments, cache=self.cache), []
+        return FileResource(readable_filestores=self.readable_filestores, segments=segments, cache=self.cache), []
 
 
     def __call__(self, request):
         """
         Find the appropriate image to return including cacheing and resizing
-        XXX ERROR CHECKING AND LOCKING NEEDED
         """
         if not self.segments:
             return None
+        filename = '/'.join(self.segments)
 
         # get the requested filepath from the segments
-        filename = self._get_requested_filename()
-        for file_store in self.readable_file_stores:
-            f = self.get_file(request, filename, file_store)
-            print 'fs',file_store,'f',
+        etag = str(request.if_none_match)
+        for filestore in self.readable_filestores:
+            f = self.get_file(request, filestore, filename, etag)
             if f:
                 return f
+        return http.not_found()
 
 
-    def get_file(self, request, filename, readable_file_store):
+    def get_file(self, request, filestore, filename, etag):
         """ get the file through the cache and possibly resizing """
-        mtime_cache = readable_file_store.mtime_cache
         # Check the file is up to date
         try:
-            attr = readable_file_store.cacheattr(filename)
+            cache_tag, content_type, f = filestore.get(filename, etag)
         except KeyError:
-            return
-        if attr is None or not self.cache.cache_ok(filename, attr, mtime=mtime_cache):
-            data = readable_file_store.get_file(filename)
-            self.cache.store(filename, data, attr, mtime=mtime_cache)
+            # XXX if the original is not their, clear resize cache (this would mean a globbing delete every request!)
+            # cache_filename = filestore.name+'_'+filename
+            # self.cache.delete(cache_filename, glob=True)
+            return 
 
-        # If we're trying to resize, check mtime on resized_cache
-        size = get_size_from_dict(request.GET)
-        size_suffix = self.get_size_suffix(size)
-        if size:
-            if attr is None or not self.cache.cache_ok(filename, attr, size_suffix, mtime=mtime_cache):
-                resize_image(self.cache._abs(filename),
-                             self.cache._abs(filename, size_suffix),
-                             size, self.cache.resize_quality)
-                self.cache.store_cacheattr(filename, attr, size_suffix, mtime=mtime_cache)
+        width, height = get_size_from_dict(request.GET)
+        size= get_size_suffix(width, height)
 
-        data = self.cache.contents(filename, size_suffix)
-        mimetype = self.cache.get_mimetype(filename, size_suffix)
-        return http.ok([('content-type', mimetype )], data)
+        if not size:
+            if f:
+                data = f.read()
+                f.close()
+                return http.ok([('Content-Type', content_type ),('ETag', cache_tag)], data)
+            else:
+                return http.not_modified([('ETag', cache_tag)])
 
-
-    def get_size_suffix(self, size):
-        if size is None:
-            return ''
-        width, height = size
-        if height or width:
-            return '-%sx%s'% (width, height)
-
-
-    def _get_requested_suffix(self):
-        if '.' in self.segments[-1]:
-            return self.segments[-1].split('.')[-1]
-        return ''
-
-
-    def _get_requested_filename(self):
-        return '/'.join(self.segments)
-
-
-def getmtime(f):
-    if os.path.exists(f):
-        return datetime.utcfromtimestamp(os.path.getmtime(f))
-    return datetime(1970, 1, 1, 0, 0)
-
-
-
-class Cache(object):
-    # XXX ERROR CHECKING AND LOCKING NEEDED I THINK.. 
-
-    def __init__(self,dir='cache', resize_quality=70):
-        self.dir = dir
-        self.resize_quality = resize_quality
-
-    def contents(self, filename, size_suffix=''):
-        return open(self._abs(filename,size_suffix=size_suffix), 'rb').read()
-
-
-    def cacheattr(self, filename, size_suffix='', mtime=True):
-        # By default the system uses the file mtime but if you set
-        # a mtime_cache of false
-        # you want to create a non temporal cache markerk
-        if mtime == True:
-            return getmtime(self._abs(filename, size_suffix=size_suffix))
-        else:
-            try:
-                return open(self._abs('.%s-attrfile'%filename, size_suffix=size_suffix)).read()
-            except IOError:
-                raise KeyError()
-
-
-    def _abs(self, filename, size_suffix=''):
-        return '%s/%s%s'% (self.dir, filename.replace('/','-'),size_suffix)
-
-
-    def store(self, filename, data, attr, size_suffix='', mtime=True):
-        open(self._abs(filename,size_suffix=size_suffix),'w').write(data)
-        if mtime == False:
-            # if we're not using mtimes for caching info, store with an attr file
-            self.store_cacheattr(filename, attr, size_suffix='', mtime=mtime)
-
-
-    def store_cacheattr(self, filename, attr, size_suffix='', mtime=True):
-        open(self._abs('.%s-attrfile'%filename, size_suffix=size_suffix),'w').write(attr)
-
-
-    def cache_ok(self, filename, attr, size_suffix='', mtime=True):
         try:
-            cacheattr = self.cacheattr(filename, size_suffix=size_suffix, mtime=mtime)
+            cache_filename = filestore.name+'_'+filename+size
+            resized_cache_tag, content_type, rf = self.cache.get(cache_filename, cache_tag)
+            resize_needed = resized_cache_tag != cache_tag
+            if resize_needed:
+                rf.close()
+            
         except KeyError:
-            return False
-        if mtime==True:
-            return cacheattr >= attr
-        return cacheattr == attr
+            resize_needed = True
+
+        if resize_needed:
+            if f is None:
+                try:
+                    cache_tag, content_type, f = filestore.get(filename)
+                except KeyError:
+                    return 
+            rf = resize_image(f, (width, height), self.resize_quality)
+            f.close()
+            self.cache.put(cache_filename, rf, cache_tag, content_type)
+            rf.seek(0)
+            data = rf.read()
+            rf.close()
+            return http.ok([('Content-Type', content_type ),('ETag', cache_tag)], data)
+        
+        if rf:
+            data = rf.read()
+            rf.close()
+            return http.ok([('Content-Type', content_type ),('ETag', cache_tag)], data)
+        else:
+            return http.not_modified([('ETag', cache_tag)])
+       
 
 
-    def get_mimetype(self, filename, size_suffix=''):
-        return get_mimetype(self._abs(filename, size_suffix=size_suffix))
 
-
-
-def resize_image(src_path, target_path, size, quality=70):
+def resize_image(src_fh, size, quality=70):
     """
     this is an example identify
     '/home/tim/Desktop/tim.jpg JPEG 48x48 48x48+0+0 DirectClass 8-bit 920b \n'
     """
+    fileno, filename = tempfile.mkstemp()
+    fh = os.fdopen(fileno, 'wb')
+    shutil.copyfileobj(src_fh, fh)
+    fh.close()
+    resized_filename = filename + '-resized'
     width, height = size
-    stdout = subprocess.Popen([IDENTIFY, src_path], \
+    stdout = subprocess.Popen([IDENTIFY, filename], \
                             stdout=subprocess.PIPE).communicate()[0]
     iwidth, iheight = [ int(s) for s in stdout.split(' ')[2].split('x')]
     if width is None:
@@ -219,8 +142,14 @@ def resize_image(src_path, target_path, size, quality=70):
     if height is None:
         height = int(iheight*(float(width)/float(iwidth)))
     subprocess.call([CONVERT, '-thumbnail',
-        '%sx%s'% (width, height), '-quality', str(quality), src_path, target_path])
+        '%sx%s'% (width, height), '-quality', str(quality), filename, resized_filename])
+    return open(resized_filename,'rb')
 
+def get_size_suffix(width, height):
+    if width is None and height is None:
+        return ''
+    if height or width:
+        return '-%sx%s'% (width, height)
 
 def get_size_from_dict(data):
     """
@@ -238,14 +167,6 @@ def get_size_from_dict(data):
         if height is not None:
             height = int(height)
     if not width and not height:
-        return None
+        return (None, None)
     return (width, height)
-
-
-def get_mimetype(filename):
-    """
-    use python-magic to guess the mimetype
-    """
-    mimetype = magic.from_file(filename, mime=True)
-    return mimetype or 'application/octet-stream'
 
