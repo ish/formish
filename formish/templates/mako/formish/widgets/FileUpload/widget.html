@@ -3,21 +3,32 @@
 if '*' in field.name:
     value_name = ''
     value_default = ''
+    mimetype = ''
 else:
     value_name = field.value['name'][0]
     value_default = field.value['default'][0]
+    mimetype = field.value['mimetype'][0]
 %>
-% if field.widget.show_image_preview is True:
+
+<div class="preview">
+% if field.widget.show_image_thumbnail == True and mimetype.startswith('image'):
 %   if value_name != '':
 <img src="${field.widget.urlfactory(value_name)}" />
 %   else:
-<img src="${field.widget.originalurl}" />
+<img src="${field.widget.image_thumbnail_default}" />
 %   endif
+% elif field.widget.show_file_preview:
+<div class="icon ${mimetype.replace('/','_')}">
+</div>
 % endif
-% if field.widget.allow_clear is True:
-<input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" />
+</div>
+
+% if field.widget.show_download_link == True:
+<a href="${field.widget.urlfactory(value_name)}">download</a>
 % endif
 
+<input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" />
 <input id="${field.cssname}-id" type="hidden" name="${field.name}.name" value="${value_name}" />
+<input id="${field.cssname}-mimetype" type="hidden" name="${field.name}.mimetype" value="${mimetype}" />
 <input id="${field.cssname}-default" type="hidden" name="${field.name}.default" value="${value_default}" />
 <input id="${field.cssname}" type="file" name="${field.name}.file" />

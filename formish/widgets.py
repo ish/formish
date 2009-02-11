@@ -289,43 +289,44 @@ class FileUpload(Widget):
 
     _template = 'FileUpload'
     
-    def __init__(self, filestore, show_image_preview=False, resource_root='/filehandler', \
-                 allow_clear=True, css_class=None, originalurl=None, urlfactory=None):
+    def __init__(self, filestore, show_file_preview=True, show_download_link=False, show_image_thumbnail=False, url_base='/filehandler', \
+                 css_class=None, image_thumbnail_default=None, url_ident_factory=None):
         """
         :arg filestore: filestore is any object with the following methods:
 
             storeFile(self, f)
                 where f is a file instance
 
-        :arg show_image_preview: a boolean that, if set, will include an image
+        :arg show_image_thumbnail: a boolean that, if set, will include an image
             thumbnail with the widget
         :arg css_class: extra css classes to apply to the widget
-        :arg originalurl: a default url to 
-        XXX originalurl -> default_image 
+        :arg image_thumbnail_default: a default url to 
+        XXX image_thumbnail_default -> default_image 
         XXX allow_clear -> allow_delete 
-        XXX urlfactory -> filestore_key_factory
+        XXX url_ident_factory -> filestore_key_factory
         """
         Widget.__init__(self)
         self.css_class = css_class
         self.filestore = filestore
-        self.show_image_preview = show_image_preview
-        self.allow_clear = allow_clear
-        self.originalurl = originalurl
-        self.resource_root = resource_root
-        if urlfactory is not None:
-            self._urlfactory = urlfactory
+        self.show_image_thumbnail = show_image_thumbnail
+        self.image_thumbnail_default = image_thumbnail_default
+        self.url_base = url_base
+        self.show_download_link = show_download_link
+        self.show_file_preview = show_file_preview
+        if url_ident_factory is not None:
+            self.url_ident_factory = url_ident_factory
         else:
-            self._urlfactory = lambda i: i.filename
+            self.url_ident_factory = lambda i: i.filename
           
 
     def urlfactory(self, data):
         if not data:
-            return self.originalurl
+            return self.image_thumbnail_default
         if isinstance(data, SchemaFile):
-            key = self._urlfactory(data)
+            key = self.url_ident_factory(data)
         else:
             key = data
-        return '%s/%s' % (self.resource_root, key)
+        return '%s/%s' % (self.url_base, key)
     
     def pre_render(self, schema_type, data):
         """
@@ -333,13 +334,15 @@ class FileUpload(Widget):
         as the name. We also store it in the 'default' field so we can check if
         something has been uploaded (the identifier doesn't match the name)
         """
+        mimetype = ''
         if isinstance(data, SchemaFile):
-            self.default = data.filename
+            default = data.filename
+            mimetype = data.mimetype
         elif data is not None:
-            self.default = data
+            default = data
         else:
-            self.default = ''
-        return {'name': [self.default], 'default':[self.default]}
+            default = ''
+        return {'name': [default], 'default':[default], 'mimetype':[mimetype]}
     
     def pre_parse_request(self, schema_type, data, full_request_data):
         """
@@ -349,6 +352,7 @@ class FileUpload(Widget):
         """
         if data.get('remove', [None])[0] is not None:
             data['name'] = ['']
+            data['mimetype'] = ['']
             return data
 
         fieldstorage = data.get('file', [''])[0]
@@ -356,6 +360,7 @@ class FileUpload(Widget):
             filename = '%s-%s'%(uuid.uuid4().hex,fieldstorage.filename)
             self.filestore.put(filename, fieldstorage.file, fieldstorage.type, uuid.uuid4().hex)
             data['name'] = [filename]
+            data['mimetype'] = [fieldstorage.type]
         return data
     
     def convert(self, schema_type, request_data):
