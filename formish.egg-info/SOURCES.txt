@@ -146,11 +146,11 @@ docs/html/_static/images/logo/ish.io.png
 docs/html/_static/js/sifr-config.js
 docs/html/_static/js/sifr.js
 formish/__init__.py
-formish/dottedDict.py
-formish/filehandler.py
 formish/fileresource.py
+formish/filestore.py
 formish/forms.py
 formish/renderer.py
+formish/safefilename.py
 formish/util.py
 formish/validation.py
 formish/widgets.py
