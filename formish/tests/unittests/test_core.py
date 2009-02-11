@@ -1,7 +1,7 @@
 import formish
 import unittest
 import schemaish
-from formish.dottedDict import dottedDict
+from dottedish import dotted
 from formish.forms import validation
 import copy
 from webob import MultiDict
@@ -91,10 +91,10 @@ class TestFormBuilding(unittest.TestCase):
         request =  Request(name, r)
         form = formish.Form(schema_nested, name)
         # request to data
-        rdtd = validation.convert_request_data_to_data(form.structure, dottedDict(copy.deepcopy(request.POST)))
-        assert rdtd == dottedDict(reqr)
+        rdtd = validation.convert_request_data_to_data(form.structure, dotted(copy.deepcopy(request.POST)))
+        assert rdtd == dotted(reqr)
         # data to request
-        dtrd = validation.convert_data_to_request_data(form.structure, dottedDict(data))
+        dtrd = validation.convert_data_to_request_data(form.structure, dotted(data))
         assert dtrd == reqrdata
 
 
@@ -153,9 +153,9 @@ class TestFormBuilding(unittest.TestCase):
         # Does the form produce an int and a string
         self.assertEquals(form.validate(request), {'a': 3, 'b': '4'})
         # Does the convert request to data work
-        self.assertEqual( validation.convert_request_data_to_data(form.structure, dottedDict(request.POST)) , {'a': 3, 'b': '4'})
+        self.assertEqual( validation.convert_request_data_to_data(form.structure, dotted(request.POST)) , {'a': 3, 'b': '4'})
         # Does the convert data to request work
-        self.assert_( validation.convert_data_to_request_data(form.structure, dottedDict( {'a': 3, 'b': '4'} )) == reqr)
+        self.assert_( validation.convert_data_to_request_data(form.structure, dotted( {'a': 3, 'b': '4'} )) == reqr)
 
 def success(request, data):
     return 'success'
@@ -196,9 +196,9 @@ def failure(request, form):
         # Check the data is converted correctly
         self.assertEquals(form.validate(request), {'a': d, 'b': '4'})
         # Check req to data
-        self.assertEqual( validation.convert_request_data_to_data(form.structure, dottedDict(request.POST)) , dottedDict({'a': d, 'b': '4'}))
+        self.assertEqual( validation.convert_request_data_to_data(form.structure, dotted(request.POST)) , dotted({'a': d, 'b': '4'}))
         # Check data to req
-        self.assert_( validation.convert_data_to_request_data(form.structure, dottedDict( {'a': d, 'b': '4'} )) == dottedDict({'a': {'month': [3], 'day': [1], 'year': [1966]}, 'b': ['4']}))
+        self.assert_( validation.convert_data_to_request_data(form.structure, dotted( {'a': d, 'b': '4'} )) == dotted({'a': {'month': [3], 'day': [1], 'year': [1966]}, 'b': ['4']}))
 
     def test_form_retains_request_data(self):
         form = formish.Form(schemaish.Structure([("field", schemaish.String())]))

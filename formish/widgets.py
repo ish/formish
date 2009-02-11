@@ -289,7 +289,7 @@ class FileUpload(Widget):
 
     _template = 'FileUpload'
     
-    def __init__(self, filestore, show_image_preview=False, \
+    def __init__(self, filestore, show_image_preview=False, resource_root='/filehandler', \
                  allow_clear=True, css_class=None, originalurl=None, urlfactory=None):
         """
         :arg filestore: filestore is any object with the following methods:
@@ -301,6 +301,9 @@ class FileUpload(Widget):
             thumbnail with the widget
         :arg css_class: extra css classes to apply to the widget
         :arg originalurl: a default url to 
+        XXX originalurl -> default_image 
+        XXX allow_clear -> allow_delete 
+        XXX urlfactory -> filestore_key_factory
         """
         Widget.__init__(self)
         self.css_class = css_class
@@ -308,6 +311,7 @@ class FileUpload(Widget):
         self.show_image_preview = show_image_preview
         self.allow_clear = allow_clear
         self.originalurl = originalurl
+        self.resource_root = resource_root
         if urlfactory is not None:
             self._urlfactory = urlfactory
         else:
@@ -315,13 +319,13 @@ class FileUpload(Widget):
           
 
     def urlfactory(self, data):
-        if data == '':
+        if not data:
             return self.originalurl
         if isinstance(data, SchemaFile):
-            ident = self._urlfactory(data)
-        elif data is not None:
-            ident = data
-        return '/filehandler/%s'% ident
+            key = self._urlfactory(data)
+        else:
+            key = data
+        return '%s/%s' % (self.resource_root, key)
     
     def pre_render(self, schema_type, data):
         """

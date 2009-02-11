@@ -85,7 +85,7 @@ class FormResource(resource.Resource):
         except AttributeError:
             raise http.NotFoundError()
         self.description = _format(self.form_getter.func_doc)
-        self.filestore = filestore.CacheAwareWritableFileStore('store')
+        self.filestore = filestore.CachedTempFilestore('store')
 
     @resource.GET()
     def GET(self, request):

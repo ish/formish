@@ -4,14 +4,11 @@ make temporary files
 """
 import tempfile
 import os.path
-import uuid, magic
-from datetime import datetime
 import shutil
 from formish import safefilename
-import safefilename
 
 
-class FileSystemHeaderedFileStore(object):
+class FileSystemHeaderedFilestore(object):
     """
     A general purpose readable and writable file store useful for storing data
     along with additional metadata (simple key-value pairs).
@@ -62,7 +59,7 @@ class FileSystemHeaderedFileStore(object):
 
 
 
-class CacheAwareWritableFileStore(FileSystemHeaderedFileStore):
+class CachedTempFilestore(FileSystemHeaderedFilestore):
 
     def __init__(self, root_dir=None, name=None):
         if root_dir is None:
@@ -75,9 +72,8 @@ class CacheAwareWritableFileStore(FileSystemHeaderedFileStore):
             self.name = name
 
     def get(self, key, cache_tag=None):
-        headers, f = FileSystemHeaderedFileStore.get(self, key)
+        headers, f = FileSystemHeaderedFilestore.get(self, key)
         headers = dict(headers)
-        print 'checking cache tag in store', cache_tag, repr(headers['Cache-Tag'])
         if not cache_tag and headers['Cache-Tag'] == cache_tag:
             f.close()
             return (headers['Cache-Tag'], None, None)
@@ -89,5 +85,5 @@ class CacheAwareWritableFileStore(FileSystemHeaderedFileStore):
             headers = {}
         headers['Cache-Tag'] = cache_tag
         headers['Content-Type'] = content_type
-        FileSystemHeaderedFileStore.put(self, key, headers, src)
+        FileSystemHeaderedFilestore.put(self, key, headers, src)
 

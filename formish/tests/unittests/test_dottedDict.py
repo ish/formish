@@ -1,5 +1,5 @@
 import unittest
-from formish.dottedDict import dottedDict, _setDict, _get, _setdefault
+from dottedish import dotted, _set_dict, _get, _setdefault
 
 
 class DummyObject(object):
@@ -27,30 +27,30 @@ class TestDottedDict(unittest.TestCase):
     def test_convert(self):
         """Just checking that converting results in assigning the right dict """
         for test in self.test_dict_data:
-            self.assertEqual(dottedDict(test[0]).data, test[1])
+            self.assertEqual(dotted(test[0]).data, test[1])
         
     def test_convert_error(self):
         for test in self.test_error:
-            self.assertRaises(KeyError,dottedDict, test)
+            self.assertRaises(KeyError,dotted, test)
             
     def test_convert_dictlist(self):
         for test in self.test_dictlist_data:
-            self.assertEqual(dottedDict(test[0]).data, test[1])
+            self.assertEqual(dotted(test[0]).data, test[1])
             
     def test_comparing(self):
         """Using the special method __eq__ to compare a dotted dict with a normal dict """
         for test in self.test_dict_data:
-            self.assertEqual(dottedDict(test[0]), test[1])
+            self.assertEqual(dotted(test[0]), test[1])
             
     def test_references(self):
-        """Does it refer to the same data if you convert an existing dottedDict or plain dict """
+        """Does it refer to the same data if you convert an existing dotted or plain dict """
         a = DummyObject()
         d = {'a.a.a':1, 'a.b.a':3, 'b':a}
         # Check dict single level keys don't lose reference
-        self.assertEqual( dottedDict(d).data['b'], d['b'] )
-        self.assertEqual( dottedDict(d).data, dottedDict(dottedDict(d)).data )
+        self.assertEqual( dotted(d).data['b'], d['b'] )
+        self.assertEqual( dotted(d).data, dotted(dotted(d)).data )
         
-    def test_setDict(self):
+    def test_set_dict(self):
         # Set dict should return a list if the key is a '0'
         testval = 'test'
         tests = [
@@ -66,7 +66,7 @@ class TestDottedDict(unittest.TestCase):
         ]
 
         for d, key, result in tests:
-            d = _setDict(d, key, testval)
+            d = _set_dict(d, key, testval)
             self.assertEqual( d, result )
 
         #error_tests = [
@@ -77,7 +77,7 @@ class TestDottedDict(unittest.TestCase):
             
         #]
         #for d, key in error_tests:
-            #c = lambda ignore: _setDict(d, key, testval)
+            #c = lambda ignore: _set_dict(d, key, testval)
             #self.assertRaises( KeyError, c, None )
         
     def test_dict_dottedget(self):
@@ -105,7 +105,7 @@ class TestDottedDict(unittest.TestCase):
         
         ]
         for d, checkers  in tests:
-            dd = dottedDict(d)
+            dd = dotted(d)
             for k, v in checkers:
                 self.assertEquals(dd.get(k), v)
 
@@ -116,12 +116,12 @@ class TestDottedDict(unittest.TestCase):
         ]
         # Check None's come out
         for d, checkers  in error_tests:
-            dd = dottedDict(d)
+            dd = dotted(d)
             for k, v in checkers:
                 self.assertEquals(dd.get(k), None)
         # Check the default comes out
         for d, checkers  in error_tests:
-            dd = dottedDict(d)
+            dd = dotted(d)
             for k, v in checkers:
                 self.assertEquals(dd.get(k, v), v)
 
@@ -143,7 +143,7 @@ class TestDottedDict(unittest.TestCase):
         
         ]
         for d, checkers  in tests:
-            dd = dottedDict(d)
+            dd = dotted(d)
             for k, v, result in checkers:
                 dd[k] = v
                 self.assertEquals(dd, result)

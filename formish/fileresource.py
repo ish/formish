@@ -3,17 +3,11 @@ The fileresource provides a basic restish fileresource for assets and images
 
 Requires ImageMagick for image resizing
 """
-import tempfile
-from datetime import datetime
-import os.path
-import subprocess
-import urllib
+import tempfile, os, subprocess, shutil
 from restish import http, resource
-import uuid
-import shutil
 
+from formish.filestore import CachedTempFilestore
 
-from formish.filestore import CacheAwareWritableFileStore
 import logging
 log = logging.getLogger('formish')
 
@@ -27,27 +21,27 @@ class FileResource(resource.Resource):
     A simple file serving utility
     """
 
-    def __init__(self, readable_filestores=None, readable_filestore=None, segments=None, cache=None):
+    def __init__(self, filestores=None, filestore=None, segments=None, cache=None):
         if cache:
             self.cache = cache
         else:
-            self.cache =  CacheAwareWritableFileStore(root_dir='cache')
-        if readable_filestore is not None:
-            self.readable_filestores = [readable_filestore]
-        elif readable_filestores is not None:
-            self.readable_filestores = readable_filestores
+            self.cache =  CachedTempFilestore(root_dir='cache')
+        if filestore is not None:
+            self.filestores = [filestore]
+        elif filestores is not None:
+            self.filestores = filestores
         else:
-            tempfilestore = CacheAwareWritableFileStore(name='tmp')
-            filestore = CacheAwareWritableFileStore(root_dir='store', name='store')
-            self.readable_filestores = [filestore, tempfilestore]
-        self.readable_filestores.append(self.cache)
+            tempfilestore = CachedTempFilestore(name='tmp')
+            filestore = CachedTempFilestore(root_dir='store', name='store')
+            self.filestores = [filestore, tempfilestore]
+        self.filestores.append(self.cache)
         self.segments = segments
         self.resize_quality = 70
 
 
     @resource.child(resource.any)
     def child(self, request, segments):
-        return FileResource(readable_filestores=self.readable_filestores, segments=segments, cache=self.cache), []
+        return FileResource(filestores=self.filestores, segments=segments, cache=self.cache), []
 
 
     def __call__(self, request):
@@ -60,7 +54,7 @@ class FileResource(resource.Resource):
 
         # get the requested filepath from the segments
         etag = str(request.if_none_match)
-        for filestore in self.readable_filestores:
+        for filestore in self.filestores:
             f = self.get_file(request, filestore, filename, etag)
             if f:
                 return f
@@ -136,7 +130,7 @@ def resize_image(src_fh, size, quality=70):
     width, height = size
     stdout = subprocess.Popen([IDENTIFY, filename], \
                             stdout=subprocess.PIPE).communicate()[0]
-    iwidth, iheight = [ int(s) for s in stdout.split(' ')[2].split('x')]
+    iwidth, iheight = [int(s) for s in stdout.split(' ')[2].split('x')]
     if width is None:
         width = int(iwidth*(float(height)/float(iheight)))
     if height is None:

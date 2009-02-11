@@ -1,7 +1,7 @@
 import logging, os.path, tempfile, subprocess
 import formish, schemaish, validatish
-from formish.dottedDict import dottedDict
-from formish.filestore import CacheAwareWritableFileStore
+from dottedish import dotted
+from formish.filestore import CachedTempFilestore
 from testish.lib import xformish
 import webob
 from urllib import urlencode
@@ -23,7 +23,7 @@ def build_request(formname, data, rawdata=False):
         for d in data:
             fields.append(d) 
     else:
-        d = dottedDict(data)
+        d = dotted(data)
         for k, v in d.dotteditems():
             fields.append( (k,v) )
     fields.append( ('submit','Submit') )
@@ -416,7 +416,7 @@ def form_File(request):
     schema = schemaish.Structure()
     schema.add('myFile', schemaish.File())
     form = formish.Form(schema, 'form')
-    form['myFile'].widget = formish.FileUpload(filestore=CacheAwareWritableFileStore())
+    form['myFile'].widget = formish.FileUpload(filestore=CachedTempFilestore())
     return form
 
 def functest_File(self):
@@ -706,7 +706,7 @@ def form_RequiredStringAndFile(request):
     schema.add('required', schemaish.String(validator=validatish.Required()))
     schema.add('myFileField', schemaish.File())
     form = formish.Form(schema, 'form')
-    form['myFileField'].widget = formish.FileUpload(filestore=CacheAwareWritableFileStore(),show_image_preview=True,originalurl='/images/nouploadyet.png')
+    form['myFileField'].widget = formish.FileUpload(filestore=CachedTempFilestore(),show_image_preview=True,originalurl='/images/nouploadyet.png')
     return form
 
 def functest_RequiredStringAndFile(self):
@@ -761,7 +761,7 @@ def functest_RequiredStringAndFile(self):
 
     filesrc = filesrc.split('/')[-1]
 
-    fs = filestore.FileSystemHeaderedFileStore(root_dir='store')
+    fs = filestore.FileSystemHeaderedFilestore(root_dir='store')
     headers, fp = fs.get(filesrc)
     actualfilepath = safefilename.encode(filesrc)
     assert os.path.exists(os.path.abspath('store/%s'%actualfilepath))
@@ -775,7 +775,7 @@ def functest_RequiredStringAndFile(self):
     actualfilepath = 'store_%s-100x100'%filesrc
     actualfilepath = safefilename.encode(actualfilepath)
     assert os.path.exists('cache/%s'%actualfilepath)
-    fs = filestore.FileSystemHeaderedFileStore(root_dir='cache')
+    fs = filestore.FileSystemHeaderedFilestore(root_dir='cache')
     headers, fp = fs.get('store_%s-100x100'%filesrc)
     f = open('/tmp/testish-functest','wb')
     shutil.copyfileobj(fp, f)
@@ -1155,7 +1155,7 @@ def form_UploadStructure(request):
 
     form = formish.Form(schema, 'form')
 
-    form['myStruct.a'].widget = formish.FileUpload(filestore=CacheAwareWritableFileStore())
+    form['myStruct.a'].widget = formish.FileUpload(filestore=CachedTempFilestore())
     return form
 
 
@@ -1193,7 +1193,7 @@ def form_SequenceOfUploadStructures(request):
 
     form = formish.Form(schema, 'form')
 
-    form['myList.*.a'].widget = formish.FileUpload(filestore=CacheAwareWritableFileStore())
+    form['myList.*.a'].widget = formish.FileUpload(filestore=CachedTempFilestore())
     return form
 
 def functest_SequenceOfUploadStructures(self):
