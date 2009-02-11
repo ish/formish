@@ -3,16 +3,11 @@ The fileresource provides a basic restish fileresource for assets and images
 
 Requires ImageMagick for image resizing
 """
-import tempfile
-from datetime import datetime
-import os.path
-import magic
-import subprocess
-import urllib
+import tempfile, os, subprocess, shutil
 from restish import http, resource
 
+from formish.filestore import CachedTempFilestore
 
-from formish.filehandler import TempFileHandler
 import logging
 log = logging.getLogger('formish')
 
@@ -20,176 +15,135 @@ log = logging.getLogger('formish')
 IDENTIFY = '/usr/bin/identify'
 CONVERT = '/usr/bin/convert'
 
-class FileAccessor(object): 
-    """
-    A skeleton class that should be implemented so that the files resource can
-    build caches, etc
-    """
-
-    def __init__(self):
-        self.prefix = 'store-%s'%tempfile.gettempprefix()
-        self.tempdir = tempfile.gettempdir()
-
-
-    def get_mimetype(self, filename):
-        """
-        Get the mime type of the file with this id
-        """
-        actualfilename = '%s/%s%s'% (self.tempdir, self.prefix, filename)
-        return magic.from_file(actualfilename, mime=True)
-
-
-    def get_mtime(self, filename):
-        actualfilename = '%s/%s%s'% (self.tempdir, self.prefix, filename)
-        try:
-            return datetime.fromtimestamp( os.path.getmtime(actualfilename) )
-        except OSError:
-            raise KeyError
-
-
-    def get_file(self, filename):
-        """
-        Get the file object for this id
-        """
-        actualfilename = '%s/%s%s'% (self.tempdir, self.prefix, filename)
-        return open(actualfilename).read()
-
-    def file_exists(self, filename):
-        actualfilename = '%s/%s%s'% (self.tempdir, self.prefix, filename)
-        return os.path.exists(actualfilename)
-       
 
 class FileResource(resource.Resource):
     """
     A simple file serving utility
     """
 
-    def __init__(self, fileaccessor=None, filehandler=None, segments=None):
-        log.debug('formish.FileResource: initialising FileResource')
-        if fileaccessor is None:
-            self.fileaccessor = FileAccessor()
+    def __init__(self, filestores=None, filestore=None, segments=None, cache=None):
+        if cache:
+            self.cache = cache
         else:
-            self.fileaccessor = fileaccessor
-        if filehandler is None:
-            self.filehandler = TempFileHandler()
+            self.cache =  CachedTempFilestore(root_dir='cache')
+        if filestore is not None:
+            self.filestores = [filestore]
+        elif filestores is not None:
+            self.filestores = filestores
         else:
-            self.filehandler = filehandler
+            tempfilestore = CachedTempFilestore(name='tmp')
+            filestore = CachedTempFilestore(root_dir='store', name='store')
+            self.filestores = [filestore, tempfilestore]
+        self.filestores.append(self.cache)
         self.segments = segments
+        self.resize_quality = 70
+
 
     @resource.child(resource.any)
     def child(self, request, segments):
-        return FileResource(fileaccessor=self.fileaccessor, filehandler=self.filehandler, segments=segments), []
+        return FileResource(filestores=self.filestores, segments=segments, cache=self.cache), []
 
 
     def __call__(self, request):
-        log.debug('formish.FileResource: in File Resource')
-        if not self.segments:    
+        """
+        Find the appropriate image to return including cacheing and resizing
+        """
+        if not self.segments:
             return None
+        filename = '/'.join(self.segments)
 
-        # This is our input filepath
-        requested_filepath = self._get_requested_filepath()
-        log.debug('formish.FileResource: requested_filepath=%s',requested_filepath)
- 
-        # Get the raw cache file path and mtime
-        raw_cached_filepath = self._get_cachefile_path(requested_filepath)
-        log.debug('formish.FileResource: raw_cached_filepath=%s',raw_cached_filepath)
-        raw_cached_mtime = self._get_file_mtime(raw_cached_filepath)
+        # get the requested filepath from the segments
+        etag = str(request.if_none_match)
+        for filestore in self.filestores:
+            f = self.get_file(request, filestore, filename, etag)
+            if f:
+                return f
+        return http.not_found()
 
-        # Check to see if fa and temp exist
-        tempfile_path = self._get_tempfile_path(requested_filepath)
-        log.debug('formish.FileResource: tempfile_path=%s',tempfile_path)
 
-        # work out which has changed most recently (if either is newer than cache)
-        fileaccessor_mtime = self._get_fileaccessor_mtime(requested_filepath)
-        tempfile_mtime = self._get_file_mtime(tempfile_path)
-        source_mtime = max(fileaccessor_mtime, tempfile_mtime)
-
-        # unfound files return a 1970 timestamp for simplicity, if we don't have files newer than 1971, bugout
-        if source_mtime < datetime(1971,1,1,0,0):
-            return None
-
-        if source_mtime > raw_cached_mtime:
-            if fileaccessor_mtime > tempfile_mtime:
-                log.debug('formish.FileResource: fileaccessor resource is newer. rebuild raw cache')
-                filedata = self.fileaccessor.get_file(requested_filepath)
-                mimetype = self.fileaccessor.get_mimetype(requested_filepath)
-            else:
-                log.debug('formish.FileResource: tempfile resource is newer. rebuilding raw cache')
-                filedata = open(tempfile_path).read()
-                mimetype = get_mimetype(tempfile_path)
-            open(raw_cached_filepath,'w').write(filedata)
-        else:
-            log.debug('formish.FileResource: raw cache file is valid')
-            mimetype = get_mimetype(raw_cached_filepath)
-
-        # If we're trying to resize, check mtime on resized_cache
-        size_suffix = self._get_size_suffix(request)
-        if size_suffix:
-            log.debug('formish.FileResource: size_suffix=%s',size_suffix)
-            cached_filepath = self._get_cachefile_path(requested_filepath, size_suffix)
-            cached_mtime = self._get_file_mtime(cached_filepath)
-            log.debug('formish.FileResource: cached_filepath=%s',cached_filepath)
-
-            if not os.path.exists(cached_filepath) or source_mtime > cached_mtime:
-                width, height = get_size_from_dict(request.GET)
-                log.debug('formish.FileResource: cache invalid. resizing image')
-                resize_image(raw_cached_filepath, cached_filepath, width, height)
-        else:
-            log.debug('formish.FileResource: resized cache file is valid.')
-            cached_filepath = raw_cached_filepath
-
-        return http.ok([('content-type', mimetype )], open(cached_filepath, 'rb').read())
-         
-
-    def _get_requested_suffix(self):
-        if '.' in self.segments[-1]:
-            return self.segments[-1].split('.')[-1]
-        return ''
-
-    def _get_requested_filepath(self):
-        return '/'.join(self.segments)
-
-    def _get_cachefile_path(self,filepath,size_suffix=''):
-        return 'cache/%s%s'% (filepath.replace('/','-'),size_suffix)
-
-    def _get_tempfile_path(self, filepath):
-        return self.filehandler.get_path_for_file(urllib.unquote_plus(filepath))
-
-    def _get_file_mtime(self, filepath,size_suffix=''):
-        if os.path.exists(filepath):
-            return datetime.utcfromtimestamp(os.path.getmtime(filepath))
-        return datetime(1970, 1, 1, 0, 0)
-
-    def _get_fileaccessor_mtime(self, filepath):
+    def get_file(self, request, filestore, filename, etag):
+        """ get the file through the cache and possibly resizing """
+        # Check the file is up to date
         try:
-            return self.fileaccessor.get_mtime(filepath)
+            cache_tag, content_type, f = filestore.get(filename, etag)
         except KeyError:
-            return datetime(1970, 1, 1, 0, 0)
+            # XXX if the original is not their, clear resize cache (this would mean a globbing delete every request!)
+            # cache_filename = filestore.name+'_'+filename
+            # self.cache.delete(cache_filename, glob=True)
+            return 
 
-    def _get_size_suffix(self, request):
-        log.debug('formish.FileResource: request.GET args=%s',request.GET)
         width, height = get_size_from_dict(request.GET)
-        if height or width:
-            return '-%sx%s'% (width, height)
-        return ''
+        size= get_size_suffix(width, height)
 
+        if not size:
+            if f:
+                data = f.read()
+                f.close()
+                return http.ok([('Content-Type', content_type ),('ETag', cache_tag)], data)
+            else:
+                return http.not_modified([('ETag', cache_tag)])
+
+        try:
+            cache_filename = filestore.name+'_'+filename+size
+            resized_cache_tag, content_type, rf = self.cache.get(cache_filename, cache_tag)
+            resize_needed = resized_cache_tag != cache_tag
+            if resize_needed:
+                rf.close()
+            
+        except KeyError:
+            resize_needed = True
+
+        if resize_needed:
+            if f is None:
+                try:
+                    cache_tag, content_type, f = filestore.get(filename)
+                except KeyError:
+                    return 
+            rf = resize_image(f, (width, height), self.resize_quality)
+            f.close()
+            self.cache.put(cache_filename, rf, cache_tag, content_type)
+            rf.seek(0)
+            data = rf.read()
+            rf.close()
+            return http.ok([('Content-Type', content_type ),('ETag', cache_tag)], data)
         
+        if rf:
+            data = rf.read()
+            rf.close()
+            return http.ok([('Content-Type', content_type ),('ETag', cache_tag)], data)
+        else:
+            return http.not_modified([('ETag', cache_tag)])
+       
 
-def resize_image(src_path, target_path, width, height, quality=70):
+
+
+def resize_image(src_fh, size, quality=70):
     """
     this is an example identify
     '/home/tim/Desktop/tim.jpg JPEG 48x48 48x48+0+0 DirectClass 8-bit 920b \n'
     """
-    stdout = subprocess.Popen([IDENTIFY, src_path], \
+    fileno, filename = tempfile.mkstemp()
+    fh = os.fdopen(fileno, 'wb')
+    shutil.copyfileobj(src_fh, fh)
+    fh.close()
+    resized_filename = filename + '-resized'
+    width, height = size
+    stdout = subprocess.Popen([IDENTIFY, filename], \
                             stdout=subprocess.PIPE).communicate()[0]
-    iwidth, iheight = [ int(s) for s in stdout.split(' ')[2].split('x')]
+    iwidth, iheight = [int(s) for s in stdout.split(' ')[2].split('x')]
     if width is None:
         width = int(iwidth*(float(height)/float(iheight)))
     if height is None:
         height = int(iheight*(float(width)/float(iwidth)))
-    subprocess.call([CONVERT, '-thumbnail', 
-        '%sx%s'% (width, height), '-quality', str(quality), src_path, target_path])
+    subprocess.call([CONVERT, '-thumbnail',
+        '%sx%s'% (width, height), '-quality', str(quality), filename, resized_filename])
+    return open(resized_filename,'rb')
 
+def get_size_suffix(width, height):
+    if width is None and height is None:
+        return ''
+    if height or width:
+        return '-%sx%s'% (width, height)
 
 def get_size_from_dict(data):
     """
@@ -199,7 +153,6 @@ def get_size_from_dict(data):
     if size is not None:
         width = int(size.split('x')[0])
         height = int(size.split('x')[1])
-        log.debug('formish.FileResource: data[size]=%sx%s'%(width, height))
     else:
         width = data.get('width', None)
         if width is not None:
@@ -207,14 +160,7 @@ def get_size_from_dict(data):
         height = data.get('height', None)
         if height is not None:
             height = int(height)
-        log.debug('formish.FileResource: data[width],data[height]=%s,%s'%(width, height))
+    if not width and not height:
+        return (None, None)
     return (width, height)
-
-
-def get_mimetype(filename):
-    """
-    use python-magic to guess the mimetype
-    """
-    mimetype = magic.from_file(filename, mime=True)
-    return mimetype or 'application/octet-stream'
 

@@ -3,12 +3,12 @@ import unittest
 import webob
 import urllib
 from BeautifulSoup import BeautifulSoup
-from formish.dottedDict import dottedDict
+from dottedish import dotted
 import webob
 from urllib import urlencode
 
 def build_request(formname, data):
-    d = dottedDict(data)
+    d = dotted(data)
     e = {'REQUEST_METHOD': 'POST'}
     request = webob.Request.blank('/',environ=e)
     fields = []

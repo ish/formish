@@ -2,6 +2,11 @@
 Changlelog
 ==========
 
+0.7dev
+------
+
+ * Lots of changes to the way file uploads are handled - will document before a tagged release
+
 0.6.6 (2009-01-29)
 ------------------
 
