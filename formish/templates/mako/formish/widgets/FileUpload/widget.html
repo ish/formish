@@ -11,21 +11,30 @@ else:
 %>
 
 <div class="preview">
-% if field.widget.show_image_thumbnail == True and mimetype.startswith('image'):
-%   if value_name != '':
-<img src="${field.widget.urlfactory(value_name)}" />
-%   else:
-<img src="${field.widget.image_thumbnail_default}" />
-%   endif
-% elif field.widget.show_file_preview:
+
+
+% if field.widget.show_file_preview:
 <div class="icon ${mimetype.replace('/','_')}">
+% endif
+
+% if field.widget.show_image_thumbnail == True:
+%   if value_name != '' and mimetype.startswith('image'):
+  <img src="${field.widget.urlfactory(value_name)}" />
+%   elif field.widget.image_thumbnail_default is not None:
+  <img src="${field.widget.image_thumbnail_default}" />
+%   endif
+% endif
+
+% if field.widget.show_file_preview:
 </div>
 % endif
-</div>
 
 % if field.widget.show_download_link == True:
 <a href="${field.widget.urlfactory(value_name)}">download</a>
 % endif
+
+</div>
+
 
 <input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" />
 <input id="${field.cssname}-id" type="hidden" name="${field.name}.name" value="${value_name}" />
