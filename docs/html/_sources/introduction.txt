@@ -47,6 +47,17 @@ Any form has to work on a data structure of some sort and it makes sense for thi
         name = schemaish.String()
         age = schemaish.Integer()
 
+.. doctest:: [basic]
+
+    >>> import schemaish, validatish
+    >>> my_schema = schemaish.Structure()
+    >>> my_schema.add( 'name', schemaish.String() )
+    >>> my_schema.add( 'age', schemaish.Integer() )
+    >>> my_schema
+    schemaish.Structure("name": schemaish.String(), "age": schemaish.Integer())
+
+
+
 
 Each of these schemas can be validated, however we don't have any validators yet. We looked for a reusable validator library that was simple in execution (i.e. just callable!) but there weren't any that really fitted the bill (we tried FormEncode but it seems to conflate validation and conversion, which we don't think is quite right - personal opinion of course)).
 

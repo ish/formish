@@ -24,10 +24,10 @@ class Widget(object):
     _template = None
     
     def __init__(self, **k):
-        self.converter_options = k.get('converter_options', {})
         self.css_class = k.get('css_class', None)
         self.converttostring = True
         self.empty = k.get('empty', None)
+        self.converter_options = k.get('converter_options', {})
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
     
@@ -62,12 +62,20 @@ class Widget(object):
             return self.empty
         return string_converter(schema_type).to_type(string_data)
 
-    def __repr__(self):
-        return '<widget "%s">'% (self._template)
 
     def __call__(self, field):
         return field.form.renderer('/formish/widgets/%s.html'%self._template, {'f':field})
 
+    def __repr__(self):
+        attributes = []
+        if self.converter_options != {'delimiter':','}:
+            attributes.append('converter_options=%r'%self.converter_options)
+        if self.css_class:
+            attributes.append('css_class=%r'%self.css_class)
+        if self.empty is not None:
+            attributes.append('empty=%r'%self.empty)
+
+        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
 
 
 
@@ -95,6 +103,18 @@ class Input(Widget):
             return self.empty
         return string_converter(schema_type).to_type(string_data)
 
+    def __repr__(self):
+        attributes = []
+        if self.strip is False:
+            attributes.append('strip=%r'%self.strip)
+        if self.converter_options != {'delimiter':','}:
+            attributes.append('converter_options=%r'%self.converter_options)
+        if self.css_class:
+            attributes.append('css_class=%r'%self.css_class)
+        if self.empty is not None:
+            attributes.append('empty=%r'%self.empty)
+
+        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
 
 
 class Password(Input):
@@ -143,6 +163,18 @@ class CheckedPassword(Input):
             return self.empty
         return string_converter(schema_type).to_type(password)
 
+    def __repr__(self):
+        attributes = []
+        if self.strip is False:
+            attributes.append('strip=%r'%self.strip)
+        if self.converter_options != {'delimiter':','}:
+            attributes.append('converter_options=%r'%self.converter_options)
+        if self.css_class:
+            attributes.append('css_class=%r'%self.css_class)
+        if self.empty is not None:
+            attributes.append('empty=%r'%self.empty)
+
+        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
 
 
 class Hidden(Input):
@@ -179,6 +211,24 @@ class SequenceDefault(Widget):
         """
         return data
 
+    def __repr__(self):
+        attributes = []
+        if self.converter_options != {'delimiter':','}:
+            attributes.append('converter_options=%r'%self.converter_options)
+        if self.css_class:
+            attributes.append('css_class=%r'%self.css_class)
+        if self.empty is not None:
+            attributes.append('empty=%r'%self.empty)
+        if self.min:
+            attributes.append('min=%r'%self.min)
+        if self.max:
+            attributes.append('max=%r'%self.max)
+        if self.addremove:
+            attributes.append('addremove=%r'%self.addremove)
+        if self.sortable:
+            attributes.append('sortable=%r'%self.sortable)
+
+        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
         
 class TextArea(Input):
     """
@@ -223,6 +273,18 @@ class TextArea(Input):
         return string_converter(schema_type).to_type(string_data,
             converter_options=self.converter_options)
 
+    def __repr__(self):
+        attributes = []
+        if self.strip is False:
+            attributes.append('strip=%r'%self.strip)
+        if self.converter_options != {'delimiter':','}:
+            attributes.append('converter_options=%r'%self.converter_options)
+        if self.css_class:
+            attributes.append('css_class=%r'%self.css_class)
+        if self.empty is not None:
+            attributes.append('empty=%r'%self.empty)
+
+        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
     
 class Checkbox(Widget):
     """
@@ -280,6 +342,21 @@ class DateParts(Widget):
         else:
             return self.empty
         return datetuple_converter(schema_type).to_type(date_parts)
+
+    def __repr__(self):
+        attributes = []
+        if self.strip is False:
+            attributes.append('strip=%r'%self.strip)
+        if self.day_first is not None:
+            attributes.append('day_first=%r'%self.day_first)
+        if self.converter_options != {'delimiter':','}:
+            attributes.append('converter_options=%r'%self.converter_options)
+        if self.css_class:
+            attributes.append('css_class=%r'%self.css_class)
+        if self.empty is not None:
+            attributes.append('empty=%r'%self.empty)
+
+        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
         
 
 class FileUpload(Widget):
@@ -306,7 +383,6 @@ class FileUpload(Widget):
         XXX url_ident_factory -> filestore_key_factory
         """
         Widget.__init__(self)
-        self.css_class = css_class
         self.filestore = filestore
         self.show_image_thumbnail = show_image_thumbnail
         self.image_thumbnail_default = image_thumbnail_default
@@ -317,6 +393,28 @@ class FileUpload(Widget):
             self.url_ident_factory = url_ident_factory
         else:
             self.url_ident_factory = lambda i: i.filename
+
+    def __repr__(self):
+        attributes = []
+        attributes.append('filestore=%r'%self.filestore)
+        if self.show_image_thumbnail == True:
+            attribute.append('show_image_thumbnail=True')
+        if self.image_thumbnail_default:
+            attribute.append('image_thumbnail_default=%r'%self.image_thumbnail_default)
+        if self.url_base != "/filehandler":
+            attribute.append('url_base=%r'%self.url_base)
+        if self.show_download_link == True:
+            attribute.append('show_download_link=True')
+        if show_file_preview == False:
+            attribute.append('show_file_preview=False')
+        if self.converter_options != {'delimiter':','}:
+            attributes.append('converter_options=%r'%self.converter_options)
+        if self.css_class:
+            attributes.append('css_class=%r'%self.css_class)
+        if self.empty is not None:
+            attributes.append('empty=%r'%self.empty)
+
+        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
           
 
     def urlfactory(self, data):
@@ -402,6 +500,7 @@ class SelectChoice(Widget):
             self.none_option = none_option
         Widget.__init__(self, **k)
         self.options = _normalise_options(options)
+
             
     def selected(self, option, value, schema_type):
         """
@@ -440,6 +539,20 @@ class SelectChoice(Widget):
         if none_option is self.empty:
             return ''
         return none_option
+
+    def __repr__(self):
+        attributes = []
+        attributes.append('options=%s'%repr(self.options))
+        if self.none_option is not UNSET:
+            attributes.append('none_option=%s'%repr(self.none_option))
+        if self.converter_options != {'delimiter':','}:
+            attributes.append('converter_options=%r'%self.converter_options)
+        if self.css_class:
+            attributes.append('css_class=%r'%self.css_class)
+        if self.empty is not None:
+            attributes.append('empty=%r'%self.empty)
+
+        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
     
 class SelectWithOtherChoice(SelectChoice):
     """
@@ -471,8 +584,6 @@ class SelectWithOtherChoice(SelectChoice):
         """
         select = request_data['select'][0]
         other = request_data['other'][0]
-        if self.strip:
-            other = other.strip()
         if select == '...':
             value = other
         else:
@@ -506,6 +617,20 @@ class SelectWithOtherChoice(SelectChoice):
             return ' selected="selected"'
         else:
             return ''
+
+    def __repr__(self):
+        attributes = []
+        attributes.append('options=%r'%self.options)
+        if self.none_option is not UNSET:
+            attributes.append('none_option=%r'%self.none_option)
+        if self.converter_options != {'delimiter':','}:
+            attributes.append('converter_options=%r'%self.converter_options)
+        if self.css_class:
+            attributes.append('css_class=%r'%self.css_class)
+        if self.empty is not None:
+            attributes.append('empty=%r'%self.empty)
+
+        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
 
 class RadioChoice(Widget):
     """
@@ -563,6 +688,22 @@ class RadioChoice(Widget):
         if none_option is self.empty:
             return ''
         return none_option
+
+    def __repr__(self):
+        attributes = []
+        attributes.append('options=%r'%self.options)
+        if self.none_option is not UNSET:
+            attributes.append('none_option=%r'%self.none_option)
+        if self.strip is False:
+            attributes.append('strip=%s'%self.strip)
+        if self.converter_options != {'delimiter':','}:
+            attributes.append('converter_options=%r'%self.converter_options)
+        if self.css_class:
+            attributes.append('css_class=%r'%self.css_class)
+        if self.empty is not None:
+            attributes.append('empty=%r'%self.empty)
+
+        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
     
 class CheckboxMultiChoice(Widget):
     """
@@ -607,6 +748,18 @@ class CheckboxMultiChoice(Widget):
         else:
             return ''
 
+    def __repr__(self):
+        attributes = []
+        attributes.append('options=%r'%self.options)
+        if self.converter_options != {'delimiter':','}:
+            attributes.append('converter_options=%r'%self.converter_options)
+        if self.css_class:
+            attributes.append('css_class=%r'%self.css_class)
+        if self.empty is not None:
+            attributes.append('empty=%r'%self.empty)
+
+        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
+
 class CheckboxMultiChoiceTree(Widget):
     """
     A more complicated checkbox select that
@@ -634,6 +787,22 @@ class CheckboxMultiChoiceTree(Widget):
             return ' checked="checked"'
         else:
             return ''        
+
+    def __repr__(self):
+        attributes = []
+        attributes.append('options=%r'%self.options)
+        if self.none_option is not UNSET:
+            attributes.append('none_option=%r'%self.none_option)
+        if self.strip is False:
+            attributes.append('strip=%s'%self.strip)
+        if self.converter_options != {'delimiter':','}:
+            attributes.append('converter_options=%r'%self.converter_options)
+        if self.css_class:
+            attributes.append('css_class=%r'%self.css_class)
+        if self.empty is not None:
+            attributes.append('empty=%r'%self.empty)
+
+        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
         
 def _normalise_options(options):
     """

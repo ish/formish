@@ -101,6 +101,14 @@
     <span class="n">age</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Integer</span><span class="p">()</span>
 </pre></div>
 </div>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">schemaish</span><span class="o">,</span> <span class="nn">validatish</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">()</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;age&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Integer</span><span class="p">()</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_schema</span>
+<span class="go">schemaish.Structure(&quot;name&quot;: schemaish.String(), &quot;age&quot;: schemaish.Integer())</span>
+</pre></div>
+</div>
 <p>Each of these schemas can be validated, however we don&#8217;t have any validators yet. We looked for a reusable validator library that was simple in execution (i.e. just callable!) but there weren&#8217;t any that really fitted the bill (we tried FormEncode but it seems to conflate validation and conversion, which we don&#8217;t think is quite right - personal opinion of course)).</p>
 </div>
 <div class="section" id="validatish">

@@ -98,6 +98,12 @@ class TemplatedString(object):
             return ''
         return unicode(self.val)
 
+    def __repr__(self):
+        if not self.val:
+            return ''
+        return unicode(self.val)
+        
+
     def __nonzero__(self):
         if self.val:
             return True
@@ -136,6 +142,9 @@ class Field(object):
         self.name = name
         self.attr = attr
         self.form = form
+
+    def __repr__(self):
+        return 'formish.Field(name=%r, attr=%r)'% (self.name, self.attr)
 
     @property
     def title(self):
@@ -236,13 +245,6 @@ class Field(object):
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
 
-    def __repr__(self):
-        attrclassstr = str(self.attr.__class__)
-        if attrclassstr[8:22] == 'schemaish.attr':
-            attrname = attrclassstr[23:-2]
-        else:
-            attrname = attrclassstr[8:-2]
-        return '<formish %s name="%s" attr="%s">'% (self.type, self.name, attrname)
 
 
 class CollectionFieldsWrapper(ObjectWrapper):
@@ -457,12 +459,7 @@ class Collection(object):
         return fall_back_renderer(renderer, name, widget, vars)
 
     def __repr__(self):
-        attrclassstr = str(self.attr.__class__)
-        if attrclassstr[8:22] == 'schemaish.attr':
-            attrname = attrclassstr[23:-2]
-        else:
-            attrname = attrclassstr[8:-2]
-        return '<formish %s name="%s" attr="%s">'% (self.type, self.name, attrname)
+        return 'formish.%s(name=%r, attr=%r)'% (self.__class__.__name__, self.name, self.attr)
 
 class Group(Collection):
     """
@@ -542,12 +539,7 @@ class BoundWidget(object):
         return self.field.form.renderer('/formish/widgets/%s/widget.html'%self._template, {'field':self.field})
 
     def __repr__(self):
-        attrclassstr = str(self.field.attr.__class__)
-        if attrclassstr[8:22] == 'schemaish.attr':
-            attrname = attrclassstr[23:-2]
-        else:
-            attrname = attrclassstr[8:-2]
-        return '<bound widget name="%s", widget="%s", type="%s">'%(self.field.name, self.widget._template, attrname)
+        return 'BoundWidget(widget=%r, field=%r)'%(self.widget, self.field)
 
 class FormFieldsWrapper(ObjectWrapper):
     """
@@ -618,6 +610,17 @@ class Form(object):
         if renderer is not None:
             self.renderer = renderer
 
+    def __repr__(self):
+        attributes = []
+        attributes.append('%r'%self.structure.attr)
+        attributes.append('name=%r'%self.name)
+        if self.defaults.data != {}:
+            attributes.append('defaults=%r'%self.defaults.data)
+        if self.errors.data != {}:
+            attributes.append('errors=%r'%self.errors.data)
+        if self.action_url:
+            attributes.append('action_url=%r'%self.action_url)
+        return 'formish.Form(%s)'%( ', '.join(attributes) )
 
     def _element_name_get(self):
         """ Set the element name """
@@ -695,8 +698,8 @@ class Form(object):
         data = validation.convert_request_data_to_data(self.structure, \
                                             request_data, errors=self.errors) 
         if raise_exceptions and len(self.errors.keys()):
-            raise validation.FormError('Tried to access data but conversion' \
-        ' from request failed with %s errors (%s)'% \
+            raise validation.FormError( \
+        'Tried to access data but conversion from request failed with %s errors (%s)'% \
                    (len(self.errors.keys()), self.errors.data))
         return data
     
@@ -778,8 +781,7 @@ class Form(object):
                 if key not in self.errors:
                     self.errors[key] = value
         if len(self.errors.keys()) > 0:
-            err_msg = 'Tried to access data but conversion' \
-                    'from request failed with %s errors'
+            err_msg = 'Tried to access data but conversion from request failed with %s errors'
             raise validation.FormError(err_msg% (len(self.errors.keys())))
         return data
 
@@ -877,6 +879,8 @@ class Form(object):
     def actions(self):
         """ Return just the actions part of the template """
         return self.renderer('/formish/form_actions.html', {'form':self})
+
+        
    
 
 
