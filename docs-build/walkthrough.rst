@@ -14,55 +14,71 @@ Creating a schema
 
 First of all we need to create a data schema to define what types of data we want in the form. Schema's use the 'Schemaish' package which lets you define structures against which you can validate/convert data. Lets take a look at the structure of a Form instance to begin with
 
+.. doctest::
 
->>> import schemaish
->>> schema = schemaish.Structure()
->>> schema.add( 'myfield', schemaish.String() )
->>> schema.attrs
-[('myfield', <schemaish.attr.String object at 0x...>)]
+    >>> import schemaish
+    >>> schema = schemaish.Structure()
+    >>> schema.add( 'myfield', schemaish.String() )
+    >>> schema.attrs
+    [('myfield', schemaish.String())]
 
 Creating a form
 ---------------
 
 So we now have a single field in our schema which is defined as a string. We can now create a form from this
 
->>> import formish
->>> form = formish.Form(schema)
+.. doctest::
+
+    >>> import formish
+    >>> form = formish.Form(schema)
 
 Attributes of a form
 ^^^^^^^^^^^^^^^^^^^^
 
 And what can we do with the form? Well at the moment we have a form name and some fields
 
->>> form.name
-'formish'
 
->>> for field in form.fields:
-...     print field
-... 
-<formish.forms.Field object at 0x...>
+.. doctest:: 
+
+    >>> form.name
+    'form'
+
+.. doctest::
+
+    >>> for field in form.fields:
+    ...     print field
+    ... 
+    formish.Field(name='myfield', attr=schemaish.String())
 
 Attributes of a field
 ^^^^^^^^^^^^^^^^^^^^^
 
 And what about our field? Well it's now become a form field, which means it has a few extra attributes to do with creating things like classes, ids, etc.
 
->>> field = form.fields.next()
->>> field.name
-'myfield'
+.. doctest:: 
+
+    >>> field = form.fields.next()
+    >>> field.name
+    'myfield'
 
 Obviously the name is what we have it.
 
->>> field.widget
-<bound widget name="myfield", widget="Input", type="String">
+.. doctest::
 
->>> field.title
-'Myfield'
+    >>> field.widget
+    BoundWidget(widget=formish.Input(), field=formish.Field(name='myfield', attr=schemaish.String()))
+
+.. doctest::
+
+    >>> field.title
+    'Myfield'
 
 The title, if not specified in the schema field, is derived from the form name by converting camel case into capitalised words.
 
->>> field.cssname
-'formish-myfield'
+.. doctest:: 
+
+    >>> field.cssname
+    'form-myfield'
 
 This is the start of the templating stuff.. The cssname is an identifier that can be inserted into forms, used for ids and class names.
 
@@ -71,8 +87,10 @@ How to create HTML
 
 We create our HTML by calling the form as follows..
 
->>> form()
-'...<form id="form" action="" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">...'
+.. doctest:: 
+
+    >>> form()
+    '...<form id="form" action="" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">...'
 
 I've skipped the majority of this output as it's probably better shown formatted
 
@@ -99,7 +117,11 @@ What's in the HTML
 
 Firstly we have the form setup itself. The form name/id can be set by passing it into the Form as follows.
 
->>> named_form = Form(schema,name='myformname')
+.. doctest:: 
+
+    >>> named_form = formish.Form(schema, name='myformname')
+    >>> named_form
+    formish.Form(schemaish.Structure("myfield": schemaish.String()), name='myformname')
 
 Otherwise the form defaults to 'formish'. 
 
@@ -164,11 +186,13 @@ Processing the Submitted Form
 
 Once the form is submitted, we can get the data by calling 'validate'. In order to simulate this, we're going to create a request object by hand using webob.. 
 
->>> import webob
->>> r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
->>> r.POST['myfield'] = 'myvalue'
->>> form.validate(r)
-{'myfield': u'myvalue'}
+.. doctest::
+
+    >>> import webob
+    >>> r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
+    >>> r.POST['myfield'] = 'myvalue'
+    >>> form.validate(r)
+    {'myfield': u'myvalue'}
 
 And that is our simple form overview complete. 
 
@@ -187,56 +211,86 @@ Creating the form
 
 For our contrived example, we'll build a simple registration form.
 
->>> import schemaish
->>> schema = schemaish.Structure()
->>> schema.add( 'firstName', schemaish.String() )
->>> schema.add( 'surname', schemaish.String() )
->>> schema.add( 'dateOfBirth', schemaish.Date() )
->>> schema.add( 'streetNumber', schemaish.Integer() )
->>> schema.add( 'country', schemaish.String() )
->>> schema.add( 'termsAndConditions', schemaish.Boolean() )
->>> form = formish.Form(schema)
+.. doctest::
+
+    >>> import schemaish
+    >>> schema = schemaish.Structure()
+    >>> schema.add( 'firstName', schemaish.String() )
+    >>> schema.add( 'surname', schemaish.String() )
+    >>> schema.add( 'dateOfBirth', schemaish.Date() )
+    >>> schema.add( 'streetNumber', schemaish.Integer() )
+    >>> schema.add( 'country', schemaish.String() )
+    >>> schema.add( 'termsAndConditions', schemaish.Boolean() )
+    >>> form = formish.Form(schema)
+    >>> form
+    formish.Form(schemaish.Structure("firstName": schemaish.String(), "surname": schemaish.String(), "dateOfBirth": schemaish.Date(), "streetNumber": schemaish.Integer(), "country": schemaish.String(), "termsAndConditions": schemaish.Boolean()), name='form')
 
 As you can see, we've got strings, an integer, a data and a boolean. 
 
 We could also have built the schema using a declarative style
 
->>> class MySchema(schemaish.Structure):
-...     firstName = schemaish.String()
-...     surname = schemaish.String()
-...     dateOfBirth = schemaish.Date()
-...     streetNumber = schemaish.Integer()
-...     country = schemaish.String()
-...     termsAndConditions = schemaish.Boolean()
->>> form = formish.Form(MySchema())
+.. doctest::
+
+    >>> class MySchema(schemaish.Structure):
+    ...     firstName = schemaish.String()
+    ...     surname = schemaish.String()
+    ...     dateOfBirth = schemaish.Date()
+    ...     streetNumber = schemaish.Integer()
+    ...     country = schemaish.String()
+    ...     termsAndConditions = schemaish.Boolean()
+    ...
+    >>> form = formish.Form(MySchema())
+    >>> form
+    formish.Form(schemaish.Structure("firstName": schemaish.String(), "surname": schemaish.String(), "dateOfBirth": schemaish.Date(), "streetNumber": schemaish.Integer(), "country": schemaish.String(), "termsAndConditions": schemaish.Boolean()), name='form')
 
 By default, all of the fields use input boxes with the date asking for isoformat and the boolean asking for True or False. We want to make the form a little friendlier though. 
 
 We'll start with the date widget. Date parts uses three input boxes instead of a single input and, by default, is in US month first format. We're in the UK so we change dayFirst to True
 
->>> form['dateOfBirth'].widget = formish.DateParts(dayFirst=True)
+.. doctest::
+
+    >>> form['dateOfBirth'].widget = formish.DateParts(day_first=True)
+    >>> form['dateOfBirth'].widget
+    BoundWidget(widget=formish.DateParts(day_first=True), field=formish.Field(name='dateOfBirth', attr=schemaish.Date()))
+
 
 Next we'll make the country a select box. To do this we pass a series of options to the SelectChoice widget.
 
->>> form['country'].widget = formish.SelectChoice(options=['UK','US'])
+.. doctest::
+
+    >>> form['country'].widget = formish.SelectChoice(options=['UK','US'])
+    >>> form['country'].widget
+    BoundWidget(widget=formish.SelectChoice(options=[('UK', 'UK'), ('US', 'US')], none_option=(None, '- choose -')), field=formish.Field(name='country', attr=schemaish.String()))
 
 If we wanted different values for our options we would pass each option in as a tuple of ('value','label'). We could also set a label for the field that appears when there is no input value. This is called the 'none_option'. The none_options defaults to ('', '--choose--') so we could change it to ('','Pick a Country'). Here is an example
 
->>> options = [('UK','I live in the UK'),('US','I live in the US')]
->>> none_option = ('','Where do you live')
->>> form['country'].widget = formish.SelectChoice(options=options, none_option=none_option)
+.. doctest::
+
+    >>> options = [('UK','I live in the UK'),('US','I live in the US')]
+    >>> none_option = ('','Where do you live')
+    >>> form['country'].widget = formish.SelectChoice(options=options, none_option=none_option)
+    >>> form['country'].widget
+    BoundWidget(widget=formish.SelectChoice(options=[('UK', 'I live in the UK'), ('US', 'I live in the US')], none_option=('', 'Where do you live')), field=formish.Field(name='country', attr=schemaish.String()))
 
 Finally, we'd like a checkbox for the Boolean value
 
->>> form['termsAndConditions'].widget = formish.Checkbox()
+.. doctest::
+
+    >>> form['termsAndConditions'].widget = formish.Checkbox()
+    >>> form['termsAndConditions'].widget
+    BoundWidget(widget=formish.Checkbox(), field=formish.Field(name='termsAndConditions', attr=schemaish.Boolean()))
+
 
 How does this form work?
 ------------------------
 
 Well let's give it some default values and look at what we get. 
 
->>> import datetime
->>> form.defaults = {'firstName': 'Tim', 'surname': 'Parkin', 'dateOfBirth': datetime.datetime(1966,12,18), 'streetNumber': 123, 'country': 'UK', 'termsAndConditions': False}
+.. doctest::
+
+    >>> import datetime
+    >>> form.defaults = {'firstName': 'Tim', 'surname': 'Parkin', 'dateOfBirth': datetime.datetime(1966,12,18), 'streetNumber': 123, 'country': 'UK', 'termsAndConditions': False}
+
 
 If we create the form now, we get the following fields. One thing to note is that most widgets within Formish use strings to serialise their values into forms. The exception here is the date parts widget. 
 
@@ -350,31 +404,41 @@ Processing the submitted form
 
 Repeating the creation of a request using webob, setting some input values and validating gives us:
 
->>> import webob
->>> r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
->>> r.POST['firstName'] = 'Tim'
->>> r.POST['surname'] = 'Parkin'
->>> r.POST['streetNumber'] = '123'
->>> r.POST['dateOfBirth.day'] = '18'
->>> r.POST['dateOfBirth.month'] = '13'
->>> r.POST['dateOfBirth.year'] = '1966'
->>> r.POST['country'] = 'UK'
->>> r.POST['termsAndConditions'] = 'True'
->>> form.validate(r)
-...formish.validation.FormError: Tried to access data but conversion from request failed with 1 errors
+.. doctest::
+
+    >>> import webob
+    >>> r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
+    >>> r.POST['firstName'] = 'Tim'
+    >>> r.POST['surname'] = 'Parkin'
+    >>> r.POST['streetNumber'] = '123'
+    >>> r.POST['dateOfBirth.day'] = '18'
+    >>> r.POST['dateOfBirth.month'] = '13'
+    >>> r.POST['dateOfBirth.year'] = '1966'
+    >>> r.POST['country'] = 'UK'
+    >>> r.POST['termsAndConditions'] = 'True'
+    >>> try:
+    ...     form.validate(r)
+    ... except formish.FormError, e:
+    ...     print e
+    ...
+    Tried to access data but conversion from request failed with 1 errors
 
 The observant amongst you will notice I put a month of 13 in which has triggered a FormError.
 
 Let's look at some of the error states on the form now
 
->>> form.errors
-{'dateOfBirth': ConvertError('Invalid date: month must be in 1..12',)}
+.. doctest::
+
+    >>> form.errors
+    {'dateOfBirth': 'Invalid date: month must be in 1..12'}
 
 The form has a dictionary of errors on it that map to the field names.
 
->>> field = form.get_field('dateOfBirth')
->>> field.error
-ConvertError('Invalid date: month must be in 1..12',)
+.. doctest::
+
+    >>> field = form.get_field('dateOfBirth')
+    >>> field.error
+    Invalid date: month must be in 1..12
 
 The dateOfBirth field shows it's own error.
 
@@ -383,9 +447,11 @@ Showing the errors
 
 The whole form is now in an error state and we can interrogate it about the errors. The form will also render itself with these errors.
 
->>> field.classes
-'field date dateparts error'
->>> field()
+.. doctest::
+    >>> field.classes
+    'field date dateparts error'
+    >>> field()
+    '<div id="form-dateOfBirth-field" class="field form-dateOfBirth date dateparts error">\n\n<label for="form-dateOfBirth">Date Of Birth</label>\n\n\n<div class="inputs">\n\n\n<input id="form-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /\n<input id="form-dateOfBirth-month" type="text" name="dateOfBirth.month" value="13" size="2" /> /\n<input id="form-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />\n\n\n</div>\n\n\n<span class="error">Invalid date: month must be in 1..12</span>\n\n\n\n</div>\n'
 
 This produces the following - note the error 'span' below the form field.
 
@@ -417,21 +483,28 @@ Calling the 'form()' will render the whole form including the error messages.
 
 Let's see what happens if we have an invalid integer - we'll fix the month first
 
->>> r.POST['dateOfBirth.month'] = '12'
->>> r.POST['streetNumber'] = 'aa'
->>> form.validate(r)
-...formish.validation.FormError: Tried to access data but conversion from request failed with 1 errors
->>> field = form.get_field('streetNumber')
->>> field.error
-ConvertError('Not a valid number',)
->>> 
+.. doctest::
+
+    >>> r.POST['dateOfBirth.month'] = '12'
+    >>> r.POST['streetNumber'] = 'aa'
+    >>> try:
+    ...     form.validate(r)
+    ... except formish.FormError, e:
+    ...     print e
+    ...
+    Tried to access data but conversion from request failed with 1 errors
+    >>> field = form.get_field('streetNumber')
+    >>> field.error
+    Not a valid integer
 
 Customising Errors
 ------------------
 
 The errors attribute is available for you to change if you like. You can add your own error to a form by updating or setting the dictionary.
 
->>> form.errors['country'] = 'You must be outside the UK'
+.. doctest::
+
+    >>> form.errors['country'] = 'You must be outside the UK'
 
 This will automatically add the appropriate error messages in your form just as if you had used a schema validator
 
@@ -441,9 +514,15 @@ Success!
 
 Finally, lets see what valid data gives us.. 
 
->>> r.POST['streetNumber'] = '123'
->>> form.validate(r)
-{'termsAndConditions': True, 'surname': u'Parkin', 'firstName': u'Tim', 'country': u'UK', 'dateOfBirth': datetime.date(1966, 12, 18), 'streetNumber': 123}
+.. doctest::
+
+    >>> r.POST['streetNumber'] = '123'
+    >>> try:
+    ...     form.validate(r)
+    ... except formish.FormError, e:
+    ...     print e
+    ...
+    {'termsAndConditions': True, 'surname': u'Parkin', 'firstName': u'Tim', 'country': u'UK', 'dateOfBirth': datetime.date(1966, 12, 18), 'streetNumber': 123}
 
 
 
@@ -489,16 +568,25 @@ Here we have an integer validator. This tries to convert the value to an integer
 
 Let's see this one in action
 
->>> schema = schemaish.Structure()
->>> schema.add( 'myfield', schemaish.Integer(validator=validatish.is_integer) )
->>> form = formish.Form(schema)
->>> r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
->>> r.POST['myfield'] = 'aa'
->>> form.validate(r)
-...formish.validation.FormError: Tried to access data but conversion from request failed with 1 errors
+.. doctest::
 
->>> form.errors
-{'myfield': ConvertError('Not a valid number',)}
+    >>> import validatish
+    >>> schema = schemaish.Structure()
+    >>> schema.add( 'myfield', schemaish.Integer(validator=validatish.is_integer) )
+    >>> form = formish.Form(schema)
+    >>> r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
+    >>> r.POST['myfield'] = 'aa'
+    >>> try:
+    ...     form.validate(r)
+    ... except formish.FormError, e:
+    ...     print e
+    ...
+    Tried to access data but conversion from request failed with 1 errors
+
+.. doctest::
+
+    >>> form.errors
+    {'myfield': 'Not a valid integer'}
 
 Whilst it is perfectly acceptable to use functions for validation, our main library uses classes to aid type checking (for example to find out if our field is required for css styling) and in order to pass validator configuration.
 
@@ -536,11 +624,13 @@ Short Version
 
 We handle files for you so that all you have to do is process the file handle given to you.. Here is an example using the default filehandlers..
 
->>> schema = schemaish.Structure()
->>> schema.add( 'myfile', schemaish.File )
->>> form = formish.Form(schema)
->>> from formish import filehandler
->>> form['myfile'].widget = formish.FileUpload(filehandler=filehandler.TempFileHandlerWeb())
+.. doctest::
+
+    >>> schema = schemaish.Structure()
+    >>> schema.add( 'myfile', schemaish.File )
+    >>> form = formish.Form(schema)
+    >>> from formish import filestore
+    >>> form['myfile'].widget = formish.FileUpload(filestore.CachedTempFilestore())
 
 What does this produce?
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -706,11 +796,16 @@ Checkbox Multi Choice
 
 Now we've talked through the basics.. I'll skip a lot of the detail and just demonstrate the process.. 
 
->>> schema = schemaish.Structure()
->>> schema.add( 'myfield', schemaish.Sequence(schemaish.Integer()) )
->>> form = formish.Form(schema)
->>> form.defaults = {'myfield': [2,4]}
->>> form['myfield'].widget = formish.CheckboxMultiChoice(options=[1,2,3,4])
+
+.. doctest::
+
+    >>> schema = schemaish.Structure()
+    >>> schema.add( 'myfield', schemaish.Sequence(schemaish.Integer()) )
+    >>> form = formish.Form(schema)
+    >>> form.defaults = {'myfield': [2,4]}
+    >>> form['myfield'].widget = formish.CheckboxMultiChoice(options=[1,2,3,4])
+    >>> form['myfield'].widget
+    BoundWidget(widget=formish.CheckboxMultiChoice(options=[(1, '1'), (2, '2'), (3, '3'), (4, '4')]), field=formish.Sequence(name='myfield', attr=schemaish.Sequence(schemaish.Integer())))
 
 Let's take a look at the html that produced.. 
 
@@ -763,11 +858,15 @@ Text Area Sequence
 
 Sometimes it's easier to enter information directly into a textarea
 
->>> form['myfield'].widget = formish.TextArea()
+.. doctest::
+
+    >>> form['myfield'].widget = formish.TextArea()
 
 Which produces a simple text area as html. When it processes this textarea, it uses the csv module to get the data (it also uses it to put the default data onto the form). By default, the conversion uses commas for a simple sequence. e.g.
 
->>> form.defaults = {'myfield': [1,3,5,7]}
+.. doctest::
+
+    >>> form.defaults = {'myfield': [1,3,5,7]}
 
 .. raw:: html
 
@@ -790,8 +889,9 @@ Which produces a simple text area as html. When it processes this textarea, it u
 
 However you can change this behaviour by passing the Textarea widget a converter_option dictionary value .. e.g.
 
+.. doctest::
 
->>> form['myfield'].widget = formish.TextArea(converter_options={'delimiter': '\n'})
+    >>> form['myfield'].widget = formish.TextArea(converter_options={'delimiter': '\n'})
 
 .. raw:: html
 
@@ -809,11 +909,13 @@ Text Area Sequence of Sequences
 
 You can also use a textarea to represent a sequence of sequences... 
 
->>> schema = schemaish.Structure()
->>> schema.add( 'myfield', schemaish.Sequence(schemaish.Sequence(schemaish.Integer())))
->>> form = formish.Form(schema)
->>> form.defaults = {'myfield': [[2,4],[6,8]]}
->>> form['myfield'].widget = formish.TextArea()
+.. doctest::
+
+    >>> schema = schemaish.Structure()
+    >>> schema.add( 'myfield', schemaish.Sequence(schemaish.Sequence(schemaish.Integer())))
+    >>> form = formish.Form(schema)
+    >>> form.defaults = {'myfield': [[2,4],[6,8]]}
+    >>> form['myfield'].widget = formish.TextArea()
 
 In this case, the default delimiter is a comma and is used on a row by row basis.
 
@@ -841,17 +943,19 @@ Formish also allows you to create sub-sections in forms that can contain any oth
 A Structure of Structures
 -------------------------
 
->>> class MyName(schemaish.Structure):
-...     firstName = schemaish.String()
-...     surname = schemaish.String()
->>> class MyAddress(schemaish.Structure):
-...     streetNumber = schemaish.Integer()
-...     country = schemaish.String()
->>> class MySchema(schemaish.Structure):
-...     name = MyName()
-...     address = MyAddress()
-...     termsAndConditions = schemaish.Boolean()
->>> form = formish.Form(MySchema())
+.. doctest::
+
+    >>> class MyName(schemaish.Structure):
+    ...     firstName = schemaish.String()
+    ...     surname = schemaish.String()
+    >>> class MyAddress(schemaish.Structure):
+    ...     streetNumber = schemaish.Integer()
+    ...     country = schemaish.String()
+    >>> class MySchema(schemaish.Structure):
+    ...     name = MyName()
+    ...     address = MyAddress()
+    ...     termsAndConditions = schemaish.Boolean()
+    >>> form = formish.Form(MySchema())
 
 This will create the following
 
@@ -967,9 +1071,12 @@ A tuple can be used to create a list that has different types in it. For instanc
 
 Lets see how that works.
 
->>> schema.add( 'myfield', schemaish.Sequence( schemaish.Tuple( schemaish.Integer(), schemaish.Date() ) ) )
->>> form = formish.Form(schema)
->>> form['myfield'].widget=formish.TextArea()
+.. doctest::
+
+    >>> schema = schemaish.Structure()
+    >>> schema.add( 'myfield', schemaish.Sequence( schemaish.Tuple( (schemaish.Integer(), schemaish.Date()) ) ) )
+    >>> form = formish.Form(schema)
+    >>> form['myfield'].widget=formish.TextArea()
 
 You will now get a textarea that will return validation messages if it is unable to convert to integers or strings and that will output appropriately typed data.
 
