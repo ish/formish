@@ -622,7 +622,7 @@ class SelectWithOtherChoice(SelectChoice):
         attributes = []
         attributes.append('options=%r'%self.options)
         if self.none_option is not UNSET:
-            attributes.append('none_option=%r'%self.none_option)
+            attributes.append('none_option=%r'%list(self.none_option))
         if self.converter_options != {'delimiter':','}:
             attributes.append('converter_options=%r'%self.converter_options)
         if self.css_class:
@@ -693,9 +693,7 @@ class RadioChoice(Widget):
         attributes = []
         attributes.append('options=%r'%self.options)
         if self.none_option is not UNSET:
-            attributes.append('none_option=%r'%self.none_option)
-        if self.strip is False:
-            attributes.append('strip=%s'%self.strip)
+            attributes.append('none_option=%r'%list(self.none_option))
         if self.converter_options != {'delimiter':','}:
             attributes.append('converter_options=%r'%self.converter_options)
         if self.css_class:
