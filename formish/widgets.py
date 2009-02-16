@@ -434,7 +434,7 @@ class FileUpload(Widget):
         """
         mimetype = ''
         if isinstance(data, SchemaFile):
-            default = data.filename
+            default = self.url_ident_factory(data)
             mimetype = data.mimetype
         elif data is not None:
             default = data
