@@ -1311,6 +1311,21 @@ def form_SequenceOfStructures(request):
     return form
 
 
+def form_SequenceOfStructuresGridWidget(request):
+    """ 
+    Using a table structure to edit a sequence of dicts
+    """
+    schema = schemaish.Structure()
+    schema.add('rows', schemaish.Sequence(schemaish.Structure([
+        ('a', schemaish.String()),
+        ('b', schemaish.String()),])))
+
+    form = formish.Form(schema, 'form')
+    form['rows'].widget = formish.Grid()
+    form.defaults = {'rows': [{'a':'1','b':'2'},{'a':'3','b':'4'},{'a':'5','b':'6'}]}
+    return form
+
+
 def form_GranularFormLayout(request):
     """
     A simple demonstration of partial rendering of parts of forms.
