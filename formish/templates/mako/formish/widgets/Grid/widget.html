@@ -1,32 +1,25 @@
 <%page args="field" />
 
+<%
+import itertools
+rowsclone, rows = itertools.tee(field.fields)
+headers = list(rowsclone)[0]
+%>
+
 <table id="${field.cssname}">
   <thead>
     <tr>
-% for k,v in field.attr.attr.attrs:
-      <th>${k}</th>
+% for f in headers.fields:
+      <th>${f.title}</th>
 % endfor
     </tr>
   </thead>
-  
-<%
-if len(field.value) <2:
-    rows = 2
-else:
-    rows = len(field.value)
-%>
 
-
-% for row in xrange(rows):
+% for row in rows:
   <tr>
-%   for k,v in field.attr.attr.attrs:
-%     if row > len(field.value)-1:
-<td><input type="text" name="${field.name}.${row}.${k}" /></td>
-%     else:
-<td><input type="text" name="${field.name}.${row}.${k}" value="${field.value[row][k][0]}" /></td>
-%     endif
+%   for f in row.fields:
+<td>${f.widget()|n}</td>
 %   endfor
   </tr>
 % endfor
-
 </table>
