@@ -1,10 +1,11 @@
+import pdb
 """
 Commonly needed form widgets.
 """
 
 __all__ = ['Input', 'Password', 'CheckedPassword', 'Hidden', 'TextArea',
         'Checkbox', 'DateParts', 'FileUpload', 'SelectChoice','SelectWithOtherChoice','RadioChoice',
-        'CheckboxMultiChoice', 'SequenceDefault','CheckboxMultiChoiceTree']
+        'CheckboxMultiChoice', 'SequenceDefault','CheckboxMultiChoiceTree', 'Grid']
 
 from convertish.convert import string_converter, \
         datetuple_converter,ConvertError
@@ -241,7 +242,6 @@ class TextArea(Input):
     _template = 'TextArea'
     
     def __init__(self, **k):
-        Input.__init__(self, **k)
         self.cols = k.pop('cols', None)
         self.rows = k.pop('rows', None)
         self.strip = k.pop('strip', True)
@@ -277,6 +277,55 @@ class TextArea(Input):
         attributes = []
         if self.strip is False:
             attributes.append('strip=%r'%self.strip)
+        if self.converter_options != {'delimiter':','}:
+            attributes.append('converter_options=%r'%self.converter_options)
+        if self.css_class:
+            attributes.append('css_class=%r'%self.css_class)
+        if self.empty is not None:
+            attributes.append('empty=%r'%self.empty)
+
+        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
+
+class Grid(Input):
+    """
+    Grid input field
+
+    """
+
+    _template = 'Grid'
+    
+    def __init__(self, **k):
+        Input.__init__(self, **k)
+        if not self.converter_options.has_key('delimiter'):
+            self.converter_options['delimiter'] = '\n'
+        self.converttostring = False
+    
+    def pre_render(self, schema_type, data):
+        """
+        We're using the converter options to allow processing sequence data
+        using the csv module
+        """
+        string_data = string_converter(schema_type).from_type(data, \
+            converter_options=self.converter_options)
+        if string_data is None:
+            return ['']
+        return [string_data]
+    
+    def convert(self, schema_type, request_data):
+        """
+        We're using the converter options to allow processing sequence data
+        using the csv module
+        """
+        out = []
+        
+        string_data = request_data[0]
+        if string_data == '':
+            return self.empty
+        return string_converter(schema_type).to_type(string_data,
+            converter_options=self.converter_options)
+
+    def __repr__(self):
+        attributes = []
         if self.converter_options != {'delimiter':','}:
             attributes.append('converter_options=%r'%self.converter_options)
         if self.css_class:
