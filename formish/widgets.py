@@ -289,7 +289,6 @@ class TextArea(Input):
 class Grid(Input):
     """
     Grid input field
-
     """
 
     _template = 'Grid'
@@ -301,26 +300,12 @@ class Grid(Input):
         self.converttostring = False
     
     def pre_render(self, schema_type, data):
-        """
-        We're using the converter options to allow processing sequence data
-        using the csv module
-        """
         string_data = string_converter(schema_type).from_type(data, \
             converter_options=self.converter_options)
-        if string_data is None:
-            return ['']
         return [string_data]
     
     def convert(self, schema_type, request_data):
-        """
-        We're using the converter options to allow processing sequence data
-        using the csv module
-        """
-        out = []
-        
         string_data = request_data[0]
-        if string_data == '':
-            return self.empty
         return string_converter(schema_type).to_type(string_data,
             converter_options=self.converter_options)
 
@@ -330,8 +315,6 @@ class Grid(Input):
             attributes.append('converter_options=%r'%self.converter_options)
         if self.css_class:
             attributes.append('css_class=%r'%self.css_class)
-        if self.empty is not None:
-            attributes.append('empty=%r'%self.empty)
 
         return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
     
