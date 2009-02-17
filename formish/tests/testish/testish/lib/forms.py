@@ -1317,12 +1317,13 @@ def form_SequenceOfStructuresGridWidget(request):
     """
     schema = schemaish.Structure()
     schema.add('rows', schemaish.Sequence(schemaish.Structure([
-        ('a', schemaish.String()),
+        ('a', schemaish.Boolean()),
         ('b', schemaish.String()),])))
 
     form = formish.Form(schema, 'form')
     form['rows'].widget = formish.Grid()
-    form.defaults = {'rows': [{'a':'1','b':'2'},{'a':'3','b':'4'},{'a':'5','b':'6'}]}
+    form['rows.*.a'].widget = formish.Checkbox()
+    form.defaults = {'rows': [{'a':True,'b':'2'},{'a':False,'b':'4'},{'a':False,'b':'6'}]}
     return form
 
 
