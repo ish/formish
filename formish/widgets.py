@@ -398,7 +398,7 @@ class FileUpload(Widget):
 
     _template = 'FileUpload'
     
-    def __init__(self, filestore, show_file_preview=True, show_download_link=False, show_image_thumbnail=False, url_base='/filehandler', \
+    def __init__(self, filestore, show_file_preview=True, show_download_link=False, show_image_thumbnail=False, url_base=None, \
                  css_class=None, image_thumbnail_default=None, url_ident_factory=None):
         """
         :arg filestore: filestore is any object with the following methods:
@@ -418,7 +418,10 @@ class FileUpload(Widget):
         self.filestore = filestore
         self.show_image_thumbnail = show_image_thumbnail
         self.image_thumbnail_default = image_thumbnail_default
-        self.url_base = url_base
+        if url_base is None:
+            self.url_base = '/filehandler'
+        else:
+            self.url_base = url_base
         self.show_download_link = show_download_link
         self.show_file_preview = show_file_preview
         if url_ident_factory is not None:
