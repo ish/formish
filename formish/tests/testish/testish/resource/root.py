@@ -102,7 +102,7 @@ class FormResource(resource.Resource):
             tests = '<a href="?show_tests=True">Click here to see tests</a>'
         if form is None:
             form = self.form_getter(request)
-            form.renderer = request.environ['restish.templating.renderer']
+            form.renderer = request.environ['restish.templating'].renderer
         return {'title': self.title, 'description': self.description,
                 'form': form, 'data': pformat(data),'rawdata': data,
                 'template': extract_function.extract_docstring('template_%s'%self.id),
@@ -113,7 +113,7 @@ class FormResource(resource.Resource):
     @resource.POST()
     def POST(self, request):
         form = self.form_getter(request)
-        form.renderer = request.environ['restish.templating.renderer']
+        form.renderer = request.environ['restish.templating'].renderer
         try:
             data = form.validate(request)
         except formish.FormError, e:
