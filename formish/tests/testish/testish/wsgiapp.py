@@ -1,4 +1,5 @@
 from restish.app import RestishApp
+from restish.templating import Templating
 
 from testish.resource import root
 
@@ -38,7 +39,7 @@ def setup_environ(app, global_conf, app_conf):
 
         # Add additional keys to the environ here. For example:
         #
-        environ['restish.templating.renderer'] = renderer
+        environ['restish.templating'] = Templating(renderer)
 
         return app(environ, start_response)
 
