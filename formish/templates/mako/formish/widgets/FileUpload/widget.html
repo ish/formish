@@ -8,6 +8,8 @@ else:
     value_name = field.value['name'][0]
     value_default = field.value['default'][0]
     mimetype = field.value['mimetype'][0]
+    if mimetype is None:
+        mimetype = ''
 %>
 
 <div class="preview">
