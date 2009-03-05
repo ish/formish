@@ -5,7 +5,7 @@ from formish.filestore import CachedTempFilestore
 from testish.lib import xformish
 import webob
 from urllib import urlencode
-from datetime import datetime
+import datetime
 
 log = logging.getLogger(__name__)
 
