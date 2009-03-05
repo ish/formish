@@ -432,15 +432,15 @@ class FileUpload(Widget):
         attributes = []
         attributes.append('filestore=%r'%self.filestore)
         if self.show_image_thumbnail == True:
-            attribute.append('show_image_thumbnail=True')
+            attributes.append('show_image_thumbnail=True')
         if self.image_thumbnail_default:
-            attribute.append('image_thumbnail_default=%r'%self.image_thumbnail_default)
+            attributes.append('image_thumbnail_default=%r'%self.image_thumbnail_default)
         if self.url_base != "/filehandler":
-            attribute.append('url_base=%r'%self.url_base)
+            attributes.append('url_base=%r'%self.url_base)
         if self.show_download_link == True:
-            attribute.append('show_download_link=True')
-        if show_file_preview == False:
-            attribute.append('show_file_preview=False')
+            attributes.append('show_download_link=True')
+        if self.show_file_preview == False:
+            attributes.append('show_file_preview=False')
         if self.converter_options != {'delimiter':','}:
             attributes.append('converter_options=%r'%self.converter_options)
         if self.css_class:
