@@ -73,7 +73,7 @@ class TestHTML(unittest.TestCase):
             assert str(f.errors['one']) == 'must be greater than 18; must be greater than 20'
             assert str(f['one'].field.errors.exceptions[0]) == 'must be greater than 18'
 
-    def test_complex_error_all_required(self):
+    def test_complex_error_all_required_1(self):
         
         schema = schemaish.Structure([("one", schemaish.Integer(validator=v.All(
                        v.Required(), v.Integer(), v.Range(min=18), v.Range(min=20), 
@@ -90,7 +90,7 @@ class TestHTML(unittest.TestCase):
             assert str(f.errors['one']) == 'is required; must be greater than 18; must be greater than 20'
             assert str(f['one'].field.errors.exceptions[0]) == 'is required'
 
-    def test_complex_error_all_required(self):
+    def test_complex_error_all_required_2(self):
         
         schema = schemaish.Structure([("one", schemaish.Integer(validator=v.All(
                        v.Required(), v.Integer(), v.Any(v.Range(min=18), v.Range(min=20)), 

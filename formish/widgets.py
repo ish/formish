@@ -1,4 +1,3 @@
-import pdb
 """
 Commonly needed form widgets.
 """
@@ -10,7 +9,7 @@ __all__ = ['Input', 'Password', 'CheckedPassword', 'Hidden', 'TextArea',
 from convertish.convert import string_converter, \
         datetuple_converter,ConvertError
 from schemaish.type import File as SchemaFile
-from dottedish import dotted, get_dict_from_dotted_dict
+from dottedish import get_dict_from_dotted_dict
 import uuid
 
 
