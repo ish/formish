@@ -15,7 +15,6 @@ class FileSystemHeaderedFilestore(object):
 
     This can be used to implement temporary file stores, local caches, etc.
     XXX file ownership?
-    XXX delete
     """
 
     def __init__(self, root_dir):
@@ -32,15 +31,18 @@ class FileSystemHeaderedFilestore(object):
             if not line:
                 break
             name, value = line.split(': ', 1)
-            headers.append((name, value))
+            headers.append((name, value.decode('utf-8')))
         return headers, f
 
     def put(self, key, headers, src):
+        # XXX We should only allow strings as headers keys and values.
         dest = file(os.path.join(self._root_dir, safefilename.encode(key)), 'wb')
         try:
             if isinstance(headers, dict):
                headers = headers.items()
             for name, value in headers:
+                if isinstance(value, unicode):
+                    value = value.encode('utf-8')
                 dest.write('%s: %s\n' % (name, value))
             dest.write('\n')
             shutil.copyfileobj(src, dest)
@@ -55,8 +57,6 @@ class FileSystemHeaderedFilestore(object):
                     os.remove(os.path.join(self._root_dir,f))
         else:
             os.remove( os.path.join(self._root_dir, safefilename.encode(key)))
-
-
 
 
 class CachedTempFilestore(FileSystemHeaderedFilestore):
@@ -74,16 +74,19 @@ class CachedTempFilestore(FileSystemHeaderedFilestore):
     def get(self, key, cache_tag=None):
         headers, f = FileSystemHeaderedFilestore.get(self, key)
         headers = dict(headers)
-        if not cache_tag and headers['Cache-Tag'] == cache_tag:
+        if cache_tag and headers.get('Cache-Tag') == cache_tag:
             f.close()
-            return (headers['Cache-Tag'], None, None)
-        return (headers['Cache-Tag'],headers['Content-Type'], f)
-
+            return (cache_tag, None, None)
+        return (headers.get('Cache-Tag'), headers.get('Content-Type'), f)
 
     def put(self, key, src, cache_tag, content_type, headers=None):
         if headers is None:
             headers = {}
-        headers['Cache-Tag'] = cache_tag
-        headers['Content-Type'] = content_type
+        else:
+            headers = dict(headers)
+        if cache_tag:
+            headers['Cache-Tag'] = cache_tag
+        if content_type:
+            headers['Content-Type'] = content_type
         FileSystemHeaderedFilestore.put(self, key, headers, src)
 
