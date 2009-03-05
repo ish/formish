@@ -4,7 +4,6 @@ import webob
 import urllib
 from BeautifulSoup import BeautifulSoup
 from dottedish import dotted
-import webob
 from urllib import urlencode
 
 def build_request(formname, data):

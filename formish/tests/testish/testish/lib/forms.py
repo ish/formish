@@ -1,4 +1,4 @@
-import logging, os.path, tempfile, subprocess
+import logging, os.path, subprocess
 import formish, schemaish, validatish
 from dottedish import dotted
 from formish.filestore import CachedTempFilestore
@@ -224,13 +224,11 @@ def form_DateDifferentEmpty(request):
     schema = schemaish.Structure()
     schema.add('myDateField', schemaish.Date())
     form = formish.Form(schema, 'form')
-    import datetime
     form['myDateField'].widget = formish.Input(empty=datetime.date.today())
     return form
 
 def unittest_DateDifferentEmpty(self, formdef):
     # Test None data
-    import datetime
     f = formdef(None)
     testdata = {'myDateField': None}
     f.defaults = testdata
@@ -1051,19 +1049,17 @@ def form_SelectChoiceDate(request):
     """
     A select choice that uses dates for values
     """
-    from datetime import date
     schema = schemaish.Structure()
     schema.add('myDateSelect', schemaish.Date())
-    options = [(date(1970,1,1),'a'),(date(1980,1,1),'b'),(date(1990,1,1),'c')]
+    options = [(datetime.date(1970,1,1),'a'),(datetime.date(1980,1,1),'b'),(datetime.date(1990,1,1),'c')]
 
     form = formish.Form(schema, 'form')
     form['myDateSelect'].widget = formish.SelectChoice(options)
     return form
 
 def unittest_SelectChoiceDate(self, formdef):
-    from datetime import date
     f = formdef(None)
-    testdata = {'myDateSelect': date(1980,1,1)}
+    testdata = {'myDateSelect': datetime.date(1980,1,1)}
     f.defaults = testdata
     request = build_request('form',testdata)
     data = f.validate(request)
