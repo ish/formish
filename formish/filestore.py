@@ -4,8 +4,7 @@ make temporary files
 """
 import tempfile
 import os.path
-import shutil
-from formish import safefilename
+from formish import _copyfile, safefilename
 
 
 class FileSystemHeaderedFilestore(object):
@@ -45,7 +44,7 @@ class FileSystemHeaderedFilestore(object):
                     value = value.encode('utf-8')
                 dest.write('%s: %s\n' % (name, value))
             dest.write('\n')
-            shutil.copyfileobj(src, dest)
+            _copyfile.copyfileobj(src, dest)
         finally:
             dest.close()
 
