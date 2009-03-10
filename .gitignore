@@ -11,3 +11,4 @@ export.sh
 *.swp
 *.swo
 *.noseids
+formish/tests/testish/cache/*
