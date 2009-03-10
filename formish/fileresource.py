@@ -71,7 +71,6 @@ class FileResource(resource.Resource):
             # cache_filename = filestore.name+'_'+filename
             # self.cache.delete(cache_filename, glob=True)
             return 
-
         width, height = get_size_from_dict(request.GET)
         size= get_size_suffix(width, height)
 
@@ -85,7 +84,7 @@ class FileResource(resource.Resource):
 
         try:
             cache_filename = filestore.name+'_'+filename+size
-            resized_cache_tag, content_type, rf = self.cache.get(cache_filename, cache_tag)
+            resized_cache_tag, content_type, rf = self.cache.get(cache_filename, etag)
             resize_needed = resized_cache_tag != cache_tag
             if resize_needed:
                 rf.close()
