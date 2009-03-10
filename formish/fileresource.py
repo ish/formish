@@ -86,7 +86,7 @@ class FileResource(resource.Resource):
             cache_filename = filestore.name+'_'+filename+size
             resized_cache_tag, content_type, rf = self.cache.get(cache_filename, etag)
             resize_needed = resized_cache_tag != cache_tag
-            if resize_needed:
+            if resize_needed and rf is not None:
                 rf.close()
             
         except KeyError:
