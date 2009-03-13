@@ -28,8 +28,8 @@ class TestFormExamples(base.TestCase):
 
         form.defaults = request_data
         htmlsoup = BeautifulSoup(form())
-        assert htmlsoup.findAll(id='form_name-fieldOne-field')[0]['class'] == 'field form_name-fieldOne type-string widget-input'
-        assert htmlsoup.findAll(id='form_name-fieldTwo-field')[0]['class'] == 'field form_name-fieldTwo type-string widget-input'
+        assert htmlsoup.findAll(id='form_name-fieldOne--field')[0]['class'] == 'field form_name-fieldOne type-string widget-input'
+        assert htmlsoup.findAll(id='form_name-fieldTwo--field')[0]['class'] == 'field form_name-fieldTwo type-string widget-input'
         assert htmlsoup.findAll(id='form_name-fieldOne')[0]['value'] == 'a'
         assert htmlsoup.findAll(id='form_name-fieldTwo')[0]['value'] == 'b'
 
@@ -55,8 +55,8 @@ class TestFormExamples(base.TestCase):
 
         form.defaults = expected_data
         htmlsoup = BeautifulSoup(form())
-        assert htmlsoup.findAll(id='form_name-fieldOne-field')[0]['class'] == 'field form_name-fieldOne type-integer widget-input'
-        assert htmlsoup.findAll(id='form_name-fieldTwo-field')[0]['class'] == 'field form_name-fieldTwo type-integer widget-input'
+        assert htmlsoup.findAll(id='form_name-fieldOne--field')[0]['class'] == 'field form_name-fieldOne type-integer widget-input'
+        assert htmlsoup.findAll(id='form_name-fieldTwo--field')[0]['class'] == 'field form_name-fieldTwo type-integer widget-input'
         assert htmlsoup.findAll(id='form_name-fieldOne')[0]['value'] == '1'
         assert htmlsoup.findAll(id='form_name-fieldTwo')[0]['value'] == '2'
         
@@ -83,7 +83,7 @@ class TestFormExamples(base.TestCase):
 
         form.defaults = expected_data
         htmlsoup = BeautifulSoup(form())
-        assert htmlsoup.findAll(id='form_name-a-field')[0]['class'] == 'field form_name-a type-date widget-input'
+        assert htmlsoup.findAll(id='form_name-a--field')[0]['class'] == 'field form_name-a type-date widget-input'
         assert htmlsoup.findAll(id='form_name-a')[0]['value'] == '1966-12-18'
         
     def test_date_dateparts_form(self):
@@ -110,7 +110,7 @@ class TestFormExamples(base.TestCase):
 
         form.defaults = expected_data
         htmlsoup = BeautifulSoup(form())
-        assert htmlsoup.findAll(id='form_name-a-field')[0]['class'] == 'field form_name-a type-date widget-dateparts'
+        assert htmlsoup.findAll(id='form_name-a--field')[0]['class'] == 'field form_name-a type-date widget-dateparts'
         assert htmlsoup.findAll(id='form_name-a')[0]['value'] == '18'
 
 
@@ -149,7 +149,7 @@ class TestErrorRendering(base.TestCase):
         ERROR_TEXT = '!!!WOOP!!!WOOP!!!WOOP!!!'
         form = formish.Form(schema, errors={attr: ERROR_TEXT})
         html = form()
-        element = BeautifulSoup(html).find(id='form-%s-field'%(attr.replace('.', '-'),))
+        element = BeautifulSoup(html).find(id='form-%s--field'%(attr.replace('.', '-'),))
         div_error = element.find('div',{'class': 'error'})
         span_error = element.find('span',{'class': 'error'})
         assert div_error or span_error
