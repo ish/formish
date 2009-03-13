@@ -45,15 +45,12 @@ def _classes(self):
     classes = [
         'field',
         re.sub('[0-9\*]+','n',_cssname(self)),
-        self.attr.__class__.__name__.lower(),
+        'type-%s'%self.attr.__class__.__name__.lower(),
         ]
-    if self.widget is not None:
-        classes.append(self.widget.widget.__class__.__name__.lower())
-    else:
-        classes.append('defaultwidget')
+    classes.append('widget-%s'%self.widget.widget.__class__.__name__.lower())
     if self.required:
         classes.append('required')
-    if self.widget is not None and self.widget.css_class:
+    if self.widget.css_class is not None:
         classes.append(self.widget.css_class)
     if str(self.error):
         classes.append('error')
