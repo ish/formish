@@ -29,7 +29,7 @@ class TestHTML(unittest.TestCase):
         except fv.FormError, e:
             assert str(f.errors['one']) == 'is required'
         soup = BeautifulSoup(f())
-        assert soup.find(id='form-one-field').find("span", "error").string == 'is required' , "test that the form error is being created"
+        assert soup.find(id='form-one--field').find("span", "error").string == 'is required' , "test that the form error is being created"
         
     def test_complex_form(self):
         
