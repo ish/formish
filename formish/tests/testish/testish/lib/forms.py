@@ -1297,7 +1297,7 @@ def functest_SequenceOfStructuresWithSelects(self):
     try: self.assertEqual("b", sel.get_value("form-myList-0-b"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    sel.click_at("css=#form-myList-field > a", "")
+    sel.click_at("css=#form-myList--field > a", "")
     try: self.assertEqual("", sel.get_value("form-myList-1-a"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
@@ -1326,7 +1326,7 @@ def functest_SequenceOfDateParts(self):
     sel = self.selenium
     sel.open("/SequenceOfDateParts")
 
-    sel.click_at("css=#form-birthdays-field > a", "")
+    sel.click_at("css=#form-birthdays--field > a", "")
     try: self.assertEqual("", sel.get_value("form-birthdays-0-date"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
@@ -1510,7 +1510,7 @@ ${form.metadata()|n}
 
 ${form['firstName']()|n}
 
-<div id="${form['surname'].cssname}-field" class="${form['surname'].classes}">
+<div id="${form['surname'].cssname}--field" class="${form['surname'].classes}">
   <strong>${form['surname'].description}</strong>
   <em>${form['surname'].error}</em>
   ${form['surname'].widget()|n}

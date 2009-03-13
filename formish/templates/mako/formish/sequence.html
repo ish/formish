@@ -9,7 +9,7 @@ if field.widget.sortable is True:
 else:
     sortableclass = ''
 %>
-<fieldset id="${field.cssname}-field" class="${field.classes}${addremoveclass}${sortableclass}">
+<fieldset id="${field.cssname}--field" class="${field.classes}${addremoveclass}${sortableclass}">
 ${field.label()|n}
 ${field.error()|n}
 ${field.fields()|n}
