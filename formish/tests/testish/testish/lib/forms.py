@@ -1088,6 +1088,63 @@ def unittest_SelectChoiceSequenceInteger(self, formdef):
 
 #########################
 #
+#   Defaults
+#
+
+def form_SelectChoiceDefault(request):
+    """
+    A select choice that uses dates for values
+    """
+    schema = schemaish.Structure()
+    schema.add('mySelect', schemaish.Integer())
+    options = [(1,'a'),(2,'b'),(3,'c')]
+
+    form = formish.Form(schema, 'form')
+    form['mySelect'].widget = formish.SelectChoice(options)
+    form.defaults = {'mySelect':2}
+    return form
+
+def form_RadioChoiceDefault(request):
+    """
+    A select choice that uses dates for values
+    """
+    schema = schemaish.Structure()
+    schema.add('myRadio', schemaish.Integer())
+    options = [(1,'a'),(2,'b'),(3,'c')]
+
+    form = formish.Form(schema, 'form')
+    form['myRadio'].widget = formish.RadioChoice(options)
+    form.defaults = {'myRadio':2}
+    return form
+
+def form_CheckboxMultiChoiceDefault(request):
+    """
+    A checkbox representing a set of values
+    """
+    schema = schemaish.Structure()
+    schema.add('multiChoice', schemaish.Sequence(schemaish.Integer()))
+    options = [(1,'a'),(2,'b'),(3,'c')]
+
+    form = formish.Form(schema, 'form')
+    form['multiChoice'].widget = formish.CheckboxMultiChoice(options)
+    form.defaults = {'multiChoice':[2]}
+    return form
+
+def form_SelectWithOtherChoiceDefault(request):
+    """
+    A basic select choice with input option
+    """
+    schema = schemaish.Structure()
+    schema.add('mySelect', schemaish.Integer())
+    options = [(1,'a'),(2,'b'),(3,'c')]
+
+    form = formish.Form(schema, 'form')
+    form['mySelect'].widget = formish.SelectWithOtherChoice(options)
+    form.defaults = {'mySelect':2}
+    return form
+
+#########################
+#
 #   Multi Select Widgets
 #
 

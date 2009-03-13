@@ -69,7 +69,6 @@ class TestHTML(unittest.TestCase):
         try:
             data = f.validate(r)
         except fv.FormError, e:
-            print '---',f.errors['one']
             assert str(f.errors['one']) == 'must be greater than 18; must be greater than 20'
             assert str(f['one'].field.errors.exceptions[0]) == 'must be greater than 18'
 
