@@ -100,7 +100,7 @@ I've skipped the majority of this output as it's probably better shown formatted
       <div>
         <input type="hidden" name="_charset_" />
         <input type="hidden" name="__formish_form__" value="form" />
-        <div id="form-myfield-field" class="field string input">
+        <div id="form-myfield--field" class="field type-string widget-input">
           <label for="form-myfield">Myfield</label>
           <div class="inputs">
             <input id="form-myfield" type="text" name="myfield" value="" />
@@ -160,7 +160,7 @@ The input field(s)
 .. code-block:: html
 
       <!-- The String Field -->
-      <div id="form-myfield-field" class="field string input">
+      <div id="form-myfield--field" class="field type-string widget-input">
         <label for="form-myfield">Myfield</label>
         <div class="inputs">
           <input id="form-myfield" type="text" name="myfield" value="" />
@@ -301,14 +301,14 @@ This is the same as our first example but note that the label for firstName has 
 
 .. code-block:: html
 
-    <div id="form-firstName-field" class="field string input">
+    <div id="form-firstName--field" class="field type-string widget-input">
       <label for="form-firstName">First Name</label>
       <div class="inputs">
         <input id="form-firstName" type="text" name="firstName" value="Tim" />
       </div>
     </div>
 
-    <div id="form-surname-field" class="field string input">
+    <div id="form-surname--field" class="field type-string widget-input">
       <label for="form-surname">Surname</label>
       <div class="inputs">
         <input id="form-surname" type="text" name="surname" value="Parkin" />
@@ -322,7 +322,7 @@ The date field splits the date into three parts, each part indicated using dotte
 
 .. raw:: html
 
-    <div id="form-dateOfBirth-field" class="field date dateparts">
+    <div id="form-dateOfBirth--field" class="field type-date widget-dateparts">
       <label for="form-dateOfBirth">Date Of Birth</label>
       <div class="inputs">
         <input id="form-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
@@ -333,7 +333,7 @@ The date field splits the date into three parts, each part indicated using dotte
 
 .. code-block:: html
 
-    <div id="form-dateOfBirth-field" class="field date dateparts">
+    <div id="form-dateOfBirt--field" class="field type-date widget-dateparts">
       <label for="form-dateOfBirth">Date Of Birth</label>
       <div class="inputs">
         <input id="form-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
@@ -347,7 +347,7 @@ Integer Field
 
 .. code-block:: html
 
-    <div id="form-streetNumber-field" class="field integer input">
+    <div id="form-streetNumber--field" class="field type-integer widget-input">
       <label for="form-streetNumber">Street Number</label>
       <div class="inputs">
         <input id="form-streetNumber" type="text" name="streetNumber" value="123" />
@@ -361,7 +361,7 @@ This uses the 'none_option' value to show 'Where do you live' by default but bec
 
 .. raw:: html
 
-    <div id="form-country-field" class="field string selectchoice">
+    <div id="form-country--field" class="field type-string widget-selectchoice">
       <label for="form-country">Country</label>
       <div class="inputs">
         <select id="form-country" name="country">
@@ -374,7 +374,7 @@ This uses the 'none_option' value to show 'Where do you live' by default but bec
 
 .. code-block:: html
 
-    <div id="form-country-field" class="field string selectchoice">
+    <div id="form-country--field" class="field type-string widget-selectchoice">
       <label for="form-country">Country</label>
       <div class="inputs">
         <select id="form-country" name="country">
@@ -391,7 +391,7 @@ Boolean Field
 
 .. code-block:: html
 
-    <div id="form-termsAndConditions-field" class="field boolean checkbox">
+    <div id="form-termsAndConditions--field" class="field type-boolean widget-checkbox">
       <label for="form-termsAndConditions">Terms And Conditions</label>
       <div class="inputs">
         <input id="form-termsAndConditions" type="checkbox" name="termsAndConditions" value="True" checked="checked"  />
@@ -451,13 +451,13 @@ The whole form is now in an error state and we can interrogate it about the erro
     >>> field.classes
     'field date dateparts error'
     >>> field()
-    '<div id="form-dateOfBirth-field" class="field form-dateOfBirth date dateparts error">\n\n<label for="form-dateOfBirth">Date Of Birth</label>\n\n\n<div class="inputs">\n\n\n<input id="form-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /\n<input id="form-dateOfBirth-month" type="text" name="dateOfBirth.month" value="13" size="2" /> /\n<input id="form-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />\n\n\n</div>\n\n\n<span class="error">Invalid date: month must be in 1..12</span>\n\n\n\n</div>\n'
+    '<div id="form-dateOfBirth--field" class="field form-dateOfBirth type-date widget-dateparts error">\n\n<label for="form-dateOfBirth">Date Of Birth</label>\n\n\n<div class="inputs">\n\n\n<input id="form-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /\n<input id="form-dateOfBirth-month" type="text" name="dateOfBirth.month" value="13" size="2" /> /\n<input id="form-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />\n\n\n</div>\n\n\n<span class="error">Invalid date: month must be in 1..12</span>\n\n\n\n</div>\n'
 
 This produces the following - note the error 'span' below the form field.
 
 .. raw:: html
 
-    <div id="form-dateOfBirth-field" class="field date dateparts error">
+    <div id="form-dateOfBirth--field" class="field type-date widget-dateparts error">
       <label for="form-dateOfBirth">Date Of Birth</label>
       <div class="inputs">
         <input id="form-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
@@ -469,7 +469,7 @@ This produces the following - note the error 'span' below the form field.
 
 .. code-block:: html
 
-    <div id="form-dateOfBirth-field" class="field date dateparts error">
+    <div id="form-dateOfBirth--field" class="field type-date widget-dateparts error">
       <label for="form-dateOfBirth">Date Of Birth</label>
       <div class="inputs">
         <input id="form-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
@@ -637,7 +637,7 @@ What does this produce?
 
 .. code-block:: html
 
-    <div id="form-myfile-field" class="field type fileupload">
+    <div id="form-myfile--field" class="field type-file widget-fileupload">
       <label for="form-myfile">Myfile</label>
       <div class="inputs">
         <input id="form-myfile-remove" type="checkbox" name="myfile.remove" value="true" />
@@ -651,7 +651,7 @@ and looks like
 
 .. raw:: html 
 
-    <div id="form-myfile-field" class="field type fileupload">
+    <div id="form-myfile-field" class="field type-file widget-fileupload">
       <label for="form-myfile">Myfile</label>
       <div class="inputs">
         <input id="form-myfile-remove" type="checkbox" name="myfile.remove" value="true" />
@@ -811,7 +811,7 @@ Let's take a look at the html that produced..
 
 .. raw:: html
 
-    <div id="form-myfield-field" class="field sequence checkboxmultichoice">
+    <div id="form-myfield--field" class="field type-sequence widget-checkboxmultichoice">
       <label for="form-myfield">Myfield</label>
       <div class="inputs">
         <input id="form-myfield-0" name="myfield" type="checkbox" value="1" />
@@ -830,7 +830,7 @@ Let's take a look at the html that produced..
     </div>
 .. code-block:: html
 
-    <div id="form-myfield-field" class="field sequence checkboxmultichoice">
+    <div id="form-myfield--field" class="field type-sequence widget-checkboxmultichoice">
       <label for="form-myfield">Myfield</label>
       <div class="inputs">
         <input id="form-myfield-0" name="myfield" type="checkbox" value="1" />
@@ -870,7 +870,7 @@ Which produces a simple text area as html. When it processes this textarea, it u
 
 .. raw:: html
 
-    <div id="form-myfield-field" class="field sequence textarea">
+    <div id="form-myfield--field" class="field type-sequence widget-textarea">
       <label for="form-myfield">Myfield</label>
       <div class="inputs">
         <textarea id="form-myfield" name="myfield">1,3,5,7</textarea>
@@ -880,7 +880,7 @@ Which produces a simple text area as html. When it processes this textarea, it u
 
 .. code-block:: html
 
-    <div id="form-myfield-field" class="field sequence textarea">
+    <div id="form-myfield--field" class="field type-sequence widget-textarea">
       <label for="form-myfield">Myfield</label>
       <div class="inputs">
         <textarea id="form-myfield" name="myfield">1,3,5,7</textarea>
@@ -965,37 +965,37 @@ This will create the following
     <form id="form" action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
       <input type="hidden" name="_charset_" />
       <input type="hidden" name="__formish_form__" value="form" />
-      <fieldset id="form-name-field" class="field myname sequencedefault sequencecontrols">
+      <fieldset id="form-name--field" class="field myname sequencedefault sequencecontrols">
         <legend>Name</legend>
-        <div id="form-name-firstName-field" class="field string input">
+        <div id="form-name-firstName--field" class="field type-string widget-input">
           <label for="form-name-firstName">First Name</label>
           <div class="inputs">
             <input id="form-name-firstName" type="text" name="name.firstName" value="" />
           </div>
         </div>
-        <div id="form-name-surname-field" class="field string input">
+        <div id="form-name-surname--field" class="field type-string widget-input">
           <label for="form-name-surname">Surname</label>
           <div class="inputs">
             <input id="form-name-surname" type="text" name="name.surname" value="" />
           </div>
         </div>
       </fieldset>
-      <fieldset id="form-address-field" class="field myaddress sequencedefault sequencecontrols">
+      <fieldset id="form-address--field" class="field myaddress widget-sequencedefault sequencecontrols">
         <legend>Address</legend>
-        <div id="form-address-streetNumber-field" class="field integer input">
+        <div id="form-address-streetNumber--field" class="field type-integer widget-input">
           <label for="form-address-streetNumber">Street Number</label>
           <div class="inputs">
             <input id="form-address-streetNumber" type="text" name="address.streetNumber" value="" />
           </div>
         </div>
-        <div id="form-address-country-field" class="field string input">
+        <div id="form-address-country--field" class="field type-string widget-input">
           <label for="form-address-country">Country</label>
           <div class="inputs">
             <input id="form-address-country" type="text" name="address.country" value="" />
           </div>
         </div>
       </fieldset>
-      <div id="form-termsAndConditions-field" class="field boolean input">
+      <div id="form-termsAndConditions--field" class="field type-boolean widget-input">
         <label for="form-termsAndConditions">Terms And Conditions</label>
         <div class="inputs">
           <input id="form-termsAndConditions" type="text" name="termsAndConditions" value="" />
@@ -1011,37 +1011,37 @@ This will create the following
     <form id="form" action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
       <input type="hidden" name="_charset_" />
       <input type="hidden" name="__formish_form__" value="form" />
-      <fieldset id="form-name-field" class="field myname sequencedefault sequencecontrols">
+      <fieldset id="form-name--field" class="field myname sequencedefault sequencecontrols">
         <legend>Name</legend>
-        <div id="form-name-firstName-field" class="field string input">
+        <div id="form-name-firstName--field" class="field type-string widget-input">
           <label for="form-name-firstName">First Name</label>
           <div class="inputs">
             <input id="form-name-firstName" type="text" name="name.firstName" value="" />
           </div>
         </div>
-        <div id="form-name-surname-field" class="field string input">
+        <div id="form-name-surname--field" class="field type-string widget-input">
           <label for="form-name-surname">Surname</label>
           <div class="inputs">
             <input id="form-name-surname" type="text" name="name.surname" value="" />
           </div>
         </div>
       </fieldset>
-      <fieldset id="form-address-field" class="field myaddress sequencedefault sequencecontrols">
+      <fieldset id="form-address--field" class="field myaddress widget-sequencedefault sequencecontrols">
         <legend>Address</legend>
-        <div id="form-address-streetNumber-field" class="field integer input">
+        <div id="form-address-streetNumber--field" class="field type-integer widget-input">
           <label for="form-address-streetNumber">Street Number</label>
           <div class="inputs">
             <input id="form-address-streetNumber" type="text" name="address.streetNumber" value="" />
           </div>
         </div>
-        <div id="form-address-country-field" class="field string input">
+        <div id="form-address-country--field" class="field type-string widget-input">
           <label for="form-address-country">Country</label>
           <div class="inputs">
             <input id="form-address-country" type="text" name="address.country" value="" />
           </div>
         </div>
       </fieldset>
-      <div id="form-termsAndConditions-field" class="field boolean input">
+      <div id="form-termsAndConditions--field" class="field type-boolean widget-input">
         <label for="form-termsAndConditions">Terms And Conditions</label>
         <div class="inputs">
           <input id="form-termsAndConditions" type="text" name="termsAndConditions" value="" />
