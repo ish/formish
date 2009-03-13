@@ -1101,7 +1101,7 @@ def form_SelectChoiceDefault(request):
 
     form = formish.Form(schema, 'form')
     form['mySelect'].widget = formish.SelectChoice(options)
-    form.defaults = {'mySelect':2}
+    form['mySelect'].default = 2
     return form
 
 def form_RadioChoiceDefault(request):
@@ -1114,7 +1114,7 @@ def form_RadioChoiceDefault(request):
 
     form = formish.Form(schema, 'form')
     form['myRadio'].widget = formish.RadioChoice(options)
-    form.defaults = {'myRadio':2}
+    form['myRadio'].default = 2
     return form
 
 def form_CheckboxMultiChoiceDefault(request):
@@ -1127,7 +1127,7 @@ def form_CheckboxMultiChoiceDefault(request):
 
     form = formish.Form(schema, 'form')
     form['multiChoice'].widget = formish.CheckboxMultiChoice(options)
-    form.defaults = {'multiChoice':[2]}
+    form['multiChoice'].default = [2]
     return form
 
 def form_SelectWithOtherChoiceDefault(request):
@@ -1140,7 +1140,7 @@ def form_SelectWithOtherChoiceDefault(request):
 
     form = formish.Form(schema, 'form')
     form['mySelect'].widget = formish.SelectWithOtherChoice(options)
-    form.defaults = {'mySelect':2}
+    form['mySelect'].default = 2
     return form
 
 #########################
