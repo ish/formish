@@ -5,7 +5,7 @@
   <label for="${field.cssname}-noneoption">${field.widget.none_option[1]}</label>
 </div>
 %endif
-%for n, option in enumerate(field.widget.options):
+%for n, option in enumerate(field.widget.get_options(field.attr)):
 <%
 if len(field.value) > 0: 
   selected = field.widget.selected(option,field.value[0],field.attr)
@@ -17,3 +17,4 @@ else:
   <label for="${field.cssname}-${n}">${option[1]}</label>
 </div>
 %endfor
+

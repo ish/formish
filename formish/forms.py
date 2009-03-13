@@ -14,7 +14,7 @@ from formish import validation
 from formish import widgets
 from formish.renderer import _default_renderer
 
-
+NOARG = object()
 
 class Action(object):
     """
@@ -184,7 +184,7 @@ class Field(object):
     def value(self):
         """Convert the request_data to a value object for the form or None."""
         if '*' in self.name:
-            return  self.widget.pre_render(self.attr, None)
+            return  self.widget.pre_render(self.attr, self.defaults)
         return self.form.request_data.get(self.name, None)
 
 
@@ -193,6 +193,15 @@ class Field(object):
         """ Does this field have a Not Empty validator of some sort """
         return validatish.validation_includes(self.attr.validator, validatish.Required)
 
+
+    @property
+    def defaults(self):
+        """Get the defaults from the form."""
+        if '*' not in self.name:
+            defaults = self.form.defaults.get(self.name, None)
+        else:
+            defaults = self.form.get_item_data(self.name, 'default', None)
+        return defaults
 
     @property
     def error(self):
@@ -799,19 +808,26 @@ class Form(object):
         Allow the setting os certain attributes on item_data, a dictionary used
         to associates data with fields.
         """
-        allowed = ['title', 'widget', 'description']
+        allowed = ['title', 'widget', 'description','default']
         if name in allowed:
-            self.item_data.setdefault(key, {})[name] = value
+            if name == 'default' and '*' not in key:
+                self.defaults[key] = value
+            else:
+                self.item_data.setdefault(key, {})[name] = value
         else:
             raise KeyError('Cannot set data onto this attribute')
 
 
-    def get_item_data(self, key, name):
+    def get_item_data(self, key, name, default=NOARG):
         """
         Access item data associates with a field key and an attribute name
         (e.g. title, widget, description')
         """
-        return self.item_data.get(key, {})[name]
+        if default is NOARG:
+            data = self.item_data.get(key, {})[name]
+        else:
+            data = self.item_data.get(key, {}).get(name, default)
+        return data
 
 
     def get_item_data_values(self, name=None):

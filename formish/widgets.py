@@ -544,11 +544,7 @@ class SelectChoice(Widget):
             v = self.empty
         else:
             v = value
-        try:
-            cv = string_converter(schema_type).to_type(v)
-        except ConvertError:
-            return ''
-        if option[0] == cv:
+        if option[0] == v:
             return ' selected="selected"'
         else:
             return ''
@@ -641,13 +637,8 @@ class SelectWithOtherChoice(SelectChoice):
             v = self.empty
         else:
             v = value
-        # Convert or raise
-        try:
-            cv = string_converter(schema_type).to_type(v)
-        except ConvertError:
-            return ''
         # Check for selected
-        if option[0] == cv:
+        if option[0] == v:
             return ' selected="selected"'
         else:
             return ''
@@ -666,7 +657,7 @@ class SelectWithOtherChoice(SelectChoice):
 
         return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
 
-class RadioChoice(Widget):
+class RadioChoice(SelectChoice):
     """
     Radio choice html element
     """
@@ -675,13 +666,19 @@ class RadioChoice(Widget):
 
     none_option = (None, '- choose -')
 
-    def __init__(self, options, **k):
-        none_option = k.pop('none_option', UNSET)
-        if none_option is not UNSET:
-            self.none_option = none_option
-        Widget.__init__(self, **k)
-        self.options = _normalise_options(options)
-            
+    def selected(self, option, value, schema_type):
+        """
+        Check if the currently rendering input is the same as the value
+        """
+        if value == '':
+            v = self.empty
+        else:
+            v = value
+        if option[0] == v:
+            return ' checked="checked"'
+        else:
+            return ''
+
     def convert(self, schema_type, request_data):
         """
         If we don't have a choice, set a blank value
@@ -696,23 +693,6 @@ class RadioChoice(Widget):
             return self.empty
 
         return string_converter(schema_type).to_type(string_data)
-
-    def selected(self, option, value, schema_type):
-        """
-        Check if the currently rendering input is the same as the value
-        """
-        if value == '':
-            v = self.empty
-        else:
-            v = value
-        try:
-            cv = string_converter(schema_type).to_type(v)
-        except ConvertError:
-            return ''
-        if option[0] == cv:
-            return ' checked="checked"'
-        else:
-            return ''
     
     def get_none_option_value(self, schema_type):
         """
