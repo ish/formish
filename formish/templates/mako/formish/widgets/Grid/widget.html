@@ -1,15 +1,13 @@
 <%page args="field" />
 
 <%
-import itertools
-rowsclone, rows = itertools.tee(field.fields)
-headers = list(rowsclone)[0]
+rows = list(field.fields)
 %>
 
 <table id="${field.cssname}">
   <thead>
     <tr>
-% for f in headers.fields:
+% for f in rows[0].fields:
       <th>${f.title}</th>
 % endfor
     </tr>
