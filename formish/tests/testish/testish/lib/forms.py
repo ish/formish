@@ -533,6 +533,30 @@ def form_Required(request):
     form = formish.Form(schema, 'form')
     return form
 
+def form_CheckboxRequired(request):
+    """
+    Simple Boolean Checkbox
+    """
+    schema = schemaish.Structure()
+    schema.add('checkbox', schemaish.Boolean(validator=validatish.Equal(True)))
+
+    form = formish.Form(schema, 'form')
+    form['checkbox'].widget = formish.Checkbox()
+    return form
+
+def form_RadioChoiceRequired(request):
+    """
+    A basic radio choice
+    """
+    schema = schemaish.Structure()
+    schema.add('myRadio', schemaish.Integer(validator=validatish.Required()))
+    options = [(1,'a'),(2,'b'),(3,'c')]
+
+    form = formish.Form(schema, 'form')
+    form['myRadio'].widget = formish.RadioChoice(options)
+    return form
+
+
 def form_MinLength(request):
     """
     Minimum Length fields - this one is min length four chars
@@ -783,7 +807,6 @@ def functest_RequiredStringAndFile(self):
 
           
     return
-
 
 
 ########################
