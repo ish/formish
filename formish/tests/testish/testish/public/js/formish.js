@@ -70,9 +70,9 @@ function convert_id_to_name(s) {
 function renumber_sequences(o) {
   var n = 0;
   var previous_seqid_prefix = '';
-  o.find('.sequence.sequencedefault > div').each( function () {
+  o.find('.type-sequence.widget-sequencedefault > div').each( function () {
     var seqid = $(this).parent().attr('id');
-    var seqid_prefix = seqid.substr(0,seqid.length-5);
+    var seqid_prefix = seqid.substr(0,seqid.length-6);
     if (seqid_prefix != previous_seqid_prefix) {
       n = 0;
     } else {
@@ -80,7 +80,7 @@ function renumber_sequences(o) {
     }    
     // replace id occurences
     var thisid = $(this).attr('id');
-    var newid = seqid_prefix + n + '-field';
+    var newid = seqid_prefix + n + '--field';
     $(this).attr('id',newid);
     // Replace 'for' occurences
     $(this).find("[for^='"+seqid_prefix+"']").each( function () {
@@ -103,9 +103,9 @@ function renumber_sequences(o) {
     });
     previous_seqid_prefix = seqid_prefix;
   });
-  o.find('.sequence.sequencedefault > fieldset').each( function () {
+  o.find('.type-sequence.widget-sequencedefault > fieldset').each( function () {
     var seqid = $(this).parent().attr('id');
-    var seqid_prefix = seqid.substr(0,seqid.length-5);
+    var seqid_prefix = seqid.substr(0,seqid.length-6);
     if (seqid_prefix != previous_seqid_prefix) {
       n = 0;
     } else {
@@ -114,7 +114,7 @@ function renumber_sequences(o) {
     // replace id occurences
     var thisid = $(this).attr('id');
     //$(this).find('> legend').text(n);
-    var newid = seqid_prefix + n + '-field';
+    var newid = seqid_prefix + n + '--field';
     $(this).attr('id',newid);
     // Replace 'for' occurences
     $(this).find("[for^='"+seqid_prefix+"']").each( function () {
@@ -190,8 +190,8 @@ function add_mousedown_to_addlinks(o) {
 };
 
 function add_remove_buttons(o) {
-  o.find('.sequencedefault .remove').remove() 
-  o.find('.sequence.sequencedefault > div > label').each( function() {
+  o.find('.addremove .remove').remove() 
+  o.find('.addremove > div > label').each( function() {
     if ($(this).next().text() != 'x') {
       var x = $('<span class="remove">x</span>');
       $(this).after(x);
@@ -202,7 +202,7 @@ function add_remove_buttons(o) {
       });
     };
   });
-  o.find('.sequence.sequencedefault > fieldset > legend').each( function() {
+  o.find('.addremove > fieldset > legend').each( function() {
     if ($(this).next().text() != 'x') {
       var x = $('<span class="remove">x</span>');
       $(this).after(x);
@@ -221,10 +221,10 @@ function order_changed(e,ui) {
 }
 
 function add_sortables(o) {
-  o.find('.sequencedefault .handle').remove() 
-  o.find('.sequence.sequencedefault > div > label').after('<div class="handle">drag me</div>');
-  o.find('.sequence.sequencedefault > fieldset > legend').after('<div class="handle">drag me</div>');
-  o.find('.sequence.sequencedefault').sortable({'items':'> .field','stop':order_changed});
+  o.find('.sortable .handle').remove();
+  o.find('.sortable > div > label').after('<div class="handle">drag me</div>');
+  o.find('.sortable > fieldset > legend').after('<div class="handle">drag me</div>');
+  o.find('.sortable').sortable({'items':'> .field','stop':order_changed,'handle':'.handle'});
   
 }
 
@@ -233,4 +233,33 @@ function formish() {
     add_mousedown_to_addlinks($('form'));
     add_remove_buttons($('form'));
     add_sortables($('form'));
+}
+
+
+function profile() {
+  $("#profile-contact_details .actions").append("<a class=\"combined-adderlink\">add</a><div class=\"combined-adderlink-over\"><div id=\"add-email\"></div><div id=\"add-phone\"></div><div id=\"add-address\"></div></div>");
+  $("#profile-contact_details .adderlink").css('display','none');
+  $("#add-email").mousedown( function () {
+    $("#form-emails--field .adderlink").trigger('mousedown');
+    $("#profile-contact_details .combined-adderlink-over").css('display','none');
+  });
+  $("#add-phone").mousedown( function () {
+    $("#form-phones--field .adderlink").trigger('mousedown');
+    $("#profile-contact_details .combined-adderlink-over").css('display','none');
+  });
+  $("#add-address").mousedown( function () {
+    $("#form-addresses--field .adderlink").trigger('mousedown');
+    $("#profile-contact_details .combined-adderlink-over").css('display','none');
+  });
+  $("#profile-contact_details .combined-adderlink").mousedown( function () {
+    $("#profile-contact_details .combined-adderlink-over").css('display','block');
+  })
+  $("#profile-contact_details .combined-adderlink-over").mousedown( function () {
+    $("#profile-contact_details .combined-adderlink-over").css('display','none');
+  })
+  $("#profile .actions").each( function () {
+     $(this).prepend('<a class="cancel" onclick="javascript:history.back()">Cancel</a>');
+     $(this).find('.cancel').css('margin-left','50px');
+     $(this).find('input').css('margin-left','20px');
+  });
 }
