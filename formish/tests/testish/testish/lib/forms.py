@@ -1166,6 +1166,17 @@ def form_SelectWithOtherChoiceDefault(request):
     form['mySelect'].default = 2
     return form
 
+def form_SequenceOfStringsWithDefault(request):
+    """
+    A sequence with some defaults
+    """
+    schema = schemaish.Structure()
+    schema.add( 'myList', schemaish.Sequence( schemaish.String() ))
+
+    form = formish.Form(schema, 'form')
+    form.defaults = {'myList': ['a','b']}
+    return form
+
 #########################
 #
 #   Multi Select Widgets
