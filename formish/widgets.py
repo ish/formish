@@ -772,6 +772,23 @@ class CheckboxMultiChoice(Widget):
 
         return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
 
+def get_parent(segments):
+    if len(segments) == 1:
+        return ''
+    else:
+        return '.'.join(segments[:-1])
+
+def mktree(options):
+    last_segments_len = 1
+    root = {'': {'data':('root', 'Root'), 'children':[]} }
+    for id, label in options:
+        segments = id.split('.')
+        parent = get_parent(segments)
+        root[id] = {'data': (id, label), 'children':[]}
+        root[parent]['children'].append(root[id])
+    return root['']
+
+
 class CheckboxMultiChoiceTree(Widget):
     """
     A more complicated checkbox select that
@@ -781,7 +798,7 @@ class CheckboxMultiChoiceTree(Widget):
 
     def __init__(self, options, cssClass=None):
         self.options = options
-        self.optiontree = get_dict_from_dotted_dict(dict(options),noexcept=True) 
+        self.optiontree = mktree(options)
         Widget.__init__(self,cssClass=cssClass)
             
     def pre_render(self, schema_type, data):
