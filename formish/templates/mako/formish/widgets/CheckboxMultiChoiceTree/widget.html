@@ -1,25 +1,23 @@
 <%page args="field" />
 
-<%def name="render_subtree(field,options,optiontree,prefix='')">
 <%
-    optionkeys = [option[0] for option in options]
+optionkeys = [k for k,v in field.widget.options]
 %>
-%   if isinstance(optiontree, dict):
+
+<%def name="render_subtree(field, optiontrees)">
 <ul>
-%       for k, v in optiontree.items():
+% for optiontree in optiontrees['children']:
 <%
-            fullkey = '%s%s'%(prefix,k)
-            index = optionkeys.index(fullkey)
-            option = options[index]
+option = optiontree['data']
+index = optionkeys.index(option[0])
 %>
   <li><input id="${field.cssname}-${index}" name="${field.name}" type="checkbox" value="${option[0]}"${field.widget.checked(option,field.value,field.attr)|n} />
   <label for="${field.cssname}-${index}">${option[1]}</label></li>
-  ${render_subtree(field,options,v,prefix='%s.'%fullkey)}
+  ${render_subtree(field,optiontree)}
   
-%       endfor
+% endfor
 </ul>
-%   endif
 </%def>
 
-${render_subtree(field,field.widget.options,field.widget.optiontree)}
+${render_subtree(field,field.widget.optiontree)}
 

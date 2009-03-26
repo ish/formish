@@ -19,7 +19,7 @@
   width: 200px;
 }
 
-.formish-form .checkedpassword .inputs label {
+.formish-form .widget-checkedpassword .inputs label {
   margin-left: -210px;
   text-align:right;
 }
@@ -39,30 +39,31 @@
 }
 
 .formish-form .inputs input {
-  width: 300px;
+  width: 500px;
 }
 
-.formish-form .checkbox .inputs input, .formish-form .checkboxmultichoice input {
+.formish-form .checkbox .inputs input, .formish-form .widget-checkboxmultichoice input {
   width: auto;
 }
 
-.formish-form .field.date .inputs input {
+.formish-form .field.widget-date .inputs input,
+.formish-form .field.approximat.widget-dateparts .inputs input {
   width: auto;
 }
 
-.formish-form .field.decimal .inputs input {
+.formish-form .field.type-decimal .inputs input {
   width: 8em;
 }
 
 .formish-form .inputs textarea {
-  width: 500px;
-  height: 100px;
+  width: 700px;
+  height: 200px;
 }
 
 .formish-form .message, .formish-form .description {
   display: block;
   margin-left: 210px;
-  font-size: 88%;
+  font-size: 79%;
 }
 
 .formish-form .description {
@@ -84,13 +85,14 @@
   margin-right: 0.5em;
 }
 
-.formish-form .checkboxmultichoicetree .inputs,
-.formish-form .checkboxmultichoice .inputs {
+
+.formish-form .widget-checkboxmultichoicetree .inputs,
+.formish-form .widget-checkboxmultichoice .inputs {
   clear: both;
 }
 
-.formish-form .checkboxmultichoice .inputs label,
-.formish-form .checkboxmultichoicetree .inputs label {
+.formish-form .widget-checkboxmultichoice .inputs label,
+.formish-form .widget-checkboxmultichoicetree .inputs label {
   margin-left:10px;
   font-size:80%;
   font-style:italic;
@@ -103,7 +105,24 @@
   height:30px;
 }
 
-.formish-form .fileuploadwidget input.upload-checkbox-remove {
+.formish-form .widget-checkboxmultichoicetree li {
+  list-style: none;
+
+}
+  
+.formish-form .widget-checkboxmultichoicetree ul {
+  margin-left: 30px;
+}
+.formish-form .preview {
+  float: left;
+}
+
+.formish-form .widget-fileupload img {
+  height:20px;
+  padding-right: 8px;
+}
+
+.formish-form .widget-fileupload input.upload-checkbox-remove {
   width:auto;
 }
 
@@ -112,7 +131,7 @@
   color: #777;
 }
 
-.formish-form .field.hidden {
+.formish-form .field.widget-hidden {
   display: none;
 }
 
@@ -122,11 +141,11 @@
   height: 300px;
 }
 
-.formish-form .radiochoice .inputs input {
+.formish-form .widget-radiochoice .inputs input {
   width: auto;
 }
 
-.formish-form .radiochoice .inputs label {
+.formish-form .widget-radiochoice .inputs label {
   display: inline;
   float: none;
 }
@@ -140,23 +159,24 @@
 }
 
 .formish-form .resttextarea .preview-frame {
-  height: 500px;
+  height: 700px;
   width: 80%;
 }
 
 .formish-form fieldset {
-  position: relative;
+  border: 1px solid #CCC;
+  margin: 10px 5px;
+  padding: 5px;
 }
 
 .formish-form fieldset.error {
   border-color: #900;
 }
 
-.formish-form .remove {
-  display: block;
-  position: absolute;
-  top: 0px;
-  right: 2.6em;
+.formish-form legend {
+  background: #CCC;
+  border: 1px solid #CCC;
+  padding: 2px 6px
 }
 
 .formish-form .handle {
