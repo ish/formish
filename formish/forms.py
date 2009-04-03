@@ -45,9 +45,9 @@ def _classes(self):
     classes = [
         'field',
         re.sub('[0-9\*]+','n',_cssname(self)),
-        'type-%s'%self.attr.__class__.__name__.lower(),
+        'type-%s'%self.attr.type.lower(),
         ]
-    classes.append('widget-%s'%self.widget.widget.__class__.__name__.lower())
+    classes.append('widget-%s'%self.widget.type.lower())
     if self.required:
         classes.append('required')
     if self.widget.css_class is not None:
@@ -465,7 +465,7 @@ class Collection(object):
         return fall_back_renderer(renderer, name, widget, vars)
 
     def __repr__(self):
-        return 'formish.%s(name=%r, attr=%r)'% (self.__class__.__name__, self.name, self.attr)
+        return 'formish.%s(name=%r, attr=%r)'% (self.type, self.name, self.attr)
 
 class Group(Collection):
     """

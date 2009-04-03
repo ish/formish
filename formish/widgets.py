@@ -20,7 +20,8 @@ class Widget(object):
     """
     Base class for widgets
     """
-
+    
+    type = None
     _template = None
     
     def __init__(self, **k):
@@ -63,6 +64,7 @@ class Widget(object):
         return string_converter(schema_type).to_type(string_data)
 
 
+
     def __call__(self, field):
         return field.form.renderer('/formish/widgets/%s.html'%self._template, {'f':field})
 
@@ -84,6 +86,7 @@ class Input(Widget):
     Basic input widget type, used for text input
     """
 
+    type = 'Input'
     _template = 'Input'
 
     def __init__(self, **k):
@@ -121,6 +124,7 @@ class Password(Input):
     """
     Password widget is a basic input type but using password html input type
     """
+    type = 'Password'
     _template = 'Password'
 
 
@@ -130,6 +134,7 @@ class CheckedPassword(Input):
     Checked Password ensures that the password has been entered twice
     """
 
+    type = 'CheckedPassword'
     _template = 'CheckedPassword'
 
     def __init__(self, **k):
@@ -181,6 +186,7 @@ class Hidden(Input):
     """
     Basic input but using a hidden html input field
     """
+    type = 'Hidden'
     _template = 'Hidden'
 
 
@@ -195,6 +201,7 @@ class SequenceDefault(Widget):
         activated)
     """
 
+    type = 'SequenceDefault'
     _template = 'SequenceDefault'
 
     def __init__(self, **k):
@@ -238,6 +245,7 @@ class TextArea(Input):
     :arg rows: set the cols attr on the textarea element
     """
 
+    type = 'TextArea'
     _template = 'TextArea'
     
     def __init__(self, **k):
@@ -290,6 +298,7 @@ class Grid(Input):
     Grid input field
     """
 
+    type = 'Grid'
     _template = 'Grid'
     
     def __init__(self, **k):
@@ -322,6 +331,7 @@ class Checkbox(Widget):
     Checkbox widget, defaults to True or False
     """
 
+    type = 'Checkbox'
     _template = 'Checkbox'
 
     def convert(self, schema_type, request_data):
@@ -340,6 +350,7 @@ class DateParts(Widget):
     Simple three part date entry form
     """
 
+    type = 'DateParts'
     _template = 'DateParts'
     
     def __init__(self, **k):
@@ -395,6 +406,7 @@ class FileUpload(Widget):
     File upload widget.
     """
 
+    type = 'FileUpload'
     _template = 'FileUpload'
     
     def __init__(self, filestore, show_file_preview=True, show_download_link=False, show_image_thumbnail=False, url_base=None, \
@@ -519,6 +531,7 @@ class SelectChoice(Widget):
     Html Select element
     """
 
+    type = 'SelectChoice'
     _template = 'SelectChoice'
 
     none_option = (None, '- choose -')
@@ -588,6 +601,7 @@ class SelectWithOtherChoice(SelectChoice):
     """
     Html Select element
     """
+    type = 'SelectWithOtherChoice'
     _template = 'SelectWithOtherChoice'
 
     other_option = ('...', 'Other ...')
@@ -662,6 +676,7 @@ class RadioChoice(SelectChoice):
     Radio choice html element
     """
 
+    type = 'RadioChoice'
     _template = 'RadioChoice'
 
     none_option = (None, '- choose -')
@@ -722,6 +737,7 @@ class CheckboxMultiChoice(Widget):
     Checkbox multi choice is a set of checkboxes that for a sequence of data
     """
 
+    type = 'CheckboxMultiChoice'
     _template = 'CheckboxMultiChoice'
 
     def __init__(self, options, css_class=None):
@@ -794,6 +810,7 @@ class CheckboxMultiChoiceTree(Widget):
     A more complicated checkbox select that
     """
 
+    type = 'CheckboxMultiChoiceTree'
     _template = 'CheckboxMultiChoiceTree'
 
     def __init__(self, options, cssClass=None):
