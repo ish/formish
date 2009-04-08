@@ -21,6 +21,7 @@ class TestHTML(unittest.TestCase):
         
     def test_error_html(self):
         r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
+        r.POST['__formish_form__'] = 'form'
         r.POST['one'] = ''
         schema = schemaish.Structure([('one', schemaish.String(validator=v.Required()))])
         f = formish.Form(schema,name="form")
@@ -65,6 +66,7 @@ class TestHTML(unittest.TestCase):
 
         f.add_action(lambda x: x, 'submit', label="Submit Me")
         r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
+        r.POST['__formish_form__'] = 'form'
         r.POST['one'] = '9'
         try:
             data = f.validate(r)
@@ -81,6 +83,7 @@ class TestHTML(unittest.TestCase):
 
         f.add_action(lambda x: x, 'submit', label="Submit Me")
         r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
+        r.POST['__formish_form__'] = 'form'
         r.POST['one'] = ''
         try:
             data = f.validate(r)
@@ -98,6 +101,7 @@ class TestHTML(unittest.TestCase):
 
         f.add_action(lambda x: x, 'submit', label="Submit Me")
         r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
+        r.POST['__formish_form__'] = 'form'
         r.POST['one'] = ''
         try:
             data = f.validate(r)

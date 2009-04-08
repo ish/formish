@@ -784,8 +784,8 @@ class Form(object):
         """
         self.errors = {}
         # Check this request was POSTed by this form.
-        if not request.method =='POST' and \
-           request.POST.get('__formish_form__',None) == self.name:
+        if request.method !='POST' or \
+           request.POST.get('__formish_form__') != self.name:
             raise Exception("request does not match form name")
         
         request_post = UnicodeMultiDict(request.POST, \

@@ -201,7 +201,7 @@ class TestFormBuilding(unittest.TestCase):
     def test_form_retains_request_data(self):
         form = formish.Form(schemaish.Structure([("field", schemaish.String())]))
         assert 'name="field" value=""' in form()
-        data = form.validate(Request('formish', {'field': 'value'}))
+        data = form.validate(Request('form', {'field': 'value'}))
         assert data == {'field': 'value'}
         assert form.request_data['field'] == ['value']
         assert 'name="field" value="value"' in form()
