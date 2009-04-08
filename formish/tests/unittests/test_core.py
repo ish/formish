@@ -157,12 +157,6 @@ class TestFormBuilding(unittest.TestCase):
         # Does the convert data to request work
         self.assert_( validation.convert_data_to_request_data(form.structure, dotted( {'a': 3, 'b': '4'} )) == reqr)
 
-def success(request, data):
-    return 'success'
-
-def failure(request, form):
-    return 'failure'
-
     def test_failure_and_success_callables(self):
 
 
@@ -172,12 +166,16 @@ def failure(request, form):
 
         r = {'a':'2','b': '4'}
         request = Request(name, r)
-        self.assertEquals(form.validate(request, success, failure), 'failure')
+        self.assertEquals(form.validate(request, failure, success), 'failure')
+        self.assertEquals(form.validate(request, failure), 'failure')
+        self.assertRaises(formish.FormError, form.validate, request, success_callable=success)
 
         r = {'a': '12', 'b': '4'}
         request = Request(name, r)
         form = formish.Form(schema_flat, name)
-        self.assertEquals(form.validate(request, success, failure), 'success')
+        self.assertEquals(form.validate(request, failure, success), 'success')
+        self.assertEquals(form.validate(request, success_callable=success), 'success')
+        self.assertEquals(form.validate(request, failure_callable=failure), {'a': 12, 'b': '4'})
         
           
     def test_datetuple_type(self):
@@ -228,6 +226,14 @@ def failure(request, form):
         assert form.defaults == {'field': 'default value'}
         assert form.request_data == {'field': ['default value']}
         assert 'name="field" value="default value"' in form()
+
+
+def success(request, data):
+    return 'success'
+
+
+def failure(request, form):
+    return 'failure'
 
 
 class TestBugs(unittest.TestCase):
