@@ -167,11 +167,15 @@ class TestFormBuilding(unittest.TestCase):
         r = {'a':'2','b': '4'}
         request = Request(name, r)
         self.assertEquals(form.validate(request, failure, success), 'failure')
+        self.assertEquals(form.validate(request, failure), 'failure')
+        self.assertRaises(formish.FormError, form.validate, request, success_callable=success)
 
         r = {'a': '12', 'b': '4'}
         request = Request(name, r)
         form = formish.Form(schema_flat, name)
         self.assertEquals(form.validate(request, failure, success), 'success')
+        self.assertEquals(form.validate(request, success_callable=success), 'success')
+        self.assertEquals(form.validate(request, failure_callable=failure), {'a': 12, 'b': '4'})
         
           
     def test_datetuple_type(self):
