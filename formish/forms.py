@@ -695,8 +695,9 @@ class Form(object):
         """
         if len(self._actions)==0:
             raise validation.NoActionError('The form does not have any actions')
+        request_data = getattr(request, self.method.upper())
         for action in self._actions:
-            if action.name in request.POST.keys():
+            if action.name in request_data:
                 return action.callback(request, self, *args)
         return self._actions[0].callback(request, self, *args)
 

@@ -23,7 +23,6 @@ class Request(object):
         getattr(self, method.upper())['__formish_form__'] = form_name
         # Set the method
         self.method = method
-        print '**', 'GET:', self.GET, 'POST:', self.POST
         
             
 class TestFormBuilding(unittest.TestCase):
@@ -247,6 +246,36 @@ class TestFormBuilding(unittest.TestCase):
                                 ('get', Request(GET={'string': 'abc'}, method='GET'))]:
             data = formish.Form(schema, method=method).validate(request)
             self.assertTrue(data == {'string': 'abc'})
+
+
+class TestActions(unittest.TestCase):
+
+    def test_get(self):
+        request = Request(method='GET')
+        self.assertTrue(self._form('GET').action(request) == 'one')
+        request = Request(GET={'one': 'One'}, method='GET')
+        self.assertTrue(self._form('GET').action(request) == 'one')
+        request = Request(GET={'two': 'Two'}, method='GET')
+        self.assertTrue(self._form('GET').action(request) == 'two')
+
+    def test_post(self):
+        request = Request(method='POST')
+        self.assertTrue(self._form('POST').action(request) == 'one')
+        request = Request(POST={'one': 'One'}, method='POST')
+        self.assertTrue(self._form('POST').action(request) == 'one')
+        request = Request(POST={'two': 'Two'}, method='POST')
+        self.assertTrue(self._form('POST').action(request) == 'two')
+
+    def _form(self, method):
+        def callback1(*a, **k):
+            return 'one'
+        def callback2(*a, **k):
+            return 'two'
+        schema = schemaish.Structure([('string', schemaish.String())])
+        form = formish.Form(schema, method=method)
+        form.add_action(callback1, 'one')
+        form.add_action(callback2, 'two')
+        return form
 
 
 def success(request, data):
