@@ -26,7 +26,7 @@ class Test(unittest.TestCase):
         r = webob.Request.blank('http://localhost/')
         r.method = 'POST'
         r.content_type = 'application/x-www-form-urlencoded'
-        kvpairs = []
+        kvpairs = [('__formish_form__', 'form')]
         for k in d.dottedkeys():
             lastsegment = k.split('.')[-1]
             try:

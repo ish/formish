@@ -566,7 +566,9 @@ class Form(object):
 
     The Form type is the container for all the information a form needs to
     render and validate data.
-    """    
+    """
+
+    SUPPORTED_METHODS = ['GET', 'POST']
 
     renderer = _default_renderer
 
@@ -576,7 +578,7 @@ class Form(object):
     _request_data = None
 
     def __init__(self, structure, name=None, defaults=None, errors=None,
-            action_url=None, renderer=None):
+            action_url=None, renderer=None, method='POST'):
         """
         Create a new form instance
 
@@ -597,7 +599,12 @@ class Form(object):
 
         :arg renderer: Something that returns a form serialization when called
         :type renderer: callable
+
+        :arg method: Option method, default POST
+        :type method: string
         """
+        if method.upper() not in self.SUPPORTED_METHODS:
+            raise ValueError("method must be one of GET or POST")
         # allow a single schema items to be used on a form
         if not isinstance(structure, schemaish.Structure):
             structure = schemaish.Structure([structure])
@@ -615,6 +622,7 @@ class Form(object):
         self.action_url = action_url
         if renderer is not None:
             self.renderer = renderer
+        self.method = method
 
     def __repr__(self):
         attributes = []
@@ -687,8 +695,9 @@ class Form(object):
         """
         if len(self._actions)==0:
             raise validation.NoActionError('The form does not have any actions')
+        request_data = getattr(request, self.method.upper())
         for action in self._actions:
-            if action.name in request.POST.keys():
+            if action.name in request_data:
                 return action.callback(request, self, *args)
         return self._actions[0].callback(request, self, *args)
 
@@ -766,7 +775,7 @@ class Form(object):
         :raises: formish.FormError, raised on validation failure.
         """
         try: 
-            data = self.__validate(request)
+            data = self._validate(request)
         except validation.FormError, e:
             if failure_callable is None:
                 raise
@@ -777,32 +786,35 @@ class Form(object):
         else:
             return success_callable(request, data)
 
-    def __validate(self, request):
+    def _validate(self, request):
         """
         Get the data without raising exceptions and then validate the data. If
         there are errors, raise them; otherwise return the data
         """
+        # XXX Should this happen after the basic stuff has happened?
         self.errors = {}
-        # Check this request was POSTed by this form.
-        if not request.method =='POST' and \
-           request.POST.get('__formish_form__',None) == self.name:
+        # Decide what request data to use. The method will have been validated
+        # already (unless someone's messing around!) so we can just use it in a
+        # getattr.
+        request_data = getattr(request, self.method.upper())
+        # Check this request was submitted by this form.
+        if request_data.get('__formish_form__') != self.name:
             raise Exception("request does not match form name")
-        
-        request_post = UnicodeMultiDict(request.POST, \
-                        encoding=util.get_post_charset(request))
+        # Decode request data according to the request's charset.
+        request_data = UnicodeMultiDict(request_data,
+                                        encoding=util.get_post_charset(request))
         # Remove the sequence factory data from the request
-        for k in request_post.keys():
+        for k in request_data.keys():
             if '*' in k:
-                request_post.pop(k)
+                request_data.pop(k)
         # We need the _request_data to be populated so sequences know how many
         # items they have (i.e. .fields method on a sequence uses the number of
         # values on the _request_data)
-        self._request_data = dotted(request_post)
+        self._request_data = dotted(request_data)
         self.request_data = validation.pre_parse_request_data( \
-                    self.structure,dotted(request_post))
+                    self.structure,dotted(request_data))
         data = self.get_unvalidated_data( \
                     self.request_data, raise_exceptions=False)
-        #self._request_data = dotted(request_post)
         try:
             self.structure.attr.validate(data)
         except schemaish.attr.Invalid, e:

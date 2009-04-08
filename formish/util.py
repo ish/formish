@@ -53,7 +53,12 @@ def form_in_request(request):
     """
     Return the name of the form for the request or None.
     """
-    return request.POST.get('__formish_form__')
+    if request.method == 'POST':
+        return request.POST.get('__formish_form__')
+    if request.method == 'GET':
+        return request.GET.get('__formish_form__')
+    return None
+
 
 def get_post_charset(request):
     """Locate the unicode encoding of the POST'ed form data.
@@ -85,3 +90,4 @@ def get_post_charset(request):
             return charset
 
     return 'utf-8'
+
