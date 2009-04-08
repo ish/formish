@@ -766,7 +766,7 @@ class Form(object):
         :raises: formish.FormError, raised on validation failure.
         """
         try: 
-            data = self.__validate(request)
+            data = self._validate(request)
         except validation.FormError, e:
             if failure_callable is None:
                 raise
@@ -777,7 +777,7 @@ class Form(object):
         else:
             return success_callable(request, data)
 
-    def __validate(self, request):
+    def _validate(self, request):
         """
         Get the data without raising exceptions and then validate the data. If
         there are errors, raise them; otherwise return the data
