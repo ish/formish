@@ -15,12 +15,15 @@ class DummyObject(object):
 class Request(object):
     headers = {'content-type':'text/html'}
     
-    def __init__(self, form_name='form', POST=None):
-        if POST is None:
-            POST = {}
-        self.POST = MultiDict(POST)
-        self.POST['__formish_form__'] = form_name
-        self.method = 'POST'
+    def __init__(self, form_name='form', POST=None, GET=None, method='POST'):
+        # Build GET and POST data
+        self.GET = MultiDict(GET or {})
+        self.POST = MultiDict(POST or {})
+        # Add the form's name to the appropriate request data dict.
+        getattr(self, method.upper())['__formish_form__'] = form_name
+        # Set the method
+        self.method = method
+        print '**', 'GET:', self.GET, 'POST:', self.POST
         
             
 class TestFormBuilding(unittest.TestCase):
@@ -226,6 +229,24 @@ class TestFormBuilding(unittest.TestCase):
         assert form.defaults == {'field': 'default value'}
         assert form.request_data == {'field': ['default value']}
         assert 'name="field" value="default value"' in form()
+
+    def test_method(self):
+        schema = schemaish.Structure([('string', schemaish.String())])
+        # Default should be POST
+        self.assertTrue('method="post"' in formish.Form(schema)().lower())
+        # (Crudely) check that an explicit method is rendered correctly by the
+        # templates.
+        for method in ['POST', 'GET', 'get', 'Get']:
+            expected = ('method="%s"' % method).lower()
+            rendered = formish.Form(schema, method=method)().lower()
+            self.assertTrue(expected in rendered)
+        # Check that unsupported methods are rejected.
+        self.assertRaises(ValueError, formish.Form, schema, method='unsupported')
+        # Check that default (POST) and non-default (e.g. GET) forms validate.
+        for method, request in [('post', Request(POST={'string': 'abc'})),
+                                ('get', Request(GET={'string': 'abc'}, method='GET'))]:
+            data = formish.Form(schema, method=method).validate(request)
+            self.assertTrue(data == {'string': 'abc'})
 
 
 def success(request, data):
