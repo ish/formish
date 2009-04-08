@@ -112,6 +112,8 @@ I've skipped the majority of this output as it's probably better shown formatted
       </div>
     </form>
 
+If you want to see the HTML styled with a default CSS stylesheet, take a look at http://test.ish.io or look within the tests directory for a sample restish based website that includes a css file. 
+
 What's in the HTML
 ------------------
 
