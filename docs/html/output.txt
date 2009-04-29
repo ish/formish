@@ -1,0 +1,24 @@
+Results of doctest builder run on 2009-04-29 13:20:05
+=====================================================
+
+Document: introduction
+----------------------
+1 items passed all tests:
+  31 tests in default
+31 tests in 1 items.
+31 passed and 0 failed.
+Test passed.
+
+Document: walkthrough
+---------------------
+1 items passed all tests:
+ 105 tests in default
+105 tests in 1 items.
+105 passed and 0 failed.
+Test passed.
+
+Doctest summary
+===============
+  136 tests
+    0 failures in tests
+    0 failures in setup code

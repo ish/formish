@@ -3,7 +3,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Using Formish within Restish &mdash; Formish v1 documentation</title>
+    <title>Using Formish within Restish &amp;mdash; Formish v1 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -64,7 +64,6 @@
         <div class="bodywrapper">
           <div class="body">
             
-  
   <div class="section" id="using-formish-within-restish">
 <h1>Using Formish within Restish<a class="headerlink" href="#using-formish-within-restish" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="using-a-simple-form-withing-restish">
@@ -114,10 +113,8 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">html</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">form</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">thanks</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="n">data</span><span class="p">)</span>
 
-    <span class="nd">@templating</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="s">&#39;thanks.html&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">thanks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Just show the data &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">http</span><span class="o">.</span><span class="n">see_other</span><span class="p">(</span><span class="s">&#39;/thanks&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We need to have the following in the <tt class="docutils literal"><span class="pre">test.html</span></tt> file</p>
@@ -134,10 +131,10 @@
 <li>(On Success): Show a thanks page.</li>
 </ol>
 <p>We can also pass the success and failure callables to the validate function to simplify the form handling.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Root</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Resource</span><span class="p">(</span><span class="n">resource</span><span class="o">.</span><span class="n">Resource</span><span class="p">):</span>
 
     <span class="nd">@resource</span><span class="o">.</span><span class="n">GET</span><span class="p">()</span>
-    <span class="nd">@templating</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="s">&#39;test.html&#39;</span><span class="p">)</span>
+    <span class="nd">@templating</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="s">&#39;page.html&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">html</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">form</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">form</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">form</span> <span class="o">=</span> <span class="n">get_form</span><span class="p">()</span>
@@ -145,11 +142,10 @@
 
     <span class="nd">@resource</span><span class="o">.</span><span class="n">POST</span><span class="p">()</span>
     <span class="k">def</span> <span class="nf">POST</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">get_form</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">html</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thanks</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">get_contact_form</span><span class="p">()</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">html</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">thanks</span><span class="p">)</span>
 
-    <span class="nd">@templating</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="s">&#39;thanks.html&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">thanks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;data&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">http</span><span class="o">.</span><span class="n">see_other</span><span class="p">(</span><span class="s">&#39;/thanks&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -232,9 +228,8 @@
             <span class="n">form</span><span class="p">[</span><span class="s">&#39;domain&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain_form</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">{</span><span class="s">&#39;forms&#39;</span><span class="p">:</span> <span class="n">forms</span><span class="p">}</span>
 
-    <span class="nd">@templating</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="s">&#39;thanks.html&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">thanks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">http</span><span class="o">.</span><span class="n">see_other</span><span class="p">(</span><span class="s">&#39;/thanks&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>We could simplify this further, although I&#8217;m not sure this is quite as readable..</p>
@@ -265,9 +260,8 @@
                 <span class="n">form</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">form</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">{</span><span class="s">&#39;forms&#39;</span><span class="p">:</span> <span class="n">forms</span><span class="p">}</span>
 
-    <span class="nd">@templating</span><span class="o">.</span><span class="n">page</span><span class="p">(</span><span class="s">&#39;thanks.html&#39;</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">thanks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">http</span><span class="o">.</span><span class="n">see_other</span><span class="p">(</span><span class="s">&#39;/thanks&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

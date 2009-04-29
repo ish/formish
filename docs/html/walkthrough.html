@@ -3,7 +3,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>A Formish Walkthrough &mdash; Formish v1 documentation</title>
+    <title>A Formish Walkthrough &amp;mdash; Formish v1 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -64,7 +64,6 @@
         <div class="bodywrapper">
           <div class="body">
             
-  
   <div class="section" id="a-formish-walkthrough">
 <h1>A Formish Walkthrough<a class="headerlink" href="#a-formish-walkthrough" title="Permalink to this headline">¶</a></h1>
 <p>Formish is a templating language agnostic form generation and handling library.</p>
@@ -78,7 +77,7 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myfield&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">()</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">attrs</span>
-<span class="go">[(&#39;myfield&#39;, &lt;schemaish.attr.String object at 0x...&gt;)]</span>
+<span class="go">[(&#39;myfield&#39;, schemaish.String())]</span>
 </pre></div>
 </div>
 </div>
@@ -93,13 +92,13 @@
 <h4>Attributes of a form<a class="headerlink" href="#attributes-of-a-form" title="Permalink to this headline">¶</a></h4>
 <p>And what can we do with the form? Well at the moment we have a form name and some fields</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">name</span>
-<span class="go">&#39;formish&#39;</span>
+<span class="go">&#39;form&#39;</span>
 </pre></div>
 </div>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="n">field</span>
 <span class="gp">...</span>
-<span class="go">&lt;formish.forms.Field object at 0x...&gt;</span>
+<span class="go">formish.Field(name=&#39;myfield&#39;, attr=schemaish.String())</span>
 </pre></div>
 </div>
 </div>
@@ -113,7 +112,7 @@
 </div>
 <p>Obviously the name is what we have it.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span><span class="o">.</span><span class="n">widget</span>
-<span class="go">&lt;bound widget name=&quot;myfield&quot;, widget=&quot;Input&quot;, type=&quot;String&quot;&gt;</span>
+<span class="go">BoundWidget(widget=formish.Input(), field=formish.Field(name=&#39;myfield&#39;, attr=schemaish.String()))</span>
 </pre></div>
 </div>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span><span class="o">.</span><span class="n">title</span>
@@ -122,7 +121,7 @@
 </div>
 <p>The title, if not specified in the schema field, is derived from the form name by converting camel case into capitalised words.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span><span class="o">.</span><span class="n">cssname</span>
-<span class="go">&#39;formish-myfield&#39;</span>
+<span class="go">&#39;form-myfield&#39;</span>
 </pre></div>
 </div>
 <p>This is the start of the templating stuff.. The cssname is an identifier that can be inserted into forms, used for ids and class names.</p>
@@ -132,7 +131,7 @@
 <h3>How to create HTML<a class="headerlink" href="#how-to-create-html" title="Permalink to this headline">¶</a></h3>
 <p>We create our HTML by calling the form as follows..</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">()</span>
-<span class="go">&#39;...&lt;form id=&quot;form&quot; action=&quot;&quot; class=&quot;formish-form&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot; accept-charset=&quot;utf-8&quot;&gt;...&#39;</span>
+<span class="go">u&#39;...&lt;form id=&quot;form&quot; action=&quot;&quot; class=&quot;formish-form&quot; method=&quot;POST&quot; enctype=&quot;multipart/form-data&quot; accept-charset=&quot;utf-8&quot;&gt;...&#39;</span>
 </pre></div>
 </div>
 <p>I&#8217;ve skipped the majority of this output as it&#8217;s probably better shown formatted</p>
@@ -140,7 +139,7 @@
   <span class="nt">&lt;div&gt;</span>
     <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;_charset_&quot;</span> <span class="nt">/&gt;</span>
     <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;__formish_form__&quot;</span> <span class="na">value=</span><span class="s">&quot;form&quot;</span> <span class="nt">/&gt;</span>
-    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-myfield-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-myfield--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-string widget-input&quot;</span><span class="nt">&gt;</span>
       <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-myfield&quot;</span><span class="nt">&gt;</span>Myfield<span class="nt">&lt;/label&gt;</span>
       <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
         <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-myfield&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
@@ -153,11 +152,14 @@
 <span class="nt">&lt;/form&gt;</span>
 </pre></div>
 </div>
+<p>If you want to see the HTML styled with a default CSS stylesheet, take a look at <a class="reference external" href="http://test.ish.io">http://test.ish.io</a> or look within the tests directory for a sample restish based website that includes a css file.</p>
 </div>
 <div class="section" id="what-s-in-the-html">
 <h3>What&#8217;s in the HTML<a class="headerlink" href="#what-s-in-the-html" title="Permalink to this headline">¶</a></h3>
 <p>Firstly we have the form setup itself. The form name/id can be set by passing it into the Form as follows.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">named_form</span> <span class="o">=</span> <span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;myformname&#39;</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">named_form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;myformname&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">named_form</span>
+<span class="go">formish.Form(schemaish.Structure(&quot;myfield&quot;: schemaish.String()), name=&#39;myformname&#39;)</span>
 </pre></div>
 </div>
 <p>Otherwise the form defaults to &#8216;formish&#8217;.</p>
@@ -184,7 +186,7 @@
 <div class="section" id="the-input-field-s">
 <h4>The input field(s)<a class="headerlink" href="#the-input-field-s" title="Permalink to this headline">¶</a></h4>
 <div class="highlight-html"><div class="highlight"><pre><span class="c">&lt;!-- The String Field --&gt;</span>
-<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-myfield-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-myfield--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-string widget-input&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-myfield&quot;</span><span class="nt">&gt;</span>Myfield<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-myfield&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
@@ -210,6 +212,7 @@
 <p>Once the form is submitted, we can get the data by calling &#8216;validate&#8217;. In order to simulate this, we&#8217;re going to create a request object by hand using webob..</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">webob</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">webob</span><span class="o">.</span><span class="n">Request</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="s">&#39;http://localhost/&#39;</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;REQUEST_METHOD&#39;</span><span class="p">:</span> <span class="s">&#39;POST&#39;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;__formish_form__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;form&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;myfield&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;myvalue&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 <span class="go">{&#39;myfield&#39;: u&#39;myvalue&#39;}</span>
@@ -239,6 +242,8 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;country&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">()</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;termsAndConditions&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Boolean</span><span class="p">()</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span>
+<span class="go">formish.Form(schemaish.Structure(&quot;firstName&quot;: schemaish.String(), &quot;surname&quot;: schemaish.String(), &quot;dateOfBirth&quot;: schemaish.Date(), &quot;streetNumber&quot;: schemaish.Integer(), &quot;country&quot;: schemaish.String(), &quot;termsAndConditions&quot;: schemaish.Boolean()), name=&#39;form&#39;)</span>
 </pre></div>
 </div>
 <p>As you can see, we&#8217;ve got strings, an integer, a data and a boolean.</p>
@@ -250,26 +255,37 @@
 <span class="gp">... </span>    <span class="n">streetNumber</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Integer</span><span class="p">()</span>
 <span class="gp">... </span>    <span class="n">country</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">String</span><span class="p">()</span>
 <span class="gp">... </span>    <span class="n">termsAndConditions</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Boolean</span><span class="p">()</span>
+<span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">MySchema</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span>
+<span class="go">formish.Form(schemaish.Structure(&quot;firstName&quot;: schemaish.String(), &quot;surname&quot;: schemaish.String(), &quot;dateOfBirth&quot;: schemaish.Date(), &quot;streetNumber&quot;: schemaish.Integer(), &quot;country&quot;: schemaish.String(), &quot;termsAndConditions&quot;: schemaish.Boolean()), name=&#39;form&#39;)</span>
 </pre></div>
 </div>
 <p>By default, all of the fields use input boxes with the date asking for isoformat and the boolean asking for True or False. We want to make the form a little friendlier though.</p>
 <p>We&#8217;ll start with the date widget. Date parts uses three input boxes instead of a single input and, by default, is in US month first format. We&#8217;re in the UK so we change dayFirst to True</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;dateOfBirth&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">DateParts</span><span class="p">(</span><span class="n">dayFirst</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;dateOfBirth&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">DateParts</span><span class="p">(</span><span class="n">day_first</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;dateOfBirth&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span>
+<span class="go">BoundWidget(widget=formish.DateParts(day_first=True), field=formish.Field(name=&#39;dateOfBirth&#39;, attr=schemaish.Date()))</span>
 </pre></div>
 </div>
 <p>Next we&#8217;ll make the country a select box. To do this we pass a series of options to the SelectChoice widget.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;country&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">SelectChoice</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;UK&#39;</span><span class="p">,</span><span class="s">&#39;US&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;country&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span>
+<span class="go">BoundWidget(widget=formish.SelectChoice(options=[(&#39;UK&#39;, &#39;UK&#39;), (&#39;US&#39;, &#39;US&#39;)], none_option=(None, &#39;- choose -&#39;)), field=formish.Field(name=&#39;country&#39;, attr=schemaish.String()))</span>
 </pre></div>
 </div>
 <p>If we wanted different values for our options we would pass each option in as a tuple of (&#8216;value&#8217;,&#8217;label&#8217;). We could also set a label for the field that appears when there is no input value. This is called the &#8216;none_option&#8217;. The none_options defaults to (&#8216;&#8217;, &#8216;&#8211;choose&#8211;&#8217;) so we could change it to (&#8216;&#8217;,&#8217;Pick a Country&#8217;). Here is an example</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">options</span> <span class="o">=</span> <span class="p">[(</span><span class="s">&#39;UK&#39;</span><span class="p">,</span><span class="s">&#39;I live in the UK&#39;</span><span class="p">),(</span><span class="s">&#39;US&#39;</span><span class="p">,</span><span class="s">&#39;I live in the US&#39;</span><span class="p">)]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">none_option</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;&#39;</span><span class="p">,</span><span class="s">&#39;Where do you live&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;country&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">SelectChoice</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">,</span> <span class="n">none_option</span><span class="o">=</span><span class="n">none_option</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;country&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span>
+<span class="go">BoundWidget(widget=formish.SelectChoice(options=[(&#39;UK&#39;, &#39;I live in the UK&#39;), (&#39;US&#39;, &#39;I live in the US&#39;)], none_option=(&#39;&#39;, &#39;Where do you live&#39;)), field=formish.Field(name=&#39;country&#39;, attr=schemaish.String()))</span>
 </pre></div>
 </div>
 <p>Finally, we&#8217;d like a checkbox for the Boolean value</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;termsAndConditions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;termsAndConditions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span>
+<span class="go">BoundWidget(widget=formish.Checkbox(), field=formish.Field(name=&#39;termsAndConditions&#39;, attr=schemaish.Boolean()))</span>
 </pre></div>
 </div>
 </div>
@@ -284,14 +300,14 @@
 <div class="section" id="string-fields">
 <h4>String fields<a class="headerlink" href="#string-fields" title="Permalink to this headline">¶</a></h4>
 <p>This is the same as our first example but note that the label for firstName has been expanded into &#8216;First Name&#8217;.</p>
-<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-firstName-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-firstName--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-string widget-input&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-firstName&quot;</span><span class="nt">&gt;</span>First Name<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-firstName&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;firstName&quot;</span> <span class="na">value=</span><span class="s">&quot;Tim&quot;</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;/div&gt;</span>
 <span class="nt">&lt;/div&gt;</span>
 
-<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-surname-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-surname--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-string widget-input&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-surname&quot;</span><span class="nt">&gt;</span>Surname<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-surname&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;surname&quot;</span> <span class="na">value=</span><span class="s">&quot;Parkin&quot;</span> <span class="nt">/&gt;</span>
@@ -303,14 +319,14 @@
 <div class="section" id="date-field">
 <h4>Date Field<a class="headerlink" href="#date-field" title="Permalink to this headline">¶</a></h4>
 <p>The date field splits the date into three parts, each part indicated using dotted notation.</p>
-<div id="form-dateOfBirth-field" class="field date dateparts">
+<div id="form-dateOfBirth--field" class="field type-date widget-dateparts">
   <label for="form-dateOfBirth">Date Of Birth</label>
   <div class="inputs">
     <input id="form-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
     <input id="form-dateOfBirth-month" type="text" name="dateOfBirth.month" value="12" size="2" /> /
     <input id="form-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
   </div>
-</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-dateOfBirth-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field date dateparts&quot;</span><span class="nt">&gt;</span>
+</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-dateOfBirt--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-date widget-dateparts&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-dateOfBirth&quot;</span><span class="nt">&gt;</span>Date Of Birth<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-dateOfBirth&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth.day&quot;</span> <span class="na">value=</span><span class="s">&quot;18&quot;</span> <span class="na">size=</span><span class="s">&quot;2&quot;</span> <span class="nt">/&gt;</span> /
@@ -323,7 +339,7 @@
 </div>
 <div class="section" id="integer-field">
 <h4>Integer Field<a class="headerlink" href="#integer-field" title="Permalink to this headline">¶</a></h4>
-<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-streetNumber-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field integer input&quot;</span><span class="nt">&gt;</span>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-streetNumber--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-integer widget-input&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-streetNumber&quot;</span><span class="nt">&gt;</span>Street Number<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-streetNumber&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;streetNumber&quot;</span> <span class="na">value=</span><span class="s">&quot;123&quot;</span> <span class="nt">/&gt;</span>
@@ -335,7 +351,7 @@
 <div class="section" id="select-field">
 <h4>Select Field<a class="headerlink" href="#select-field" title="Permalink to this headline">¶</a></h4>
 <p>This uses the &#8216;none_option&#8217; value to show &#8216;Where do you live&#8217; by default but because we have set a default value, &#8216;I live in the UK&#8217; is selected.</p>
-<div id="form-country-field" class="field string selectchoice">
+<div id="form-country--field" class="field type-string widget-selectchoice">
   <label for="form-country">Country</label>
   <div class="inputs">
     <select id="form-country" name="country">
@@ -344,7 +360,7 @@
       <option value="US" >I live in the US</option>
     </select>
   </div>
-</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-country-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string selectchoice&quot;</span><span class="nt">&gt;</span>
+</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-country--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-string widget-selectchoice&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-country&quot;</span><span class="nt">&gt;</span>Country<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;select</span> <span class="na">id=</span><span class="s">&quot;form-country&quot;</span> <span class="na">name=</span><span class="s">&quot;country&quot;</span><span class="nt">&gt;</span>
@@ -359,7 +375,7 @@
 </div>
 <div class="section" id="boolean-field">
 <h4>Boolean Field<a class="headerlink" href="#boolean-field" title="Permalink to this headline">¶</a></h4>
-<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-termsAndConditions-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field boolean checkbox&quot;</span><span class="nt">&gt;</span>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-termsAndConditions--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-boolean widget-checkbox&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-termsAndConditions&quot;</span><span class="nt">&gt;</span>Terms And Conditions<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-termsAndConditions&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">name=</span><span class="s">&quot;termsAndConditions&quot;</span> <span class="na">value=</span><span class="s">&quot;True&quot;</span> <span class="na">checked=</span><span class="s">&quot;checked&quot;</span>  <span class="nt">/&gt;</span>
@@ -374,6 +390,7 @@
 <p>Repeating the creation of a request using webob, setting some input values and validating gives us:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">webob</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">webob</span><span class="o">.</span><span class="n">Request</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="s">&#39;http://localhost/&#39;</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;REQUEST_METHOD&#39;</span><span class="p">:</span> <span class="s">&#39;POST&#39;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;__formish_form__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;form&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;firstName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Tim&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;surname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Parkin&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;streetNumber&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;123&#39;</span>
@@ -382,20 +399,24 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;dateOfBirth.year&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;1966&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;country&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;UK&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;termsAndConditions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;True&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-<span class="go">...formish.validation.FormError: Tried to access data but conversion from request failed with 1 errors</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">formish</span><span class="o">.</span><span class="n">FormError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="n">e</span>
+<span class="gp">...</span>
+<span class="go">Tried to access data but conversion from request failed with 1 errors</span>
 </pre></div>
 </div>
 <p>The observant amongst you will notice I put a month of 13 in which has triggered a FormError.</p>
 <p>Let&#8217;s look at some of the error states on the form now</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">errors</span>
-<span class="go">{&#39;dateOfBirth&#39;: ConvertError(&#39;Invalid date: month must be in 1..12&#39;,)}</span>
+<span class="go">{&#39;dateOfBirth&#39;: &#39;Invalid date: month must be in 1..12&#39;}</span>
 </pre></div>
 </div>
 <p>The form has a dictionary of errors on it that map to the field names.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">get_field</span><span class="p">(</span><span class="s">&#39;dateOfBirth&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">field</span><span class="o">.</span><span class="n">error</span>
-<span class="go">ConvertError(&#39;Invalid date: month must be in 1..12&#39;,)</span>
+<span class="go">Invalid date: month must be in 1..12</span>
 </pre></div>
 </div>
 <p>The dateOfBirth field shows it&#8217;s own error.</p>
@@ -403,13 +424,11 @@
 <div class="section" id="showing-the-errors">
 <h3>Showing the errors<a class="headerlink" href="#showing-the-errors" title="Permalink to this headline">¶</a></h3>
 <p>The whole form is now in an error state and we can interrogate it about the errors. The form will also render itself with these errors.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span><span class="o">.</span><span class="n">classes</span>
-<span class="go">&#39;field date dateparts error&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">field</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre>
 </pre></div>
 </div>
 <p>This produces the following - note the error &#8216;span&#8217; below the form field.</p>
-<div id="form-dateOfBirth-field" class="field date dateparts error">
+<div id="form-dateOfBirth--field" class="field type-date widget-dateparts error">
   <label for="form-dateOfBirth">Date Of Birth</label>
   <div class="inputs">
     <input id="form-dateOfBirth" type="text" name="dateOfBirth.day" value="18" size="2" /> /
@@ -417,7 +436,7 @@
     <input id="form-dateOfBirth-year" type="text" name="dateOfBirth.year" value="1966" size="4" />
   </div>
   <span class="error">Invalid date: month must be in 1..12</span>
-</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-dateOfBirth-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field date dateparts error&quot;</span><span class="nt">&gt;</span>
+</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-dateOfBirth--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-date widget-dateparts error&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-dateOfBirth&quot;</span><span class="nt">&gt;</span>Date Of Birth<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-dateOfBirth&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;dateOfBirth.day&quot;</span> <span class="na">value=</span><span class="s">&quot;18&quot;</span> <span class="na">size=</span><span class="s">&quot;2&quot;</span> <span class="nt">/&gt;</span> /
@@ -432,12 +451,15 @@
 <p>Let&#8217;s see what happens if we have an invalid integer - we&#8217;ll fix the month first</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;dateOfBirth.month&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;12&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;streetNumber&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;aa&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-<span class="go">...formish.validation.FormError: Tried to access data but conversion from request failed with 1 errors</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">formish</span><span class="o">.</span><span class="n">FormError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="n">e</span>
+<span class="gp">...</span>
+<span class="go">Tried to access data but conversion from request failed with 1 errors</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">field</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">get_field</span><span class="p">(</span><span class="s">&#39;streetNumber&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">field</span><span class="o">.</span><span class="n">error</span>
-<span class="go">ConvertError(&#39;Not a valid number&#39;,)</span>
-<span class="go">&gt;&gt;&gt;</span>
+<span class="go">Not a valid integer</span>
 </pre></div>
 </div>
 </div>
@@ -453,7 +475,11 @@
 <h3>Success!<a class="headerlink" href="#success" title="Permalink to this headline">¶</a></h3>
 <p>Finally, lets see what valid data gives us..</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;streetNumber&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;123&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">formish</span><span class="o">.</span><span class="n">FormError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="n">e</span>
+<span class="gp">...</span>
 <span class="go">{&#39;termsAndConditions&#39;: True, &#39;surname&#39;: u&#39;Parkin&#39;, &#39;firstName&#39;: u&#39;Tim&#39;, &#39;country&#39;: u&#39;UK&#39;, &#39;dateOfBirth&#39;: datetime.date(1966, 12, 18), &#39;streetNumber&#39;: 123}</span>
 </pre></div>
 </div>
@@ -490,17 +516,23 @@ validatish.Invalid, if validation fails.</p>
 </pre></div>
 </div>
 <p>Let&#8217;s see this one in action</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">validatish</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myfield&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Integer</span><span class="p">(</span><span class="n">validator</span><span class="o">=</span><span class="n">validatish</span><span class="o">.</span><span class="n">is_integer</span><span class="p">)</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">webob</span><span class="o">.</span><span class="n">Request</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="s">&#39;http://localhost/&#39;</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;REQUEST_METHOD&#39;</span><span class="p">:</span> <span class="s">&#39;POST&#39;</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;myfield&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;aa&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-<span class="go">...formish.validation.FormError: Tried to access data but conversion from request failed with 1 errors</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;__formish_form__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;form&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">formish</span><span class="o">.</span><span class="n">FormError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="n">e</span>
+<span class="gp">...</span>
+<span class="go">Tried to access data but conversion from request failed with 1 errors</span>
 </pre></div>
 </div>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">errors</span>
-<span class="go">{&#39;myfield&#39;: ConvertError(&#39;Not a valid number&#39;,)}</span>
+<span class="go">{&#39;myfield&#39;: &#39;Not a valid integer&#39;}</span>
 </pre></div>
 </div>
 <p>Whilst it is perfectly acceptable to use functions for validation, our main library uses classes to aid type checking (for example to find out if our field is required for css styling) and in order to pass validator configuration.</p>
@@ -534,13 +566,13 @@ validatish.Invalid, if validation fails.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myfile&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">File</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">formish</span> <span class="kn">import</span> <span class="n">filehandler</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;myfile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">FileUpload</span><span class="p">(</span><span class="n">filehandler</span><span class="o">=</span><span class="n">filehandler</span><span class="o">.</span><span class="n">TempFileHandlerWeb</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">formish</span> <span class="kn">import</span> <span class="n">filestore</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;myfile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">FileUpload</span><span class="p">(</span><span class="n">filestore</span><span class="o">.</span><span class="n">CachedTempFilestore</span><span class="p">())</span>
 </pre></div>
 </div>
 <div class="section" id="what-does-this-produce">
 <h4>What does this produce?<a class="headerlink" href="#what-does-this-produce" title="Permalink to this headline">¶</a></h4>
-<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-myfile-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type fileupload&quot;</span><span class="nt">&gt;</span>
+<div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-myfile--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-file widget-fileupload&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-myfile&quot;</span><span class="nt">&gt;</span>Myfile<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-myfile-remove&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">name=</span><span class="s">&quot;myfile.remove&quot;</span> <span class="na">value=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
@@ -552,7 +584,7 @@ validatish.Invalid, if validation fails.</p>
 </pre></div>
 </div>
 <p>and looks like</p>
-<div id="form-myfile-field" class="field type fileupload">
+<div id="form-myfile-field" class="field type-file widget-fileupload">
   <label for="form-myfile">Myfile</label>
   <div class="inputs">
     <input id="form-myfile-remove" type="checkbox" name="myfile.remove" value="true" />
@@ -659,6 +691,34 @@ validatish.Invalid, if validation fails.</p>
 <div class="section" id="what-else-can-i-configure">
 <h4>What else can I configure?<a class="headerlink" href="#what-else-can-i-configure" title="Permalink to this headline">¶</a></h4>
 <p>The formish <tt class="docutils literal"><span class="pre">FileUpload</span></tt> widget takes the following arguments</p>
+<dl class="method">
+<dt id="formish.widgets.FileUpload.__init__">
+<tt class="descclassname">FileUpload.</tt><tt class="descname">__init__</tt><big>(</big><em>filestore</em>, <em>show_file_preview=True</em>, <em>show_download_link=False</em>, <em>show_image_thumbnail=False</em>, <em>url_base=None</em>, <em>css_class=None</em>, <em>image_thumbnail_default=None</em>, <em>url_ident_factory=None</em><big>)</big><a class="headerlink" href="#formish.widgets.FileUpload.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>filestore</em> &#8211; <p>filestore is any object with the following methods:</p>
+<dl class="docutils">
+<dt>storeFile(self, f)</dt>
+<dd>where f is a file instance</dd>
+</dl>
+</li>
+<li><em>show_image_thumbnail</em> &#8211; a boolean that, if set, will include an image
+thumbnail with the widget</li>
+<li><em>css_class</em> &#8211; extra css classes to apply to the widget</li>
+<li><em>image_thumbnail_default</em> &#8211; a default url to</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>XXX image_thumbnail_default -&gt; default_image 
+XXX allow_clear -&gt; allow_delete 
+XXX url_ident_factory -&gt; filestore_key_factory</p>
+</dd></dl>
+
 </div>
 </div>
 </div>
@@ -673,10 +733,12 @@ validatish.Invalid, if validation fails.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;myfield&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">2</span><span class="p">,</span><span class="mf">4</span><span class="p">]}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;myfield&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">CheckboxMultiChoice</span><span class="p">(</span><span class="n">options</span><span class="o">=</span><span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">2</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">4</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;myfield&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span>
+<span class="go">BoundWidget(widget=formish.CheckboxMultiChoice(options=[(1, &#39;1&#39;), (2, &#39;2&#39;), (3, &#39;3&#39;), (4, &#39;4&#39;)]), field=formish.Sequence(name=&#39;myfield&#39;, attr=schemaish.Sequence(schemaish.Integer())))</span>
 </pre></div>
 </div>
 <p>Let&#8217;s take a look at the html that produced..</p>
-<div id="form-myfield-field" class="field sequence checkboxmultichoice">
+<div id="form-myfield--field" class="field type-sequence widget-checkboxmultichoice">
   <label for="form-myfield">Myfield</label>
   <div class="inputs">
     <input id="form-myfield-0" name="myfield" type="checkbox" value="1" />
@@ -692,7 +754,7 @@ validatish.Invalid, if validation fails.</p>
     <label for="form-myfield-3">4</label>
     <br />
   </div>
-</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-myfield-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field sequence checkboxmultichoice&quot;</span><span class="nt">&gt;</span>
+</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-myfield--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-sequence widget-checkboxmultichoice&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-myfield&quot;</span><span class="nt">&gt;</span>Myfield<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-myfield-0&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span> <span class="na">type=</span><span class="s">&quot;checkbox&quot;</span> <span class="na">value=</span><span class="s">&quot;1&quot;</span> <span class="nt">/&gt;</span>
@@ -729,12 +791,12 @@ validatish.Invalid, if validation fails.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">defaults</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;myfield&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1</span><span class="p">,</span><span class="mf">3</span><span class="p">,</span><span class="mf">5</span><span class="p">,</span><span class="mf">7</span><span class="p">]}</span>
 </pre></div>
 </div>
-<div id="form-myfield-field" class="field sequence textarea">
+<div id="form-myfield--field" class="field type-sequence widget-textarea">
   <label for="form-myfield">Myfield</label>
   <div class="inputs">
     <textarea id="form-myfield" name="myfield">1,3,5,7</textarea>
   </div>
-</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-myfield-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field sequence textarea&quot;</span><span class="nt">&gt;</span>
+</div><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-myfield--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-sequence widget-textarea&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-myfield&quot;</span><span class="nt">&gt;</span>Myfield<span class="nt">&lt;/label&gt;</span>
   <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;textarea</span> <span class="na">id=</span><span class="s">&quot;form-myfield&quot;</span> <span class="na">name=</span><span class="s">&quot;myfield&quot;</span><span class="nt">&gt;</span>1,3,5,7<span class="nt">&lt;/textarea&gt;</span>
@@ -800,37 +862,37 @@ validatish.Invalid, if validation fails.</p>
 <form id="form" action="" method="post" enctype="multipart/form-data" accept-charset="utf-8">
   <input type="hidden" name="_charset_" />
   <input type="hidden" name="__formish_form__" value="form" />
-  <fieldset id="form-name-field" class="field myname sequencedefault sequencecontrols">
+  <fieldset id="form-name--field" class="field myname sequencedefault sequencecontrols">
     <legend>Name</legend>
-    <div id="form-name-firstName-field" class="field string input">
+    <div id="form-name-firstName--field" class="field type-string widget-input">
       <label for="form-name-firstName">First Name</label>
       <div class="inputs">
         <input id="form-name-firstName" type="text" name="name.firstName" value="" />
       </div>
     </div>
-    <div id="form-name-surname-field" class="field string input">
+    <div id="form-name-surname--field" class="field type-string widget-input">
       <label for="form-name-surname">Surname</label>
       <div class="inputs">
         <input id="form-name-surname" type="text" name="name.surname" value="" />
       </div>
     </div>
   </fieldset>
-  <fieldset id="form-address-field" class="field myaddress sequencedefault sequencecontrols">
+  <fieldset id="form-address--field" class="field myaddress widget-sequencedefault sequencecontrols">
     <legend>Address</legend>
-    <div id="form-address-streetNumber-field" class="field integer input">
+    <div id="form-address-streetNumber--field" class="field type-integer widget-input">
       <label for="form-address-streetNumber">Street Number</label>
       <div class="inputs">
         <input id="form-address-streetNumber" type="text" name="address.streetNumber" value="" />
       </div>
     </div>
-    <div id="form-address-country-field" class="field string input">
+    <div id="form-address-country--field" class="field type-string widget-input">
       <label for="form-address-country">Country</label>
       <div class="inputs">
         <input id="form-address-country" type="text" name="address.country" value="" />
       </div>
     </div>
   </fieldset>
-  <div id="form-termsAndConditions-field" class="field boolean input">
+  <div id="form-termsAndConditions--field" class="field type-boolean widget-input">
     <label for="form-termsAndConditions">Terms And Conditions</label>
     <div class="inputs">
       <input id="form-termsAndConditions" type="text" name="termsAndConditions" value="" />
@@ -842,37 +904,37 @@ validatish.Invalid, if validation fails.</p>
 </form><div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;form&quot;</span> <span class="na">action=</span><span class="s">&quot;&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span> <span class="na">accept-charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;_charset_&quot;</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;__formish_form__&quot;</span> <span class="na">value=</span><span class="s">&quot;form&quot;</span> <span class="nt">/&gt;</span>
-  <span class="nt">&lt;fieldset</span> <span class="na">id=</span><span class="s">&quot;form-name-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field myname sequencedefault sequencecontrols&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;fieldset</span> <span class="na">id=</span><span class="s">&quot;form-name--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field myname sequencedefault sequencecontrols&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;legend&gt;</span>Name<span class="nt">&lt;/legend&gt;</span>
-    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-name-firstName-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-name-firstName--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-string widget-input&quot;</span><span class="nt">&gt;</span>
       <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-name-firstName&quot;</span><span class="nt">&gt;</span>First Name<span class="nt">&lt;/label&gt;</span>
       <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
         <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-name-firstName&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;name.firstName&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
       <span class="nt">&lt;/div&gt;</span>
     <span class="nt">&lt;/div&gt;</span>
-    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-name-surname-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-name-surname--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-string widget-input&quot;</span><span class="nt">&gt;</span>
       <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-name-surname&quot;</span><span class="nt">&gt;</span>Surname<span class="nt">&lt;/label&gt;</span>
       <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
         <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-name-surname&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;name.surname&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
       <span class="nt">&lt;/div&gt;</span>
     <span class="nt">&lt;/div&gt;</span>
   <span class="nt">&lt;/fieldset&gt;</span>
-  <span class="nt">&lt;fieldset</span> <span class="na">id=</span><span class="s">&quot;form-address-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field myaddress sequencedefault sequencecontrols&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;fieldset</span> <span class="na">id=</span><span class="s">&quot;form-address--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field myaddress widget-sequencedefault sequencecontrols&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;legend&gt;</span>Address<span class="nt">&lt;/legend&gt;</span>
-    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-address-streetNumber-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field integer input&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-address-streetNumber--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-integer widget-input&quot;</span><span class="nt">&gt;</span>
       <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-address-streetNumber&quot;</span><span class="nt">&gt;</span>Street Number<span class="nt">&lt;/label&gt;</span>
       <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
         <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-address-streetNumber&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;address.streetNumber&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
       <span class="nt">&lt;/div&gt;</span>
     <span class="nt">&lt;/div&gt;</span>
-    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-address-country-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field string input&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-address-country--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-string widget-input&quot;</span><span class="nt">&gt;</span>
       <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-address-country&quot;</span><span class="nt">&gt;</span>Country<span class="nt">&lt;/label&gt;</span>
       <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
         <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-address-country&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;address.country&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
       <span class="nt">&lt;/div&gt;</span>
     <span class="nt">&lt;/div&gt;</span>
   <span class="nt">&lt;/fieldset&gt;</span>
-  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-termsAndConditions-field&quot;</span> <span class="na">class=</span><span class="s">&quot;field boolean input&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;form-termsAndConditions--field&quot;</span> <span class="na">class=</span><span class="s">&quot;field type-boolean widget-input&quot;</span><span class="nt">&gt;</span>
     <span class="nt">&lt;label</span> <span class="na">for=</span><span class="s">&quot;form-termsAndConditions&quot;</span><span class="nt">&gt;</span>Terms And Conditions<span class="nt">&lt;/label&gt;</span>
     <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;inputs&quot;</span><span class="nt">&gt;</span>
       <span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">&quot;form-termsAndConditions&quot;</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;termsAndConditions&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
@@ -897,7 +959,8 @@ validatish.Invalid, if validation fails.</p>
 <h3>Tuples<a class="headerlink" href="#tuples" title="Permalink to this headline">¶</a></h3>
 <p>A tuple can be used to create a list that has different types in it. For instance, if we used the Sequence of Sequence example above, we have no control over how many items are in each row. Using a Sequence of Tuples allows us to define the length of the row and also the types of the items in the row.</p>
 <p>Lets see how that works.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myfield&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Sequence</span><span class="p">(</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Tuple</span><span class="p">(</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Integer</span><span class="p">(),</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Date</span><span class="p">()</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myfield&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Sequence</span><span class="p">(</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Tuple</span><span class="p">(</span> <span class="p">(</span><span class="n">schemaish</span><span class="o">.</span><span class="n">Integer</span><span class="p">(),</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Date</span><span class="p">())</span> <span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;myfield&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span><span class="o">=</span><span class="n">formish</span><span class="o">.</span><span class="n">TextArea</span><span class="p">()</span>
 </pre></div>
@@ -909,9 +972,188 @@ validatish.Invalid, if validation fails.</p>
 <h2>Class Documentation<a class="headerlink" href="#class-documentation" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="form-class">
 <h3>Form Class<a class="headerlink" href="#form-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="formish.forms.Form">
+<em class="property">
+class </em><tt class="descclassname">formish.forms.</tt><tt class="descname">Form</tt><big>(</big><em>structure</em>, <em>name=None</em>, <em>defaults=None</em>, <em>errors=None</em>, <em>action_url=None</em>, <em>renderer=None</em>, <em>method='POST'</em><big>)</big><a class="headerlink" href="#formish.forms.Form" title="Permalink to this definition">¶</a></dt>
+<dd><p>The definition of a form</p>
+<p>The Form type is the container for all the information a form needs to
+render and validate data.</p>
+<p>Create a new form instance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>structure</em> (schemaish.Structure) &#8211; Schema Structure attribute to bind to the the form</li>
+<li><em>name</em> (str &#8220;valid html id&#8221;) &#8211; Optional form name used to identify multiple forms on the same page</li>
+<li><em>defaults</em> (dict) &#8211; Default values for the form</li>
+<li><em>errors</em> (dict) &#8211; Errors to store on the form for redisplay</li>
+<li><em>action_url</em> (string &#8220;url or path&#8221;) &#8211; Use if you don&#8217;t want the form to post to itself</li>
+<li><em>renderer</em> (callable) &#8211; Something that returns a form serialization when called</li>
+<li><em>method</em> (string) &#8211; Option method, default POST</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="formish.forms.Form.action">
+<tt class="descname">action</tt><big>(</big><em>request</em>, <em>*args</em><big>)</big><a class="headerlink" href="#formish.forms.Form.action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find and call the action callback for the action found in the request</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>request</em> (webob.Request) &#8211; request which is used to find the action and also passed through to
+the callback</li>
+<li><em>args</em> &#8211; list of arguments Pass through to the callback</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Form.add_action">
+<tt class="descname">add_action</tt><big>(</big><em>callback</em>, <em>name='submit'</em>, <em>label=None</em><big>)</big><a class="headerlink" href="#formish.forms.Form.add_action" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an action callable to the form</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>callback</em> (callable) &#8211; A function to call if this action is triggered</li>
+<li><em>name</em> (string) &#8211; The identifier for this action</li>
+<li><em>label</em> (string) &#8211; Use this label instead of the form.name for the value of
+the action (for buttons, the value is used as the text on the button)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Form.fields">
+<tt class="descname">fields</tt><a class="headerlink" href="#formish.forms.Form.fields" title="Permalink to this definition">¶</a></dt>
+<dd>Return a generator that yields all of the fields at the top level of
+the form (e.g. if a field is a subsection or sequence, it will be up to
+the application to iterate that field&#8217;s fields.</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Form.validate">
+<tt class="descname">validate</tt><big>(</big><em>request</em>, <em>failure_callable=None</em>, <em>success_callable=None</em><big>)</big><a class="headerlink" href="#formish.forms.Form.validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate the form data in the request.</p>
+<p>By default, this method returns either a dict of data or raises an
+exception if validation fails. However, if either success_callable or
+failure_callable are provided then the approriate callback will be
+called, and the callback&#8217;s result will be returned instead.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><em>request</em> (webob.Request) &#8211; the HTTP request</li>
+<li><em>failure_callable</em> &#8211; Optional callback to call on failure.</li>
+<li><em>success_callable</em> &#8211; Optional callback to call on success.</li>
+</ul>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Python dict of converted and validated data.</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last">formish.FormError, raised on validation failure.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Form.__call__">
+<tt class="descname">__call__</tt><big>(</big><big>)</big><a class="headerlink" href="#formish.forms.Form.__call__" title="Permalink to this definition">¶</a></dt>
+<dd>Calling the Form generates a serialisation using the form&#8217;s renderer</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="field-class">
 <h3>Field Class<a class="headerlink" href="#field-class" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="formish.forms.Field">
+<em class="property">
+class </em><tt class="descclassname">formish.forms.</tt><tt class="descname">Field</tt><big>(</big><em>name</em>, <em>attr</em>, <em>form</em><big>)</big><a class="headerlink" href="#formish.forms.Field" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for a schema field type that includes form information.</p>
+<p>The Schema Type Atribute does not have any bindings to the form library, it can be
+used on it&#8217;s own. We bind the Schema Attribute to a Field in order to include form
+related information.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field"><th class="field-name" colspan="2">Method __call__:</th></tr>
+<tr><td>&nbsp;</td><td class="field-body"><p class="first">returns a serialisation for this field using the form&#8217;s renderer - read only</p>
+</td>
+</tr>
+<tr class="field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><em>name</em> &#8211; Name for the field</li>
+<li><em>attr</em> (schemaish.attr.*) &#8211; Schema attr to bind to the field</li>
+<li><em>form</em> (formish.Form instance.) &#8211; The form the field belongs to.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="formish.forms.Field.title">
+<tt class="descname">title</tt><a class="headerlink" href="#formish.forms.Field.title" title="Permalink to this definition">¶</a></dt>
+<dd>The Field schema&#8217;s title</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.description">
+<tt class="descname">description</tt><a class="headerlink" href="#formish.forms.Field.description" title="Permalink to this definition">¶</a></dt>
+<dd>The Field schema&#8217;s description</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.cssname">
+<tt class="descname">cssname</tt><a class="headerlink" href="#formish.forms.Field.cssname" title="Permalink to this definition">¶</a></dt>
+<dd>cssname identifier for the field</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.classes">
+<tt class="descname">classes</tt><a class="headerlink" href="#formish.forms.Field.classes" title="Permalink to this definition">¶</a></dt>
+<dd>Works out a list of classes that should be applied to the field</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.value">
+<tt class="descname">value</tt><a class="headerlink" href="#formish.forms.Field.value" title="Permalink to this definition">¶</a></dt>
+<dd>Convert the request_data to a value object for the form or None.</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.required">
+<tt class="descname">required</tt><a class="headerlink" href="#formish.forms.Field.required" title="Permalink to this definition">¶</a></dt>
+<dd>Does this field have a Not Empty validator of some sort</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.error">
+<tt class="descname">error</tt><a class="headerlink" href="#formish.forms.Field.error" title="Permalink to this definition">¶</a></dt>
+<dd>Lazily get the error from the form.errors when needed</dd></dl>
+
+<dl class="attribute">
+<dt id="formish.forms.Field.widget">
+<tt class="descname">widget</tt><a class="headerlink" href="#formish.forms.Field.widget" title="Permalink to this definition">¶</a></dt>
+<dd>return the fields widget bound with extra params.</dd></dl>
+
+<dl class="method">
+<dt id="formish.forms.Field.__call__">
+<tt class="descname">__call__</tt><big>(</big><big>)</big><a class="headerlink" href="#formish.forms.Field.__call__" title="Permalink to this definition">¶</a></dt>
+<dd>returns a serialisation for this field using the form&#8217;s renderer</dd></dl>
+
+</dd></dl>
+
 </div>
 </div>
 </div>
