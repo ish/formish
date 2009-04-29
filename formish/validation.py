@@ -143,7 +143,7 @@ def from_request_data(form_structure, request_data, data=None, errors=None):
         try:
             if field.type is 'group' or \
               (field.type == 'sequence' and \
-                (field.widget._template is 'SequenceDefault' \
+                (field.widget.type is 'SequenceDefault' \
                  or field.widget.converttostring is False)):
                 if field.type == 'sequence':
                     # Make sure we have an empty field at least. If we don't do
@@ -173,7 +173,7 @@ def pre_parse_incoming_request_data(form_structure, request_data, data=None):
     for field in form_structure.fields:
         if field.type is 'group' or \
           (field.type == 'sequence' and \
-             field.widget._template is 'SequenceDefault'):
+             field.widget.type is 'SequenceDefault'):
             pre_parse_incoming_request_data(field, request_data, data=data)
         else: 
             # This needs to be cleverer...
