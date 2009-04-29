@@ -113,6 +113,15 @@ def unittest_StringDifferentEmpty(self, formdef):
     self.assertIdHasValue(f, 'form-myStringField', '8')
     self.assertRoundTrip(f, testdata)
 
+def form_Tuple(request):
+    """
+    A simple form with a single tuple field of string, integer form
+    """
+    schema = schemaish.Structure()
+    schema.add('myIntegerField', schemaish.Tuple(attrs=[schemaish.String(), schemaish.Integer()]))
+    form = formish.Form(schema, 'form')
+    return form
+
 def form_Integer(request):
     """
     A simple form with a single integer field
@@ -361,13 +370,13 @@ def functest_Decimal(self):
     sel.type("form-myDecimalField", "1")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myDecimalField': Decimal(\"1\")}"))
+    try: self.failUnless(sel.is_text_present("{'myDecimalField': Decimal('1')}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
     sel.type("form-myDecimalField", "18.001")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myDecimalField': Decimal(\"18.001\")}"))
+    try: self.failUnless(sel.is_text_present("{'myDecimalField': Decimal('18.001')}"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
     return

@@ -1,4 +1,4 @@
 <%page args="field" />
-% if field.widget._template != 'Hidden':
+% if field.widget.type != 'Hidden':
 <label for="${field.cssname}">${field.title}</label>
 %endif

@@ -22,7 +22,7 @@ class Widget(object):
     """
     
     type = None
-    _template = None
+    template = None
     
     def __init__(self, **k):
         self.css_class = k.get('css_class', None)
@@ -33,7 +33,7 @@ class Widget(object):
             self.converter_options['delimiter'] = ','
     
 
-    def pre_render(self, schema_type, data):
+    def to_request_data(self, schema_type, data):
         """
         Before the widget is rendered, the data is converted to a string
         format.If the data is None then we return an empty string. The sequence
@@ -45,7 +45,7 @@ class Widget(object):
         return [string_data]
 
 
-    def pre_parse_request(self, schema_type, request_data, full_request_data):
+    def pre_parse_incoming_request_data(self, schema_type, request_data, full_request_data):
         """
         Prior to convert being run, we have a chance to munge the data. This is
         only used by file upload at the moment
@@ -53,7 +53,7 @@ class Widget(object):
         return request_data
 
 
-    def convert(self, schema_type, request_data):
+    def from_request_data(self, schema_type, request_data):
         """
         after the form has been submitted, the request data is converted into
         to the schema type.
@@ -66,7 +66,7 @@ class Widget(object):
 
 
     def __call__(self, field):
-        return field.form.renderer('/formish/widgets/%s.html'%self._template, {'f':field})
+        return field.form.renderer('/formish/widgets/%s.html'%self.template, {'f':field})
 
     def __repr__(self):
         attributes = []
@@ -87,7 +87,7 @@ class Input(Widget):
     """
 
     type = 'Input'
-    _template = 'Input'
+    template = 'field.Input'
 
     def __init__(self, **k):
         self.strip = k.pop('strip', True)
@@ -95,7 +95,7 @@ class Input(Widget):
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
 
-    def convert(self, schema_type, request_data):
+    def from_request_data(self, schema_type, request_data):
         """
         Default to stripping whitespace
         """
@@ -125,7 +125,7 @@ class Password(Input):
     Password widget is a basic input type but using password html input type
     """
     type = 'Password'
-    _template = 'Password'
+    template = 'field.Password'
 
 
    
@@ -135,7 +135,7 @@ class CheckedPassword(Input):
     """
 
     type = 'CheckedPassword'
-    _template = 'CheckedPassword'
+    template = 'field.CheckedPassword'
 
     def __init__(self, **k):
         self.strip = k.pop('strip', True)
@@ -144,7 +144,7 @@ class CheckedPassword(Input):
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
             
-    def pre_render(self, schema_type, data):
+    def to_request_data(self, schema_type, data):
         """
         Extract both the password and confirm fields
         """
@@ -153,7 +153,7 @@ class CheckedPassword(Input):
             return {'password': [''], 'confirm': ['']}
         return {'password': [string_data], 'confirm': [string_data]}
     
-    def convert(self, schema_type, request_data):
+    def from_request_data(self, schema_type, request_data):
         """
         Check the password and confirm match (when stripped)
         """
@@ -187,7 +187,7 @@ class Hidden(Input):
     Basic input but using a hidden html input field
     """
     type = 'Hidden'
-    _template = 'Hidden'
+    template = 'field.Hidden'
 
 
 
@@ -202,7 +202,7 @@ class SequenceDefault(Widget):
     """
 
     type = 'SequenceDefault'
-    _template = 'SequenceDefault'
+    template = 'sequence.-'
 
     def __init__(self, **k):
         Widget.__init__(self, **k)
@@ -212,9 +212,9 @@ class SequenceDefault(Widget):
         self.sortable = k.get('sortable', True)
         self.converttostring = False
 
-    def pre_render(self, schema_type, data):
+    def to_request_data(self, schema_type, data):
         """
-        Short circuits the usual pre_render
+        Short circuits the usual to_request_data
         """
         return data
 
@@ -246,7 +246,7 @@ class TextArea(Input):
     """
 
     type = 'TextArea'
-    _template = 'TextArea'
+    template = 'field.TextArea'
     
     def __init__(self, **k):
         self.cols = k.pop('cols', None)
@@ -256,7 +256,7 @@ class TextArea(Input):
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = '\n'
     
-    def pre_render(self, schema_type, data):
+    def to_request_data(self, schema_type, data):
         """
         We're using the converter options to allow processing sequence data
         using the csv module
@@ -267,7 +267,7 @@ class TextArea(Input):
             return ['']
         return [string_data]
     
-    def convert(self, schema_type, request_data):
+    def from_request_data(self, schema_type, request_data):
         """
         We're using the converter options to allow processing sequence data
         using the csv module
@@ -299,7 +299,7 @@ class Grid(Input):
     """
 
     type = 'Grid'
-    _template = 'Grid'
+    template = 'field.Grid'
     
     def __init__(self, **k):
         Input.__init__(self, **k)
@@ -307,12 +307,12 @@ class Grid(Input):
             self.converter_options['delimiter'] = '\n'
         self.converttostring = False
     
-    def pre_render(self, schema_type, data):
+    def to_request_data(self, schema_type, data):
         string_data = string_converter(schema_type).from_type(data, \
             converter_options=self.converter_options)
         return [string_data]
     
-    def convert(self, schema_type, request_data):
+    def from_request_data(self, schema_type, request_data):
         string_data = request_data[0]
         return string_converter(schema_type).to_type(string_data,
             converter_options=self.converter_options)
@@ -332,9 +332,9 @@ class Checkbox(Widget):
     """
 
     type = 'Checkbox'
-    _template = 'Checkbox'
+    template = 'field.Checkbox'
 
-    def convert(self, schema_type, request_data):
+    def from_request_data(self, schema_type, request_data):
         """
         If the request data exists, then we treat this as True
         """
@@ -351,7 +351,7 @@ class DateParts(Widget):
     """
 
     type = 'DateParts'
-    _template = 'DateParts'
+    template = 'field.DateParts'
     
     def __init__(self, **k):
         self.strip = k.pop('strip', True)
@@ -361,7 +361,7 @@ class DateParts(Widget):
             self.converter_options['delimiter'] = ','
 
         
-    def pre_render(self, schema_type, data):
+    def to_request_data(self, schema_type, data):
         """
         Convert to date parts
         """
@@ -372,7 +372,7 @@ class DateParts(Widget):
                 'month': [dateparts[1]],
                 'day': [dateparts[2]]}
     
-    def convert(self, schema_type, request_data):
+    def from_request_data(self, schema_type, request_data):
         """
         Pull out the parts and convert
         """
@@ -407,9 +407,10 @@ class FileUpload(Widget):
     """
 
     type = 'FileUpload'
-    _template = 'FileUpload'
+    template = 'field.FileUpload'
     
-    def __init__(self, filestore, show_file_preview=True, show_download_link=False, show_image_thumbnail=False, url_base=None, \
+    def __init__(self, filestore, show_file_preview=True, show_download_link=False, \
+                 show_image_thumbnail=False, url_base=None, \
                  css_class=None, image_thumbnail_default=None, url_ident_factory=None):
         """
         :arg filestore: filestore is any object with the following methods:
@@ -472,7 +473,7 @@ class FileUpload(Widget):
             key = data
         return '%s/%s' % (self.url_base, key)
     
-    def pre_render(self, schema_type, data):
+    def to_request_data(self, schema_type, data):
         """
         We use the url factory to get an identifier for the file which we use
         as the name. We also store it in the 'default' field so we can check if
@@ -488,7 +489,7 @@ class FileUpload(Widget):
             default = ''
         return {'name': [default], 'default':[default], 'mimetype':[mimetype]}
     
-    def pre_parse_request(self, schema_type, data, full_request_data):
+    def pre_parse_incoming_request_data(self, schema_type, data, full_request_data):
         """
         File uploads are wierd; in out case this means assymetric. We store the
         file in a temporary location and just store an identifier in the field.
@@ -507,7 +508,7 @@ class FileUpload(Widget):
             data['mimetype'] = [fieldstorage.type]
         return data
     
-    def convert(self, schema_type, request_data):
+    def from_request_data(self, schema_type, request_data):
         """
         Creates a File object if possible
         """
@@ -532,7 +533,7 @@ class SelectChoice(Widget):
     """
 
     type = 'SelectChoice'
-    _template = 'SelectChoice'
+    template = 'field.SelectChoice'
 
     none_option = (None, '- choose -')
 
@@ -602,7 +603,7 @@ class SelectWithOtherChoice(SelectChoice):
     Html Select element
     """
     type = 'SelectWithOtherChoice'
-    _template = 'SelectWithOtherChoice'
+    template = 'field.SelectWithOtherChoice'
 
     other_option = ('...', 'Other ...')
 
@@ -613,7 +614,7 @@ class SelectWithOtherChoice(SelectChoice):
         self.strip = k.pop('strip',True)
         SelectChoice.__init__(self, options, **k)
 
-    def pre_render(self, schema_type, data):
+    def to_request_data(self, schema_type, data):
         """
         populate the other choice if needed
         """
@@ -622,7 +623,7 @@ class SelectWithOtherChoice(SelectChoice):
             return {'select': ['...'], 'other': [string_data]}
         return {'select': [string_data], 'other': ['']}
 
-    def convert(self, schema_type, request_data):
+    def from_request_data(self, schema_type, request_data):
         """
         Check to see if we need to use the 'other' value
         """
@@ -677,7 +678,7 @@ class RadioChoice(SelectChoice):
     """
 
     type = 'RadioChoice'
-    _template = 'RadioChoice'
+    template = 'field.RadioChoice'
 
     none_option = (None, '- choose -')
 
@@ -694,7 +695,7 @@ class RadioChoice(SelectChoice):
         else:
             return ''
 
-    def convert(self, schema_type, request_data):
+    def from_request_data(self, schema_type, request_data):
         """
         If we don't have a choice, set a blank value
         """
@@ -738,13 +739,13 @@ class CheckboxMultiChoice(Widget):
     """
 
     type = 'CheckboxMultiChoice'
-    _template = 'CheckboxMultiChoice'
+    template = 'field.CheckboxMultiChoice'
 
     def __init__(self, options, css_class=None):
         self.options = _normalise_options(options)
         Widget.__init__(self, css_class=css_class)
             
-    def pre_render(self, schema_type, data):
+    def to_request_data(self, schema_type, data):
         """
         Iterate over the data, converting each one
         """
@@ -752,7 +753,7 @@ class CheckboxMultiChoice(Widget):
             return []
         return [string_converter(schema_type.attr).from_type(d) for d in data]
     
-    def convert(self, schema_type, request_data):
+    def from_request_data(self, schema_type, request_data):
         """
         Iterating to convert back to the source data
         """
@@ -811,19 +812,19 @@ class CheckboxMultiChoiceTree(Widget):
     """
 
     type = 'CheckboxMultiChoiceTree'
-    _template = 'CheckboxMultiChoiceTree'
+    template = 'field.CheckboxMultiChoiceTree'
 
     def __init__(self, options, cssClass=None):
         self.options = options
         self.optiontree = mktree(options)
         Widget.__init__(self,cssClass=cssClass)
             
-    def pre_render(self, schema_type, data):
+    def to_request_data(self, schema_type, data):
         if data is None: 
             return []
         return [string_converter(schema_type.attr).from_type(d) for d in data]
     
-    def convert(self, schema_type, data):
+    def from_request_data(self, schema_type, data):
         return [string_converter(schema_type.attr).to_type(d) for d in data]
 
     def checked(self, option, values, schema_type):

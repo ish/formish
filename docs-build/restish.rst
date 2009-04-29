@@ -53,10 +53,8 @@ We'll start off with one of the examples from the Formish documentation.
                 return self.html(request, form)
             return self.thanks(request,data)
 
-        @templating.page('thanks.html')
         def thanks(self, request, data):
-            """ Just show the data """
-            return {'data': data}
+            return http.see_other('/thanks')
 
 
 We need to have the following in the ``test.html`` file
@@ -78,10 +76,10 @@ We can also pass the success and failure callables to the validate function to s
 
 .. code-block:: python
 
-    class Root(resource.Resource):
+    class Resource(resource.Resource):
 
         @resource.GET()
-        @templating.page('test.html')
+        @templating.page('page.html')
         def html(self, request, form=None):
             if form is None:
                 form = get_form()
@@ -89,11 +87,10 @@ We can also pass the success and failure callables to the validate function to s
 
         @resource.POST()
         def POST(self, request):
-            return get_form().validate(request, self.html, self.thanks)
+            return get_contact_form().validate(request, self.html, self.thanks)
 
-        @templating.page('thanks.html')
         def thanks(self, request, data):
-            return {'data': data}
+            return http.see_other('/thanks')
 
 
 Multiple Actions on a Form
@@ -186,9 +183,8 @@ If we have more than one form on a page, we can use the utility function, ``form
                 form['domain'] = self._domain_form()
             return {'forms': forms}
 
-        @templating.page('thanks.html')
         def thanks(self, request, data):
-            pass
+            return http.see_other('/thanks')
 
 We could simplify this further, although I'm not sure this is quite as readable.. 
 
@@ -221,6 +217,5 @@ We could simplify this further, although I'm not sure this is quite as readable.
                     form[f] = self.form(f)
             return {'forms': forms}
 
-        @templating.page('thanks.html')
         def thanks(self, request, data):
-            pass
+            return http.see_other('/thanks')

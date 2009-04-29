@@ -90,8 +90,7 @@ def getNestedProperty(data, dottedkey):
         return None
 
 
-def convert_data_to_request_data(form_structure, data,
-                      request_data=None, errors=None):
+def to_request_data(form_structure, data, request_data=None, errors=None):
     """
     Take a form structure and use it's widgets to convert schema data (dict) to
     request data
@@ -114,19 +113,18 @@ def convert_data_to_request_data(form_structure, data,
               (field.type is 'sequence' and \
                 (field.widget is None or \
                   field.widget.converttostring is False)):
-                convert_data_to_request_data(field, data,
+                to_request_data(field, data,
                         request_data=request_data, errors=errors)
             else:
                 item_data = getNestedProperty(data, field.name)
                 request_data[field.name] = \
-                        field.widget.pre_render(field.attr, item_data)
+                        field.widget.to_request_data(field.attr, item_data)
         except Invalid, e:
             errors[field.name] = e
             raise
     return request_data
         
-def convert_request_data_to_data(form_structure,
-                  request_data, data=None, errors=None):
+def from_request_data(form_structure, request_data, data=None, errors=None):
     """
     Take a form structure and use it's widgets to convert request data to schema data (dict)
     
@@ -152,10 +150,10 @@ def convert_request_data_to_data(form_structure,
                     # this and there are no items in the list then this key
                     # wouldn't appear.
                     data[field.name] = []
-                convert_request_data_to_data(field, request_data,
+                from_request_data(field, request_data,
                                           data=data, errors=errors)
             else: 
-                data[field.name] = field.widget.convert(field.attr, \
+                data[field.name] = field.widget.from_request_data(field.attr, \
                                                 request_data.get(field.name,[]))
         except convert.ConvertError, e:
             errors[field.name] = e.message
@@ -163,7 +161,7 @@ def convert_request_data_to_data(form_structure,
     data = recursive_convert_sequences(dotted(data))
     return data
 
-def pre_parse_request_data(form_structure, request_data, data=None):
+def pre_parse_incoming_request_data(form_structure, request_data, data=None):
     """
     Some widgets (at the moment only files) need to have their data massaged in
     order to make sure that data->request and request->data is symmetric
@@ -176,11 +174,11 @@ def pre_parse_request_data(form_structure, request_data, data=None):
         if field.type is 'group' or \
           (field.type == 'sequence' and \
              field.widget._template is 'SequenceDefault'):
-            pre_parse_request_data(field, request_data, data=data)
+            pre_parse_incoming_request_data(field, request_data, data=data)
         else: 
             # This needs to be cleverer...
             item_data = request_data.get(field.name, [])
-            data[field.name] = field.widget.pre_parse_request(field.attr, item_data, full_request_data=request_data)
+            data[field.name] = field.widget.pre_parse_incoming_request_data(field.attr, item_data, full_request_data=request_data)
 
     return dotted(data)
 

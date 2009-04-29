@@ -3,4 +3,5 @@ ProxyTypes >= 0.9
 schemaish >= 0.5.3
 validatish >= 0.6
 convertish >= 0.5.3
+dottedish
 webob >= 0.9.5

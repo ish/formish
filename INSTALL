@@ -9,9 +9,6 @@ You will need:
 
 * python 2.4 or later.
 
-* PEAK-rules which can be found here:
-  http://pypi.python.org/pypi/PEAK-Rules
-
 * ProxyTypes which can be found here:
   http://pypi.python.org/pypi/ProxyTypes
 
@@ -24,7 +21,10 @@ You will need:
 * schemaish
   http://pypi.python.org/pypi/schemaish
 
-Required(ish)
+* dottedish
+  http://pypi.python.org/pypi/dottedish
+
+Required(??)
 -------------
 
 * mako - the inbuild renderer uses mako and we only have mako widgets at the
@@ -84,7 +84,6 @@ If you want to make sure you have everything that may be used, try this..
 
 easy_install -U setuptools
 easy_install webob
-easy_install peak-rules
 easy_install proxytypes
 easy_install mako
 easy_install paste
@@ -100,6 +99,7 @@ easy_install validatish
 easy_install convertish
 easy_install schemaish
 easy_install formish
+easy_install dottedish
 
 The functional also require imagemagick and selenium which will need installing via some other method (aptitude, download etc)
 
@@ -127,10 +127,12 @@ and here is a script to listen in for tests
     openbox-session &
     
     # Start selenium server.
-    java -jar selenium-server.jar -forcedBrowserMode "*firefox3 /usr/lib/firefox-3.0.5/firefox"
+    java -jar selenium-server.jar -forcedBrowserMode "*firefox3 /usr/lib/firefox-****INSERTCORRECTVERSION***/firefox"
     
     # Shutdown Xnest
     kill $xnest_pid
+
+NB: Check firefox version number in above
 
 When you run this script it should set up a listening selenium server that will pick up on the func tests you might run. Check the path to firefox as the version changes regularly. Different versions of java play differently too...  
 

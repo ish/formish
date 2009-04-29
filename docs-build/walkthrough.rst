@@ -90,7 +90,7 @@ We create our HTML by calling the form as follows..
 .. doctest:: 
 
     >>> form()
-    '...<form id="form" action="" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">...'
+    u'...<form id="form" action="" class="formish-form" method="POST" enctype="multipart/form-data" accept-charset="utf-8">...'
 
 I've skipped the majority of this output as it's probably better shown formatted
 
@@ -192,6 +192,7 @@ Once the form is submitted, we can get the data by calling 'validate'. In order 
 
     >>> import webob
     >>> r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
+    >>> r.POST['__formish_form__'] = 'form'
     >>> r.POST['myfield'] = 'myvalue'
     >>> form.validate(r)
     {'myfield': u'myvalue'}
@@ -410,6 +411,7 @@ Repeating the creation of a request using webob, setting some input values and v
 
     >>> import webob
     >>> r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
+    >>> r.POST['__formish_form__'] = 'form'
     >>> r.POST['firstName'] = 'Tim'
     >>> r.POST['surname'] = 'Parkin'
     >>> r.POST['streetNumber'] = '123'
@@ -578,6 +580,7 @@ Let's see this one in action
     >>> form = formish.Form(schema)
     >>> r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
     >>> r.POST['myfield'] = 'aa'
+    >>> r.POST['__formish_form__'] = 'form'
     >>> try:
     ...     form.validate(r)
     ... except formish.FormError, e:

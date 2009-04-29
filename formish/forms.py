@@ -108,9 +108,9 @@ class TemplatedString(object):
             return False
 
     def __call__(self):
+        widget_type, widget = self.obj.widget.template.split('.')
         renderer = self.obj.form.renderer
-        name = '%s_%s'%(self.obj.type,self.attr_name)
-        widget = self.obj.widget._template
+        name = '%s/%s'%(widget_type,self.attr_name)
         vars = {'field':self.obj}
         return fall_back_renderer(renderer, name, widget, vars)
 
@@ -128,6 +128,7 @@ class Field(object):
     
     """
     type = 'field'
+
     def __init__(self, name, attr, form):
         """
         :arg name: Name for the field
@@ -181,7 +182,7 @@ class Field(object):
     def value(self):
         """Convert the request_data to a value object for the form or None."""
         if '*' in self.name:
-            return  self.widget.pre_render(self.attr, self.defaults)
+            return  self.widget.to_request_data(self.attr, self.defaults)
         return self.form.request_data.get(self.name, None)
 
 
@@ -229,25 +230,25 @@ class Field(object):
 
     def __call__(self):
         """ returns a serialisation for this field using the form's renderer """
+        widget_type, widget = self.widget.template.split('.')
         renderer = self.form.renderer
-        name = 'field'
-        widget = self.widget._template
+        name = 'field/main'
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
             
     def label(self):
+        widget_type, widget = self.widget.template.split('.')
         """ returns the templated title """
         renderer = self.form.renderer
-        name = 'field_label'
-        widget = self.widget._template
+        name = 'field/label'
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
     
     def inputs(self):
         """ returns the templated widget """
+        widget_type, widget = self.widget.template.split('.')
         renderer = self.form.renderer
-        name = 'field_inputs'
-        widget = self.widget._template
+        name = 'field/inputs'
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
 
@@ -263,9 +264,9 @@ class CollectionFieldsWrapper(ObjectWrapper):
         self.collection = collection
 
     def __call__(self):
+        widget_type, widget = self.collection.widget.template.split('.')
         renderer = self.collection.form.renderer
-        name = '%s_fields'%self.collection.type
-        widget = self.collection.widget._template
+        name = '%s/fields'%widget_type
         vars = {'field':self.collection}
         return fall_back_renderer(renderer, name, widget, vars)
 
@@ -297,6 +298,17 @@ class Collection(object):
         self.title = self.attr.title
         if self.title is None and name is not None:
             self.title = util.title_from_name(self.name.split('.')[-1])
+
+    @property
+    def template_type(self):
+        """ Returns the template type to use for this item """
+        if self.attr.type == 'Structure':
+            name = 'structure'
+        elif self.attr.type == 'Sequence' and self.widget.type == 'SequenceDefault':
+            name = 'sequence' 
+        else:
+            name = 'field'
+        return name
 
 
     @property
@@ -434,45 +446,45 @@ class Collection(object):
 
     def __call__(self):
         """ returns a serialisation for this field using the form's renderer """
+        widget_type, widget = self.widget.template.split('.')
         renderer = self.form.renderer
-        name = self.type
-        widget = self.widget._template
+        name = '%s/main'%widget_type
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
             
     def label(self):
         """ returns the templated title """
+        widget_type, widget = self.widget.template.split('.')
         renderer = self.form.renderer
-        name = '%s_label'%self.type
-        widget = self.widget._template
+        name = '%s/label'%widget_type
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
          
     def metadata(self):
         """ returns the metadata """
+        widget_type, widget = self.widget.template.split('.')
         renderer = self.form.renderer
-        name = '%s_metadata'%self.type
-        widget = self.widget._template
+        name = '%s/metadata'%widget_type
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
 
     def inputs(self):
         """ returns the templated widget """
+        widget_type, widget = self.widget.template.split('.')
         renderer = self.form.renderer
-        name = '%s_inputs'%self.type
-        widget = self.widget._template
+        name = '%s/inputs'%widget_type
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
 
     def __repr__(self):
-        return 'formish.%s(name=%r, attr=%r)'% (self.type, self.name, self.attr)
+        return 'formish.%s(name=%r, attr=%r)'% (self.type.title(), self.name, self.attr)
 
 class Group(Collection):
     """
     A group is a basic collection with a different template
     """
     type = 'group'
-    _template = 'structure'
+    template = 'structure'
 
 
 
@@ -481,7 +493,7 @@ class Sequence(Collection):
     A sequence is a collection with a variable number of fields depending on request data, data or min/max values
     """
     type = 'sequence'
-    _template = 'ssequence'
+    template = 'sequence'
 
     def collection_fields(self):
         """ 
@@ -542,7 +554,8 @@ class BoundWidget(object):
         setattr(self.widget, name, value)
 
     def __call__(self):
-        return self.field.form.renderer('/formish/widgets/%s/widget.html'%self._template, {'field':self.field})
+        widget_type, widget = self.widget.template.split('.')
+        return self.field.form.renderer('/formish/widgets/%s/widget.html'%widget, {'field':self.field})
 
     def __repr__(self):
         return 'BoundWidget(widget=%r, field=%r)'%(self.widget, self.field)
@@ -557,7 +570,7 @@ class FormFieldsWrapper(ObjectWrapper):
         ObjectWrapper.__init__(self, form.structure.fields)
 
     def __call__(self):
-        return self.form.renderer('/formish/form_fields.html', {'form':self.form})
+        return self.form.renderer('/formish/form/fields.html', {'form':self.form})
     
 
 class Form(object):
@@ -710,8 +723,7 @@ class Form(object):
         :arg request_data: Webob style request data
         :arg raise_exceptions: Whether to raise exceptions or return errors
         """
-        data = validation.convert_request_data_to_data(self.structure, \
-                                            request_data, errors=self.errors) 
+        data = validation.from_request_data(self.structure, request_data, errors=self.errors) 
         if raise_exceptions and len(self.errors.keys()):
             raise validation.FormError( \
         'Tried to access data but conversion from request failed with %s errors (%s)'% \
@@ -726,8 +738,7 @@ class Form(object):
         """
         if self._request_data is not None:
             return self._request_data
-        self._request_data = validation.convert_data_to_request_data(self.structure, \
-                                dotted(self.defaults))
+        self._request_data = validation.to_request_data(self.structure, dotted(self.defaults))
         return self._request_data
 
 
@@ -811,7 +822,7 @@ class Form(object):
         # items they have (i.e. .fields method on a sequence uses the number of
         # values on the _request_data)
         self._request_data = dotted(request_data)
-        self.request_data = validation.pre_parse_request_data( \
+        self.request_data = validation.pre_parse_incoming_request_data( \
                     self.structure,dotted(request_data))
         data = self.get_unvalidated_data( \
                     self.request_data, raise_exceptions=False)
@@ -901,23 +912,23 @@ class Form(object):
         """
         Calling the Form generates a serialisation using the form's renderer
         """
-        return self.renderer('/formish/form.html', {'form':self})
+        return self.renderer('/formish/form/main.html', {'form':self})
 
     def header(self):
         """ Return just the header part of the template """
-        return self.renderer('/formish/form_header.html', {'form':self})
+        return self.renderer('/formish/form/header.html', {'form':self})
         
     def footer(self):
         """ Return just the footer part of the template """
-        return self.renderer('/formish/form_footer.html', {'form':self})
+        return self.renderer('/formish/form/footer.html', {'form':self})
         
     def metadata(self):
         """ Return just the metada part of the template """
-        return self.renderer('/formish/form_metadata.html', {'form':self})
+        return self.renderer('/formish/form/metadata.html', {'form':self})
 
     def actions(self):
         """ Return just the actions part of the template """
-        return self.renderer('/formish/form_actions.html', {'form':self})
+        return self.renderer('/formish/form/actions.html', {'form':self})
 
         
    
