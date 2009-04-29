@@ -2,11 +2,32 @@
 Changlelog
 ==========
 
-0.7dev
+0.7
 ------
 
+ * Input widgets can be used for sequence data (csv input field)
+ * Added support for GET forms
+ * Included css template in main formish module
+ * Made success/failure form callback more flexible and intuitive
+ * Reviewed use of css class and id names and added prefixes to field, widget
+   and type to prevent clashes
+ * Added ability to apply a default value to a single form element
+ * Updated testish example/test app to use new restish templating
+ * Better reprs for widgets and form definitions
+ * Documentation improvements
+   - Started adding doctests to documentation
+   - Reduced the weight of the documentation (simplify styling/templates)
  * Lots of changes to the way file uploads are handled - will document before a tagged release
-
+   - Using a 'headered' filestore that allows meta information to be stored
+     with the file 
+   - this means cached files are not browseable on the filesystem anymore
+   - fixed bugs in thumbnail preview
+   - lots more tests around cacheing and file store
+     
+BUG FIX: There were some errors in the previous file upload system but the
+         replacement of the file upload system has improved the whole file
+         upload system
+ 
 0.6.6 (2009-01-29)
 ------------------
 

@@ -146,6 +146,7 @@ docs/html/_static/images/logo/ish.io.png
 docs/html/_static/js/sifr-config.js
 docs/html/_static/js/sifr.js
 formish/__init__.py
+formish/_copyfile.py
 formish/fileresource.py
 formish/filestore.py
 formish/forms.py
@@ -161,6 +162,7 @@ formish.egg-info/entry_points.txt
 formish.egg-info/not-zip-safe
 formish.egg-info/requires.txt
 formish.egg-info/top_level.txt
+formish/css/formish.css
 formish/examples/root-template.html
 formish/templates/mako/formish/field.html
 formish/templates/mako/formish/field_description.html
@@ -195,6 +197,8 @@ formish/templates/mako/formish/widgets/CheckboxMultiChoiceTree/widget.html
 formish/templates/mako/formish/widgets/CheckedPassword/widget.html
 formish/templates/mako/formish/widgets/DateParts/widget.html
 formish/templates/mako/formish/widgets/FileUpload/widget.html
+formish/templates/mako/formish/widgets/Grid/sequence.html
+formish/templates/mako/formish/widgets/Grid/widget.html
 formish/templates/mako/formish/widgets/Hidden/widget.html
 formish/templates/mako/formish/widgets/Input/widget.html
 formish/templates/mako/formish/widgets/Password/widget.html
@@ -214,6 +218,7 @@ formish/tests/testish/setup.py
 formish/tests/testish/testish.ini
 formish/tests/testish/unittest
 formish/tests/testish/cache/.gitignore
+formish/tests/testish/store/.gitignore
 formish/tests/testish/testdata/photo.jpg
 formish/tests/testish/testdata/photo.png
 formish/tests/testish/testdata/test.txt
@@ -263,6 +268,7 @@ formish/tests/testish/testish/templates/formish/widgets/ReCAPTCHA/widget.html
 formish/tests/unittests/base.py
 formish/tests/unittests/test_core.py
 formish/tests/unittests/test_dottedDict.py
+formish/tests/unittests/test_filestores.py
 formish/tests/unittests/test_formdata.py
 formish/tests/unittests/test_html.py
 formish/tests/unittests/test_widget.py

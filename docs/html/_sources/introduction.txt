@@ -29,30 +29,29 @@ Data Schema
 
 Any form has to work on a data structure of some sort and it makes sense for this not to be tied in any way to web data. We built a fairly light weight schema library called `schemaish <http://ish.io/projects/show/schemaish>`_ which defines data structures and allows metadata (such as field titles and descriptions) to be assigned. Validation can also be added to each node in a schema (see later). Here are a few examples of creating schema structures.
 
-.. code-block:: python
+.. doctest::
 
-    import schemaish
+    >>> import schemaish
+    >>> schema_item = schemaish.Integer()
+    >>> schema_item
+    schemaish.Integer()
 
-    schema_item = schemaish.Integer()
-
-    # or 
-
-    my_schema = schemaish.Structure()
-    my_schema.add( 'name', schemaish.String() )
-    my_schema.add( 'age', schemaish.Integer() )
-
-    # or 
-
-    class MyStructure(schemaish.Structure):
-        name = schemaish.String()
-        age = schemaish.Integer()
-
-.. doctest:: [basic]
+.. doctest::
 
     >>> import schemaish, validatish
     >>> my_schema = schemaish.Structure()
     >>> my_schema.add( 'name', schemaish.String() )
     >>> my_schema.add( 'age', schemaish.Integer() )
+    >>> my_schema
+    schemaish.Structure("name": schemaish.String(), "age": schemaish.Integer())
+
+.. doctest::
+
+    >>> class MyStructure(schemaish.Structure):
+    ...     name = schemaish.String()
+    ...     age = schemaish.Integer()
+    ...
+    >>> my_schema = MyStructure()
     >>> my_schema
     schemaish.Structure("name": schemaish.String(), "age": schemaish.Integer())
 
@@ -71,49 +70,58 @@ In our `validatish <http://ish.io/projects/show/validatish>`_ package, we create
 
 Here is an example of a function based validator
 
-.. code-block:: python
+.. doctest::
 
-    def is_string(v):
-        """ checks that the value is an instance of basestring """
-        if v is None:
-            return
-        msg = "must be a string"
-        if not isinstance(v,basestring):
-            raise Invalid(msg)
+    >>> import validatish
+    >>> def is_string(v):
+    ...     """ checks that the value is an instance of basestring """
+    ...     if v is None:
+    ...         return
+    ...     msg = "must be a string"
+    ...     if not isinstance(v,basestring):
+    ...         raise validatish.Invalid(msg)
+    ... 
+    >>> is_string(1)
+    Traceback (most recent call last):
+    Invalid: must be a string
+    >>> is_string('foo')
+   
 
 And here is an example of its matching class based version. We recommend using the class based validators all of the time to keep consistency (you can't use function based validators if the validator needs configuring - schemaish expects a callable that takes a single argument).
 
-.. code-block:: python
+.. doctest::
 
-    class String(Validator):
-        def __call__(self, v):
-            validate.is_string(v)
+    >>> class String():
+    ...     def __call__(self, v):
+    ...         is_string(v)
+    ...
+    >>> v = String()
+    >>> v(1)
+    Traceback (most recent call last):
+    Invalid: must be a string
+    >>> v('foo')
 
-
-.. note:: If a value is None, then the validation is not applied (this would imply a required constraint also).
+.. note:: If a value is None, then the validation is not applied (as this would imply a required constraint also).
 
 So, now we can pass a validator into one of our schema instances
 
-.. code-block:: python
+.. doctest::
 
     >>> import schemaish
     >>> from validatish import validator
-
-    >>> schema = schemaish.String(validator=validator.String()))
-
+    >>> schema = schemaish.String(validator=validator.String())
     >>> try:
     ...     schema.validate(10)
     ...     print 'success!'
     ... except schemaish.Invalid, e:
-    ...     print 'error',e.error_dict
+    ...     print e.error_dict
     ... 
-    error {'': 'must be a string'}
-
+    {'': validatish.Invalid("must be a string", validator=validatish.String())}
     >>> try:
     ...     schema.validate('foo')
     ...     print 'success!'
     ... except schemaish.Invalid, e:
-    ...     print 'error',e.error_dict
+    ...     print e.error_dict
     ... 
     success!
 
@@ -121,23 +129,20 @@ So, now we can pass a validator into one of our schema instances
 
 If we apply validators to multiple items in a structure, we can validate them all in one go. 
 
-.. code-block:: python
+.. doctest::
 
     >>> import schemaish
     >>> from validatish import validator
-
     >>> schema = schemaish.Structure()
     >>> schema.add('name', schemaish.String(validator=validator.String()))
     >>> schema.add('age', schemaish.Integer(validator=validator.Range(min=18)))  
-
     >>> try:
     ...     schema.validate({'name': 6, 'age': 17})
     ...     print 'success!'
     ... except schemaish.Invalid, e:
-    ...     print 'error',e.error_dict
+    ...     print e.error_dict
     ... 
-    error {'age': 'must be greater than 18', 'name': 'must be a string'}
-
+    {'age': validatish.Invalid("must be greater than 18", validator=validatish.Range(min=18, max=None)), 'name': validatish.Invalid("must be a string", validator=validatish.String())}
     >>> try:
     ...     schema.validate({'name': 'John Drake', 'age': 28})
     ...     print 'success!'
@@ -527,82 +532,44 @@ File Upload
 
 File uploads are notoriously difficult to use in forms. The persistence of uploaded data before the form is finished is messy and a consistent preivew that works for this temporary persistence and also when you've implemented your final store is not straightforward. Formish needs three things for form uploads (and provides defaults for all of them
 
-FileHandler
-^^^^^^^^^^^
+Filestores
+^^^^^^^^^^
 
-The filehandlers job is to persist file uploads up until a form is successfully completed. The FileUpload widget asks the filehandler to store the file and remove it after the process has finished. If you want to access the file then it will also give you a direct path for it and a mimtype.
+The filestore job is to persist file uploads up until a form is successfully completed. The FileUpload widget asks the filestore to store the file and remove it after the process has finished. The file is returned as a file handle, mime_type and the filename (or id)
 
-.. code-block:: python
-
-    class TempFileHandler(FileHandlerMinimal):
-        """
-        File handler using python tempfile module to store file
-        """
-
-        def __init__(self):
-            self.prefix = tempfile.gettempprefix()
-            self.tempdir = tempfile.gettempdir()
-
-
-        def store_file(self, fieldstorage):
-            """
-            Given a filehandle, store the file and return an identifier, in this
-            case the original filename
-            """
-            fileno, filename = tempfile.mkstemp( \
-                            suffix='%s-%s'% (uuid.uuid4().hex,fieldstorage.filename))
-            filehandle = os.fdopen(fileno, 'wb')
-            filehandle.write(fieldstorage.value)
-            filehandle.close()
-            filename = ''.join( filename[(len(self.tempdir)+len(self.prefix)+1):] )
-            return filename
-
-        def delete_file(self, filename):
-            """
-            remove the tempfile
-            """
-            filename = '%s/%s%s'% (tempdir, self.prefix, self.filename)
-            os.remove(filename)
-
-        def get_path_for_file(self, filename):
-            """
-            given the filename, get the path for the temporary file
-            """
-            return '%s/%s%s'% (self.tempdir, self.prefix, filename)
-
-        def get_mimetype(self, filename):
-            """
-            use python-magic to guess the mimetype or use application/octet-stream
-            if no guess
-            """
-            mimetype = magic.from_file('%s/%s%s'%(self.tempdir,self.prefix,filename),mime=True)
-            return mimetype or 'application/octet-stream'
-
-
-If you want to server the files in your web apllication (and the default FileUpload widget includes facility for an image_preview box) then you'll need to use TempFileHandlerWeb, which includes a resource_root and a fileaccessor
+The filestore uses a headered file format which is similar to an email format with one or more lines of key value pairs followed by the binary data. This allows us to store information on the image file such as cache tags and content types. The files are store in a directory given with root_dir and the filestore can also be given a name (which is used in the fileresource to namespace resized image files to prevent clashes between different filestores)
 
 .. code-block:: python
 
-    class TempFileHandlerWeb(TempFileHandler):
-        """
-        Same as the temporary file handler but includes ability to include a resource and a url generator (if you want access to the temporary files on the website, e.g. for previews)
-        """
+    class CachedTempFilestore(FileSystemHeaderedFilestore):
 
-        def __init__(self, resource_root='/filehandler',urlfactory=None):
-            TempFileHandler.__init__(self)
-            self.default_url = default_url
-            self.resource_root = resource_root
-            self.urlfactory = urlfactory
+        def __init__(self, root_dir=None, name=None):
+            if root_dir is None:
+                self._root_dir = tempfile.gettempdir()
+            else:
+                self._root_dir = root_dir
+            if name is None:
+                self.name = ''
+            else:
+                self.name = name
 
-        def get_url_for_file(self, identifier):
-            """
-            Generate a url given an identifier
-            """
-            if self.urlfactory is not None:
-                return self.urlfactory(identifier)
-            return '%s/%s'% (self.resource_root, identifier)
+        def get(self, key, cache_tag=None):
+            headers, f = FileSystemHeaderedFilestore.get(self, key)
+            headers = dict(headers)
+            if not cache_tag and headers['Cache-Tag'] == cache_tag:
+                f.close()
+                return (headers['Cache-Tag'], None, None)
+            return (headers['Cache-Tag'],headers['Content-Type'], f)
 
-This extends the basic tempfile handler to allow you to pass a urlfactory and a root resource for where your assets are mounted.  
+
+        def put(self, key, src, cache_tag, content_type, headers=None):
+            if headers is None:
+                headers = {}
+            headers['Cache-Tag'] = cache_tag
+            headers['Content-Type'] = content_type
+            FileSystemHeaderedFilestore.put(self, key, headers, src)
+
+
 
 urlfactory
 ^^^^^^^^^^
@@ -618,9 +585,9 @@ So here is a simple FileUpload widget
 
     form = formish.Form(schema)
     form['myFile'].widget = formish.FileUpload(
-                               filehandler=formish.TempFileHandlerWeb(),
-                               originalurl='/images/nouploadyet.png',
-                               show_image_preview=True
+                               formish.filestore.CachedTempFilestore(),
+                               image_thumbnail_default='/images/nouploadyet.png',
+                               show_image_thumbnail=True
                                )
 
     
@@ -632,12 +599,11 @@ To set up a file resource handler at /filehandler, you could use the following (
 
     @resource.child()
     def filehandler(self, request, segments):
-        db = collection.CouchishDB(request)
-        fa = couchish.FileAccessor(db)
-        fh = formish.TempFileHandler()
-        return FileResource(fileaccessor=fa,filehandler=fh)
+        tempfilestore = formish.filestore.CachedTempFilestore(name='tmp')
+        filestore = couchish.filestore.CouchDBAttachmentSource(couchish_store,name='cdb')
+        return FileResource(filestores=[filestore, tempfilestore])
 
-This looks a little more complicated, and is. This resource needs to serve files that are already in your application's persistent storage (the FileAccessor here) and also provide a way of accessing temporary files that have been uploaded as the form is being possibly posted repeatedly before finally succeeding. Don't worry though, if you're happy with using temporary file storage for a while, your resource could look like this
+This looks a little more complicated, and is. This resource needs to serve files that are already in your application's persistent storage (the filestore here) and also provide a way of accessing temporary files that have been uploaded as the form is being possibly posted repeatedly before finally succeeding. Don't worry though, if you're happy with using temporary file storage for a while, your resource could look like this
 
 .. code-block:: python
 
@@ -649,7 +615,6 @@ Then at some point when you get your storage implemented, you could add your own
 
 We've got a file file examples working at `http://ish.io:8891 <http://ish.io:8891>`_. (Please don't upload any multi megabyte files.. I haven't got a validator on it yet :-)
 
-I don't think I've explained file uploads as well as I could so perhaps I'll refine this at a later date.
 
 The way forward
 ---------------
@@ -661,7 +626,7 @@ Slighly bigger pieces of work would be trying to implement some form of wsgi ass
 Other goals.. 
 
 * Multi page forms.. 
-* relational validation (this required only if that not - is possible now but would like to make more intuitive)
+* relational validation (e.g. this item required only if that not given. this is possible now but would like to make more intuitive)
 * GET form submissions
 * immutable and plain html versions of templates
 
