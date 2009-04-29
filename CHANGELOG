@@ -2,6 +2,10 @@
 Changlelog
 ==========
 
+0.7a
+-----
+BUG FIX: Missed replacing a reference to _template in formish.validation
+
 0.7
 ------
 
