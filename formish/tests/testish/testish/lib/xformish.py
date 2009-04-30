@@ -17,7 +17,7 @@ class DateParts(widgets.DateParts):
 
 class ApproximateDateParts(widgets.DateParts):
 
-    _template = 'ApproximateDateParts'
+    template = 'field.ApproximateDateParts'
 
     def to_request_data(self, schema_type, data):
         if data is None:
@@ -45,7 +45,7 @@ class ApproximateDateParts(widgets.DateParts):
 
 class ReCAPTCHA(widgets.Input):
 
-    _template = 'ReCAPTCHA'
+    template = 'field.ReCAPTCHA'
 
     API_SSL_SERVER="https://api-secure.recaptcha.net"
     API_SERVER="http://api.recaptcha.net"
@@ -59,7 +59,7 @@ class ReCAPTCHA(widgets.Input):
         self.privatekey = privatekey
         self.remoteip = environ.get('REMOTE_ADDR', '127.0.0.1')
 
-    def pre_parse_request(self, schema_type, request_data, full_request_data):
+    def pre_parse_incoming_request_data(self, schema_type, request_data, full_request_data):
         """ reCaptcha won't let you use your own field names so we move them """
         return {'recaptcha_challenge_field': full_request_data['recaptcha_challenge_field'], 
                 'recaptcha_response_field': full_request_data['recaptcha_response_field'],}
