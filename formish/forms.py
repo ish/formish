@@ -376,7 +376,10 @@ class Collection(object):
         try:
             widget_type = BoundWidget(self.form.get_item_data(starify(self.name),'widget'),self)
         except KeyError:
-            widget_type = BoundWidget(widgets.SequenceDefault(),self)
+            if self.type == 'group':
+                widget_type = BoundWidget(widgets.StructureDefault(),self)
+            else:
+                widget_type = BoundWidget(widgets.SequenceDefault(),self)
         return widget_type
 
 

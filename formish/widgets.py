@@ -236,7 +236,28 @@ class SequenceDefault(Widget):
             attributes.append('sortable=%r'%self.sortable)
 
         return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
-        
+
+
+class StructureDefault(Widget):
+    """
+    Sequence handling widget - used by default for schema sequences
+
+    :arg min: minimum number of sequence items to show
+    :arg max: maximum number of sequence items to show
+    :arg addremove: boolean whether to show the addremove buttons (jquery
+        activated)
+    """
+
+    type = 'StructureDefault'
+    template = 'structure.-'
+
+    def to_request_data(self, schema_type, data):
+        """
+        Short circuits the usual to_request_data
+        """
+        return data
+    
+
 class TextArea(Input):
     """
     Textarea input field
