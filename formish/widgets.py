@@ -829,7 +829,7 @@ class CheckboxMultiChoiceTree(Widget):
 
     def checked(self, option, values, schema_type):
         if values is not None:
-            typed_values = self.convert(schema_type,values)
+            typed_values = self.from_request_data(schema_type,values)
         if values is not None and option[0] in typed_values:
             return ' checked="checked"'
         else:

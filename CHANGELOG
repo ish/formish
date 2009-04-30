@@ -2,6 +2,10 @@
 Changlelog
 ==========
 
+0.7b
+-----
+BUG FIX: Fixed one last remaining use of widget.convert in CheckboxMultiChoiceTree
+
 0.7a
 -----
 BUG FIX: Missed replacing a reference to _template in formish.validation
