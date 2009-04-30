@@ -19,14 +19,14 @@ class ApproximateDateParts(widgets.DateParts):
 
     _template = 'ApproximateDateParts'
 
-    def pre_render(self, schema_type, data):
+    def to_request_data(self, schema_type, data):
         if data is None:
             return {'year': [''], 'month': [''], 'day': ['']}
         parts = [i for i in data.split('-')]
         parts.extend(['']*(3-len(parts)))
         return {'year': [parts[0]], 'month': [parts[1]], 'day': [parts[2]]}
 
-    def convert(self, schema_type, data):
+    def from_request_data(self, schema_type, data):
         # Collect all the parts from the request.
         parts = (data['year'][0].strip(), data['month'][0], data['day'][0])
         if not parts[0] and (parts[1] or parts[2]):
@@ -64,7 +64,7 @@ class ReCAPTCHA(widgets.Input):
         return {'recaptcha_challenge_field': full_request_data['recaptcha_challenge_field'], 
                 'recaptcha_response_field': full_request_data['recaptcha_response_field'],}
 
-    def convert(self, schema_type, data):
+    def from_request_data(self, schema_type, data):
         params = urllib.urlencode({
                         'privatekey': self.privatekey,
                         'remoteip' :  self.remoteip,
