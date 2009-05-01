@@ -824,6 +824,7 @@ def mktree(options):
         parent = get_parent(segments)
         root[id] = {'data': (id, label), 'children':[]}
         root[parent]['children'].append(root[id])
+    print root['']
     return root['']
 
 
@@ -835,10 +836,10 @@ class CheckboxMultiChoiceTree(Widget):
     type = 'CheckboxMultiChoiceTree'
     template = 'field.CheckboxMultiChoiceTree'
 
-    def __init__(self, options, cssClass=None):
+    def __init__(self, options, css_class=None):
         self.options = options
         self.optiontree = mktree(options)
-        Widget.__init__(self,cssClass=cssClass)
+        Widget.__init__(self,css_class=css_class)
             
     def to_request_data(self, schema_type, data):
         if data is None: 
