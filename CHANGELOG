@@ -2,6 +2,12 @@
 Changlelog
 ==========
 
+0.7d
+----
+
+BUG FIX: Fixed problem with checkbox multi choice tree widget not applying
+         css_class correctly and not nesting html ul/li's correctly
+
 0.7c
 -----
 BUG FIX: Nested structures were using the sequence template

@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: formish
-Version: 0.7c
+Version: 0.7d
 Summary: Formish is a schema backed, templating language agnostic form generation and handling library.
 Home-page: http://form.ish.io
 Author: Tim Parkin, Matt Goodall
