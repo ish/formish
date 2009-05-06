@@ -42,8 +42,11 @@ Formish is a schema backed, templating language agnostic form generation and han
           'convertish >= 0.5.3',
           'dottedish>=0.5',
           'webob >= 0.9.5',
+          'Mako',
       ],
       entry_points="""
       # -*- Entry points: -*-
       """,
+      test_suite='formish.tests.unittests',
+      tests_require = ['BeautifulSoup'],
       )
