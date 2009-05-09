@@ -2,6 +2,11 @@
 Changlelog
 ==========
 
+0.7e
+----
+
+Relase didn't include any template files (caused by missing gitlsfiles when building)
+
 0.7d
 ----
 
