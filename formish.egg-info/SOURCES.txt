@@ -207,6 +207,7 @@ formish/templates/mako/formish/widgets/SelectChoice/widget.html
 formish/templates/mako/formish/widgets/SelectWithOtherChoice/widget.html
 formish/templates/mako/formish/widgets/TextArea/widget.html
 formish/tests/TODO
+formish/tests/__init__.py
 formish/tests/testish/development.ini
 formish/tests/testish/functest
 formish/tests/testish/live.ini
@@ -263,6 +264,7 @@ formish/tests/testish/testish/templates/form.html
 formish/tests/testish/testish/templates/root.html
 formish/tests/testish/testish/templates/formish/widgets/ApproximateDateParts/widget.html
 formish/tests/testish/testish/templates/formish/widgets/ReCAPTCHA/widget.html
+formish/tests/unittests/__init__.py
 formish/tests/unittests/base.py
 formish/tests/unittests/test_core.py
 formish/tests/unittests/test_dottedDict.py
