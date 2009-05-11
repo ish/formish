@@ -24,15 +24,12 @@ class Action(object):
     :arg name: an valid html id used to lookup an action
     :arg label: The 'value' of the submit button and hence the text that people see
     """
-    def __init__(self, name, value=None, callback=None):
+    def __init__(self, name=None, value=None, callback=None):
         if not util.valid_identifier(name):
             raise validation.FormError('Invalid action name %r.'% name)
         self.callback = callback
         self.name = name
-        if value is None:
-            self.value = util.title_from_name(name)
-        else:
-            self.value = value
+        self.value = value
 
             
 def _cssname(self):
