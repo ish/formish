@@ -24,15 +24,15 @@ class Action(object):
     :arg name: an valid html id used to lookup an action
     :arg label: The 'value' of the submit button and hence the text that people see
     """
-    def __init__(self, callback, name, label):
+    def __init__(self, name, value=None, callback=None):
         if not util.valid_identifier(name):
             raise validation.FormError('Invalid action name %r.'% name)
         self.callback = callback
         self.name = name
-        if label is None:
-            self.label = util.title_from_name(name)
+        if value is None:
+            self.value = util.title_from_name(name)
         else:
-            self.label = label
+            self.value = value
 
             
 def _cssname(self):
@@ -594,7 +594,7 @@ class Form(object):
     _request_data = None
 
     def __init__(self, structure, name=None, defaults=None, errors=None,
-            action_url=None, renderer=None, method='POST'):
+            action_url=None, renderer=None, method='POST', add_default_action=True):
         """
         Create a new form instance
 
@@ -635,6 +635,8 @@ class Form(object):
         self.errors = dotted(errors)
         self.error = None
         self._actions = []
+        if add_default_action:
+            self.add_action( 'submit', 'Submit' )
         self.action_url = action_url
         if renderer is not None:
             self.renderer = renderer
@@ -680,7 +682,7 @@ class Form(object):
 
     name = property(_name_get, _name_set)
 
-    def add_action(self, callback, name="submit", label=None):
+    def add_action(self, name, value=None, callback=None):
         """ 
         Add an action callable to the form
 
@@ -697,7 +699,7 @@ class Form(object):
         """
         if name in [action.name for action in self._actions]:
             raise ValueError('Action with name %r already exists.'% name)
-        self._actions.append( Action(callback, name, label) )              
+        self._actions.append( Action(name, value, callback) )              
 
     def action(self, request, *args):
         """

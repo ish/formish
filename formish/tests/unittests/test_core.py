@@ -272,9 +272,9 @@ class TestActions(unittest.TestCase):
         def callback2(*a, **k):
             return 'two'
         schema = schemaish.Structure([('string', schemaish.String())])
-        form = formish.Form(schema, method=method)
-        form.add_action(callback1, 'one')
-        form.add_action(callback2, 'two')
+        form = formish.Form(schema, method=method, add_default_action=False)
+        form.add_action('one', 'One', callback1)
+        form.add_action('two', 'Two', callback2)
         return form
 
 
