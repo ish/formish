@@ -5,6 +5,10 @@ if action.value is None:
     value = ''
 else:
     value = ' value="%s"'%action.value
+if action.name is None:
+    name = ''
+else:
+    name = ' name="%s"'%action.name
 %>
     <input type="submit" id="${form.name}-action-${action.name}" name="${action.name}"${value|n} />
     %endfor
