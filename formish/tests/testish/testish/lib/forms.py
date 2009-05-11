@@ -1274,6 +1274,7 @@ def form_SequenceOfSimpleStructures(request):
     schema.add( 'myList', schemaish.Sequence( substructure ))
 
     form = formish.Form(schema, 'form')
+    form['myList'].widget = formish.SequenceDefault(min=1)
     return form
   
 def form_SequenceOfUploadStructures(request):

@@ -39,7 +39,7 @@ class TestHTML(unittest.TestCase):
                          ('c', schemaish.Sequence(schemaish.String())), ("d", schemaish.String()), \
                          ("e", schemaish.Integer(validator=v.Required())), ("f", schemaish.String(validator=v.Required())) ])
         schema = schemaish.Structure([("one", one), ("two", two)])
-        f = formish.Form(schema,name="form")
+        f = formish.Form(schema,name="form",add_default_action=False)
 
         f['one.b'].widget = formish.TextArea()
         f['two.a'].widget = formish.SelectChoice([('opt1',"Options 1"),('opt2',"Option 2")], none_option=('-select option-',None))
@@ -48,7 +48,7 @@ class TestHTML(unittest.TestCase):
         f['two.d'].widget = formish.RadioChoice([('opt1',"Options 1"),('opt2',"Option 2")])
         f['two.f'].widget = formish.CheckedPassword()
 
-        f.add_action(lambda x: x, 'submit', label="Submit Me")
+        f.add_action('submit', "Submit Me")
         f.defaults = {'one': {'a' : 'ooteenee','c':['3','4','5']}, 'two': {'a': 'opt1','b': date(1966,1,3),'c':['opt2'],'d':'opt2'} } 
         soup = BeautifulSoup(f())
         ## Latch the results for acceptance tests
@@ -62,9 +62,9 @@ class TestHTML(unittest.TestCase):
         schema = schemaish.Structure([("one", schemaish.Integer(validator=v.All(
                        v.Required(), v.Integer(), v.Range(min=18), v.Range(min=20), 
                    ))),])
-        f = formish.Form(schema,name="form")
+        f = formish.Form(schema,name="form",add_default_action=False)
 
-        f.add_action(lambda x: x, 'submit', label="Submit Me")
+        f.add_action('submit', "Submit Me")
         r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
         r.POST['__formish_form__'] = 'form'
         r.POST['one'] = '9'
@@ -79,9 +79,9 @@ class TestHTML(unittest.TestCase):
         schema = schemaish.Structure([("one", schemaish.Integer(validator=v.All(
                        v.Required(), v.Integer(), v.Range(min=18), v.Range(min=20), 
                    ))),])
-        f = formish.Form(schema,name="form")
+        f = formish.Form(schema,name="form",add_default_action=False)
 
-        f.add_action(lambda x: x, 'submit', label="Submit Me")
+        f.add_action('submit', "Submit Me")
         r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
         r.POST['__formish_form__'] = 'form'
         r.POST['one'] = ''
@@ -97,9 +97,9 @@ class TestHTML(unittest.TestCase):
         schema = schemaish.Structure([("one", schemaish.Integer(validator=v.All(
                        v.Required(), v.Integer(), v.Any(v.Range(min=18), v.Range(min=20)), 
                    ))),])
-        f = formish.Form(schema,name="form")
+        f = formish.Form(schema,name="form", add_default_action=False)
 
-        f.add_action(lambda x: x, 'submit', label="Submit Me")
+        f.add_action('submit', "Submit Me")
         r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
         r.POST['__formish_form__'] = 'form'
         r.POST['one'] = ''

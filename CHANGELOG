@@ -2,6 +2,18 @@
 Changlelog
 ==========
 
+0.7.1
+-----
+
+API CHANGES:
+
+ * Action init argument changes and add_action argument changes. Also, a default form now has an action in form.actions
+  
+   A form now has a 'add_default_action' keyword argument that defaults to True. 
+   Action init now takes (name, value=None, callback=None).
+   The default action on a form has a value of 'Submit' and a name of 'submit'.
+   You can manage the list of actions explicitly. A value of None removes the value html attribute.
+
 0.7e
 ----
 
