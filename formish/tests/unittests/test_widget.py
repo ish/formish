@@ -159,6 +159,17 @@ class TestErrorRendering(base.TestCase):
             assert span_error.string == ERROR_TEXT 
 
 
+class TestSequenceDefault(base.TestCase):
+
+    def test_empty_with_min(self):
+        form = formish.Form(
+            schemaish.Structure([
+                ('foo', schemaish.Sequence(schemaish.String())),
+            ])
+        )
+        form['foo'].widget = formish.SequenceDefault(min=1)
+        data = form.validate(self.Request('form', {}))
+
 
 if __name__ == '__main__':
     unittest.main()
