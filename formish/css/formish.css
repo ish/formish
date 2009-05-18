@@ -19,7 +19,8 @@
   width: 200px;
 }
 
-.formish-form .widget-checkedpassword .inputs label {
+.formish-form .widget-checkedpassword .inputs label,
+.formish-form .widget-checkedinput .inputs label {
   margin-left: -210px;
   text-align:right;
 }

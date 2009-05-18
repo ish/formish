@@ -124,7 +124,7 @@ def to_request_data(form_structure, data, request_data=None, errors=None):
             raise
     return request_data
         
-def from_request_data(form_structure, request_data, data=None, errors=None):
+def from_request_data(form_structure, request_data, data=None, errors=None, defaults=None, skip_read_only_defaults=False):
     """
     Take a form structure and use it's widgets to convert request data to schema data (dict)
     
@@ -134,6 +134,8 @@ def from_request_data(form_structure, request_data, data=None, errors=None):
     :arg errors: used to accumulate conversion failures (internal - used while recursing)
     
     """
+    if defaults is None:
+        defaults = {}
     if data is None:
         data = {}
     if errors is None:
@@ -151,10 +153,14 @@ def from_request_data(form_structure, request_data, data=None, errors=None):
                     # wouldn't appear.
                     data[field.name] = []
                 from_request_data(field, request_data,
-                                          data=data, errors=errors)
+                                          data=data, errors=errors, defaults=defaults, skip_read_only_defaults=skip_read_only_defaults)
             else: 
-                data[field.name] = field.widget.from_request_data(field.attr, \
-                                                request_data.get(field.name,[]))
+                if field.widget.readonly is not True:
+                    data[field.name] = field.widget.from_request_data(field.attr, \
+                                                request_data.get(field.name))
+                else:
+                    if skip_read_only_defaults is False:
+                        data[field.name] = defaults.get(field.name)
         except convert.ConvertError, e:
             errors[field.name] = e.message
     
@@ -177,7 +183,7 @@ def pre_parse_incoming_request_data(form_structure, request_data, data=None):
             pre_parse_incoming_request_data(field, request_data, data=data)
         else: 
             # This needs to be cleverer...
-            item_data = request_data.get(field.name, [])
+            item_data = request_data.get(field.name, None)
             data[field.name] = field.widget.pre_parse_incoming_request_data(field.attr, item_data, full_request_data=request_data)
 
     return dotted(data)
