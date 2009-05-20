@@ -541,11 +541,12 @@ class FileUpload(Widget):
         elif request_data['name'] == request_data['default']:
             return SchemaFile(None, None, None)
         else:
-            filename = request_data['name'][0]
+            filestore_key = request_data['name'][0]
             try:
-                cache_tag, content_type, f = self.filestore.get(filename)
+                cache_tag, content_type, f = self.filestore.get(filestore_key)
             except KeyError:
                 return None
+            filename = filestore_key.split('-', 1)[1]
             return SchemaFile(f, filename, content_type)
 
     
