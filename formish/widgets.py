@@ -524,7 +524,8 @@ class FileUpload(Widget):
         fieldstorage = data.get('file', [''])[0]
         if getattr(fieldstorage,'file',None):
             filename = '%s-%s'%(uuid.uuid4().hex,fieldstorage.filename)
-            self.filestore.put(filename, fieldstorage.file, fieldstorage.type, uuid.uuid4().hex)
+            cache_tag = uuid.uuid4().hex
+            self.filestore.put(filename, fieldstorage.file, cache_tag, fieldstorage.type)
             data['name'] = [filename]
             data['mimetype'] = [fieldstorage.type]
         return data
@@ -542,7 +543,7 @@ class FileUpload(Widget):
         else:
             filename = request_data['name'][0]
             try:
-                content_type, cache_tag, f = self.filestore.get(filename)
+                cache_tag, content_type, f = self.filestore.get(filename)
             except KeyError:
                 return None
             return SchemaFile(f, filename, content_type)
