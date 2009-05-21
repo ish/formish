@@ -6,7 +6,7 @@ Requires ImageMagick for image resizing
 import tempfile, os, subprocess, shutil
 from restish import http, resource
 
-from formish.filestore import CachedTempFilestore
+from formish.filestore import CachedTempFilestore, FileSystemHeaderedFilestore
 
 import logging
 log = logging.getLogger('formish')
@@ -25,14 +25,14 @@ class FileResource(resource.Resource):
         if cache:
             self.cache = cache
         else:
-            self.cache =  CachedTempFilestore(root_dir='cache')
+            self.cache =  CachedTempFilestore(FileSystemHeaderedFilestore(root_dir='cache'))
         if filestore is not None:
             self.filestores = [filestore]
         elif filestores is not None:
             self.filestores = filestores
         else:
             tempfilestore = CachedTempFilestore(name='tmp')
-            filestore = CachedTempFilestore(root_dir='store', name='store')
+            filestore = CachedTempFilestore(FileSystemHeaderedFilestore(root_dir='store'), name='store')
             self.filestores = [filestore, tempfilestore]
         self.filestores.append(self.cache)
         self.segments = segments

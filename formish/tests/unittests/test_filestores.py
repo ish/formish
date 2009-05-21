@@ -66,7 +66,7 @@ class TestCachedTempFilestore(unittest.TestCase):
 
     def setUp(self):
         self.dirname = tempfile.mkdtemp()
-        self.store = CachedTempFilestore(self.dirname)
+        self.store = CachedTempFilestore(FileSystemHeaderedFilestore(self.dirname))
 
     def tearDown(self):
         shutil.rmtree(self.dirname)

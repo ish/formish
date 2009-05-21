@@ -58,20 +58,19 @@ class FileSystemHeaderedFilestore(object):
             os.remove( os.path.join(self._root_dir, safefilename.encode(key)))
 
 
-class CachedTempFilestore(FileSystemHeaderedFilestore):
+class CachedTempFilestore(object):
 
-    def __init__(self, root_dir=None, name=None):
-        if root_dir is None:
-            self._root_dir = tempfile.gettempdir()
-        else:
-            self._root_dir = root_dir
+    def __init__(self, backend=None, name=None):
+        if backend is None:
+            backend = FileSystemHeaderedFilestore(tempfile.gettempdir())
+        self.backend = backend
         if name is None:
             self.name = ''
         else:
             self.name = name
 
     def get(self, key, cache_tag=None):
-        headers, f = FileSystemHeaderedFilestore.get(self, key)
+        headers, f = self.backend.get(key)
         if headers and headers[0][0] == 'Cache-Tag':
             header_cache_tag = headers[0][1]
             headers = headers[1:]
@@ -87,5 +86,8 @@ class CachedTempFilestore(FileSystemHeaderedFilestore):
             headers = []
         if cache_tag:
             headers = [('Cache-Tag', cache_tag)] + headers
-        FileSystemHeaderedFilestore.put(self, key, headers, src)
+        self.backend.put(key, headers, src)
+
+    def delete(self, key):
+        self.backend.delete(key)
 
