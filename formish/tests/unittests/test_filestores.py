@@ -72,32 +72,32 @@ class TestCachedTempFilestore(unittest.TestCase):
         shutil.rmtree(self.dirname)
 
     def test_put(self):
-        self.store.put('foo', StringIO('bar'), '1', 'text/plain')
+        self.store.put('foo', StringIO('bar'), '1', [('Content-Type', 'text/plain')])
         assert file(os.path.join(self.dirname, 'foo'), 'rb').read() == 'Cache-Tag: 1\nContent-Type: text/plain\n\nbar'
 
     def test_get(self):
-        self.store.put('foo', StringIO('bar'), '1', 'text/plain')
-        (cache_tag, content_type, f) = self.store.get('foo')
+        self.store.put('foo', StringIO('bar'), '1', [('Content-Type', 'text/plain')])
+        (cache_tag, headers, f) = self.store.get('foo')
         try:
             assert cache_tag == '1'
-            assert content_type == 'text/plain'
+            assert headers == [('Content-Type', 'text/plain')]
             assert f.read() == 'bar'
         finally:
             f.close()
 
     def test_get_cache_hit(self):
-        self.store.put('foo', StringIO('bar'), '1', 'text/plain')
-        (cache_tag, content_type, f) = self.store.get('foo', cache_tag='1')
+        self.store.put('foo', StringIO('bar'), '1', [('Content-Type', 'text/plain')])
+        (cache_tag, headers, f) = self.store.get('foo', cache_tag='1')
         assert cache_tag == '1'
-        assert content_type is None
+        assert headers == [('Content-Type', 'text/plain')]
         assert f is None
 
     def test_get_cache_miss(self):
-        self.store.put('foo', StringIO('bar'), '1', 'text/plain')
-        (cache_tag, content_type, f) = self.store.get('foo', cache_tag='miss')
+        self.store.put('foo', StringIO('bar'), '1', [('Content-Type', 'text/plain')])
+        (cache_tag, headers, f) = self.store.get('foo', cache_tag='miss')
         try:
             assert cache_tag == '1'
-            assert content_type == 'text/plain'
+            assert headers == [('Content-Type', 'text/plain')]
             assert f.read() == 'bar'
         finally:
             f.close()
@@ -106,26 +106,19 @@ class TestCachedTempFilestore(unittest.TestCase):
         self.assertRaises(KeyError, self.store.get, 'not_found')
 
     def test_none_cache_tag(self):
-        self.store.put('foo', StringIO('bar'), None, 'text/plain')
-        (cache_tag, content_type, f) = self.store.get('foo', cache_tag='None')
+        self.store.put('foo', StringIO('bar'), None, [('Content-Type', 'text/plain')])
+        (cache_tag, headers, f) = self.store.get('foo', cache_tag='None')
         try:
             assert cache_tag is None
-            assert content_type == 'text/plain'
+            assert headers == [('Content-Type', 'text/plain')]
             assert f
         finally:
             f.close()
         (cache_tag, content_type, f) = self.store.get('foo', cache_tag='')
         try:
             assert cache_tag is None
-            assert content_type == 'text/plain'
+            assert headers == [('Content-Type', 'text/plain')]
             assert f
         finally:
             f.close()
-
-    def test_none_content_type(self):
-        self.store.put('foo', StringIO('bar'), '1', None)
-        (cache_tag, content_type, f) = self.store.get('foo', cache_tag='None')
-        assert cache_tag == '1'
-        assert content_type is None
-        assert f
 

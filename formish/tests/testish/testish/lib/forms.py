@@ -765,7 +765,7 @@ def functest_RequiredStringAndFile(self):
     try: self.assertEqual("", sel.get_value("myFileField.default"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    try: self.assertEqual("-photo.png", sel.get_value("myFileField.name")[-10:])
+    try: self.assertTrue(sel.get_value("myFileField.name"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
     sel.click("form-action-submit")
@@ -774,7 +774,7 @@ def functest_RequiredStringAndFile(self):
     try: self.assertEqual("", sel.get_value("myFileField.default"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
-    try: self.assertEqual("-photo.png", sel.get_value("myFileField.name")[-10:])
+    try: self.assertTrue(sel.get_value("myFileField.name"))
     except AssertionError, e: self.verificationErrors.append(str(e))
 
     sel.type("form-myFileField", os.path.abspath("testdata/photo.jpg"))

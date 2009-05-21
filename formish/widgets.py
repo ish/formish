@@ -523,10 +523,14 @@ class FileUpload(Widget):
 
         fieldstorage = data.get('file', [''])[0]
         if getattr(fieldstorage,'file',None):
-            filename = '%s-%s'%(uuid.uuid4().hex,fieldstorage.filename)
+            # XXX Can we reuse the key from a previous temp upload to avoid
+            # creating an additional temp file?
+            key = uuid.uuid4().hex
             cache_tag = uuid.uuid4().hex
-            self.filestore.put(filename, fieldstorage.file, cache_tag, fieldstorage.type)
-            data['name'] = [filename]
+            self.filestore.put(key, fieldstorage.file, cache_tag,
+                               [('Content-Type', fieldstorage.type),
+                                ('Filename', fieldstorage.filename)])
+            data['name'] = [key]
             data['mimetype'] = [fieldstorage.type]
         return data
     
@@ -541,13 +545,13 @@ class FileUpload(Widget):
         elif request_data['name'] == request_data['default']:
             return SchemaFile(None, None, None)
         else:
-            filestore_key = request_data['name'][0]
+            key = request_data['name'][0]
             try:
-                cache_tag, content_type, f = self.filestore.get(filestore_key)
+                cache_tag, headers, f = self.filestore.get(key)
             except KeyError:
                 return None
-            filename = filestore_key.split('-', 1)[1]
-            return SchemaFile(f, filename, content_type)
+            headers = dict(headers)
+            return SchemaFile(f, headers['Filename'], headers['Content-Type'])
 
     
 class SelectChoice(Widget):

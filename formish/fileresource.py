@@ -65,7 +65,8 @@ class FileResource(resource.Resource):
         """ get the file through the cache and possibly resizing """
         # Check the file is up to date
         try:
-            cache_tag, content_type, f = filestore.get(filename, etag)
+            cache_tag, headers, f = filestore.get(filename, etag)
+            content_type = dict(headers)['Content-Type']
         except KeyError:
             # XXX if the original is not their, clear resize cache (this would mean a globbing delete every request!)
             # cache_filename = filestore.name+'_'+filename
@@ -84,7 +85,8 @@ class FileResource(resource.Resource):
 
         try:
             cache_filename = filestore.name+'_'+filename+size
-            resized_cache_tag, content_type, rf = self.cache.get(cache_filename, etag)
+            resized_cache_tag, headers, rf = self.cache.get(cache_filename, etag)
+            content_type = dict(headers)['Content-Type']
             resize_needed = resized_cache_tag != cache_tag
             if resize_needed and rf is not None:
                 rf.close()
@@ -95,12 +97,13 @@ class FileResource(resource.Resource):
         if resize_needed:
             if f is None:
                 try:
-                    cache_tag, content_type, f = filestore.get(filename)
+                    cache_tag, headers, f = filestore.get(filename)
+                    content_type = dict(headers)['Content-Type']
                 except KeyError:
                     return 
             rf = resize_image(f, (width, height), self.resize_quality)
             f.close()
-            self.cache.put(cache_filename, rf, cache_tag, content_type)
+            self.cache.put(cache_filename, rf, cache_tag, [('Content-Type', content_type)])
             rf.seek(0)
             data = rf.read()
             rf.close()

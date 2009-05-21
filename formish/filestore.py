@@ -72,20 +72,20 @@ class CachedTempFilestore(FileSystemHeaderedFilestore):
 
     def get(self, key, cache_tag=None):
         headers, f = FileSystemHeaderedFilestore.get(self, key)
-        headers = dict(headers)
-        if cache_tag and headers.get('Cache-Tag') == cache_tag:
-            f.close()
-            return (cache_tag, None, None)
-        return (headers.get('Cache-Tag'), headers.get('Content-Type'), f)
-
-    def put(self, key, src, cache_tag, content_type, headers=None):
-        if headers is None:
-            headers = {}
+        if headers and headers[0][0] == 'Cache-Tag':
+            header_cache_tag = headers[0][1]
+            headers = headers[1:]
         else:
-            headers = dict(headers)
+            header_cache_tag = None
+        if cache_tag and header_cache_tag == cache_tag:
+            f.close()
+            return (cache_tag, headers, None)
+        return (header_cache_tag, headers, f)
+
+    def put(self, key, src, cache_tag, headers=None):
+        if headers is None:
+            headers = []
         if cache_tag:
-            headers['Cache-Tag'] = cache_tag
-        if content_type:
-            headers['Content-Type'] = content_type
+            headers = [('Cache-Tag', cache_tag)] + headers
         FileSystemHeaderedFilestore.put(self, key, headers, src)
 
