@@ -21,7 +21,7 @@ class FileResource(resource.Resource):
     A simple file serving utility
     """
 
-    def __init__(self, filestores=None, filestore=None, segments=None, cache=None):
+    def __init__(self, filestores=None, filestore=None, cache=None):
         if cache:
             self.cache = cache
         else:
@@ -35,23 +35,15 @@ class FileResource(resource.Resource):
             filestore = CachedTempFilestore(FileSystemHeaderedFilestore(root_dir='store'), name='store')
             self.filestores = [filestore, tempfilestore]
         self.filestores.append(self.cache)
-        self.segments = segments
         self.resize_quality = 70
-
 
     @resource.child(resource.any)
     def child(self, request, segments):
-        return FileResource(filestores=self.filestores, segments=segments, cache=self.cache), []
-
-
-    def __call__(self, request):
         """
         Find the appropriate image to return including cacheing and resizing
         """
-        if not self.segments:
-            return None
-        filename = '/'.join(self.segments)
-
+        # Build the full filename from the segments.
+        filename = '/'.join(segments)
         # get the requested filepath from the segments
         etag = str(request.if_none_match)
         for filestore in self.filestores:
@@ -59,7 +51,6 @@ class FileResource(resource.Resource):
             if f:
                 return f
         return http.not_found()
-
 
     def get_file(self, request, filestore, filename, etag):
         """ get the file through the cache and possibly resizing """
