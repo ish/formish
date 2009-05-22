@@ -1238,6 +1238,22 @@ def form_SimpleStructure(request):
     form = formish.Form(schema, 'form')
     return form
   
+def form_StructureWithReadonly(request):
+    """
+    A simple structure
+    """
+    structure = schemaish.Structure()
+    structure.add( 'a', schemaish.String() )
+    structure.add( 'b', schemaish.Integer() )
+
+    schema = schemaish.Structure()
+    schema.add( 'myStruct', structure )
+
+    form = formish.Form(schema, 'form')
+    form['myStruct.b'].widget = formish.Input(readonly=True)
+    form['myStruct.b'].default = 7
+    return form
+
 def form_UploadStructure(request):
     """
     A structure with a file upload
