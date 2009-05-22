@@ -934,6 +934,10 @@ class Form(object):
         """ Return just the metada part of the template """
         return self.renderer('/formish/form/metadata.html', {'form':self})
 
+    def error_list(self):
+        """ Return just the metada part of the template """
+        return self.renderer('/formish/form/error_list.html', {'form':self})
+
     def actions(self):
         """ Return just the actions part of the template """
         return self.renderer('/formish/form/actions.html', {'form':self})
