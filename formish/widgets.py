@@ -70,8 +70,6 @@ class Widget(object):
 
 
 
-    def __call__(self, field):
-        return field.form.renderer('/formish/widgets/%s.html'%self.template, {'f':field})
 
     def __repr__(self):
         attributes = []
@@ -435,7 +433,7 @@ class Checkbox(Widget):
         """
         If the request data exists, then we treat this as True
         """
-        if len(request_data) == 0:
+        if request_data is None or len(request_data) == 0:
             out_string = 'False'
         else:
             out_string = 'True'
