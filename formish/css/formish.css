@@ -35,7 +35,7 @@
   color: #555;
 }
 
-.formish-form .error > label, .formish-form .error > legend {
+.formish-form .error, .formish-form .error > label, .formish-form .error > legend {
   color: #900;
 }
 
