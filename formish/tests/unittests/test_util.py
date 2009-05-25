@@ -20,3 +20,17 @@ class TestUtil(unittest.TestCase):
         request.GET = {'__formish_form__': 'foo'}
         self.assertTrue(util.form_in_request(request) == 'foo')
 
+    def test_file_resource_path(self):
+        tests = [
+            (None, 'foo', 'foo'),
+            (None, '@foo', '@@foo'),
+            (None, 'f@o', 'f@o'),
+            ('bar', 'foo', '@bar/foo'),
+            ('bar', '@foo', '@bar/@foo'),
+            ('bar', 'f@o', '@bar/f@o'),
+        ]
+        for (name, key, path) in tests:
+            encoded = util.encode_file_resource_path(name, key)
+            self.assertTrue(encoded == path)
+            self.assertTrue(util.decode_file_resource_path(encoded) == (name, key))
+

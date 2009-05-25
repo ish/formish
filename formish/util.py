@@ -3,6 +3,7 @@ General purpose utility module.
 """
 
 import re
+import urllib
 
 
 _IDENTIFIER_REGEX = re.compile('^[a-zA-Z_][a-zA-Z0-9_]*$')
@@ -90,4 +91,33 @@ def get_post_charset(request):
             return charset
 
     return 'utf-8'
+
+
+def encode_file_resource_path(name, key):
+    """
+    Encode a file store name and key to a file resource path.
+    """
+    if name:
+        path = '@%s/%s' % (name, key)
+    else:
+        if key[:1] == '@':
+            path = ''.join(['@@', key[1:]])
+        else:
+            path = key
+    return urllib.quote(path, '/@')
+
+
+def decode_file_resource_path(path):
+    """
+    Decode a file resource path to a file store name and key.
+    """
+    path = urllib.unquote(path)
+    if path[:2] == '@@':
+        return None, ''.join(['@', path[2:]])
+    elif path[:1] == '@':
+        name, key = path.split('/', 1)
+        name = name[1:]
+    else:
+        name, key = None, path
+    return name, key
 

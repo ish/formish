@@ -6,6 +6,7 @@ Requires ImageMagick for image resizing
 import tempfile, os, subprocess, shutil
 from restish import http, resource
 
+from formish import util
 from formish.filestore import CachedTempFilestore, FileSystemHeaderedFilestore
 
 import logging
@@ -21,20 +22,20 @@ class FileResource(resource.Resource):
     A simple file serving utility
     """
 
-    def __init__(self, filestores=None, filestore=None, cache=None):
-        if cache:
-            self.cache = cache
-        else:
-            self.cache =  CachedTempFilestore(FileSystemHeaderedFilestore(root_dir='cache'))
-        if filestore is not None:
-            self.filestores = [filestore]
-        elif filestores is not None:
-            self.filestores = filestores
-        else:
-            tempfilestore = CachedTempFilestore(name='tmp')
-            filestore = CachedTempFilestore(FileSystemHeaderedFilestore(root_dir='store'), name='store')
-            self.filestores = [filestore, tempfilestore]
-        self.filestores.append(self.cache)
+    def __init__(self, filestores=None, cache=None):
+        # Create the resized image cache.
+        if cache is None:
+            cache =  CachedTempFilestore(FileSystemHeaderedFilestore(root_dir='cache'))
+        self.cache = cache
+        # Build a dict of filestores.
+        if filestores is None:
+            filestores = {}
+        elif not isinstance(filestores, dict):
+            filestores = {None: filestores}
+        # Add the 'tmp' filestore is not provided.
+        if 'tmp' not in filestores:
+            filestores['tmp'] = CachedTempFilestore()
+        self.filestores = filestores
         self.resize_quality = 70
 
     @resource.child(resource.any)
@@ -43,17 +44,23 @@ class FileResource(resource.Resource):
         Find the appropriate image to return including cacheing and resizing
         """
         # Build the full filename from the segments.
-        filename = '/'.join(segments)
+        filestore, key = util.decode_file_resource_path('/'.join(segments))
         # get the requested filepath from the segments
         etag = str(request.if_none_match)
-        for filestore in self.filestores:
-            f = self.get_file(request, filestore, filename, etag)
-            if f:
-                return f
+        f = self.get_file(request, filestore, key, etag)
+        if f:
+            return f
         return http.not_found()
 
-    def get_file(self, request, filestore, filename, etag):
+    def get_file(self, request, filestore_name, filename, etag):
         """ get the file through the cache and possibly resizing """
+
+        # Turn the filestore name into a filestore
+        try:
+            filestore = self.filestores[filestore_name]
+        except KeyError:
+            return None
+
         # Check the file is up to date
         try:
             cache_tag, headers, f = filestore.get(filename, etag)
@@ -75,7 +82,7 @@ class FileResource(resource.Resource):
                 return http.not_modified([('ETag', cache_tag)])
 
         try:
-            cache_filename = filestore.name+'_'+filename+size
+            cache_filename = (filestore_name or '')+'_'+filename+size
             resized_cache_tag, headers, rf = self.cache.get(cache_filename, etag)
             content_type = dict(headers)['Content-Type']
             resize_needed = resized_cache_tag != cache_tag

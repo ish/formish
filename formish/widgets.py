@@ -12,6 +12,8 @@ from schemaish.type import File as SchemaFile
 from dottedish import get_dict_from_dotted_dict
 import uuid
 
+from formish import util
+
 
 UNSET = object()
 
@@ -483,16 +485,11 @@ class FileUpload(Widget):
             attributes.append('empty=%r'%self.empty)
 
         return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
-          
 
     def urlfactory(self, data):
         if not data:
             return self.image_thumbnail_default
-        if isinstance(data, SchemaFile):
-            key = self.url_ident_factory(data)
-        else:
-            key = data
-        return '%s/%s' % (self.url_base, key)
+        return '%s/%s' % (self.url_base, data)
     
     def to_request_data(self, schema_type, data):
         """
@@ -502,10 +499,10 @@ class FileUpload(Widget):
         """
         mimetype = ''
         if isinstance(data, SchemaFile):
-            default = self.url_ident_factory(data)
+            default = util.encode_file_resource_path(None, self.url_ident_factory(data))
             mimetype = data.mimetype
         elif data is not None:
-            default = data
+            default = util.encode_file_resource_path(None, data)
         else:
             default = ''
         return {'name': [default], 'default':[default], 'mimetype':[mimetype]}
@@ -530,7 +527,7 @@ class FileUpload(Widget):
             self.filestore.put(key, fieldstorage.file, cache_tag,
                                [('Content-Type', fieldstorage.type),
                                 ('Filename', fieldstorage.filename)])
-            data['name'] = [key]
+            data['name'] = [util.encode_file_resource_path('tmp', key)]
             data['mimetype'] = [fieldstorage.type]
         return data
     
@@ -545,7 +542,7 @@ class FileUpload(Widget):
         elif request_data['name'] == request_data['default']:
             return SchemaFile(None, None, None)
         else:
-            key = request_data['name'][0]
+            key = util.decode_file_resource_path(request_data['name'][0])[1]
             try:
                 cache_tag, headers, f = self.filestore.get(key)
             except KeyError:
@@ -830,7 +827,6 @@ def mktree(options):
         parent = get_parent(segments)
         root[id] = {'data': (id, label), 'children':[]}
         root[parent]['children'].append(root[id])
-    print root['']
     return root['']
 
 

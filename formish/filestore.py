@@ -60,14 +60,10 @@ class FileSystemHeaderedFilestore(object):
 
 class CachedTempFilestore(object):
 
-    def __init__(self, backend=None, name=None):
+    def __init__(self, backend=None):
         if backend is None:
             backend = FileSystemHeaderedFilestore(tempfile.gettempdir())
         self.backend = backend
-        if name is None:
-            self.name = ''
-        else:
-            self.name = name
 
     def get(self, key, cache_tag=None):
         headers, f = self.backend.get(key)

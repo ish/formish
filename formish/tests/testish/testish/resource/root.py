@@ -122,6 +122,5 @@ class FormResource(resource.Resource):
             if 'myFileField' in data and data['myFileField'] is not None:
                 f = data['myFileField']
                 self.filestore.put(f.filename, f.file, uuid.uuid4().hex, [('Content-Type', f.mimetype)])
-                form['myFileField'].widget.filestore.delete(f.filename)
 
             return self.render_form(request, form=None, data=data)
