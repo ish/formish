@@ -13,6 +13,7 @@ from dottedish import get_dict_from_dotted_dict
 import uuid
 
 from formish import util
+from formish.filestore import CachedTempFilestore
 
 
 UNSET = object()
@@ -432,15 +433,12 @@ class FileUpload(Widget):
     type = 'FileUpload'
     template = 'field.FileUpload'
     
-    def __init__(self, filestore, show_file_preview=True, show_download_link=False, \
-                 show_image_thumbnail=False, url_base=None, \
-                 css_class=None, image_thumbnail_default=None, url_ident_factory=None):
+    def __init__(self, filestore=UNSET, show_file_preview=True,
+                 show_download_link=False, show_image_thumbnail=False,
+                 url_base=None, css_class=None, image_thumbnail_default=None,
+                 url_ident_factory=None):
         """
-        :arg filestore: filestore is any object with the following methods:
-
-            storeFile(self, f)
-                where f is a file instance
-
+        :arg filestore: filestore for temporary files
         :arg show_image_thumbnail: a boolean that, if set, will include an image
             thumbnail with the widget
         :arg css_class: extra css classes to apply to the widget
@@ -449,20 +447,22 @@ class FileUpload(Widget):
         XXX allow_clear -> allow_delete 
         XXX url_ident_factory -> filestore_key_factory
         """
+        # Setup defaults.
+        if filestore is UNSET:
+            filestore = CachedTempFilestore()
+        if url_base is None:
+            url_base = '/filehandler'
+        if url_ident_factory is None:
+            url_ident_factory = lambda i: i.filename
+        # Initialise instance state
         Widget.__init__(self)
         self.filestore = filestore
         self.show_image_thumbnail = show_image_thumbnail
         self.image_thumbnail_default = image_thumbnail_default
-        if url_base is None:
-            self.url_base = '/filehandler'
-        else:
-            self.url_base = url_base
+        self.url_base = url_base
         self.show_download_link = show_download_link
         self.show_file_preview = show_file_preview
-        if url_ident_factory is not None:
-            self.url_ident_factory = url_ident_factory
-        else:
-            self.url_ident_factory = lambda i: i.filename
+        self.url_ident_factory = url_ident_factory
 
     def __repr__(self):
         attributes = []
