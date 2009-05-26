@@ -19,10 +19,25 @@ class FileSystemHeaderedFilestore(object):
     """
 
     def __init__(self, root_dir, mode=0660):
+        """
+        Create a new storage space.
+
+        :arg root_dir: directory for stored files to be written to.
+        :arg mode: initial mode of created files, defaults to 0660. See os.open
+                   for details.
+        """
         self._root_dir = root_dir
         self._mode = mode
 
     def get(self, key):
+        """
+        Get the file stored for the given key.
+
+        :arg key: unique key that identifies the file.
+        :returns: tuple of (header, f) where headers is a list of (name, value)
+                  pairs and f is a readable file-like object.
+        :raises KeyError: not found
+        """
         try:
             f = open(os.path.join(self._root_dir, safefilename.encode(key)), 'rb')
         except IOError, AttributeError:
@@ -37,6 +52,14 @@ class FileSystemHeaderedFilestore(object):
         return headers, f
 
     def put(self, key, headers, src):
+        """
+        Add a file to the store, overwriting an existing file with the same key.
+
+        :arg key: unique key that identifies the file.
+        :arg headers: list of (name, value) pairs that will be associated with
+                      the file.
+        :arg src: readable file-like object
+        """
         # XXX We should only allow strings as headers keys and values.
         # Open the file with minimal permissions..
         filename = os.path.join(self._root_dir, safefilename.encode(key))
@@ -72,6 +95,17 @@ class CachedTempFilestore(object):
         self.backend = backend
 
     def get(self, key, cache_tag=None):
+        """
+        Get the file stored for the given key.
+
+        :arg key: unique key that identifies the file.
+        :arg cache_tag: opaque value that is used to validate cache freshness
+                        (similar to an HTTP etag).
+        :returns: tuple of (header, f) where headers is a list of (name, value)
+                  pairs and f is a readable file-like object. f will be None if
+                  the cache_tag was valid. f must be closed by the caller.
+        :raises KeyError: not found
+        """
         headers, f = self.backend.get(key)
         if headers and headers[0][0] == 'Cache-Tag':
             header_cache_tag = headers[0][1]
@@ -84,6 +118,16 @@ class CachedTempFilestore(object):
         return (header_cache_tag, headers, f)
 
     def put(self, key, src, cache_tag, headers=None):
+        """
+        Add a file to the store, overwriting an existing file with the same key.
+
+        :arg key: unique key that identifies the file.
+        :arg cache_tag: opaque value that is later used to validate cache
+                        freshness (similar to an HTTP etag).
+        :arg headers: list of (name, value) pairs that will be associated with
+                      the file.
+        :arg src: readable file-like object
+        """
         if headers is None:
             headers = []
         if cache_tag:
