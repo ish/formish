@@ -2,8 +2,10 @@
 Standard filehandlers for temporary storage of file uploads. Uses tempfile to
 make temporary files
 """
-import tempfile
+import os
 import os.path
+import tempfile
+
 from formish import _copyfile, safefilename
 
 
@@ -16,8 +18,9 @@ class FileSystemHeaderedFilestore(object):
     XXX file ownership?
     """
 
-    def __init__(self, root_dir):
+    def __init__(self, root_dir, mode=0660):
         self._root_dir = root_dir
+        self._mode = mode
 
     def get(self, key):
         try:
@@ -35,7 +38,10 @@ class FileSystemHeaderedFilestore(object):
 
     def put(self, key, headers, src):
         # XXX We should only allow strings as headers keys and values.
-        dest = file(os.path.join(self._root_dir, safefilename.encode(key)), 'wb')
+        # Open the file with minimal permissions..
+        filename = os.path.join(self._root_dir, safefilename.encode(key))
+        fd = os.open(filename, os.O_RDWR|os.O_CREAT, self._mode)
+        dest = os.fdopen(fd, 'wb')
         try:
             if isinstance(headers, dict):
                headers = headers.items()
