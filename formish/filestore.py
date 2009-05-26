@@ -2,8 +2,10 @@
 Standard filehandlers for temporary storage of file uploads. Uses tempfile to
 make temporary files
 """
-import tempfile
+import os
 import os.path
+import tempfile
+
 from formish import _copyfile, safefilename
 
 
@@ -16,8 +18,9 @@ class FileSystemHeaderedFilestore(object):
     XXX file ownership?
     """
 
-    def __init__(self, root_dir):
+    def __init__(self, root_dir, mode=0660):
         self._root_dir = root_dir
+        self._mode = mode
 
     def get(self, key):
         try:
@@ -35,7 +38,10 @@ class FileSystemHeaderedFilestore(object):
 
     def put(self, key, headers, src):
         # XXX We should only allow strings as headers keys and values.
-        dest = file(os.path.join(self._root_dir, safefilename.encode(key)), 'wb')
+        # Open the file with minimal permissions..
+        filename = os.path.join(self._root_dir, safefilename.encode(key))
+        fd = os.open(filename, os.O_RDWR|os.O_CREAT, self._mode)
+        dest = os.fdopen(fd, 'wb')
         try:
             if isinstance(headers, dict):
                headers = headers.items()
@@ -58,34 +64,32 @@ class FileSystemHeaderedFilestore(object):
             os.remove( os.path.join(self._root_dir, safefilename.encode(key)))
 
 
-class CachedTempFilestore(FileSystemHeaderedFilestore):
+class CachedTempFilestore(object):
 
-    def __init__(self, root_dir=None, name=None):
-        if root_dir is None:
-            self._root_dir = tempfile.gettempdir()
-        else:
-            self._root_dir = root_dir
-        if name is None:
-            self.name = ''
-        else:
-            self.name = name
+    def __init__(self, backend=None):
+        if backend is None:
+            backend = FileSystemHeaderedFilestore(tempfile.gettempdir())
+        self.backend = backend
 
     def get(self, key, cache_tag=None):
-        headers, f = FileSystemHeaderedFilestore.get(self, key)
-        headers = dict(headers)
-        if cache_tag and headers.get('Cache-Tag') == cache_tag:
-            f.close()
-            return (cache_tag, None, None)
-        return (headers.get('Cache-Tag'), headers.get('Content-Type'), f)
-
-    def put(self, key, src, cache_tag, content_type, headers=None):
-        if headers is None:
-            headers = {}
+        headers, f = self.backend.get(key)
+        if headers and headers[0][0] == 'Cache-Tag':
+            header_cache_tag = headers[0][1]
+            headers = headers[1:]
         else:
-            headers = dict(headers)
+            header_cache_tag = None
+        if cache_tag and header_cache_tag == cache_tag:
+            f.close()
+            return (cache_tag, headers, None)
+        return (header_cache_tag, headers, f)
+
+    def put(self, key, src, cache_tag, headers=None):
+        if headers is None:
+            headers = []
         if cache_tag:
-            headers['Cache-Tag'] = cache_tag
-        if content_type:
-            headers['Content-Type'] = content_type
-        FileSystemHeaderedFilestore.put(self, key, headers, src)
+            headers = [('Cache-Tag', cache_tag)] + headers
+        self.backend.put(key, headers, src)
+
+    def delete(self, key):
+        self.backend.delete(key)
 

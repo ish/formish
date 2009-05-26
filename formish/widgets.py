@@ -13,6 +13,9 @@ from schemaish.type import File as SchemaFile
 from dottedish import get_dict_from_dotted_dict
 import uuid
 
+from formish import util
+from formish.filestore import CachedTempFilestore
+
 
 UNSET = object()
 
@@ -509,15 +512,12 @@ class FileUpload(Widget):
     type = 'FileUpload'
     template = 'field.FileUpload'
     
-    def __init__(self, filestore, show_file_preview=True, show_download_link=False, \
-                 show_image_thumbnail=False, url_base=None, \
-                 css_class=None, image_thumbnail_default=None, url_ident_factory=None):
+    def __init__(self, filestore=UNSET, show_file_preview=True,
+                 show_download_link=False, show_image_thumbnail=False,
+                 url_base=None, css_class=None, image_thumbnail_default=None,
+                 url_ident_factory=None):
         """
-        :arg filestore: filestore is any object with the following methods:
-
-            storeFile(self, f)
-                where f is a file instance
-
+        :arg filestore: filestore for temporary files
         :arg show_image_thumbnail: a boolean that, if set, will include an image
             thumbnail with the widget
         :arg css_class: extra css classes to apply to the widget
@@ -526,20 +526,22 @@ class FileUpload(Widget):
         XXX allow_clear -> allow_delete 
         XXX url_ident_factory -> filestore_key_factory
         """
+        # Setup defaults.
+        if filestore is UNSET:
+            filestore = CachedTempFilestore()
+        if url_base is None:
+            url_base = '/filehandler'
+        if url_ident_factory is None:
+            url_ident_factory = lambda i: i.filename
+        # Initialise instance state
         Widget.__init__(self)
         self.filestore = filestore
         self.show_image_thumbnail = show_image_thumbnail
         self.image_thumbnail_default = image_thumbnail_default
-        if url_base is None:
-            self.url_base = '/filehandler'
-        else:
-            self.url_base = url_base
+        self.url_base = url_base
         self.show_download_link = show_download_link
         self.show_file_preview = show_file_preview
-        if url_ident_factory is not None:
-            self.url_ident_factory = url_ident_factory
-        else:
-            self.url_ident_factory = lambda i: i.filename
+        self.url_ident_factory = url_ident_factory
 
     def __repr__(self):
         attributes = []
@@ -562,16 +564,11 @@ class FileUpload(Widget):
             attributes.append('empty=%r'%self.empty)
 
         return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
-          
 
     def urlfactory(self, data):
         if not data:
             return self.image_thumbnail_default
-        if isinstance(data, SchemaFile):
-            key = self.url_ident_factory(data)
-        else:
-            key = data
-        return '%s/%s' % (self.url_base, key)
+        return '%s/%s' % (self.url_base, data)
     
     def to_request_data(self, schema_type, data):
         """
@@ -581,10 +578,10 @@ class FileUpload(Widget):
         """
         mimetype = ''
         if isinstance(data, SchemaFile):
-            default = self.url_ident_factory(data)
+            default = util.encode_file_resource_path(None, self.url_ident_factory(data))
             mimetype = data.mimetype
         elif data is not None:
-            default = data
+            default = util.encode_file_resource_path(None, data)
         else:
             default = ''
         return {'name': [default], 'default':[default], 'mimetype':[mimetype]}
@@ -604,10 +601,14 @@ class FileUpload(Widget):
 
         fieldstorage = data.get('file', [''])[0]
         if getattr(fieldstorage,'file',None):
-            filename = '%s-%s'%(uuid.uuid4().hex,fieldstorage.filename)
+            # XXX Can we reuse the key from a previous temp upload to avoid
+            # creating an additional temp file?
+            key = uuid.uuid4().hex
             cache_tag = uuid.uuid4().hex
-            self.filestore.put(filename, fieldstorage.file, cache_tag, fieldstorage.type)
-            data['name'] = [filename]
+            self.filestore.put(key, fieldstorage.file, cache_tag,
+                               [('Content-Type', fieldstorage.type),
+                                ('Filename', fieldstorage.filename)])
+            data['name'] = [util.encode_file_resource_path('tmp', key)]
             data['mimetype'] = [fieldstorage.type]
         return data
     
@@ -622,13 +623,13 @@ class FileUpload(Widget):
         elif request_data['name'] == request_data['default']:
             return SchemaFile(None, None, None)
         else:
-            filestore_key = request_data['name'][0]
+            key = util.decode_file_resource_path(request_data['name'][0])[1]
             try:
-                cache_tag, content_type, f = self.filestore.get(filestore_key)
+                cache_tag, headers, f = self.filestore.get(key)
             except KeyError:
                 return None
-            filename = filestore_key.split('-', 1)[1]
-            return SchemaFile(f, filename, content_type)
+            headers = dict(headers)
+            return SchemaFile(f, headers['Filename'], headers['Content-Type'])
 
     
 class SelectChoice(Widget):

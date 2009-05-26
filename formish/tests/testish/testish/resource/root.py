@@ -85,7 +85,7 @@ class FormResource(resource.Resource):
         except AttributeError:
             raise http.NotFoundError()
         self.description = _format(self.form_getter.func_doc)
-        self.filestore = filestore.CachedTempFilestore('store')
+        self.filestore = filestore.CachedTempFilestore(filestore.FileSystemHeaderedFilestore('store'))
 
     @resource.GET()
     def GET(self, request):
@@ -121,7 +121,6 @@ class FormResource(resource.Resource):
         else:
             if 'myFileField' in data and data['myFileField'] is not None:
                 f = data['myFileField']
-                self.filestore.put(f.filename, f.file, f.mimetype, uuid.uuid4().hex)
-                form['myFileField'].widget.filestore.delete(f.filename)
+                self.filestore.put(f.filename, f.file, uuid.uuid4().hex, [('Content-Type', f.mimetype)])
 
             return self.render_form(request, form=None, data=data)
