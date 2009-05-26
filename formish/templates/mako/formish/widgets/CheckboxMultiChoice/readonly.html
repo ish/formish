@@ -1,5 +1,5 @@
 <%page args="field" />
-%for value in field.value:
+%for value in field.defaults:
 % if 
 <div id="${field.cssname}-${n}">${value}</div>
 %endfor
