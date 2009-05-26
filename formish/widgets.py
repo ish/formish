@@ -1,8 +1,9 @@
+import pdb
 """
 Commonly needed form widgets.
 """
 
-__all__ = ['Input', 'Password', 'CheckedPassword', 'Hidden', 'TextArea',
+__all__ = ['Input', 'Password', 'CheckedPassword', 'CheckedInput', 'Hidden', 'TextArea',
         'Checkbox', 'DateParts', 'FileUpload', 'SelectChoice','SelectWithOtherChoice','RadioChoice',
         'CheckboxMultiChoice', 'SequenceDefault','CheckboxMultiChoiceTree', 'Grid']
 
@@ -31,6 +32,7 @@ class Widget(object):
         self.css_class = k.get('css_class', None)
         self.converttostring = True
         self.empty = k.get('empty', None)
+        self.readonly = k.get('readonly',False)
         self.converter_options = k.get('converter_options', {})
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
@@ -61,15 +63,16 @@ class Widget(object):
         after the form has been submitted, the request data is converted into
         to the schema type.
         """
-        string_data = request_data[0]
+        if request_data is None:
+            string_data = ''
+        else:
+            string_data = request_data[0]
         if string_data == '':
             return self.empty
         return string_converter(schema_type).to_type(string_data)
 
 
 
-    def __call__(self, field):
-        return field.form.renderer('/formish/widgets/%s.html'%self.template, {'f':field})
 
     def __repr__(self):
         attributes = []
@@ -102,7 +105,10 @@ class Input(Widget):
         """
         Default to stripping whitespace
         """
-        string_data = request_data[0]
+        if request_data is None:
+            string_data = ''
+        else:
+            string_data = request_data[0]
         if self.strip is True:
             string_data = string_data.strip()
         if string_data == '':
@@ -160,8 +166,13 @@ class CheckedPassword(Input):
         """
         Check the password and confirm match (when stripped)
         """
-        password = request_data['password'][0]
-        confirm = request_data['confirm'][0]
+        if request_data is None:
+            password = ''
+            confirm = ''
+        else:
+            password = request_data['password'][0]
+            confirm = request_data['confirm'][0]
+
         if self.strip is True:
             password = password.strip()
             confirm = confirm.strip()
@@ -170,6 +181,63 @@ class CheckedPassword(Input):
         if password == '':
             return self.empty
         return string_converter(schema_type).to_type(password)
+
+    def __repr__(self):
+        attributes = []
+        if self.strip is False:
+            attributes.append('strip=%r'%self.strip)
+        if self.converter_options != {'delimiter':','}:
+            attributes.append('converter_options=%r'%self.converter_options)
+        if self.css_class:
+            attributes.append('css_class=%r'%self.css_class)
+        if self.empty is not None:
+            attributes.append('empty=%r'%self.empty)
+
+        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
+
+
+class CheckedInput(Input):
+    """
+    Checked Input ensures that the input has been entered twice
+    """
+
+    type = 'CheckedInput'
+    template = 'field.CheckedInput'
+
+    def __init__(self, **k):
+        self.strip = k.pop('strip', True)
+        self.css_class = k.pop('css_class', None)
+        Input.__init__(self, **k)
+        if not self.converter_options.has_key('delimiter'):
+            self.converter_options['delimiter'] = ','
+            
+    def to_request_data(self, schema_type, data):
+        """
+        Extract both the input and confirm fields
+        """
+        string_data = string_converter(schema_type).from_type(data)
+        if string_data is None:
+            return {'input': [''], 'confirm': ['']}
+        return {'input': [string_data], 'confirm': [string_data]}
+    
+    def from_request_data(self, schema_type, request_data):
+        """
+        Check the input and confirm match (when stripped)
+        """
+        if request_data is None:
+            input = ''
+            confirm = ''
+        else:
+            input = request_data['input'][0]
+            confirm = request_data['confirm'][0]
+        if self.strip is True:
+            input = input.strip()
+            confirm = confirm.strip()
+        if input != confirm:
+            raise ConvertError('Fields did not match')
+        if input == '':
+            return self.empty
+        return string_converter(schema_type).to_type(input)
 
     def __repr__(self):
         attributes = []
@@ -296,7 +364,10 @@ class TextArea(Input):
         We're using the converter options to allow processing sequence data
         using the csv module
         """
-        string_data = request_data[0]
+        if request_data is None:
+            string_data = ''
+        else:
+            string_data = request_data[0]
         if self.strip is True:
             string_data = string_data.strip()
         if string_data == '':
@@ -337,7 +408,10 @@ class Grid(Input):
         return [string_data]
     
     def from_request_data(self, schema_type, request_data):
-        string_data = request_data[0]
+        if request_data is None:
+            string_data = []
+        else:
+            string_data = request_data[0]
         return string_converter(schema_type).to_type(string_data,
             converter_options=self.converter_options)
 
@@ -362,7 +436,7 @@ class Checkbox(Widget):
         """
         If the request data exists, then we treat this as True
         """
-        if len(request_data) == 0:
+        if request_data is None or len(request_data) == 0:
             out_string = 'False'
         else:
             out_string = 'True'
@@ -400,9 +474,14 @@ class DateParts(Widget):
         """
         Pull out the parts and convert
         """
-        year = request_data.get('year', [''])[0].strip()
-        month = request_data.get('month', [''])[0].strip()
-        day = request_data.get('day', [''])[0].strip()
+        if request_data is None:
+            year = ''
+            month = ''
+            day = ''
+        else:
+            year = request_data.get('year', [''])[0].strip()
+            month = request_data.get('month', [''])[0].strip()
+            day = request_data.get('day', [''])[0].strip()
         if year or month or day:
             date_parts = (year, month, day)
         else:
@@ -513,6 +592,8 @@ class FileUpload(Widget):
         file in a temporary location and just store an identifier in the field.
         This at least makes the file look symmetric.
         """
+        if data is None:
+            data = {}
         if data.get('remove', [None])[0] is not None:
             data['name'] = ['']
             data['mimetype'] = ['']
@@ -651,8 +732,12 @@ class SelectWithOtherChoice(SelectChoice):
         """
         Check to see if we need to use the 'other' value
         """
-        select = request_data['select'][0]
-        other = request_data['other'][0]
+        if request_data is None:
+            select = ''
+            other = ''
+        else:
+            select = request_data['select'][0]
+            other = request_data['other'][0]
         if select == '...':
             value = other
         else:
@@ -724,7 +809,7 @@ class RadioChoice(SelectChoice):
         If we don't have a choice, set a blank value
         """
 
-        if not request_data:
+        if request_data is None:
             string_data = ''
         else:
             string_data = request_data[0]
@@ -781,6 +866,8 @@ class CheckboxMultiChoice(Widget):
         """
         Iterating to convert back to the source data
         """
+        if request_data is None:
+            request_data = []
         return [string_converter(schema_type.attr).to_type(d) \
                 for d in request_data]
 
@@ -848,8 +935,10 @@ class CheckboxMultiChoiceTree(Widget):
             return []
         return [string_converter(schema_type.attr).from_type(d) for d in data]
     
-    def from_request_data(self, schema_type, data):
-        return [string_converter(schema_type.attr).to_type(d) for d in data]
+    def from_request_data(self, schema_type, request_data):
+        if request_data is None:
+            request_data = []
+        return [string_converter(schema_type.attr).to_type(d) for d in request_data]
 
     def checked(self, option, values, schema_type):
         if values is not None:

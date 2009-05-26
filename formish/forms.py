@@ -221,6 +221,7 @@ class Field(object):
             widget_type = self.form.get_item_data(starify(self.name),'widget')
         except KeyError:
             widget_type = widgets.Input()
+            self.form.set_item_data(starify(self.name),'widget',widget_type)
         return BoundWidget(widget_type, self)
 
         
@@ -377,6 +378,7 @@ class Collection(object):
                 widget_type = BoundWidget(widgets.StructureDefault(),self)
             else:
                 widget_type = BoundWidget(widgets.SequenceDefault(),self)
+            self.form.set_item_data(starify(self.name),'widget',widget_type)
         return widget_type
 
 
@@ -555,7 +557,11 @@ class BoundWidget(object):
 
     def __call__(self):
         widget_type, widget = self.widget.template.split('.')
-        return self.field.form.renderer('/formish/widgets/%s/widget.html'%widget, {'field':self.field})
+        if self.widget.readonly == True:
+            widget_template = 'readonly'
+        else:
+            widget_template = 'widget'
+        return self.field.form.renderer('/formish/widgets/%s/%s.html'%(widget, widget_template), {'field':self.field})
 
     def __repr__(self):
         return 'BoundWidget(widget=%r, field=%r)'%(self.widget, self.field)
@@ -717,7 +723,7 @@ class Form(object):
         return self._actions[0].callback(request, self, *args)
 
 
-    def get_unvalidated_data(self, request_data, raise_exceptions=True):
+    def get_unvalidated_data(self, request_data, raise_exceptions=True, skip_read_only_defaults=False):
         """
         Convert the request object into a nested dict in the correct structure
         of the schema but without applying the schema's validation.
@@ -725,7 +731,7 @@ class Form(object):
         :arg request_data: Webob style request data
         :arg raise_exceptions: Whether to raise exceptions or return errors
         """
-        data = validation.from_request_data(self.structure, request_data, errors=self.errors) 
+        data = validation.from_request_data(self.structure, request_data, errors=self.errors, defaults=self.defaults,skip_read_only_defaults=skip_read_only_defaults) 
         if raise_exceptions and len(self.errors.keys()):
             raise validation.FormError( \
         'Tried to access data but conversion from request failed with %s errors (%s)'% \
@@ -771,7 +777,7 @@ class Form(object):
     defaults = property(_get_defaults, _set_defaults)
     
 
-    def validate(self, request, failure_callable=None, success_callable=None):
+    def validate(self, request, failure_callable=None, success_callable=None, skip_read_only_defaults=False):
         """ 
         Validate the form data in the request.
 
@@ -788,7 +794,7 @@ class Form(object):
         :raises: formish.FormError, raised on validation failure.
         """
         try: 
-            data = self._validate(request)
+            data = self._validate(request, skip_read_only_defaults=skip_read_only_defaults)
         except validation.FormError, e:
             if failure_callable is None:
                 raise
@@ -799,7 +805,7 @@ class Form(object):
         else:
             return success_callable(request, data)
 
-    def _validate(self, request):
+    def _validate(self, request, skip_read_only_defaults=False):
         """
         Get the data without raising exceptions and then validate the data. If
         there are errors, raise them; otherwise return the data
@@ -827,7 +833,7 @@ class Form(object):
         self.request_data = validation.pre_parse_incoming_request_data( \
                     self.structure,dotted(request_data))
         data = self.get_unvalidated_data( \
-                    self.request_data, raise_exceptions=False)
+                    self.request_data, raise_exceptions=False, skip_read_only_defaults=skip_read_only_defaults)
         try:
             self.structure.attr.validate(data)
         except schemaish.attr.Invalid, e:
@@ -927,6 +933,10 @@ class Form(object):
     def metadata(self):
         """ Return just the metada part of the template """
         return self.renderer('/formish/form/metadata.html', {'form':self})
+
+    def error_list(self):
+        """ Return just the metada part of the template """
+        return self.renderer('/formish/form/error_list.html', {'form':self})
 
     def actions(self):
         """ Return just the actions part of the template """

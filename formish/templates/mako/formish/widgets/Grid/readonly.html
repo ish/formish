@@ -1,0 +1,23 @@
+<%page args="field" />
+
+<%
+rows = list(field.fields)
+%>
+
+<table id="${field.cssname}">
+  <thead>
+    <tr>
+% for f in rows[0].fields:
+      <th>${f.title}</th>
+% endfor
+    </tr>
+  </thead>
+
+% for row in rows:
+  <tr>
+%   for f in row.fields:
+<td>${f.widget()|n}</td>
+%   endfor
+  </tr>
+% endfor
+</table>
