@@ -46,7 +46,7 @@ class Widget(object):
         """
         if data is None:
             return ['']
-        string_data = string_converter(schema_type).from_type(data)
+        string_data = string_converter(schema_type).from_type(data, converter_options=self.converter_options)
         return [string_data]
 
 
@@ -69,7 +69,7 @@ class Widget(object):
             string_data = request_data[0]
         if string_data == '':
             return self.empty
-        return string_converter(schema_type).to_type(string_data)
+        return string_converter(schema_type).to_type(string_data, converter_options=self.converter_options)
 
 
 
@@ -113,7 +113,7 @@ class Input(Widget):
             string_data = string_data.strip()
         if string_data == '':
             return self.empty
-        return string_converter(schema_type).to_type(string_data)
+        return string_converter(schema_type).to_type(string_data, converter_options=self.converter_options)
 
     def __repr__(self):
         attributes = []

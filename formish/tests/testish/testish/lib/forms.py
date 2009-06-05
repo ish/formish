@@ -1402,6 +1402,16 @@ def form_SequenceOfSequencesAsTextArea(request):
     form['table'].widget = formish.TextArea()
     return form
     
+def form_SequenceAsInputWithDefaultAndDelimiter(request):
+    """
+    A simple text area but representing a csv style data structure
+    """
+    schema = schemaish.Structure()
+    schema.add('a', schemaish.Tuple( (schemaish.String(), schemaish.Integer()) ))
+    form = formish.Form(schema)
+    form['a'].widget = formish.Input(converter_options={'delimiter':':'})
+    form.defaults = {'a': ('a',3)}
+    return form
 
 def form_SequenceOfStructures(request):
     """
