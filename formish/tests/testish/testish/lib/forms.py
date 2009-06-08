@@ -1591,3 +1591,53 @@ ${form.footer()|n}
 
     """
 
+def form_CustomisedFormLayoutWithSequence(request):
+    """
+    A custom form
+    """
+    schema = schemaish.Structure()
+    schema.add( 'firstName', schemaish.String())
+    schema.add( 'surname', schemaish.String(description='THIS MUST BE YOUR SURNAME') )
+    email = schemaish.Structure()
+    email.add('type',schemaish.String())
+    email.add('email',schemaish.String())
+    schema.add( 'emails', schemaish.Sequence(email))
+
+    form = formish.Form(schema, 'form')
+
+    form['surname'].widget = formish.Input(css_class="surnamewidget")
+    
+    form.defaults = {'firstName': 'Tim', 'surname': 'Parkin','emails': [{'type':'home','email':'a@b.com'},{'type':'work','email':'c@d.com'}]}
+
+    return form
+
+
+def template_CustomisedFormLayoutWithSequence(request):
+    """
+${form.header()|n}
+${form.metadata()|n}
+
+${form['firstName']()|n}
+
+<div id="${form['surname'].cssname}--field" class="${form['surname'].classes}">
+  <strong>${form['surname'].description}</strong>
+  <em>${form['surname'].error}</em>
+  ${form['surname'].widget()|n}
+  <br />
+  <table>
+  %for field in form['emails'].fields:
+  <tr>
+    <td>${field['email'].title|n}</td>
+    <td> ${field['email'].widget()|n}</td>
+    <td>${field['type'].title|n}</td>
+    <td>${field['type'].widget()|n}</td>
+  </tr>
+  %endfor
+  </table>
+</div>
+
+${form.actions()|n}
+${form.footer()|n}
+
+    """
+
