@@ -41,7 +41,26 @@ class TestFormBuilding(unittest.TestCase):
         self.assertEqual(form.name,name)
         # this is really empty
         assert list(form.fields) == []
-        
+
+    def test_readonly_field(self):
+        """Test a form that has no a read only field"""
+        schema_readonly = schemaish.Structure([("a", schemaish.String()), ("b", schemaish.String())])
+        name = "Flat Form"
+        request =  Request(name)
+        form = formish.Form(schema_readonly, name)
+        form['a'].widget=formish.Input(readonly=True)
+        request = Request(name, {'b': 'bar'})
+        actualdata = form.validate(request)
+        expecteddata = {'a': None,'b': 'bar'}
+        print actualdata, expecteddata
+        assert  actualdata == expecteddata
+        form.defaults = {'a': 'foo'}
+        actualdata = form.validate(request)
+        expecteddata = {'a': 'foo','b': 'bar'}
+        print actualdata, expecteddata
+        assert  actualdata == expecteddata
+        print form()
+
 
     def test_flat_form(self):
         """Test a form that has no nested sections """
