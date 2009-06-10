@@ -16,8 +16,8 @@ function create_addlinks(o) {
 
 function get_sequence_numbers(segments, l) {
   var result = Array();
-  for each (segment in segments) {
-    if (isNaN(parseInt(segment)) == false) {
+  for(var i=0; i<segments.length; i++) {
+    if (isNaN(parseInt(segments[i])) == false) {
       result.push(segment);
     }
   }
@@ -30,7 +30,8 @@ function replace_stars(original, nums, divider) {
   var segments = original.split(divider);
   var n = 0;
 
-  for each (segment in segments) {
+  for(var i=0; i<segments.length; i++) {
+    var segment = segments[i];
     if ((segment == '*' || isNaN(parseInt(segment)) == false) && n < nums.length)   {
       // If the segment is a * or a number then we check replace it with the right number (the target number is probably right anyway)
       result.push(nums[n]);
@@ -47,7 +48,8 @@ function construct(start_segments, n, remainder, divider, strip) {
   var remainder_bits = remainder.split(divider);
   var remainder = remainder_bits.slice(1,remainder_bits.length-strip).join(divider);
   var result = Array();
-  for each (segment in start_segments) {
+  for(var i=0; i<start_segments.length; i++) {
+    segment = start_segments[i];
     if (segment != '') {
       result.push(segment);
     }
