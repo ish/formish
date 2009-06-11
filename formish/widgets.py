@@ -659,11 +659,11 @@ class SelectChoice(Widget):
         """
         Check the value passed matches the actual value
         """
-        if value == '':
+        if value == ['']:
             v = self.empty
         else:
-            v = value
-        if option[0] == v:
+            v = value[0]
+        if option == v:
             return ' selected="selected"'
         else:
             return ''
