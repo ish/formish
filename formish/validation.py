@@ -109,10 +109,7 @@ def to_request_data(form_structure, data, request_data=None, errors=None):
         errors = dotted()
     for field in form_structure.fields:
         try:
-            if field.type is 'group' or \
-              (field.type is 'sequence' and \
-                (field.widget is None or \
-                  field.widget.converttostring is False)):
+            if should_recurse(field):
                 to_request_data(field, data,
                         request_data=request_data, errors=errors)
             else:
@@ -143,10 +140,7 @@ def from_request_data(form_structure, request_data, data=None, errors=None, defa
 
     for field in form_structure.fields:
         try:
-            if field.type is 'group' or \
-              (field.type == 'sequence' and \
-                (field.widget.type is 'SequenceDefault' \
-                 or field.widget.converttostring is False)):
+            if should_recurse(field):
                 if field.type == 'sequence':
                     # Make sure we have an empty field at least. If we don't do
                     # this and there are no items in the list then this key
@@ -167,6 +161,16 @@ def from_request_data(form_structure, request_data, data=None, errors=None, defa
     data = recursive_convert_sequences(dotted(data))
     return data
 
+
+def should_recurse(field):
+    """
+    Should we recurse into data structures or let the widget handle things?
+    """
+    return (field.type is 'group' and field.widget.type == 'StructureDefault') or \
+            (field.type == 'sequence' and (field.widget.type is 'SequenceDefault' or \
+                                           field.widget.converttostring is False))
+
+
 def pre_parse_incoming_request_data(form_structure, request_data, data=None):
     """
     Some widgets (at the moment only files) need to have their data massaged in
@@ -177,9 +181,7 @@ def pre_parse_incoming_request_data(form_structure, request_data, data=None):
     if data is None:
         data = {}
     for field in form_structure.fields:
-        if field.type is 'group' or \
-          (field.type == 'sequence' and \
-             field.widget.type is 'SequenceDefault'):
+        if should_recurse(field):
             pre_parse_incoming_request_data(field, request_data, data=data)
         else: 
             # This needs to be cleverer...
