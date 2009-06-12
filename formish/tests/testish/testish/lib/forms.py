@@ -803,11 +803,11 @@ def functest_RequiredStringAndFile(self):
     stdout = subprocess.Popen([IDENTIFY, '/tmp/testish-functest'], stdout=subprocess.PIPE).communicate()[0]
     assert '/tmp/testish-functest JPEG 300x300' in stdout
     
-    actualfilepath = 'store_%s-100x100'%filesrc
+    actualfilepath = '_%s-100x100'%filesrc
     actualfilepath = safefilename.encode(actualfilepath)
     assert os.path.exists('cache/%s'%actualfilepath)
     fs = filestore.FileSystemHeaderedFilestore(root_dir='cache')
-    headers, fp = fs.get('store_%s-100x100'%filesrc)
+    headers, fp = fs.get('_%s-100x100'%filesrc)
     f = open('/tmp/testish-functest','wb')
     shutil.copyfileobj(fp, f)
     f.close()

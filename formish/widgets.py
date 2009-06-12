@@ -708,11 +708,11 @@ class SelectChoice(Widget):
         """
         Check the value passed matches the actual value
         """
-        if value == '':
+        if value == ['']:
             v = self.empty
         else:
-            v = value
-        if option[0] == v:
+            v = value[0]
+        if option == v:
             return ' selected="selected"'
         else:
             return ''
@@ -803,15 +803,15 @@ class SelectWithOtherChoice(SelectChoice):
             
     def selected(self, option, value, schema_type):
         """ Check the value passed matches the actual value """
-        if option[0] == '...' and value not in [value for value, label in self.get_options(schema_type)]:
+        if option[0] == '...' and value[0] not in [value for value, label in self.get_options(schema_type)]:
             return ' selected="selected"'
         # Map the empty value
-        if value == '':
+        if value == ['']:
             v = self.empty
         else:
-            v = value
+            v = value[0]
         # Check for selected
-        if option[0] == v:
+        if option == v:
             return ' selected="selected"'
         else:
             return ''
@@ -844,11 +844,11 @@ class RadioChoice(SelectChoice):
         """
         Check if the currently rendering input is the same as the value
         """
-        if value == '':
+        if value == ['']:
             v = self.empty
         else:
-            v = value
-        if option[0] == v:
+            v = value[0]
+        if option == v:
             return ' checked="checked"'
         else:
             return ''

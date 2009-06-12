@@ -70,7 +70,7 @@ class Root(resource.Resource):
 
     def resource_child(self, request, segments):
         if segments[0] == 'filehandler':
-            return fileresource.FileResource(), segments[1:]
+            return fileresource.FileResource(filestore.CachedTempFilestore(filestore.FileSystemHeaderedFilestore('store'))), segments[1:]
         return FormResource(segments[0]), segments[1:]
 
 

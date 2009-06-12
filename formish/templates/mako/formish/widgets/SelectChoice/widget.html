@@ -4,7 +4,7 @@
   <option value="${field.widget.get_none_option_value(field.attr)}">${field.widget.none_option[1]}</option>
 %endif
 %for option in field.widget.get_options(field.attr):
-  <option value="${option[0]}" ${field.widget.selected(option,field.value[0], field.attr)|n}>${option[1]}</option>
+  <option value="${option[0]}" ${field.widget.selected(option,field.value, field.attr)|n}>${option[1]}</option>
 %endfor
 </select>
 
