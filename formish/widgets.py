@@ -270,9 +270,7 @@ def default_empty_checker(v):
 
 
 def _default_empty_checker(v):
-    print '------',v
     if hasattr(v, 'values'):
-        print 'were a dict'
         for i in v.values():
             return _default_empty_checker(i) 
     if isinstance(v, basestring):
@@ -282,10 +280,8 @@ def _default_empty_checker(v):
     else:
         try:
             for i in v: 
-                print 'were a list'
                 return _default_empty_checker(i)
         except TypeError:
-            print 'were a value'
             if v is None or v == '':
                 return
             else:

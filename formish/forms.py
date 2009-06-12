@@ -201,9 +201,6 @@ class Field(object):
     @property
     def error(self):
         """ Lazily get the error from the form.errors when needed """
-        print 'self.name',self.name
-        print 'SELF FORM ERRORS',self.form.errors
-        print 'self.form.errors.get',self.form.errors.get(self.name, None)
         error = self.form.errors.get(self.name, None)
         if error is not None:
             val = str(error)
@@ -214,7 +211,6 @@ class Field(object):
     @property
     def errors(self):
         """ Lazily get the error from the form.errors when needed """
-        print 'self.form.errors.get(self.name)',self.form.errors.get(self.name, None)
         return self.form.errors.get(self.name, None)
 
     @property
@@ -523,9 +519,7 @@ class Sequence(Collection):
             if self.widget is not None:
                 empty_checker = self.widget.empty_checker
             if self.defaults is not None:
-                print 'self.defaults',self.defaults
                 for n,d in enumerate(self.defaults):
-                    print '**',n,d
                     if not empty_checker(d):
                         num_nonempty_fields=n+1
                 
