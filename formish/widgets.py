@@ -708,7 +708,7 @@ class SelectChoice(Widget):
             v = self.empty
         else:
             v = value[0]
-        if option == v:
+        if option[0] == v:
             return ' selected="selected"'
         else:
             return ''

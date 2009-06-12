@@ -171,6 +171,20 @@ class TestSequenceDefault(base.TestCase):
         data = form.validate(self.Request('form', {}))
 
 
+class TestSelectChoice(base.TestCase):
+
+    def test_default(self):
+        form = formish.Form(
+            schemaish.Structure([
+                ('foo', schemaish.String()),
+            ])
+        )
+        form['foo'].widget = formish.SelectChoice(['a', 'b'])
+        self.assertTrue('selected="selected"' not in form())
+        form.defaults = {'foo': 'a'}
+        self.assertTrue('value="a"  selected="selected"' in form())
+
+
 class TestSelectWithOther(base.TestCase):
 
     def test_default(self):
