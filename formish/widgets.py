@@ -769,9 +769,11 @@ class SelectWithOtherChoice(SelectChoice):
         populate the other choice if needed
         """
         string_data = string_converter(schema_type).from_type(data)
+        if string_data is None:
+            return {'select': [self.get_none_option_value(schema_type)], 'other': ['']}
         if string_data in [value for value, label in self.options]:
-            return {'select': ['...'], 'other': [string_data]}
-        return {'select': [string_data], 'other': ['']}
+            return {'select': [string_data], 'other': ['']}
+        return {'select': [self.other_option[0]], 'other': [string_data]}
 
     def from_request_data(self, schema_type, request_data):
         """
@@ -783,7 +785,7 @@ class SelectWithOtherChoice(SelectChoice):
         else:
             select = request_data['select'][0]
             other = request_data['other'][0]
-        if select == '...':
+        if select == self.other_option[0]:
             value = other
         else:
             if other != '':
@@ -793,13 +795,9 @@ class SelectWithOtherChoice(SelectChoice):
             return self.empty
         return string_converter(schema_type).to_type(value)
 
-    def get_other_option(self, schema_type):
-        """ Get the other option """
-        return (string_converter(schema_type).from_type( self.other_option[0]), self.other_option[1] )
-            
     def selected(self, option, value, schema_type):
         """ Check the value passed matches the actual value """
-        if option[0] == '...' and value[0] not in [value for value, label in self.get_options(schema_type)]:
+        if option[0] == self.other_option[0] and value[0] not in [value for value, label in self.get_options(schema_type)]:
             return ' selected="selected"'
         # Map the empty value
         if value == ['']:
@@ -807,7 +805,7 @@ class SelectWithOtherChoice(SelectChoice):
         else:
             v = value[0]
         # Check for selected
-        if option == v:
+        if option[0] == v:
             return ' selected="selected"'
         else:
             return ''
