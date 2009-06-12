@@ -184,6 +184,17 @@ class TestSelectChoice(base.TestCase):
         form.defaults = {'foo': 'a'}
         self.assertTrue('value="a"  selected="selected"' in form())
 
+    def test_none_option(self):
+        form = formish.Form(
+            schemaish.Structure([
+                ('foo', schemaish.String()),
+            ])
+        )
+        form['foo'].widget = formish.SelectChoice(options=['a', 'b'])
+        self.assertTrue('value=""' in form())
+        form['foo'].widget = formish.SelectChoice(options=['a', 'b'], none_option=None)
+        self.assertTrue('value=""' not in form())
+
 
 class TestSelectWithOther(base.TestCase):
 
