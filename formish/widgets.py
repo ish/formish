@@ -151,7 +151,7 @@ class CheckedPassword(Input):
         self.css_class = k.pop('css_class', None)
         Input.__init__(self, **k)
         if not self.converter_options.has_key('delimiter'):
-            self.converter_options['delimiter'] = ','
+            self.empty.converter_options['delimiter'] = ','
             
     def to_request_data(self, schema_type, data):
         """
@@ -261,6 +261,32 @@ class Hidden(Input):
     template = 'field.Hidden'
 
 
+def default_empty_checker(v):
+    try:
+        _default_empty_checker(v)
+    except ValueError:
+        return False
+    return True
+
+
+def _default_empty_checker(v):
+    if hasattr(v, 'values'):
+        for i in v.values():
+            return _default_empty_checker(i) 
+    if isinstance(v, basestring):
+        if v == '':
+            return
+        raise ValueError
+    else:
+        try:
+            for i in v: 
+                return _default_empty_checker(i)
+        except TypeError:
+            if v is None or v == '':
+                return
+            else:
+                raise ValueError
+    return v
 
 class SequenceDefault(Widget):
     """
@@ -277,8 +303,10 @@ class SequenceDefault(Widget):
 
     def __init__(self, **k):
         Widget.__init__(self, **k)
-        self.max = k.get('max')
-        self.min = k.get('min')
+        self.empty_checker = k.get('empty_checker',default_empty_checker)
+        self.min_start_fields = k.get('min_start_fields',1)
+        self.min_empty_start_fields = k.get('min_empty_start_fields',0)
+        self.batch_add_count = k.get('batch_add_count',1)
         self.addremove = k.get('addremove', True)
         self.sortable = k.get('sortable', True)
         self.converttostring = False
@@ -297,10 +325,12 @@ class SequenceDefault(Widget):
             attributes.append('css_class=%r'%self.css_class)
         if self.empty is not None:
             attributes.append('empty=%r'%self.empty)
-        if self.min:
-            attributes.append('min=%r'%self.min)
-        if self.max:
-            attributes.append('max=%r'%self.max)
+        if self.batch_add_count:
+            attributes.append('batch_add_count=%r'%self.batch_add_count)
+        if self.min_start_fields:
+            attributes.append('min_start_fields=%r'%self.min_start_fields)
+        if self.min_empty_start_fields:
+            attributes.append('min_empty_start_fields=%r'%self.min_empty_start_fields)
         if self.addremove:
             attributes.append('addremove=%r'%self.addremove)
         if self.sortable:
@@ -432,15 +462,30 @@ class Checkbox(Widget):
     type = 'Checkbox'
     template = 'field.Checkbox'
 
+    def __init__(self, checked_value=True, unchecked_value=False, css_class=None):
+        self.checked_value = checked_value
+        self.unchecked_value = unchecked_value
+        Widget.__init__(self, css_class=css_class)
+
+    def to_request_data(self, schema_type, data):
+        string_data = string_converter(schema_type).from_type(data)
+        return [string_data]
+
     def from_request_data(self, schema_type, request_data):
+        if request_data is None:
+            request_data = [None]
+        if string_converter(schema_type).to_type(request_data[0]) == self.checked_value:
+            return self.checked_value
+        return self.unchecked_value
+
+    def checked(self, value, schema_type):
         """
-        If the request data exists, then we treat this as True
+        For each value, convert it and check to see if it matches the input data
         """
-        if request_data is None or len(request_data) == 0:
-            out_string = 'False'
+        if value and string_converter(schema_type).to_type(value[0]) == self.checked_value:
+            return ' checked="checked"'
         else:
-            out_string = 'True'
-        return string_converter(schema_type).to_type(out_string)
+            return ''
 
     
 class DateParts(Widget):
@@ -663,7 +708,7 @@ class SelectChoice(Widget):
             v = self.empty
         else:
             v = value[0]
-        if option == v:
+        if option[0] == v:
             return ' selected="selected"'
         else:
             return ''
@@ -724,9 +769,11 @@ class SelectWithOtherChoice(SelectChoice):
         populate the other choice if needed
         """
         string_data = string_converter(schema_type).from_type(data)
+        if string_data is None:
+            return {'select': [self.get_none_option_value(schema_type)], 'other': ['']}
         if string_data in [value for value, label in self.options]:
-            return {'select': ['...'], 'other': [string_data]}
-        return {'select': [string_data], 'other': ['']}
+            return {'select': [string_data], 'other': ['']}
+        return {'select': [self.other_option[0]], 'other': [string_data]}
 
     def from_request_data(self, schema_type, request_data):
         """
@@ -738,7 +785,7 @@ class SelectWithOtherChoice(SelectChoice):
         else:
             select = request_data['select'][0]
             other = request_data['other'][0]
-        if select == '...':
+        if select == self.other_option[0]:
             value = other
         else:
             if other != '':
@@ -748,19 +795,15 @@ class SelectWithOtherChoice(SelectChoice):
             return self.empty
         return string_converter(schema_type).to_type(value)
 
-    def get_other_option(self, schema_type):
-        """ Get the other option """
-        return (string_converter(schema_type).from_type( self.other_option[0]), self.other_option[1] )
-            
     def selected(self, option, value, schema_type):
         """ Check the value passed matches the actual value """
-        if option[0] == '...' and value not in [value for value, label in self.get_options(schema_type)]:
+        if option[0] == self.other_option[0] and value[0] not in [value for value, label in self.get_options(schema_type)]:
             return ' selected="selected"'
         # Map the empty value
-        if value == '':
+        if value == ['']:
             v = self.empty
         else:
-            v = value
+            v = value[0]
         # Check for selected
         if option[0] == v:
             return ' selected="selected"'
@@ -795,11 +838,11 @@ class RadioChoice(SelectChoice):
         """
         Check if the currently rendering input is the same as the value
         """
-        if value == '':
+        if value == ['']:
             v = self.empty
         else:
-            v = value
-        if option[0] == v:
+            v = value[0]
+        if option == v:
             return ' checked="checked"'
         else:
             return ''

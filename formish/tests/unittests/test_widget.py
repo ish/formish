@@ -171,6 +171,47 @@ class TestSequenceDefault(base.TestCase):
         data = form.validate(self.Request('form', {}))
 
 
+class TestSelectChoice(base.TestCase):
+
+    def test_default(self):
+        form = formish.Form(
+            schemaish.Structure([
+                ('foo', schemaish.String()),
+            ])
+        )
+        form['foo'].widget = formish.SelectChoice(['a', 'b'])
+        self.assertTrue('selected="selected"' not in form())
+        form.defaults = {'foo': 'a'}
+        self.assertTrue('value="a"  selected="selected"' in form())
+
+    def test_none_option(self):
+        form = formish.Form(
+            schemaish.Structure([
+                ('foo', schemaish.String()),
+            ])
+        )
+        form['foo'].widget = formish.SelectChoice(options=['a', 'b'])
+        self.assertTrue('value=""' in form())
+        form['foo'].widget = formish.SelectChoice(options=['a', 'b'], none_option=None)
+        self.assertTrue('value=""' not in form())
+
+
+class TestSelectWithOther(base.TestCase):
+
+    def test_default(self):
+        form = formish.Form(
+            schemaish.Structure([
+                ('foo', schemaish.String()),
+            ])
+        )
+        form['foo'].widget = formish.SelectWithOtherChoice(['a', 'b'])
+        self.assertTrue('selected="selected"' not in form())
+        form.defaults = {'foo': 'b'}
+        self.assertTrue('value="b" selected="selected"' in form())
+        form.defaults = {'foo': 'c'}
+        self.assertTrue('value="..." selected="selected"' in form())
+
+
 if __name__ == '__main__':
     unittest.main()
 

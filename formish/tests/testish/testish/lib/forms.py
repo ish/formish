@@ -55,20 +55,17 @@ def functest_String(self):
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myStringField': None}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myStringField': None}"))
 
     sel.type("form-myStringField", "Test")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myStringField': u'Test'}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myStringField': u'Test'}"))
 
     sel.type("form-myStringField", "80")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myStringField': u'80'}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myStringField': u'80'}"))
 
     return
 
@@ -137,26 +134,22 @@ def functest_Integer(self):
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myIntegerField': None}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myIntegerField': None}"))
 
     sel.type("form-myIntegerField", "a")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("Not a valid integer"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("Not a valid integer"))
 
     sel.type("form-myIntegerField", "8.0")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("Not a valid integer"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("Not a valid integer"))
 
     sel.type("form-myIntegerField", "8")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myIntegerField': 8}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myIntegerField': 8}"))
 
     return
 
@@ -203,26 +196,22 @@ def functest_Date(self):
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myDateField': None}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myDateField': None}"))
 
     sel.type("form-myDateField", "a")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("Invalid date"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("Invalid date"))
 
     sel.type("form-myDateField", "18/12/1966")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("Invalid date"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("Invalid date"))
 
     sel.type("form-myDateField", "2008-12-18")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myDateField': datetime.date(2008, 12, 18)}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myDateField': datetime.date(2008, 12, 18)}"))
 
     return
 
@@ -261,26 +250,22 @@ def functest_Float(self):
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myFloatField': None}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myFloatField': None}"))
 
     sel.type("form-myFloatField", "a")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("Not a valid number"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("Not a valid number"))
 
     sel.type("form-myFloatField", "11")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myFloatField': 11.0}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myFloatField': 11.0}"))
 
     sel.type("form-myFloatField", "12.27")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myFloatField': 12.27}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myFloatField': 12.27}"))
 
     return
 
@@ -301,32 +286,27 @@ def functest_Boolean(self):
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myBooleanField': None}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myBooleanField': None}"))
 
     sel.type("form-myBooleanField", "a")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("u'a' should be either True or False"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("u'a' should be either True or False"))
 
     sel.type("form-myBooleanField", "t")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("u't' should be either True or False"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("u't' should be either True or False"))
 
     sel.type("form-myBooleanField", "True")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myBooleanField': True}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myBooleanField': True}"))
 
     sel.type("form-myBooleanField", "False")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myBooleanField': False}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myBooleanField': False}"))
 
     return
 
@@ -358,26 +338,22 @@ def functest_Decimal(self):
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myDecimalField': None}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myDecimalField': None}"))
 
     sel.type("form-myDecimalField", "a")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("Not a valid number"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("Not a valid number"))
 
     sel.type("form-myDecimalField", "1")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myDecimalField': Decimal('1')}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myDecimalField': Decimal('1')}"))
 
     sel.type("form-myDecimalField", "18.001")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myDecimalField': Decimal('18.001')}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myDecimalField': Decimal('18.001')}"))
 
     return
 
@@ -398,21 +374,18 @@ def functest_RequiredStringAndCheckbox(self):
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("is required"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("is required"))
 
     sel.type("form-myString", "anything")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myBoolean': False, 'myString': u'anything'}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myBoolean': False, 'myString': u'anything'}"))
 
     sel.type("form-myString", "anythingelse")
     sel.click("form-myBoolean")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myBoolean': True, 'myString': u'anythingelse'}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myBoolean': True, 'myString': u'anythingelse'}"))
 
     return
 
@@ -432,16 +405,14 @@ def functest_File(self):
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myFile': None}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myFile': None}"))
 
     sel.type("form-myFile", os.path.abspath("testdata/test.txt"))
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
     
 
-    try: self.failUnless(sel.is_text_present("{'myFile': <schemaish.type.File"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myFile': <schemaish.type.File"))
 
     return
 
@@ -751,41 +722,33 @@ def functest_RequiredStringAndFile(self):
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
         
-    try: self.assertEqual("", sel.get_value("myFileField.default"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.assertEqual("", sel.get_value("myFileField.default"))
 
-    try: self.assertEqual("", sel.get_value("myFileField.name"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.assertEqual("", sel.get_value("myFileField.name"))
 
 
     sel.type("form-myFileField", os.path.abspath("testdata/photo.png"))
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
         
-    try: self.assertEqual("", sel.get_value("myFileField.default"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.assertEqual("", sel.get_value("myFileField.default"))
 
-    try: self.assertTrue(sel.get_value("myFileField.name"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.assertTrue(sel.get_value("myFileField.name"))
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
         
-    try: self.assertEqual("", sel.get_value("myFileField.default"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.assertEqual("", sel.get_value("myFileField.default"))
 
-    try: self.assertTrue(sel.get_value("myFileField.name"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.assertTrue(sel.get_value("myFileField.name"))
 
     sel.type("form-myFileField", os.path.abspath("testdata/photo.jpg"))
     sel.type("form-required", 'foo')
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
 
-    try: self.assertEqual(sel.get_attribute("//div[@id='actual']/img@src")[-9:],"photo.jpg")
-    except AssertionError, e: self.verificationErrors.append(str(e))
-    try: self.assertEqual(sel.get_attribute("//div[@id='resized']/img@src")[-22:-13],"photo.jpg")
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.assertEqual(sel.get_attribute("//div[@id='actual']/img@src")[-9:],"photo.jpg")
+    self.assertEqual(sel.get_attribute("//div[@id='resized']/img@src")[-22:-13],"photo.jpg")
 
 
     filesrc = sel.get_attribute("//div[@id='actual']/img@src")
@@ -803,11 +766,11 @@ def functest_RequiredStringAndFile(self):
     stdout = subprocess.Popen([IDENTIFY, '/tmp/testish-functest'], stdout=subprocess.PIPE).communicate()[0]
     assert '/tmp/testish-functest JPEG 300x300' in stdout
     
-    actualfilepath = 'store_%s-100x100'%filesrc
+    actualfilepath = '_%s-100x100'%filesrc
     actualfilepath = safefilename.encode(actualfilepath)
     assert os.path.exists('cache/%s'%actualfilepath)
     fs = filestore.FileSystemHeaderedFilestore(root_dir='cache')
-    headers, fp = fs.get('store_%s-100x100'%filesrc)
+    headers, fp = fs.get('_%s-100x100'%filesrc)
     f = open('/tmp/testish-functest','wb')
     shutil.copyfileobj(fp, f)
     f.close()
@@ -918,28 +881,23 @@ def functest_SelectWithOtherChoice(self):
     sel = self.selenium
     sel.open("/SelectWithOtherChoice")
 
-    try: self.assertEqual("", sel.get_value("form-mySelect"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.assertEqual("", sel.get_value("form-mySelect"))
     sel.select("form-mySelect", "label=a")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'mySelect': 1}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'mySelect': 1}"))
     sel.select("form-mySelect", "label=Other ...")
     sel.type("form-mySelect-other", "4")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'mySelect': 4}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'mySelect': 4}"))
     sel.select("form-mySelect", "label=Other ...")
     sel.type("form-mySelect-other", "d")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("Not a valid integer"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("Not a valid integer"))
 
-    try: self.assertEqual("...", sel.get_value("form-mySelect"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.assertEqual("...", sel.get_value("form-mySelect"))
 
     return
 
@@ -1007,18 +965,15 @@ def functest_RadioChoiceNoneOption(self):
 
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myRadio': None}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myRadio': None}"))
     sel.click("form-myRadio-noneoption")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myRadio': None}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myRadio': None}"))
     sel.click("form-myRadio-0")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
-    try: self.failUnless(sel.is_text_present("{'myRadio': 1}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myRadio': 1}"))
 
     return
 
@@ -1277,6 +1232,16 @@ def form_UploadStructure(request):
 #   Sequences
 #
 
+def form_SequenceOfStringsWithSequenceWidgetOptions(request):
+    """
+    A sequence with some defaults
+    """
+    schema = schemaish.Structure()
+    schema.add( 'myList', schemaish.Sequence( schemaish.String() ))
+
+    form = formish.Form(schema, 'form')
+    form['myList'].widget = formish.SequenceDefault(min_start_fields=1,min_empty_start_fields=0, batch_add_count=5)
+    return form
 
 def form_SequenceOfSimpleStructures(request):
     """
@@ -1290,7 +1255,7 @@ def form_SequenceOfSimpleStructures(request):
     schema.add( 'myList', schemaish.Sequence( substructure ))
 
     form = formish.Form(schema, 'form')
-    form['myList'].widget = formish.SequenceDefault(min=1)
+    form['myList'].widget = formish.SequenceDefault()
     return form
   
 def form_SequenceOfUploadStructures(request):
@@ -1314,17 +1279,14 @@ def functest_SequenceOfUploadStructures(self):
 
     sel.open("/SequenceOfUploadStructures")
     sel.wait_for_page_to_load("30000")
-    sel.mouse_down("link=Add")
 
     sel.type("form-myList-0-a", os.path.abspath("testdata/test.txt"))
     sel.type("form-myList-0-b", "13")
     sel.click("form-action-submit")
     sel.wait_for_page_to_load("30000")
 
-    try: self.failUnless(sel.is_text_present("{'myList': [{'a': <schemaish.type.File"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
-    try: self.failUnless(sel.is_text_present("'b': 13}]}"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.failUnless(sel.is_text_present("{'myList': [{'a': <schemaish.type.File"))
+    self.failUnless(sel.is_text_present("'b': 13}]}"))
 
     return
 
@@ -1351,18 +1313,14 @@ def functest_SequenceOfStructuresWithSelects(self):
     sel = self.selenium
     sel.open("/SequenceOfStructuresWithSelects")
 
-    try: self.assertEqual("foo", sel.get_value("form-myList-0-a"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.assertEqual("foo", sel.get_value("form-myList-0-a"))
 
-    try: self.assertEqual("b", sel.get_value("form-myList-0-b"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.assertEqual("b", sel.get_value("form-myList-0-b"))
 
     sel.click_at("css=#form-myList--field > a", "")
-    try: self.assertEqual("", sel.get_value("form-myList-1-a"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.assertEqual("", sel.get_value("form-myList-1-a"))
 
-    try: self.assertEqual("", sel.get_value("form-myList-1-b"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.assertEqual("", sel.get_value("form-myList-1-b"))
 
     return
 
@@ -1387,8 +1345,7 @@ def functest_SequenceOfDateParts(self):
     sel.open("/SequenceOfDateParts")
 
     sel.click_at("css=#form-birthdays--field > a", "")
-    try: self.assertEqual("", sel.get_value("form-birthdays-0-date"))
-    except AssertionError, e: self.verificationErrors.append(str(e))
+    self.assertEqual("", sel.get_value("form-birthdays-0-date"))
 
     return
 

@@ -22,10 +22,34 @@ class FileResource(resource.Resource):
     A simple file serving utility
     """
 
+    @classmethod
+    def quickstart(cls, store_dirname, cache_dirname):
+        """
+        Create a simple, file-system based FileResource configured with an
+        application store and a caching store.
+        """
+        store = CachedTempFilestore(FileSystemHeaderedFilestore(root_dir=store_dirname))
+        cache = CachedTempFilestore(FileSystemHeaderedFilestore(root_dir=cache_dirname))
+        return cls(store, cache)
+
     def __init__(self, filestores=None, cache=None):
-        # Create the resized image cache.
-        if cache is None:
-            cache =  CachedTempFilestore(FileSystemHeaderedFilestore(root_dir='cache'))
+        """
+        Create a FileResource to serve application and/or cached files.
+
+        Configuring application filestore(s) will allow the resource to serve
+        files stored by the application. Configuring a cache filestore will
+        allow the resource to cache application files, including resized
+        images.
+
+        The resource is able to serve files from any number of application
+        filestores. Passing a single filestore as 'filestores' configures the
+        resource to serve all files from a single, unnamed store; passing a
+        dict as 'filestores' configures the resource to serve files from a
+        named filestore, using the dict keys as the filestore names. A dict key
+        of None is used to represent the unnamed filestore, allowing an
+        application to configure the resource to serve files from a default and
+        a set of named filestores.
+        """
         self.cache = cache
         # Build a dict of filestores.
         if filestores is None:
