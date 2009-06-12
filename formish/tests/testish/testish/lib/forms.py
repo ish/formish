@@ -1277,6 +1277,16 @@ def form_UploadStructure(request):
 #   Sequences
 #
 
+def form_SequenceOfStringsWithSequenceWidgetOptions(request):
+    """
+    A sequence with some defaults
+    """
+    schema = schemaish.Structure()
+    schema.add( 'myList', schemaish.Sequence( schemaish.String() ))
+
+    form = formish.Form(schema, 'form')
+    form['myList'].widget = formish.SequenceDefault(min_start_fields=1,min_empty_start_fields=0, num_batch_add=5)
+    return form
 
 def form_SequenceOfSimpleStructures(request):
     """

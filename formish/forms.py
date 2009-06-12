@@ -201,6 +201,9 @@ class Field(object):
     @property
     def error(self):
         """ Lazily get the error from the form.errors when needed """
+        print 'self.name',self.name
+        print 'SELF FORM ERRORS',self.form.errors
+        print 'self.form.errors.get',self.form.errors.get(self.name, None)
         error = self.form.errors.get(self.name, None)
         if error is not None:
             val = str(error)
@@ -211,6 +214,7 @@ class Field(object):
     @property
     def errors(self):
         """ Lazily get the error from the form.errors when needed """
+        print 'self.form.errors.get(self.name)',self.form.errors.get(self.name, None)
         return self.form.errors.get(self.name, None)
 
     @property
@@ -508,25 +512,34 @@ class Sequence(Collection):
         # request_data we need to recurse throught the fields ... which calls
         # Sequence.fields ... which tries to build the request data ... which
         # calls Sequence.fields, etc, etc. Bang!
-        if self.form._request_data:
-            data = self.form._request_data.get(self.name, [])
-        else:
-            data = self.defaults
 
-        if data is None:
-            num_fields = 0
+        if not self.form._request_data:
+            if self.defaults is not None:
+                num_fields = len(self.defaults)
+            else:
+                num_fields = 0
+
+            num_nonempty_fields = 0
+            if self.widget is not None:
+                empty_checker = self.widget.empty_checker
+            if self.defaults is not None:
+                print 'self.defaults',self.defaults
+                for n,d in enumerate(self.defaults):
+                    print '**',n,d
+                    if not empty_checker(d):
+                        num_nonempty_fields=n+1
+                
+            min_start_fields = None
+            min_empty_start_fields = None
+            if self.widget is not None:
+                min_start_fields = getattr(self.widget, 'min_start_fields', None)
+                min_empty_start_fields = getattr(self.widget, 'min_empty_start_fields', None)
+            if min_start_fields is not None and num_fields < min_start_fields:
+                num_fields = min_start_fields
+            if min_empty_start_fields is not None and (num_fields - num_nonempty_fields) < min_empty_start_fields:
+                num_fields = num_nonempty_fields + min_empty_start_fields
         else:
-            num_fields = len(data)
-            
-        minimum = None
-        maximum = None
-        if self.widget is not None:
-            minimum = getattr(self.widget, 'min', None)
-            maximum = getattr(self.widget, 'max', None)
-        if minimum is not None and num_fields < min:
-            num_fields = minimum
-        elif max is not None and num_fields > max:
-            num_fields = maximum
+            num_fields = len(self.form._request_data.get(self.name, []))
 
 
         for num in xrange(num_fields):

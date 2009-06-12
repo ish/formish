@@ -151,7 +151,7 @@ class CheckedPassword(Input):
         self.css_class = k.pop('css_class', None)
         Input.__init__(self, **k)
         if not self.converter_options.has_key('delimiter'):
-            self.converter_options['delimiter'] = ','
+            self.empty.converter_options['delimiter'] = ','
             
     def to_request_data(self, schema_type, data):
         """
@@ -261,6 +261,36 @@ class Hidden(Input):
     template = 'field.Hidden'
 
 
+def default_empty_checker(v):
+    try:
+        _default_empty_checker(v)
+    except ValueError:
+        return False
+    return True
+
+
+def _default_empty_checker(v):
+    print '------',v
+    if hasattr(v, 'values'):
+        print 'were a dict'
+        for i in v.values():
+            return _default_empty_checker(i) 
+    if isinstance(v, basestring):
+        if v == '':
+            return
+        raise ValueError
+    else:
+        try:
+            for i in v: 
+                print 'were a list'
+                return _default_empty_checker(i)
+        except TypeError:
+            print 'were a value'
+            if v is None or v == '':
+                return
+            else:
+                raise ValueError
+    return v
 
 class SequenceDefault(Widget):
     """
@@ -277,8 +307,10 @@ class SequenceDefault(Widget):
 
     def __init__(self, **k):
         Widget.__init__(self, **k)
-        self.max = k.get('max')
-        self.min = k.get('min')
+        self.empty_checker = k.get('empty_checker',default_empty_checker)
+        self.min_start_fields = k.get('min_start_fields',1)
+        self.min_empty_start_fields = k.get('min_empty_start_fields',0)
+        self.batch_add_count = k.get('batch_add_count',1)
         self.addremove = k.get('addremove', True)
         self.sortable = k.get('sortable', True)
         self.converttostring = False
@@ -297,10 +329,12 @@ class SequenceDefault(Widget):
             attributes.append('css_class=%r'%self.css_class)
         if self.empty is not None:
             attributes.append('empty=%r'%self.empty)
-        if self.min:
-            attributes.append('min=%r'%self.min)
-        if self.max:
-            attributes.append('max=%r'%self.max)
+        if self.batch_add_count:
+            attributes.append('batch_add_count=%r'%self.batch_add_count)
+        if self.min_start_fields:
+            attributes.append('min_start_fields=%r'%self.min_start_fields)
+        if self.min_empty_start_fields:
+            attributes.append('min_empty_start_fields=%r'%self.min_empty_start_fields)
         if self.addremove:
             attributes.append('addremove=%r'%self.addremove)
         if self.sortable:
@@ -432,15 +466,30 @@ class Checkbox(Widget):
     type = 'Checkbox'
     template = 'field.Checkbox'
 
+    def __init__(self, checked_value=True, unchecked_value=False, css_class=None):
+        self.checked_value = checked_value
+        self.unchecked_value = unchecked_value
+        Widget.__init__(self, css_class=css_class)
+
+    def to_request_data(self, schema_type, data):
+        string_data = string_converter(schema_type).from_type(data)
+        return [string_data]
+
     def from_request_data(self, schema_type, request_data):
+        if request_data is None:
+            request_data = [None]
+        if string_converter(schema_type).to_type(request_data[0]) == self.checked_value:
+            return self.checked_value
+        return self.unchecked_value
+
+    def checked(self, value, schema_type):
         """
-        If the request data exists, then we treat this as True
+        For each value, convert it and check to see if it matches the input data
         """
-        if request_data is None or len(request_data) == 0:
-            out_string = 'False'
+        if value and string_converter(schema_type).to_type(value[0]) == self.checked_value:
+            return ' checked="checked"'
         else:
-            out_string = 'True'
-        return string_converter(schema_type).to_type(out_string)
+            return ''
 
     
 class DateParts(Widget):
