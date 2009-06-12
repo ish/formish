@@ -1279,7 +1279,6 @@ def functest_SequenceOfUploadStructures(self):
 
     sel.open("/SequenceOfUploadStructures")
     sel.wait_for_page_to_load("30000")
-    sel.mouse_down("link=Add")
 
     sel.type("form-myList-0-a", os.path.abspath("testdata/test.txt"))
     sel.type("form-myList-0-b", "13")
