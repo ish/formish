@@ -1240,7 +1240,7 @@ def form_SequenceOfStringsWithSequenceWidgetOptions(request):
     schema.add( 'myList', schemaish.Sequence( schemaish.String() ))
 
     form = formish.Form(schema, 'form')
-    form['myList'].widget = formish.SequenceDefault(min_start_fields=1,min_empty_start_fields=0, num_batch_add=5)
+    form['myList'].widget = formish.SequenceDefault(min_start_fields=1,min_empty_start_fields=0, batch_add_count=5)
     return form
 
 def form_SequenceOfSimpleStructures(request):
@@ -1255,7 +1255,7 @@ def form_SequenceOfSimpleStructures(request):
     schema.add( 'myList', schemaish.Sequence( substructure ))
 
     form = formish.Form(schema, 'form')
-    form['myList'].widget = formish.SequenceDefault(min=1)
+    form['myList'].widget = formish.SequenceDefault()
     return form
   
 def form_SequenceOfUploadStructures(request):

@@ -16,8 +16,8 @@ function create_addlinks(o) {
 
 function get_sequence_numbers(segments, l) {
   var result = Array();
-  for each (segment in segments) {
-    if (isNaN(parseInt(segment)) == false) {
+  for(var i=0; i<segments.length; i++) {
+    if (isNaN(parseInt(segments[i])) == false) {
       result.push(segment);
     }
   }
@@ -30,7 +30,8 @@ function replace_stars(original, nums, divider) {
   var segments = original.split(divider);
   var n = 0;
 
-  for each (segment in segments) {
+  for(var i=0; i<segments.length; i++) {
+    var segment = segments[i];
     if ((segment == '*' || isNaN(parseInt(segment)) == false) && n < nums.length)   {
       // If the segment is a * or a number then we check replace it with the right number (the target number is probably right anyway)
       result.push(nums[n]);
@@ -47,7 +48,8 @@ function construct(start_segments, n, remainder, divider, strip) {
   var remainder_bits = remainder.split(divider);
   var remainder = remainder_bits.slice(1,remainder_bits.length-strip).join(divider);
   var result = Array();
-  for each (segment in start_segments) {
+  for(var i=0; i<start_segments.length; i++) {
+    segment = start_segments[i];
     if (segment != '') {
       result.push(segment);
     }
@@ -139,14 +141,13 @@ function renumber_sequences(o) {
 
 }
 
-function add_mousedown_to_addlinks(o) {
-  o.find('.adderlink').mousedown( function() {
+function add_new_item(t,o) {
     // Get the base64 encoded template
-    var code = $(this).next('.adder').val();
+    var code = t.next('.adder').val();
     // Find out how many fields we already have
-    var l = count_previous_fields($(this).next('.adder'));
+    var l = count_previous_fields(t.next('.adder'));
     // Get some variable to help with replacing (originalname, originalid, name, id)
-    var originalname = $(this).next('.adder').attr('name');
+    var originalname = t.next('.adder').attr('name');
     var segments = originalname.split('.');
     // Get the numbers used in the originalname
     seqnums = get_sequence_numbers(segments, l);
@@ -183,17 +184,35 @@ function add_mousedown_to_addlinks(o) {
     h.find("label[for='"+id+"']").text(l);
     h.find("legend:contains('*')").text(l);
 
-    $(this).before(h);
+    t.before(h);
+    add_remove_buttons(t.parent().parent());
     add_sortables($('form'));
-    add_remove_buttons($(this).parent().parent());
-  });
+}
+
+function add_new_items(t,o) {
+   data = t.parent().parent().find('.formish-sequencedata').attr('title').split(',');
+   for (var i=0; i<data.length; i++) {
+       terms = data[i].split('=');
+       key = terms[0];
+       if (key == 'batch_add_count') {
+         value = terms[1];
+         break;
+       }
+   }; 
+   for (var i=0; i<value; i++) {
+      add_new_item(t,o);
+   }
+}
+
+function add_mousedown_to_addlinks(o) {
+  o.find('.adderlink').mousedown(function() { add_new_items($(this),o)});
 };
 
 function add_remove_buttons(o) {
   o.find('.addremove .remove').remove() 
   o.find('.addremove > div > label').each( function() {
-    if ($(this).next().text() != 'x') {
-      var x = $('<span class="remove">x</span>');
+    if ($(this).next().text() != 'delete') {
+      var x = $('<span class="remove">delete</span>');
       $(this).after(x);
       x.mousedown(function () {
         $(this).parent().remove();
@@ -203,8 +222,8 @@ function add_remove_buttons(o) {
     };
   });
   o.find('.addremove > fieldset > legend').each( function() {
-    if ($(this).next().text() != 'x') {
-      var x = $('<span class="remove">x</span>');
+    if ($(this).next().text() != 'delete') {
+      var x = $('<span class="remove">delete</span>');
       $(this).after(x);
       x.mousedown(function () {
         $(this).parent().remove();
@@ -221,45 +240,20 @@ function order_changed(e,ui) {
 }
 
 function add_sortables(o) {
-  o.find('.sortable .handle').remove();
   o.find('.sortable > div > label').after('<div class="handle">drag me</div>');
   o.find('.sortable > fieldset > legend').after('<div class="handle">drag me</div>');
   o.find('.sortable').sortable({'items':'> .field','stop':order_changed,'handle':'.handle'});
+  o.find('.sortable .handle').remove();
   
 }
 
+
+/* This needs to be run to allow sorting, adding and removing of sequence items */
 function formish() {
+    add_sortables($('form'));
     create_addlinks($('form'));
     add_mousedown_to_addlinks($('form'));
     add_remove_buttons($('form'));
-    add_sortables($('form'));
 }
 
 
-function profile() {
-  $("#profile-contact_details .actions").append("<a class=\"combined-adderlink\">add</a><div class=\"combined-adderlink-over\"><div id=\"add-email\"></div><div id=\"add-phone\"></div><div id=\"add-address\"></div></div>");
-  $("#profile-contact_details .adderlink").css('display','none');
-  $("#add-email").mousedown( function () {
-    $("#form-emails--field .adderlink").trigger('mousedown');
-    $("#profile-contact_details .combined-adderlink-over").css('display','none');
-  });
-  $("#add-phone").mousedown( function () {
-    $("#form-phones--field .adderlink").trigger('mousedown');
-    $("#profile-contact_details .combined-adderlink-over").css('display','none');
-  });
-  $("#add-address").mousedown( function () {
-    $("#form-addresses--field .adderlink").trigger('mousedown');
-    $("#profile-contact_details .combined-adderlink-over").css('display','none');
-  });
-  $("#profile-contact_details .combined-adderlink").mousedown( function () {
-    $("#profile-contact_details .combined-adderlink-over").css('display','block');
-  })
-  $("#profile-contact_details .combined-adderlink-over").mousedown( function () {
-    $("#profile-contact_details .combined-adderlink-over").css('display','none');
-  })
-  $("#profile .actions").each( function () {
-     $(this).prepend('<a class="cancel" onclick="javascript:history.back()">Cancel</a>');
-     $(this).find('.cancel').css('margin-left','50px');
-     $(this).find('input').css('margin-left','20px');
-  });
-}

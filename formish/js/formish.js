@@ -141,14 +141,13 @@ function renumber_sequences(o) {
 
 }
 
-function add_mousedown_to_addlinks(o) {
-  o.find('.adderlink').mousedown( function() {
+function add_new_item(t,o) {
     // Get the base64 encoded template
-    var code = $(this).next('.adder').val();
+    var code = t.next('.adder').val();
     // Find out how many fields we already have
-    var l = count_previous_fields($(this).next('.adder'));
+    var l = count_previous_fields(t.next('.adder'));
     // Get some variable to help with replacing (originalname, originalid, name, id)
-    var originalname = $(this).next('.adder').attr('name');
+    var originalname = t.next('.adder').attr('name');
     var segments = originalname.split('.');
     // Get the numbers used in the originalname
     seqnums = get_sequence_numbers(segments, l);
@@ -185,10 +184,28 @@ function add_mousedown_to_addlinks(o) {
     h.find("label[for='"+id+"']").text(l);
     h.find("legend:contains('*')").text(l);
 
-    $(this).before(h);
-    add_remove_buttons($(this).parent().parent());
+    t.before(h);
+    add_remove_buttons(t.parent().parent());
     add_sortables($('form'));
-  });
+}
+
+function add_new_items(t,o) {
+   data = t.parent().parent().find('.formish-sequencedata').attr('title').split(',');
+   for (var i=0; i<data.length; i++) {
+       terms = data[i].split('=');
+       key = terms[0];
+       if (key == 'batch_add_count') {
+         value = terms[1];
+         break;
+       }
+   }; 
+   for (var i=0; i<value; i++) {
+      add_new_item(t,o);
+   }
+}
+
+function add_mousedown_to_addlinks(o) {
+  o.find('.adderlink').mousedown(function() { add_new_items($(this),o)});
 };
 
 function add_remove_buttons(o) {
