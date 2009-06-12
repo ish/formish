@@ -803,11 +803,11 @@ def functest_RequiredStringAndFile(self):
     stdout = subprocess.Popen([IDENTIFY, '/tmp/testish-functest'], stdout=subprocess.PIPE).communicate()[0]
     assert '/tmp/testish-functest JPEG 300x300' in stdout
     
-    actualfilepath = 'store_%s-100x100'%filesrc
+    actualfilepath = '_%s-100x100'%filesrc
     actualfilepath = safefilename.encode(actualfilepath)
     assert os.path.exists('cache/%s'%actualfilepath)
     fs = filestore.FileSystemHeaderedFilestore(root_dir='cache')
-    headers, fp = fs.get('store_%s-100x100'%filesrc)
+    headers, fp = fs.get('_%s-100x100'%filesrc)
     f = open('/tmp/testish-functest','wb')
     shutil.copyfileobj(fp, f)
     f.close()
@@ -1277,6 +1277,16 @@ def form_UploadStructure(request):
 #   Sequences
 #
 
+def form_SequenceOfStringsWithSequenceWidgetOptions(request):
+    """
+    A sequence with some defaults
+    """
+    schema = schemaish.Structure()
+    schema.add( 'myList', schemaish.Sequence( schemaish.String() ))
+
+    form = formish.Form(schema, 'form')
+    form['myList'].widget = formish.SequenceDefault(min_start_fields=1,min_empty_start_fields=0, num_batch_add=5)
+    return form
 
 def form_SequenceOfSimpleStructures(request):
     """
