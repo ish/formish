@@ -135,6 +135,7 @@ class Field(object):
         :type form: formish.Form instance.
         """
         self.name = name
+        self.nodename = name.split('.')[-1]
         self.attr = attr
         self.form = form
 
@@ -208,10 +209,17 @@ class Field(object):
             val = ''
         return TemplatedString(self, 'error', val)
 
-    @property
-    def errors(self):
+    
+    def _get_errors(self):
         """ Lazily get the error from the form.errors when needed """
+        print 'getting ',self.name
         return self.form.errors.get(self.name, None)
+
+    def _set_errors(self, v):
+        print 'setting ',self.name, v
+        self.form.errors[self.name] = v
+
+    errors = property(_get_errors, _set_errors)
 
     @property
     def widget(self):
@@ -289,6 +297,10 @@ class Collection(object):
         :type form: formish.Form instance.
         """
         self.name = name
+        if name is not None:
+            self.nodename = name.split('.')[-1]
+        else:
+            self.nodename = ''
         self.attr = attr
         self.form = form
         self._fields = {}    
@@ -738,7 +750,7 @@ class Form(object):
         :arg request_data: Webob style request data
         :arg raise_exceptions: Whether to raise exceptions or return errors
         """
-        data = validation.from_request_data(self.structure, request_data, errors=self.errors, defaults=self.defaults,skip_read_only_defaults=skip_read_only_defaults) 
+        data = validation.from_request_data(self.structure, request_data, skip_read_only_defaults=skip_read_only_defaults) 
         if raise_exceptions and len(self.errors.keys()):
             raise validation.FormError( \
         'Tried to access data but conversion from request failed with %s errors (%s)'% \
@@ -818,7 +830,7 @@ class Form(object):
         there are errors, raise them; otherwise return the data
         """
         # XXX Should this happen after the basic stuff has happened?
-        self.errors = {}
+        self.errors = dotted()
         # Decide what request data to use. The method will have been validated
         # already (unless someone's messing around!) so we can just use it in a
         # getattr.

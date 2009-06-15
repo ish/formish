@@ -90,7 +90,7 @@ def getNestedProperty(data, dottedkey):
         return None
 
 
-def to_request_data(form_structure, data, request_data=None, errors=None):
+def to_request_data(field, data):
     """
     Take a form structure and use it's widgets to convert schema data (dict) to
     request data
@@ -103,25 +103,20 @@ def to_request_data(form_structure, data, request_data=None, errors=None):
         failures (internal - used while recursing)
     
     """
-    if request_data is None:
-        request_data = dotted()
-    if errors is None:
-        errors = dotted()
-    for field in form_structure.fields:
+    request_data = dotted()
+    for f in field.fields:
         try:
-            if should_recurse(field):
-                to_request_data(field, data,
-                        request_data=request_data, errors=errors)
+            if should_recurse(f):
+                request_data[f.nodename] = to_request_data(f, data)
             else:
-                item_data = getNestedProperty(data, field.name)
-                request_data[field.name] = \
-                        field.widget.to_request_data(field.attr, item_data)
+                item_data = getNestedProperty(data, f.name)
+                request_data[f.nodename] = f.widget.to_request_data(f.attr, item_data)
         except Invalid, e:
-            errors[field.name] = e
+            f.errors[f.name] = e
             raise
     return request_data
         
-def from_request_data(form_structure, request_data, data=None, errors=None, defaults=None, skip_read_only_defaults=False):
+def from_request_data(field, request_data, skip_read_only_defaults=False):
     """
     Take a form structure and use it's widgets to convert request data to schema data (dict)
     
@@ -131,32 +126,25 @@ def from_request_data(form_structure, request_data, data=None, errors=None, defa
     :arg errors: used to accumulate conversion failures (internal - used while recursing)
     
     """
-    if defaults is None:
-        defaults = {}
-    if data is None:
-        data = {}
-    if errors is None:
-        errors = {}
+    data = dotted()
 
-    for field in form_structure.fields:
+    for f in field.fields:
         try:
-            if should_recurse(field):
-                if field.type == 'sequence':
+            if should_recurse(f):
+                if f.type == 'sequence':
                     # Make sure we have an empty field at least. If we don't do
                     # this and there are no items in the list then this key
                     # wouldn't appear.
-                    data[field.name] = []
-                from_request_data(field, request_data,
-                                          data=data, errors=errors, defaults=defaults, skip_read_only_defaults=skip_read_only_defaults)
+                    data[f.name] = []
+                data[f.nodename] = from_request_data(f, request_data, skip_read_only_defaults=skip_read_only_defaults)
             else: 
-                if field.widget.readonly is not True:
-                    data[field.name] = field.widget.from_request_data(field.attr, \
-                                                request_data.get(field.name))
+                if f.widget.readonly is not True:
+                    data[f.nodename] = f.widget.from_request_data(f.attr, request_data.get(f.name))
                 else:
                     if skip_read_only_defaults is False:
-                        data[field.name] = defaults.get(field.name)
+                        data[f.nodename] = f.defaults
         except convert.ConvertError, e:
-            errors[field.name] = e.message
+            f.errors = e.message
     
     data = recursive_convert_sequences(dotted(data))
     return data
