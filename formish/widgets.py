@@ -428,6 +428,7 @@ class Grid(Input):
     
     def __init__(self, **k):
         Input.__init__(self, **k)
+        self.empty_checker = k.get('empty_checker',default_empty_checker)
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = '\n'
         self.converttostring = False
