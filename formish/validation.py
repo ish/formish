@@ -110,7 +110,7 @@ def to_request_data(field, data):
                 request_data[f.nodename] = to_request_data(f, data)
             else:
                 item_data = getNestedProperty(data, f.name)
-                request_data[f.nodename] = f.widget.to_request_data(f.attr, item_data)
+                request_data[f.nodename] = f.widget.to_request_data(f, item_data)
         except Invalid, e:
             f.errors[f.name] = e
             raise
@@ -139,7 +139,7 @@ def from_request_data(field, request_data, skip_read_only_defaults=False):
                 data[f.nodename] = from_request_data(f, request_data, skip_read_only_defaults=skip_read_only_defaults)
             else: 
                 if f.widget.readonly is not True:
-                    data[f.nodename] = f.widget.from_request_data(f.attr, request_data.get(f.name))
+                    data[f.nodename] = f.widget.from_request_data(f, request_data.get(f.name))
                 else:
                     if skip_read_only_defaults is False:
                         data[f.nodename] = f.defaults

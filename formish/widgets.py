@@ -38,7 +38,7 @@ class Widget(object):
             self.converter_options['delimiter'] = ','
     
 
-    def to_request_data(self, schema_type, data):
+    def to_request_data(self, field, data):
         """
         Before the widget is rendered, the data is converted to a string
         format.If the data is None then we return an empty string. The sequence
@@ -46,11 +46,11 @@ class Widget(object):
         """
         if data is None:
             return ['']
-        string_data = string_converter(schema_type).from_type(data, converter_options=self.converter_options)
+        string_data = string_converter(field.attr).from_type(data, converter_options=self.converter_options)
         return [string_data]
 
 
-    def pre_parse_incoming_request_data(self, schema_type, request_data, full_request_data):
+    def pre_parse_incoming_request_data(self, field, request_data, full_request_data):
         """
         Prior to convert being run, we have a chance to munge the data. This is
         only used by file upload at the moment
@@ -58,7 +58,7 @@ class Widget(object):
         return request_data
 
 
-    def from_request_data(self, schema_type, request_data):
+    def from_request_data(self, field, request_data):
         """
         after the form has been submitted, the request data is converted into
         to the schema type.
@@ -69,7 +69,7 @@ class Widget(object):
             string_data = request_data[0]
         if string_data == '':
             return self.empty
-        return string_converter(schema_type).to_type(string_data, converter_options=self.converter_options)
+        return string_converter(field.attr).to_type(string_data, converter_options=self.converter_options)
 
 
 
@@ -101,7 +101,7 @@ class Input(Widget):
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
 
-    def from_request_data(self, schema_type, request_data):
+    def from_request_data(self, field, request_data):
         """
         Default to stripping whitespace
         """
@@ -113,7 +113,7 @@ class Input(Widget):
             string_data = string_data.strip()
         if string_data == '':
             return self.empty
-        return string_converter(schema_type).to_type(string_data, converter_options=self.converter_options)
+        return string_converter(field.attr).to_type(string_data, converter_options=self.converter_options)
 
     def __repr__(self):
         attributes = []
@@ -153,16 +153,16 @@ class CheckedPassword(Input):
         if not self.converter_options.has_key('delimiter'):
             self.empty.converter_options['delimiter'] = ','
             
-    def to_request_data(self, schema_type, data):
+    def to_request_data(self, field, data):
         """
         Extract both the password and confirm fields
         """
-        string_data = string_converter(schema_type).from_type(data)
+        string_data = string_converter(field.attr).from_type(data)
         if string_data is None:
             return {'password': [''], 'confirm': ['']}
         return {'password': [string_data], 'confirm': [string_data]}
     
-    def from_request_data(self, schema_type, request_data):
+    def from_request_data(self, field, request_data):
         """
         Check the password and confirm match (when stripped)
         """
@@ -180,7 +180,7 @@ class CheckedPassword(Input):
             raise ConvertError('Password did not match')
         if password == '':
             return self.empty
-        return string_converter(schema_type).to_type(password)
+        return string_converter(field.attr).to_type(password)
 
     def __repr__(self):
         attributes = []
@@ -211,16 +211,16 @@ class CheckedInput(Input):
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
             
-    def to_request_data(self, schema_type, data):
+    def to_request_data(self, field, data):
         """
         Extract both the input and confirm fields
         """
-        string_data = string_converter(schema_type).from_type(data)
+        string_data = string_converter(field.attr).from_type(data)
         if string_data is None:
             return {'input': [''], 'confirm': ['']}
         return {'input': [string_data], 'confirm': [string_data]}
     
-    def from_request_data(self, schema_type, request_data):
+    def from_request_data(self, field, request_data):
         """
         Check the input and confirm match (when stripped)
         """
@@ -237,7 +237,7 @@ class CheckedInput(Input):
             raise ConvertError('Fields did not match')
         if input == '':
             return self.empty
-        return string_converter(schema_type).to_type(input)
+        return string_converter(field.attr).to_type(input)
 
     def __repr__(self):
         attributes = []
@@ -311,7 +311,7 @@ class SequenceDefault(Widget):
         self.sortable = k.get('sortable', True)
         self.converttostring = False
 
-    def to_request_data(self, schema_type, data):
+    def to_request_data(self, field, data):
         """
         Short circuits the usual to_request_data
         """
@@ -352,7 +352,7 @@ class StructureDefault(Widget):
     type = 'StructureDefault'
     template = 'structure.-'
 
-    def to_request_data(self, schema_type, data):
+    def to_request_data(self, field, data):
         """
         Short circuits the usual to_request_data
         """
@@ -378,18 +378,18 @@ class TextArea(Input):
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = '\n'
     
-    def to_request_data(self, schema_type, data):
+    def to_request_data(self, field, data):
         """
         We're using the converter options to allow processing sequence data
         using the csv module
         """
-        string_data = string_converter(schema_type).from_type(data, \
+        string_data = string_converter(field.attr).from_type(data, \
             converter_options=self.converter_options)
         if string_data is None:
             return ['']
         return [string_data]
     
-    def from_request_data(self, schema_type, request_data):
+    def from_request_data(self, field, request_data):
         """
         We're using the converter options to allow processing sequence data
         using the csv module
@@ -402,7 +402,7 @@ class TextArea(Input):
             string_data = string_data.strip()
         if string_data == '':
             return self.empty
-        return string_converter(schema_type).to_type(string_data,
+        return string_converter(field.attr).to_type(string_data,
             converter_options=self.converter_options)
 
     def __repr__(self):
@@ -433,17 +433,17 @@ class Grid(Input):
             self.converter_options['delimiter'] = '\n'
         self.converttostring = False
     
-    def to_request_data(self, schema_type, data):
-        string_data = string_converter(schema_type).from_type(data, \
+    def to_request_data(self, field, data):
+        string_data = string_converter(field.attr).from_type(data, \
             converter_options=self.converter_options)
         return [string_data]
     
-    def from_request_data(self, schema_type, request_data):
+    def from_request_data(self, field, request_data):
         if request_data is None:
             string_data = []
         else:
             string_data = request_data[0]
-        return string_converter(schema_type).to_type(string_data,
+        return string_converter(field.attr).to_type(string_data,
             converter_options=self.converter_options)
 
     def __repr__(self):
@@ -468,22 +468,22 @@ class Checkbox(Widget):
         self.unchecked_value = unchecked_value
         Widget.__init__(self, css_class=css_class)
 
-    def to_request_data(self, schema_type, data):
-        string_data = string_converter(schema_type).from_type(data)
+    def to_request_data(self, field, data):
+        string_data = string_converter(field.attr).from_type(data)
         return [string_data]
 
-    def from_request_data(self, schema_type, request_data):
+    def from_request_data(self, field, request_data):
         if request_data is None:
             request_data = [None]
-        if string_converter(schema_type).to_type(request_data[0]) == self.checked_value:
+        if string_converter(field.attr).to_type(request_data[0]) == self.checked_value:
             return self.checked_value
         return self.unchecked_value
 
-    def checked(self, value, schema_type):
+    def checked(self, field):
         """
         For each value, convert it and check to see if it matches the input data
         """
-        if value and string_converter(schema_type).to_type(value[0]) == self.checked_value:
+        if field.value and string_converter(field.attr).to_type(value[0]) == self.checked_value:
             return ' checked="checked"'
         else:
             return ''
@@ -505,18 +505,18 @@ class DateParts(Widget):
             self.converter_options['delimiter'] = ','
 
         
-    def to_request_data(self, schema_type, data):
+    def to_request_data(self, field, data):
         """
         Convert to date parts
         """
-        dateparts = datetuple_converter(schema_type).from_type(data)
+        dateparts = datetuple_converter(field.attr).from_type(data)
         if dateparts is None:
             return {'year': [''], 'month': [''], 'day': ['']}
         return {'year': [dateparts[0]],
                 'month': [dateparts[1]],
                 'day': [dateparts[2]]}
     
-    def from_request_data(self, schema_type, request_data):
+    def from_request_data(self, field, request_data):
         """
         Pull out the parts and convert
         """
@@ -532,7 +532,7 @@ class DateParts(Widget):
             date_parts = (year, month, day)
         else:
             return self.empty
-        return datetuple_converter(schema_type).to_type(date_parts)
+        return datetuple_converter(field.attr).to_type(date_parts)
 
     def __repr__(self):
         attributes = []
@@ -616,7 +616,7 @@ class FileUpload(Widget):
             return self.image_thumbnail_default
         return '%s/%s' % (self.url_base, data)
     
-    def to_request_data(self, schema_type, data):
+    def to_request_data(self, field, data):
         """
         We use the url factory to get an identifier for the file which we use
         as the name. We also store it in the 'default' field so we can check if
@@ -632,7 +632,7 @@ class FileUpload(Widget):
             default = ''
         return {'name': [default], 'default':[default], 'mimetype':[mimetype]}
     
-    def pre_parse_incoming_request_data(self, schema_type, data, full_request_data):
+    def pre_parse_incoming_request_data(self, field, data, full_request_data):
         """
         File uploads are wierd; in out case this means assymetric. We store the
         file in a temporary location and just store an identifier in the field.
@@ -658,7 +658,7 @@ class FileUpload(Widget):
             data['mimetype'] = [fieldstorage.type]
         return data
     
-    def from_request_data(self, schema_type, request_data):
+    def from_request_data(self, field, request_data):
         """
         Creates a File object if possible
         """
@@ -701,10 +701,11 @@ class SelectChoice(Widget):
         self.options = _normalise_options(options)
 
             
-    def selected(self, option, value, schema_type):
+    def selected(self, option, field):
         """
         Check the value passed matches the actual value
         """
+        value = field.value
         if value == ['']:
             v = self.empty
         else:
@@ -714,7 +715,7 @@ class SelectChoice(Widget):
         else:
             return ''
 
-    def get_options(self, schema_type):
+    def get_options(self, field):
         """
         Return all of the options for the widget
         """
@@ -723,14 +724,14 @@ class SelectChoice(Widget):
             if value == self.empty:
                 options.append( ('',label) )
             else:
-                options.append( (string_converter(schema_type).from_type(value),label) )
+                options.append( (string_converter(field.attr).from_type(value),label) )
         return options
     
-    def get_none_option_value(self, schema_type):
+    def get_none_option_value(self, field):
         """
         Get the default option (the 'unselected' option)
         """
-        none_option =  string_converter(schema_type).from_type(self.none_option[0])
+        none_option =  string_converter(field.attr).from_type(self.none_option[0])
         if none_option is self.empty:
             return ''
         return none_option
@@ -765,18 +766,18 @@ class SelectWithOtherChoice(SelectChoice):
         self.strip = k.pop('strip',True)
         SelectChoice.__init__(self, options, **k)
 
-    def to_request_data(self, schema_type, data):
+    def to_request_data(self, field, data):
         """
         populate the other choice if needed
         """
-        string_data = string_converter(schema_type).from_type(data)
+        string_data = string_converter(field.attr).from_type(data)
         if string_data is None:
-            return {'select': [self.get_none_option_value(schema_type)], 'other': ['']}
+            return {'select': [self.get_none_option_value(field)], 'other': ['']}
         if string_data in [value for value, label in self.options]:
             return {'select': [string_data], 'other': ['']}
         return {'select': [self.other_option[0]], 'other': [string_data]}
 
-    def from_request_data(self, schema_type, request_data):
+    def from_request_data(self, field, request_data):
         """
         Check to see if we need to use the 'other' value
         """
@@ -794,11 +795,12 @@ class SelectWithOtherChoice(SelectChoice):
             value = select
         if value == '':
             return self.empty
-        return string_converter(schema_type).to_type(value)
+        return string_converter(field.attr).to_type(value)
 
-    def selected(self, option, value, schema_type):
+    def selected(self, option, field):
         """ Check the value passed matches the actual value """
-        if option[0] == self.other_option[0] and value[0] not in [value for value, label in self.get_options(schema_type)]:
+        value = field.value['select']
+        if option[0] == self.other_option[0] and value[0] not in [value for value, label in self.get_options(field)]:
             return ' selected="selected"'
         # Map the empty value
         if value == ['']:
@@ -835,10 +837,11 @@ class RadioChoice(SelectChoice):
 
     none_option = (None, '- choose -')
 
-    def selected(self, option, value, schema_type):
+    def selected(self, option, field):
         """
         Check if the currently rendering input is the same as the value
         """
+        value = field.value
         if value == ['']:
             v = self.empty
         else:
@@ -848,7 +851,7 @@ class RadioChoice(SelectChoice):
         else:
             return ''
 
-    def from_request_data(self, schema_type, request_data):
+    def from_request_data(self, field, request_data):
         """
         If we don't have a choice, set a blank value
         """
@@ -861,13 +864,13 @@ class RadioChoice(SelectChoice):
         if string_data == '':
             return self.empty
 
-        return string_converter(schema_type).to_type(string_data)
+        return string_converter(field.attr).to_type(string_data)
     
-    def get_none_option_value(self, schema_type):
+    def get_none_option_value(self, field):
         """
         Get the default option (the 'unselected' option)
         """
-        none_option =  string_converter(schema_type).from_type(self.none_option[0])
+        none_option =  string_converter(field.attr).from_type(self.none_option[0])
         if none_option is self.empty:
             return ''
         return none_option
@@ -898,33 +901,33 @@ class CheckboxMultiChoice(Widget):
         self.options = _normalise_options(options)
         Widget.__init__(self, css_class=css_class)
             
-    def to_request_data(self, schema_type, data):
+    def to_request_data(self, field, data):
         """
         Iterate over the data, converting each one
         """
         if data is None: 
             return []
-        return [string_converter(schema_type.attr).from_type(d) for d in data]
+        return [string_converter(field.attr.attr).from_type(d) for d in data]
     
-    def from_request_data(self, schema_type, request_data):
+    def from_request_data(self, field, request_data):
         """
         Iterating to convert back to the source data
         """
         if request_data is None:
             request_data = []
-        return [string_converter(schema_type.attr).to_type(d) \
+        return [string_converter(field.attr.attr).to_type(d) \
                 for d in request_data]
 
-    def checked(self, option, values, schema_type):
+    def checked(self, option, field):
         """
         For each value, convert it and check to see if it matches the input data
         """
-        if values is None:
+        if field.value is None:
             return ''
         cvs = []
-        for v in values:
+        for v in field.value:
             try:
-                cvs.append( string_converter(schema_type.attr).to_type(v) )
+                cvs.append( string_converter(field.attr.attr).to_type(v) )
             except ConvertError:
                 continue
         if option[0] in cvs:
@@ -974,19 +977,19 @@ class CheckboxMultiChoiceTree(Widget):
         self.optiontree = mktree(options)
         Widget.__init__(self,css_class=css_class)
             
-    def to_request_data(self, schema_type, data):
+    def to_request_data(self, field, data):
         if data is None: 
             return []
-        return [string_converter(schema_type.attr).from_type(d) for d in data]
+        return [string_converter(field.attr.attr).from_type(d) for d in data]
     
-    def from_request_data(self, schema_type, request_data):
+    def from_request_data(self, field, request_data):
         if request_data is None:
             request_data = []
-        return [string_converter(schema_type.attr).to_type(d) for d in request_data]
+        return [string_converter(field.attr.attr).to_type(d) for d in request_data]
 
-    def checked(self, option, values, schema_type):
+    def checked(self, option, values, field):
         if values is not None:
-            typed_values = self.from_request_data(schema_type,values)
+            typed_values = self.from_request_data(field.attr,values)
         if values is not None and option[0] in typed_values:
             return ' checked="checked"'
         else:

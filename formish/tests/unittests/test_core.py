@@ -266,6 +266,22 @@ class TestFormBuilding(unittest.TestCase):
             data = formish.Form(schema, method=method).validate(request)
             self.assertTrue(data == {'string': 'abc'})
 
+    def test_simple_validation(self):
+        schema_flat = schemaish.Structure([("a", schemaish.Integer())])
+        name = "Integer Form"
+        form = formish.Form(schema_flat, name)
+        r = {'a': '3'}
+        request = Request(name, r)
+        R = copy.deepcopy(r)
+
+        reqr = {'a': ['3']}
+        # Does the form produce an int and a string
+        self.assertEquals(form.validate(request), {'a': 3})
+        # Does the convert request to data work
+        # self.assertEqual( validation.from_request_data(form.structure, dotted(request.POST)) , {'a': 3, 'b': '4'})
+        # Does the convert data to request work
+        # self.assert_( validation.to_request_data(form.structure, dotted( {'a': 3, 'b': '4'} )) == reqr)
+
 
 class TestActions(unittest.TestCase):
 
