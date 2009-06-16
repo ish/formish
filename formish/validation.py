@@ -135,7 +135,7 @@ def from_request_data(field, request_data, skip_read_only_defaults=False):
                     # Make sure we have an empty field at least. If we don't do
                     # this and there are no items in the list then this key
                     # wouldn't appear.
-                    data[f.name] = []
+                    data[f.nodename] = []
                 data[f.nodename] = from_request_data(f, request_data, skip_read_only_defaults=skip_read_only_defaults)
             else: 
                 if f.widget.readonly is not True:
