@@ -269,6 +269,22 @@ def functest_Float(self):
 
     return
 
+def unittest_Float(self, formdef):
+    # Test no data
+    f =  formdef(None)
+    self.assertIdHasValue(f, 'form-myFloatField', '')
+    # Test None data
+    f = formdef(None)
+    testdata = {'myFloatField': None}
+    f.defaults = testdata
+    self.assertIdHasValue(f, 'form-myFloatField', '')
+    self.assertRoundTrip(f, testdata)
+    # Test sample data
+    f = formdef(None)
+    testdata = {'myFloatField': 8.4}
+    f.defaults = testdata
+    self.assertIdHasValue(f, 'form-myFloatField', '8.4')
+    self.assertRoundTrip(f, testdata)
 
 
 def form_Boolean(request):
@@ -309,6 +325,23 @@ def functest_Boolean(self):
     self.failUnless(sel.is_text_present("{'myBooleanField': False}"))
 
     return
+
+def unittest_Boolean(self, formdef):
+    # Test no data
+    f =  formdef(None)
+    self.assertIdHasValue(f, 'form-myBooleanField', '')
+    # Test None data
+    f = formdef(None)
+    testdata = {'myBooleanField': None}
+    f.defaults = testdata
+    self.assertIdHasValue(f, 'form-myBooleanField', '')
+    self.assertRoundTrip(f, testdata)
+    # Test sample data
+    f = formdef(None)
+    testdata = {'myBooleanField': True}
+    f.defaults = testdata
+    self.assertIdHasValue(f, 'form-myBooleanField', 'True')
+    self.assertRoundTrip(f, testdata)
 
 def form_BooleanWithDefaults(request):
     """
@@ -367,6 +400,15 @@ def form_RequiredStringAndCheckbox(request):
     form = formish.Form(schema, 'form')
     form['myBoolean'].widget=formish.Checkbox()
     return form
+
+def unittest_RequiredStringAndCheckbox(self, formdef):
+    # Test no data
+    f =  formdef(None)
+    self.assertIdAttrHasValue(f, 'form-myBoolean','value','True')
+    self.assertRaisesValidationError(f)
+    testdata = {'myString':'7', 'myBoolean': False}
+    f.defaults = testdata
+    self.assertRoundTrip(f, testdata)
 
 def functest_RequiredStringAndCheckbox(self):
     sel = self.selenium

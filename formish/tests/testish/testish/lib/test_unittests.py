@@ -5,6 +5,7 @@ import urllib
 from BeautifulSoup import BeautifulSoup
 from dottedish import dotted
 from urllib import urlencode
+from formish import validation
 
 def build_request(formname, data):
     d = dotted(data)
@@ -41,6 +42,11 @@ class Test(unittest.TestCase):
         return r
 
     def test_unit(self):
+        print ''
+        print 'Testish Unit Tests'
+        print '  ** indicates a full, custom unit test'
+        print '  -- indicates that the form has built properly'
+        print ''
         for attr in dir(forms):
             if attr in ['form_ReCAPTCHA']:
                 continue
@@ -58,9 +64,12 @@ class Test(unittest.TestCase):
                 formdef = getattr(forms,attr)
                 unittest_attr = attr.replace('form_','unittest_')
                 if hasattr(forms,unittest_attr):
+                    print '**',attr
                     # Pass the formdef into the unittest
                     getattr(forms,unittest_attr)(self,formdef)
                 else:
+                    print '--',attr
+                    # Pass the formdef into the unittest
                     default_unittest(formdef)
 
     def assertRoundTrip(self, f, testdata):
@@ -75,13 +84,22 @@ class Test(unittest.TestCase):
     def assertIdAttrHasValue(self, f, id, attr, v):
         soup = BeautifulSoup(f())
         s = soup.find(id=id)
-        assert 'attr' in s
-        self.assertEquals(s['attr'],v)
+        assert s.has_key(attr)
+        self.assertEquals(s[attr],v)
 
     def assertIdAttrHasNoValue(self, f, id, attr):
         soup = BeautifulSoup(f())
         s = soup.find(id=id)
-        assert 'attr' not in s
+        assert not s.has_key(attr)
+
+    def assertRaisesValidationError(self,f):
+        r = self.request(dotted({}))
+        try:
+            f.validate(r)
+        except validation.FormError:
+            return
+        raise ValueError
+        
 
     
 if __name__ == '__main__':
