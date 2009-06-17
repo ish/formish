@@ -9,12 +9,20 @@ from webob import UnicodeMultiDict
 
 import schemaish, validatish
 from formish import util
-from dottedish import dotted, is_int
+from dottedish import dotted
 from formish import validation
 from formish import widgets
 from formish.renderer import _default_renderer
 
 NOARG = object()
+
+def is_int(v):
+    """ raise error if not """
+    try:
+        int(v)
+        return True
+    except ValueError:
+        return False
 
 class Action(object):
     """
