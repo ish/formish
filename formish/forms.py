@@ -673,6 +673,7 @@ class Form(object):
         if renderer is not None:
             self.renderer = renderer
         self.method = method
+        self.widget = widgets.StructureDefault()
 
     def __repr__(self):
         attributes = []
@@ -760,7 +761,7 @@ class Form(object):
         :arg request_data: Webob style request data
         :arg raise_exceptions: Whether to raise exceptions or return errors
         """
-        data = validation.from_request_data(self.structure, request_data, skip_read_only_defaults=skip_read_only_defaults) 
+        data = self.widget.from_request_data(self.structure, request_data, skip_read_only_defaults=skip_read_only_defaults) 
         if raise_exceptions and len(self.errors.keys()):
             raise validation.FormError( \
         'Tried to access data but conversion from request failed with %s errors (%s)'% \
@@ -775,7 +776,7 @@ class Form(object):
         """
         if self._request_data is not None:
             return self._request_data
-        self._request_data = validation.to_request_data(self.structure, dotted(self.defaults))
+        self._request_data = self.widget.to_request_data(self.structure, dotted(self.defaults))
         return self._request_data
 
 
@@ -859,8 +860,8 @@ class Form(object):
         # items they have (i.e. .fields method on a sequence uses the number of
         # values on the _request_data)
         self._request_data = dotted(request_data)
-        self.request_data = validation.pre_parse_incoming_request_data( \
-                    self.structure,dotted(request_data))
+        self.request_data = self.widget.pre_parse_incoming_request_data( \
+                    self.structure,dotted(request_data),dotted(request_data))
         data = self.get_unvalidated_data( \
                     self.request_data, raise_exceptions=False, skip_read_only_defaults=skip_read_only_defaults)
         try:
