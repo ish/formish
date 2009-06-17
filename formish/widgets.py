@@ -75,7 +75,7 @@ class Widget(object):
         return [string_data]
 
 
-    def pre_parse_incoming_request_data(self, field, request_data, full_request_data):
+    def pre_parse_incoming_request_data(self, field, request_data):
         """
         Prior to convert being run, we have a chance to munge the data. This is
         only used by file upload at the moment
@@ -352,6 +352,22 @@ class SequenceDefault(Widget):
                 raise
         return request_data
 
+    def pre_parse_incoming_request_data(self, field, request_data):
+        """
+        Some widgets (at the moment only files) need to have their data massaged in
+        order to make sure that data->request and request->data is symmetric
+
+        This pre parsing is a null operation for most widgets
+        """
+        data = dotted()
+
+        for f in field.fields:
+            r = request_data[int(f.nodename)]
+            d = f.widget.pre_parse_incoming_request_data(f, r)
+            if r is not None:
+                data[f.nodename] = d
+
+        return data
 
     def from_request_data(self, field, request_data, skip_read_only_default=False):
         data = dotted()
@@ -423,6 +439,24 @@ class StructureDefault(Widget):
                 raise
         return request_data
 
+    def pre_parse_incoming_request_data(self, field, request_data):
+        """
+        Some widgets (at the moment only files) need to have their data massaged in
+        order to make sure that data->request and request->data is symmetric
+
+        This pre parsing is a null operation for most widgets
+        """
+        data = {}
+
+        for f in field.fields:
+            if request_data is None:
+                r = None
+            else:
+                r = request_data.get(f.nodename, None)
+            d = f.widget.pre_parse_incoming_request_data(f, r)
+            if r is not None:
+                data[f.nodename] = d
+        return data
 
     def from_request_data(self, field, request_data, skip_read_only_defaults=False):
         data = dotted()
@@ -714,7 +748,7 @@ class FileUpload(Widget):
             default = ''
         return {'name': [default], 'default':[default], 'mimetype':[mimetype]}
     
-    def pre_parse_incoming_request_data(self, field, data, full_request_data):
+    def pre_parse_incoming_request_data(self, field, data):
         """
         File uploads are wierd; in out case this means assymetric. We store the
         file in a temporary location and just store an identifier in the field.

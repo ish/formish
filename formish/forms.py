@@ -860,10 +860,8 @@ class Form(object):
         # items they have (i.e. .fields method on a sequence uses the number of
         # values on the _request_data)
         self._request_data = dotted(request_data)
-        self.request_data = self.widget.pre_parse_incoming_request_data( \
-                    self.structure,dotted(request_data),dotted(request_data))
-        data = self.get_unvalidated_data( \
-                    self.request_data, raise_exceptions=False, skip_read_only_defaults=skip_read_only_defaults)
+        self.request_data = self.widget.pre_parse_incoming_request_data(self.structure,dotted(request_data))
+        data = self.get_unvalidated_data(self.request_data, raise_exceptions=False, skip_read_only_defaults=skip_read_only_defaults)
         try:
             self.structure.attr.validate(data)
         except schemaish.attr.Invalid, e:
