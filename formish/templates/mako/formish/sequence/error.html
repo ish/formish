@@ -1,4 +1,4 @@
 <%page args="field" />
-% if field.error:
+% if hasattr(field.errors,'message'):
 <div class="error">${unicode(field.error)}</div>
 % endif

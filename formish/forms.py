@@ -180,7 +180,7 @@ class Field(object):
     def value(self):
         """Convert the request_data to a value object for the form or None."""
         if '*' in self.name:
-            return  self.widget.to_request_data(self.attr, self.defaults)
+            return  self.widget.to_request_data(self, self.defaults)
         return self.form.request_data.get(self.name, None)
 
 
@@ -212,11 +212,9 @@ class Field(object):
     
     def _get_errors(self):
         """ Lazily get the error from the form.errors when needed """
-        print 'getting ',self.name
         return self.form.errors.get(self.name, None)
 
     def _set_errors(self, v):
-        print 'setting ',self.name, v
         self.form.errors[self.name] = v
 
     errors = property(_get_errors, _set_errors)
@@ -366,10 +364,14 @@ class Collection(object):
         val = self.form.errors.get(self.name, None)
         return TemplatedString(self, 'error', val)
 
-    @property
-    def errors(self):
+    def _get_errors(self):
         """ Lazily get the error from the form.errors when needed """
         return self.form.errors.get(self.name, None)
+
+    def _set_errors(self, v):
+        self.form.errors[self.name] = v
+
+    errors = property(_get_errors, _set_errors)
 
     @property
     def contains_error(self):
@@ -654,7 +656,7 @@ class Form(object):
         if errors is None:
             errors = {}
         self.defaults = defaults
-        self.errors = dotted(errors)
+        self.errors = errors
         self.error = None
         self._actions = []
         if add_default_action:
@@ -830,7 +832,7 @@ class Form(object):
         there are errors, raise them; otherwise return the data
         """
         # XXX Should this happen after the basic stuff has happened?
-        self.errors = dotted()
+        self.errors = {}
         # Decide what request data to use. The method will have been validated
         # already (unless someone's messing around!) so we can just use it in a
         # getattr.

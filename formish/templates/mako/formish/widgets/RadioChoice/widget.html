@@ -7,7 +7,7 @@
 %endif
 %for n, option in enumerate(field.widget.get_options(field)):
 <%
-if len(field.value) > 0: 
+if field.value and len(field.value) > 0: 
   selected = field.widget.selected(option,field)
 else:
   selected = ''

@@ -4,6 +4,7 @@ import formish
 import schemaish
 from BeautifulSoup import BeautifulSoup
 from datetime import date
+import validatish
 
 class TestFormExamples(base.TestCase):
 
@@ -147,8 +148,13 @@ class TestErrorRendering(base.TestCase):
 
     def _test(self, schema, attr):
         ERROR_TEXT = '!!!WOOP!!!WOOP!!!WOOP!!!'
-        form = formish.Form(schema, errors={attr: ERROR_TEXT})
+        form = formish.Form(schema, errors={attr: validatish.Invalid(ERROR_TEXT)})
         html = form()
+        print 'form.errotrs',form.errors
+        print 'error : ',form[attr].errors
+        print '>>>>>>>>>>>>>>>>>>>>'
+        print html
+        print '<<<<<<<<<<<<<<<<<<<<'
         element = BeautifulSoup(html).find(id='form-%s--field'%(attr.replace('.', '-'),))
         div_error = element.find('div',{'class': 'error'})
         span_error = element.find('span',{'class': 'error'})
@@ -167,7 +173,7 @@ class TestSequenceDefault(base.TestCase):
                 ('foo', schemaish.Sequence(schemaish.String())),
             ])
         )
-        form['foo'].widget = formish.SequenceDefault(min=1)
+        form['foo'].widget = formish.SequenceDefault()
         data = form.validate(self.Request('form', {}))
 
 

@@ -10,14 +10,39 @@ __all__ = ['Input', 'Password', 'CheckedPassword', 'CheckedInput', 'Hidden', 'Te
 from convertish.convert import string_converter, \
         datetuple_converter,ConvertError
 from schemaish.type import File as SchemaFile
-from dottedish import get_dict_from_dotted_dict
+from dottedish import get_dict_from_dotted_dict, dotted
 import uuid
 
 from formish import util
 from formish.filestore import CachedTempFilestore
+from validatish import Invalid
 
 
 UNSET = object()
+
+def recursive_convert_sequences(data):
+    """
+    recursively applies ``convert_sequences``
+    """
+    if not hasattr(data,'keys'):
+        return data
+    if len(data.keys()) == 0:
+        return data
+    try:
+        int(data.keys()[0])
+    except ValueError:
+        tmp = {}
+        for key, value in data.items():
+            tmp[key] = recursive_convert_sequences(value)
+        return tmp
+    intkeys = []
+    for key in data.keys():
+        intkeys.append(int(key))
+    intkeys.sort()
+    out = []
+    for key in intkeys:
+        out.append(recursive_convert_sequences(data[str(key)]))
+    return out
 
 
 class Widget(object):
@@ -315,7 +340,38 @@ class SequenceDefault(Widget):
         """
         Short circuits the usual to_request_data
         """
+        ddata = dotted(data)
+        request_data = dotted()
+        if data is None:
+            data = {}
+        for f in field.fields:
+            try:
+                request_data[f.nodename] = f.widget.to_request_data(f, ddata.get(f.nodename))
+            except Invalid, e:
+                f.errors[f.name] = e
+                raise
+        return request_data
+
+
+    def from_request_data(self, field, request_data, skip_read_only_default=False):
+        data = dotted()
+        if request_data is None:
+            request_data = {}
+        for f in field.fields:
+            data[f.nodename] = []
+            try:
+                if f.widget.readonly is not True:
+                    data[f.nodename] = f.widget.from_request_data(f, request_data.get(f.nodename))
+                else:
+                    if skip_read_only_defaults is False:
+                        data[f.nodename] = f.defaults
+            except ConvertError, e:
+                f.errors = e.message
+
+        data = recursive_convert_sequences(dotted(data))
         return data
+
+        
 
     def __repr__(self):
         attributes = []
@@ -356,7 +412,35 @@ class StructureDefault(Widget):
         """
         Short circuits the usual to_request_data
         """
+        request_data = dotted()
+        if data is None:
+            data = {}
+        for f in field.fields:
+            try:
+                request_data[f.nodename] = f.widget.to_request_data(f, data.get(f.nodename))
+            except Invalid, e:
+                f.errors[f.name] = e.message
+                raise
+        return request_data
+
+
+    def from_request_data(self, field, request_data, skip_read_only_defaults=False):
+        data = dotted()
+        if request_data is None:
+            request_data = {}
+        for f in field.fields:
+            try:
+                if f.widget.readonly is not True:
+                    data[f.nodename] = f.widget.from_request_data(f, request_data.get(f.nodename))
+                else:
+                    if skip_read_only_defaults is False:
+                        data[f.nodename] = f.defaults
+            except ConvertError, e:
+                f.errors = e.message
+        
+        data = recursive_convert_sequences(dotted(data))
         return data
+
     
 
 class TextArea(Input):
@@ -383,8 +467,7 @@ class TextArea(Input):
         We're using the converter options to allow processing sequence data
         using the csv module
         """
-        string_data = string_converter(field.attr).from_type(data, \
-            converter_options=self.converter_options)
+        string_data = string_converter(field.attr).from_type(data, converter_options=self.converter_options)
         if string_data is None:
             return ['']
         return [string_data]
@@ -402,8 +485,7 @@ class TextArea(Input):
             string_data = string_data.strip()
         if string_data == '':
             return self.empty
-        return string_converter(field.attr).to_type(string_data,
-            converter_options=self.converter_options)
+        return string_converter(field.attr).to_type(string_data, converter_options=self.converter_options)
 
     def __repr__(self):
         attributes = []
@@ -483,7 +565,7 @@ class Checkbox(Widget):
         """
         For each value, convert it and check to see if it matches the input data
         """
-        if field.value and string_converter(field.attr).to_type(value[0]) == self.checked_value:
+        if field.value and string_converter(field.attr).to_type(field.value[0]) == self.checked_value:
             return ' checked="checked"'
         else:
             return ''
