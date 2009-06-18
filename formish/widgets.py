@@ -452,8 +452,7 @@ class StructureDefault(Widget):
             else:
                 r = request_data.get(f.nodename, None)
             d = f.widget.pre_parse_incoming_request_data(f, r)
-            if r is not None:
-                data[f.nodename] = d
+            data[f.nodename] = d
         return data
 
     def from_request_data(self, field, request_data, skip_read_only_defaults=False):
