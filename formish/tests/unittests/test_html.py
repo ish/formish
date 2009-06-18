@@ -50,10 +50,13 @@ class TestHTML(unittest.TestCase):
 
         f.add_action('submit', "Submit Me")
         f.defaults = {'one': {'a' : 'ooteenee','c':['3','4','5']}, 'two': {'a': 'opt1','b': date(1966,1,3),'c':['opt2'],'d':'opt2'} } 
-        soup = BeautifulSoup(f())
+        print '*****'
+        print f()
+        print '*****'
+        #soup = BeautifulSoup(f())
         ## Latch the results for acceptance tests
         #open('formish/tests/expectations/test_complex_form.html','w').write(html)
-        expectedSoup = BeautifulSoup( open('formish/tests/unittests/expectations/test_complex_form.html').read())
+        #expectedSoup = BeautifulSoup( open('formish/tests/unittests/expectations/test_complex_form.html').read())
         #assert soup == expectedSoup
 
 

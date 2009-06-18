@@ -1,1 +1,1 @@
-./run nosetests testish/lib/test_unittests.py -d
+./run nosetests testish/lib/test_unittests.py -ds

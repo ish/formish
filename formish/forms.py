@@ -9,12 +9,17 @@ from webob import UnicodeMultiDict
 
 import schemaish, validatish
 from formish import util
-from dottedish import dotted
+from dottedish import dotted, unflatten, set
 from formish import validation
 from formish import widgets
 from formish.renderer import _default_renderer
 
 NOARG = object()
+
+def container_factory(parent_key, item_key):
+    if item_key.isdigit():
+        return []
+    return {}
 
 def is_int(v):
     """ raise error if not """
@@ -775,9 +780,9 @@ class Form(object):
         request_data format.
         """
         if self._request_data is not None:
-            return self._request_data
-        self._request_data = self.widget.to_request_data(self.structure, dotted(self.defaults))
-        return self._request_data
+            return dotted(self._request_data)
+        self._request_data = self.widget.to_request_data(self.structure, self._defaults)
+        return dotted(self._request_data)
 
 
     def _set_request_data(self, request_data):
@@ -787,7 +792,7 @@ class Form(object):
         :arg request_data: raw request data (e.g. request.POST)
         :type request_data: Dictionary (dotted or nested or dotted or MultiDict)
         """
-        self._request_data = dotted(request_data)
+        self._request_data = request_data
 
 
     request_data = property(_get_request_data, _set_request_data)
@@ -859,9 +864,13 @@ class Form(object):
         # We need the _request_data to be populated so sequences know how many
         # items they have (i.e. .fields method on a sequence uses the number of
         # values on the _request_data)
-        self._request_data = dotted(request_data)
-        self.request_data = self.widget.pre_parse_incoming_request_data(self.structure,dotted(request_data))
-        data = self.get_unvalidated_data(self.request_data, raise_exceptions=False, skip_read_only_defaults=skip_read_only_defaults)
+
+        # Convert request data to a dottedish friendly representation
+
+        request_data = unflatten(request_data.dict_of_lists().iteritems(), container_factory=container_factory) 
+
+        self._request_data = self.widget.pre_parse_incoming_request_data(self.structure,request_data)
+        data = self.get_unvalidated_data(self._request_data, raise_exceptions=False, skip_read_only_defaults=skip_read_only_defaults)
         try:
             self.structure.attr.validate(data)
         except schemaish.attr.Invalid, e:
@@ -881,7 +890,8 @@ class Form(object):
         allowed = ['title', 'widget', 'description','default']
         if name in allowed:
             if name == 'default' and '*' not in key:
-                self.defaults[key] = value
+                print 's,k,v',self.defaults._o,key,value
+                set(self.defaults,key,value,container_factory=container_factory)
             else:
                 self.item_data.setdefault(key, {})[name] = value
         else:

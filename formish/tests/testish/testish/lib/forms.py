@@ -1,6 +1,6 @@
 import logging, os.path, subprocess
 import formish, schemaish, validatish
-from dottedish import dotted
+from dottedish.api import dotted, flatten
 from formish.filestore import CachedTempFilestore
 from testish.lib import xformish
 import webob
@@ -24,7 +24,7 @@ def build_request(formname, data, rawdata=False):
             fields.append(d) 
     else:
         d = dotted(data)
-        for k, v in d.dotteditems():
+        for k, v in flatten(d):
             fields.append( (k,v) )
     fields.append( ('submit','Submit') )
     request.body = urlencode( fields )

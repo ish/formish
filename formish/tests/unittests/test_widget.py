@@ -150,7 +150,7 @@ class TestErrorRendering(base.TestCase):
         ERROR_TEXT = '!!!WOOP!!!WOOP!!!WOOP!!!'
         form = formish.Form(schema, errors={attr: validatish.Invalid(ERROR_TEXT)})
         html = form()
-        print 'form.errotrs',form.errors
+        print 'form.errors',form.errors
         print 'error : ',form[attr].errors
         print '>>>>>>>>>>>>>>>>>>>>'
         print html

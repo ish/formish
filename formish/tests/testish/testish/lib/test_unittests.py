@@ -3,7 +3,7 @@ import unittest
 import webob
 import urllib
 from BeautifulSoup import BeautifulSoup
-from dottedish import dotted
+from dottedish.api import dotted, flatten
 from urllib import urlencode
 from formish import validation
 
@@ -28,7 +28,7 @@ class Test(unittest.TestCase):
         r.method = 'POST'
         r.content_type = 'application/x-www-form-urlencoded'
         kvpairs = [('__formish_form__', 'form')]
-        for k in d.dottedkeys():
+        for k,v in flatten(d):
             lastsegment = k.split('.')[-1]
             try:
                 int(lastsegment)

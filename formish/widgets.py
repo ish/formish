@@ -10,7 +10,6 @@ __all__ = ['Input', 'Password', 'CheckedPassword', 'CheckedInput', 'Hidden', 'Te
 from convertish.convert import string_converter, \
         datetuple_converter,ConvertError
 from schemaish.type import File as SchemaFile
-from dottedish import get_dict_from_dotted_dict, dotted
 import uuid
 
 from formish import util
@@ -338,13 +337,16 @@ class SequenceDefault(Widget):
         """
         Short circuits the usual to_request_data
         """
-        ddata = dotted(data)
-        request_data = dotted()
+        request_data = {}
         if data is None:
             data = {}
         for f in field.fields:
             try:
-                request_data[f.nodename] = f.widget.to_request_data(f, ddata.get(f.nodename))
+                try:
+                    d = data[int(f.nodename)]
+                except KeyError:
+                    d = None
+                request_data[f.nodename] = f.widget.to_request_data(f, d)
             except Invalid, e:
                 f.errors[f.name] = e
                 raise
@@ -357,10 +359,13 @@ class SequenceDefault(Widget):
 
         This pre parsing is a null operation for most widgets
         """
-        data = dotted()
+        data = {}
 
         for f in field.fields:
-            r = request_data[int(f.nodename)]
+            try:
+                r = request_data[int(f.nodename)]
+            except TypeError, KeyError:
+                r = None
             d = f.widget.pre_parse_incoming_request_data(f, r)
             if r is not None:
                 data[f.nodename] = d
@@ -368,21 +373,19 @@ class SequenceDefault(Widget):
         return data
 
     def from_request_data(self, field, request_data, skip_read_only_default=False):
-        data = dotted()
+        data = []
         if request_data is None:
             request_data = {}
         for f in field.fields:
-            data[f.nodename] = []
             try:
                 if f.widget.readonly is not True:
-                    data[f.nodename] = f.widget.from_request_data(f, request_data.get(f.nodename))
+                    data.append( f.widget.from_request_data(f, request_data.get(f.nodename)) )
                 else:
                     if skip_read_only_defaults is False:
-                        data[f.nodename] = f.defaults
+                        data.append( f.defaults )
             except ConvertError, e:
                 f.errors = e.message
 
-        data = recursive_convert_sequences(dotted(data))
         return data
 
         
@@ -426,7 +429,7 @@ class StructureDefault(Widget):
         """
         Short circuits the usual to_request_data
         """
-        request_data = dotted()
+        request_data = {}
         if data is None:
             data = {}
         for f in field.fields:
@@ -456,7 +459,7 @@ class StructureDefault(Widget):
         return data
 
     def from_request_data(self, field, request_data, skip_read_only_defaults=False):
-        data = dotted()
+        data = {}
         if request_data is None:
             request_data = {}
         for f in field.fields:
@@ -469,7 +472,6 @@ class StructureDefault(Widget):
             except ConvertError, e:
                 f.errors = e.message
         
-        data = recursive_convert_sequences(dotted(data))
         return data
 
     
@@ -593,6 +595,7 @@ class DateParts(Widget):
         """
         Convert to date parts
         """
+        print 'to request data',data
         dateparts = datetuple_converter(field.attr).from_type(data)
         if dateparts is None:
             return {'year': [''], 'month': [''], 'day': ['']}
@@ -604,6 +607,7 @@ class DateParts(Widget):
         """
         Pull out the parts and convert
         """
+        print 'from request data',request_data
         if request_data is None:
             year = ''
             month = ''
