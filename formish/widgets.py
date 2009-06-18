@@ -55,7 +55,6 @@ class Widget(object):
     
     def __init__(self, **k):
         self.css_class = k.get('css_class', None)
-        self.converttostring = True
         self.empty = k.get('empty', None)
         self.readonly = k.get('readonly',False)
         self.converter_options = k.get('converter_options', {})
@@ -334,7 +333,6 @@ class SequenceDefault(Widget):
         self.batch_add_count = k.get('batch_add_count',1)
         self.addremove = k.get('addremove', True)
         self.sortable = k.get('sortable', True)
-        self.converttostring = False
 
     def to_request_data(self, field, data):
         """
@@ -534,42 +532,13 @@ class TextArea(Input):
 
         return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
 
-class Grid(Input):
+class Grid(SequenceDefault):
     """
     Grid input field
     """
-
     type = 'Grid'
     template = 'field.Grid'
     
-    def __init__(self, **k):
-        Input.__init__(self, **k)
-        self.empty_checker = k.get('empty_checker',default_empty_checker)
-        if not self.converter_options.has_key('delimiter'):
-            self.converter_options['delimiter'] = '\n'
-        self.converttostring = False
-    
-    def to_request_data(self, field, data):
-        string_data = string_converter(field.attr).from_type(data, \
-            converter_options=self.converter_options)
-        return [string_data]
-    
-    def from_request_data(self, field, request_data):
-        if request_data is None:
-            string_data = []
-        else:
-            string_data = request_data[0]
-        return string_converter(field.attr).to_type(string_data,
-            converter_options=self.converter_options)
-
-    def __repr__(self):
-        attributes = []
-        if self.converter_options != {'delimiter':','}:
-            attributes.append('converter_options=%r'%self.converter_options)
-        if self.css_class:
-            attributes.append('css_class=%r'%self.css_class)
-
-        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
     
 class Checkbox(Widget):
     """
@@ -1103,10 +1072,10 @@ class CheckboxMultiChoiceTree(Widget):
             request_data = []
         return [string_converter(field.attr.attr).to_type(d) for d in request_data]
 
-    def checked(self, option, values, field):
-        if values is not None:
-            typed_values = self.from_request_data(field.attr,values)
-        if values is not None and option[0] in typed_values:
+    def checked(self, option, field):
+        if field.value is not None:
+            typed_values = self.from_request_data(field.attr,field.value)
+        if field.value is not None and option[0] in typed_values:
             return ' checked="checked"'
         else:
             return ''        
