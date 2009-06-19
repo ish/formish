@@ -866,8 +866,7 @@ class Form(object):
         # values on the _request_data)
 
         # Convert request data to a dottedish friendly representation
-
-        self._request_data = unflatten(request_data.dict_of_lists().iteritems(), container_factory=container_factory) 
+        self._request_data = _unflatten_request_data(request_data)
 
         self._request_data = self.widget.pre_parse_incoming_request_data(self.structure,self._request_data)
         data = self.get_unvalidated_data(self._request_data, raise_exceptions=False, skip_read_only_defaults=skip_read_only_defaults)
@@ -980,7 +979,20 @@ class Form(object):
         return self.renderer('/formish/form/actions.html', {'form':self})
 
         
-   
+def _unflatten_request_data(request_data):
+    """
+    Unflatten the request data into nested dicts and lists.
+    """
+    # Build an ordered list of keys. Don't rely on the request_data doing this
+    # for us because webob's MultiDict yields the same key multiple times!
+    # Of course, if request_data is not an ordered dict then this is fairly
+    # pointless anyway.
+    keys = []
+    for key in request_data:
+        if key not in keys:
+            keys.append(key)
+    return unflatten(((key, request_data.getall(key)) for key in keys),
+                     container_factory=container_factory) 
 
 
 class FormAccessor(object):
