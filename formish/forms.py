@@ -9,12 +9,25 @@ from webob import UnicodeMultiDict
 
 import schemaish, validatish
 from formish import util
-from dottedish import dotted, is_int
+from dottedish import dotted, unflatten, set
 from formish import validation
 from formish import widgets
 from formish.renderer import _default_renderer
 
 NOARG = object()
+
+def container_factory(parent_key, item_key):
+    if item_key.isdigit():
+        return []
+    return {}
+
+def is_int(v):
+    """ raise error if not """
+    try:
+        int(v)
+        return True
+    except ValueError:
+        return False
 
 class Action(object):
     """
@@ -135,6 +148,7 @@ class Field(object):
         :type form: formish.Form instance.
         """
         self.name = name
+        self.nodename = name.split('.')[-1]
         self.attr = attr
         self.form = form
 
@@ -179,7 +193,7 @@ class Field(object):
     def value(self):
         """Convert the request_data to a value object for the form or None."""
         if '*' in self.name:
-            return  self.widget.to_request_data(self.attr, self.defaults)
+            return  self.widget.to_request_data(self, self.defaults)
         return self.form.request_data.get(self.name, None)
 
 
@@ -208,10 +222,15 @@ class Field(object):
             val = ''
         return TemplatedString(self, 'error', val)
 
-    @property
-    def errors(self):
+    
+    def _get_errors(self):
         """ Lazily get the error from the form.errors when needed """
         return self.form.errors.get(self.name, None)
+
+    def _set_errors(self, v):
+        self.form.errors[self.name] = v
+
+    errors = property(_get_errors, _set_errors)
 
     @property
     def widget(self):
@@ -289,6 +308,10 @@ class Collection(object):
         :type form: formish.Form instance.
         """
         self.name = name
+        if name is not None:
+            self.nodename = name.split('.')[-1]
+        else:
+            self.nodename = ''
         self.attr = attr
         self.form = form
         self._fields = {}    
@@ -354,10 +377,14 @@ class Collection(object):
         val = self.form.errors.get(self.name, None)
         return TemplatedString(self, 'error', val)
 
-    @property
-    def errors(self):
+    def _get_errors(self):
         """ Lazily get the error from the form.errors when needed """
         return self.form.errors.get(self.name, None)
+
+    def _set_errors(self, v):
+        self.form.errors[self.name] = v
+
+    errors = property(_get_errors, _set_errors)
 
     @property
     def contains_error(self):
@@ -642,7 +669,7 @@ class Form(object):
         if errors is None:
             errors = {}
         self.defaults = defaults
-        self.errors = dotted(errors)
+        self.errors = errors
         self.error = None
         self._actions = []
         if add_default_action:
@@ -651,6 +678,7 @@ class Form(object):
         if renderer is not None:
             self.renderer = renderer
         self.method = method
+        self.widget = widgets.StructureDefault()
 
     def __repr__(self):
         attributes = []
@@ -738,7 +766,7 @@ class Form(object):
         :arg request_data: Webob style request data
         :arg raise_exceptions: Whether to raise exceptions or return errors
         """
-        data = validation.from_request_data(self.structure, request_data, errors=self.errors, defaults=self.defaults,skip_read_only_defaults=skip_read_only_defaults) 
+        data = self.widget.from_request_data(self.structure, request_data, skip_read_only_defaults=skip_read_only_defaults) 
         if raise_exceptions and len(self.errors.keys()):
             raise validation.FormError( \
         'Tried to access data but conversion from request failed with %s errors (%s)'% \
@@ -752,9 +780,9 @@ class Form(object):
         request_data format.
         """
         if self._request_data is not None:
-            return self._request_data
-        self._request_data = validation.to_request_data(self.structure, dotted(self.defaults))
-        return self._request_data
+            return dotted(self._request_data)
+        self._request_data = self.widget.to_request_data(self.structure, self._defaults)
+        return dotted(self._request_data)
 
 
     def _set_request_data(self, request_data):
@@ -764,7 +792,7 @@ class Form(object):
         :arg request_data: raw request data (e.g. request.POST)
         :type request_data: Dictionary (dotted or nested or dotted or MultiDict)
         """
-        self._request_data = dotted(request_data)
+        self._request_data = request_data
 
 
     request_data = property(_get_request_data, _set_request_data)
@@ -836,11 +864,13 @@ class Form(object):
         # We need the _request_data to be populated so sequences know how many
         # items they have (i.e. .fields method on a sequence uses the number of
         # values on the _request_data)
-        self._request_data = dotted(request_data)
-        self.request_data = validation.pre_parse_incoming_request_data( \
-                    self.structure,dotted(request_data))
-        data = self.get_unvalidated_data( \
-                    self.request_data, raise_exceptions=False, skip_read_only_defaults=skip_read_only_defaults)
+
+        # Convert request data to a dottedish friendly representation
+
+        self._request_data = unflatten(request_data.dict_of_lists().iteritems(), container_factory=container_factory) 
+
+        self._request_data = self.widget.pre_parse_incoming_request_data(self.structure,self._request_data)
+        data = self.get_unvalidated_data(self._request_data, raise_exceptions=False, skip_read_only_defaults=skip_read_only_defaults)
         try:
             self.structure.attr.validate(data)
         except schemaish.attr.Invalid, e:
@@ -860,7 +890,7 @@ class Form(object):
         allowed = ['title', 'widget', 'description','default']
         if name in allowed:
             if name == 'default' and '*' not in key:
-                self.defaults[key] = value
+                set(self.defaults,key,value,container_factory=container_factory)
             else:
                 self.item_data.setdefault(key, {})[name] = value
         else:

@@ -12,7 +12,7 @@ optionkeys = [k for k,v in field.widget.options]
 option = optiontree['data']
 index = optionkeys.index(option[0])
 %>
-  <li><input id="${field.cssname}-${index}" name="${field.name}" type="checkbox" value="${option[0]}"${field.widget.checked(option,field.value,field.attr)|n} />
+  <li><input id="${field.cssname}-${index}" name="${field.name}" type="checkbox" value="${option[0]}"${field.widget.checked(option,field)|n} />
   <label for="${field.cssname}-${index}">${option[1]}</label>
   ${render_subtree(field,optiontree)}
   </li> 

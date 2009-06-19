@@ -1,7 +1,7 @@
 import formish
 import unittest
 import schemaish
-from dottedish import dotted
+from dottedish.api import dotted, unflatten
 from formish.forms import validation
 import copy
 from webob import MultiDict
@@ -23,6 +23,13 @@ class Request(object):
         getattr(self, method.upper())['__formish_form__'] = form_name
         # Set the method
         self.method = method
+
+    def get_post(self):
+        def container_factory(parent_key, item_key):
+            if item_key.isdigit():
+                return []
+            return {}
+        return unflatten(self.POST.dict_of_lists().iteritems(), container_factory=container_factory)
         
             
 class TestFormBuilding(unittest.TestCase):
@@ -104,18 +111,22 @@ class TestFormBuilding(unittest.TestCase):
              ),
             ])
         r = {'one.a':'','one.b': '','one.c.x': '','one.c.y': ''}
-        reqr = {'one.a':None,'one.b': None,'one.c.x': None,'one.c.y': None}
-        reqrdata = {'one.a':[''],'one.b': [''],'one.c.x': [''],'one.c.y': ['']}
-        data = {'one.a': '', 'one.b': '', 'one.c.x': '', 'one.c.y': ''}
+        reqr = unflatten({'one.a':None,'one.b': None,'one.c.x': None,'one.c.y': None}.iteritems())
+        reqrdata = unflatten({'one.a':[''],'one.b': [''],'one.c.x': [''],'one.c.y': ['']}.iteritems())
+        data = {'one': {'a': None, 'c': {'y': None, 'x': None}, 'b': None}}
         
         name = "Nested Form Two"
         request =  Request(name, r)
         form = formish.Form(schema_nested, name)
         # request to data
-        rdtd = validation.from_request_data(form.structure, dotted(copy.deepcopy(request.POST)))
-        assert rdtd == dotted(reqr)
+        rdtd = form.widget.from_request_data(form, copy.deepcopy(request.POST))
+        print 'rdtd',rdtd
+        print 'reqr',reqr
+        assert rdtd == reqr
         # data to request
-        dtrd = validation.to_request_data(form.structure, dotted(data))
+        dtrd = form.widget.to_request_data(form, data)
+        print 'dtrd',dtrd
+        print 'reqrdata',reqrdata
         assert dtrd == reqrdata
 
 
@@ -174,9 +185,9 @@ class TestFormBuilding(unittest.TestCase):
         # Does the form produce an int and a string
         self.assertEquals(form.validate(request), {'a': 3, 'b': '4'})
         # Does the convert request to data work
-        self.assertEqual( validation.from_request_data(form.structure, dotted(request.POST)) , {'a': 3, 'b': '4'})
+        self.assertEqual( form.widget.from_request_data(form, request.POST) , {'a': 3, 'b': '4'})
         # Does the convert data to request work
-        self.assert_( validation.to_request_data(form.structure, dotted( {'a': 3, 'b': '4'} )) == reqr)
+        self.assert_( form.widget.to_request_data(form, {'a': 3, 'b': '4'} ) == reqr)
 
     def test_failure_and_success_callables(self):
 
@@ -215,37 +226,41 @@ class TestFormBuilding(unittest.TestCase):
         # Check the data is converted correctly
         self.assertEquals(form.validate(request), {'a': d, 'b': '4'})
         # Check req to data
-        self.assertEqual( validation.from_request_data(form.structure, dotted(request.POST)) , dotted({'a': d, 'b': '4'}))
+        print 'repr post',repr(request.get_post())
+        self.assertEqual( form.widget.from_request_data(form, request.get_post()) , {'a': d, 'b': '4'})
         # Check data to req
-        self.assert_( validation.to_request_data(form.structure, dotted( {'a': d, 'b': '4'} )) == dotted({'a': {'month': [3], 'day': [1], 'year': [1966]}, 'b': ['4']}))
+        self.assert_( form.widget.to_request_data(form, {'a': d, 'b': '4'}) == {'a': {'month': [3], 'day': [1], 'year': [1966]}, 'b': ['4']})
 
     def test_form_retains_request_data(self):
         form = formish.Form(schemaish.Structure([("field", schemaish.String())]))
         assert 'name="field" value=""' in form()
         data = form.validate(Request('form', {'field': 'value'}))
+        print 'data',data
         assert data == {'field': 'value'}
+        print 'form.request_data[field] =',form.request_data['field']
         assert form.request_data['field'] == ['value']
         assert 'name="field" value="value"' in form()
 
     def test_form_accepts_request_data(self):
         form = formish.Form(schemaish.Structure([("field", schemaish.String())]))
         form.request_data = {'field': ['value']}
-        assert form.request_data == {'field': ['value']}
+        print 'FRD',form._request_data
+        assert form._request_data == {'field': ['value']}
 
     def test_form_with_defaults_accepts_request_data(self):
         form = formish.Form(schemaish.Structure([("field", schemaish.String())]))
         form.defaults = {'field': 'default value'}
         assert 'name="field" value="default value"' in form()
         form.request_data = {'field': ['value']}
-        assert form.request_data == {'field': ['value']}
+        assert form._request_data == {'field': ['value']}
         assert 'name="field" value="value"' in form()
 
     def test_form_defaults_clears_request_data(self):
         form = formish.Form(schemaish.Structure([("field", schemaish.String())]))
         form.request_data = {'field': ['value']}
         form.defaults = {'field': 'default value'}
-        assert form.defaults == {'field': 'default value'}
-        assert form.request_data == {'field': ['default value']}
+        assert form._defaults == {'field': 'default value'}
+        assert form._request_data == None
         assert 'name="field" value="default value"' in form()
 
     def test_method(self):
@@ -265,6 +280,22 @@ class TestFormBuilding(unittest.TestCase):
                                 ('get', Request(GET={'string': 'abc'}, method='GET'))]:
             data = formish.Form(schema, method=method).validate(request)
             self.assertTrue(data == {'string': 'abc'})
+
+    def test_simple_validation(self):
+        schema_flat = schemaish.Structure([("a", schemaish.Integer())])
+        name = "Integer Form"
+        form = formish.Form(schema_flat, name)
+        r = {'a': '3'}
+        request = Request(name, r)
+        R = copy.deepcopy(r)
+
+        reqr = {'a': ['3']}
+        # Does the form produce an int and a string
+        self.assertEquals(form.validate(request), {'a': 3})
+        # Does the convert request to data work
+        # self.assertEqual( validation.from_request_data(form.structure, dotted(request.POST)) , {'a': 3, 'b': '4'})
+        # Does the convert data to request work
+        # self.assert_( validation.to_request_data(form.structure, dotted( {'a': 3, 'b': '4'} )) == reqr)
 
 
 class TestActions(unittest.TestCase):
