@@ -293,23 +293,19 @@ def default_empty_checker(v):
 
 
 def _default_empty_checker(v):
+    if v == None:
+        return
+    if isinstance(v, basestring):
+        if v != '':
+            raise ValueError
+        return
     if hasattr(v, 'values'):
         for i in v.values():
-            return _default_empty_checker(i) 
-    if isinstance(v, basestring):
-        if v == '':
-            return
-        raise ValueError
+            _default_empty_checker(i) 
+        return
     else:
-        try:
-            for i in v: 
-                return _default_empty_checker(i)
-        except TypeError:
-            if v is None or v == '':
-                return
-            else:
-                raise ValueError
-    return v
+        for i in v: 
+            _default_empty_checker(i)
 
 class SequenceDefault(Widget):
     """
