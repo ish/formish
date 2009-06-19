@@ -867,9 +867,9 @@ class Form(object):
 
         # Convert request data to a dottedish friendly representation
 
-        request_data = unflatten(request_data.dict_of_lists().iteritems(), container_factory=container_factory) 
+        self._request_data = unflatten(request_data.dict_of_lists().iteritems(), container_factory=container_factory) 
 
-        self._request_data = self.widget.pre_parse_incoming_request_data(self.structure,request_data)
+        self._request_data = self.widget.pre_parse_incoming_request_data(self.structure,self._request_data)
         data = self.get_unvalidated_data(self._request_data, raise_exceptions=False, skip_read_only_defaults=skip_read_only_defaults)
         try:
             self.structure.attr.validate(data)
@@ -890,7 +890,6 @@ class Form(object):
         allowed = ['title', 'widget', 'description','default']
         if name in allowed:
             if name == 'default' and '*' not in key:
-                print 's,k,v',self.defaults._o,key,value
                 set(self.defaults,key,value,container_factory=container_factory)
             else:
                 self.item_data.setdefault(key, {})[name] = value

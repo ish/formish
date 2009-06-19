@@ -344,7 +344,7 @@ class SequenceDefault(Widget):
             try:
                 try:
                     d = data[int(f.nodename)]
-                except KeyError:
+                except (KeyError, IndexError):
                     d = None
                 request_data[f.nodename] = f.widget.to_request_data(f, d)
             except Invalid, e:
@@ -367,8 +367,7 @@ class SequenceDefault(Widget):
             except TypeError, KeyError:
                 r = None
             d = f.widget.pre_parse_incoming_request_data(f, r)
-            if r is not None:
-                data[f.nodename] = d
+            data[f.nodename] = d
 
         return data
 
@@ -386,7 +385,18 @@ class SequenceDefault(Widget):
             except ConvertError, e:
                 f.errors = e.message
 
+        # Trim empty fields from the end of the list
+        n = None
+        for n in xrange(len(data),0,-1):
+            if not self.empty_checker(data[n-1]):
+                break
+        else:
+            # they are all empty
+            n = 0
+        if n is not None:
+            return data[:n]
         return data
+
 
         
 
@@ -595,7 +605,6 @@ class DateParts(Widget):
         """
         Convert to date parts
         """
-        print 'to request data',data
         dateparts = datetuple_converter(field.attr).from_type(data)
         if dateparts is None:
             return {'year': [''], 'month': [''], 'day': ['']}
@@ -607,7 +616,6 @@ class DateParts(Widget):
         """
         Pull out the parts and convert
         """
-        print 'from request data',request_data
         if request_data is None:
             year = ''
             month = ''
