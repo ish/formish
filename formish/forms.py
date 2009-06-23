@@ -47,7 +47,9 @@ class Action(object):
             
 def _cssname(self):
     """ Returns a hyphenated identifier using the form name and field name """
-    return '%s-%s'% (self.form.name, '-'.join(self.name.split('.')))    
+    if self.form.name:
+        return '%s-%s'% (self.form.name, '-'.join(self.name.split('.')))    
+    return '%s'% ('-'.join(self.name.split('.')))    
 
 
 def _classes(self):

@@ -155,7 +155,7 @@ class TestErrorRendering(base.TestCase):
         print '>>>>>>>>>>>>>>>>>>>>'
         print html
         print '<<<<<<<<<<<<<<<<<<<<'
-        element = BeautifulSoup(html).find(id='form-%s--field'%(attr.replace('.', '-'),))
+        element = BeautifulSoup(html).find(id='%s--field'%(attr.replace('.', '-'),))
         div_error = element.find('div',{'class': 'error'})
         span_error = element.find('span',{'class': 'error'})
         assert div_error or span_error
