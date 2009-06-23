@@ -51,6 +51,7 @@ class Widget(object):
     
     type = None
     template = None
+    default_value = ['']
     
     def __init__(self, **k):
         self.css_class = k.get('css_class', None)
@@ -78,7 +79,7 @@ class Widget(object):
         Prior to convert being run, we have a chance to munge the data. This is
         only used by file upload at the moment
         """
-        return request_data
+        return request_data or self.default_value
 
 
     def from_request_data(self, field, request_data):

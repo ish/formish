@@ -1,2 +1,6 @@
+% if form.include_charset:
   <input type="hidden" name="_charset_" />
+% endif
+% if form.name:
   <input type="hidden" name="__formish_form__" value="${form.name}" />
+% endif

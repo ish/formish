@@ -38,7 +38,7 @@ class Action(object):
     :arg label: The 'value' of the submit button and hence the text that people see
     """
     def __init__(self, name=None, value=None, callback=None):
-        if not util.valid_identifier(name):
+        if name and not util.valid_identifier(name):
             raise validation.FormError('Invalid action name %r.'% name)
         self.callback = callback
         self.name = name
@@ -631,7 +631,7 @@ class Form(object):
     _request_data = None
 
     def __init__(self, structure, name=None, defaults=None, errors=None,
-            action_url=None, renderer=None, method='POST', add_default_action=True):
+                 action_url=None, renderer=None, method='POST', add_default_action=True, include_charset=True):
         """
         Create a new form instance
 
@@ -673,12 +673,13 @@ class Form(object):
         self.error = None
         self._actions = []
         if add_default_action:
-            self.add_action( 'submit', 'Submit' )
+            self.add_action( None, 'Submit' )
         self.action_url = action_url
         if renderer is not None:
             self.renderer = renderer
         self.method = method
         self.widget = widgets.StructureDefault()
+        self.include_charset = include_charset
 
     def __repr__(self):
         attributes = []
@@ -704,23 +705,7 @@ class Form(object):
 
     element_name = property(_element_name_get, _element_name_set)
 
-    def _name_get(self):
-        """ Get the name of the form, default to `formish` """
-        if self._element_name is not None:
-            return self._element_name
-        if self._name is not None:
-            return self._name
-        return 'form'
-
-    def _name_set(self, name):
-        """ Set the form name """ 
-        if self._element_name is not None:
-            raise Exception("Named forms cannot be used as elements.")
-        self._name = name
-
-    name = property(_name_get, _name_set)
-
-    def add_action(self, name, value=None, callback=None):
+    def add_action(self, name=None, value=None, callback=None):
         """ 
         Add an action callable to the form
 
@@ -735,7 +720,7 @@ class Form(object):
         :type label: string
         
         """
-        if name in [action.name for action in self._actions]:
+        if name and name in [action.name for action in self._actions]:
             raise ValueError('Action with name %r already exists.'% name)
         self._actions.append( Action(name, value, callback) )              
 
@@ -852,7 +837,7 @@ class Form(object):
         # getattr.
         request_data = getattr(request, self.method.upper())
         # Check this request was submitted by this form.
-        if request_data.get('__formish_form__') != self.name:
+        if self.name and request_data.get('__formish_form__') != self.name:
             raise Exception("request does not match form name")
         # Decode request data according to the request's charset.
         request_data = UnicodeMultiDict(request_data,

@@ -10,6 +10,6 @@ if action.name is None:
 else:
     name = ' name="%s"'%action.name
 %>
-    <input type="submit" id="${form.name}-action-${action.name}" name="${action.name}"${value|n} />
+<input type="submit" id="${form.name}-action-${action.name}"${name|n}${value|n} />
     %endfor
   </div>
