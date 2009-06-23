@@ -9,7 +9,14 @@ if action.name is None:
     name = ''
 else:
     name = ' name="%s"'%action.name
+form_id = []
+if form.name:
+    form_id.append(form.name)
+form_id.append('action')
+if action.name:
+    form_id.append(action.name)
+form_id = '-'.join(form_id)
 %>
-    <input type="submit" id="${form.name}-action-${action.name}" name="${action.name}"${value|n} />
+<input type="submit" id="${form_id}"${name|n}${value|n} />
     %endfor
   </div>

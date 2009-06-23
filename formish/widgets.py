@@ -51,6 +51,7 @@ class Widget(object):
     
     type = None
     template = None
+    default_value = ['']
     
     def __init__(self, **k):
         self.css_class = k.get('css_class', None)
@@ -78,7 +79,7 @@ class Widget(object):
         Prior to convert being run, we have a chance to munge the data. This is
         only used by file upload at the moment
         """
-        return request_data
+        return request_data or self.default_value
 
 
     def from_request_data(self, field, request_data):
@@ -797,12 +798,7 @@ class SelectChoice(Widget):
         """
         Check the value passed matches the actual value
         """
-        value = field.value
-        if value == ['']:
-            v = self.empty
-        else:
-            v = value[0]
-        if option[0] == v:
+        if option[0] == field.value[0]:
             return ' selected="selected"'
         else:
             return ''
@@ -894,13 +890,8 @@ class SelectWithOtherChoice(SelectChoice):
         value = field.value['select']
         if option[0] == self.other_option[0] and value[0] not in [value for value, label in self.get_options(field)]:
             return ' selected="selected"'
-        # Map the empty value
-        if value == ['']:
-            v = self.empty
-        else:
-            v = value[0]
         # Check for selected
-        if option[0] == v:
+        if option[0] == value[0]:
             return ' selected="selected"'
         else:
             return ''
@@ -933,12 +924,7 @@ class RadioChoice(SelectChoice):
         """
         Check if the currently rendering input is the same as the value
         """
-        value = field.value
-        if value == ['']:
-            v = self.empty
-        else:
-            v = value[0]
-        if option == v:
+        if option[0] == field.value[0]:
             return ' checked="checked"'
         else:
             return ''
