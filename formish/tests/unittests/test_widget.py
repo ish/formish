@@ -167,14 +167,69 @@ class TestErrorRendering(base.TestCase):
 
 class TestSequenceDefault(base.TestCase):
 
-    def test_empty_with_min(self):
-        form = formish.Form(
-            schemaish.Structure([
-                ('foo', schemaish.Sequence(schemaish.String())),
+    def test_empty_checker(self):
+        form = formish.Form(self._schema())
+        form['seq'].widget = formish.SequenceDefault()
+        # Structure should be in form ...
+        self.assertTrue('seq.0.foo' in form())
+        # ... but not in data
+        self.assertEquals(form.validate(self.Request('form', {})), {'seq': []})
+
+    def test_min_start_fields_default(self):
+        form = formish.Form(self._schema())
+        form['seq'].widget = formish.SequenceDefault()
+        html = form()
+        self.assertTrue('seq.0.foo' in html)
+        self.assertTrue('seq.1.foo' not in html)
+
+    def test_min_start_fields(self):
+        for i in range(1, 5):
+            form = formish.Form(self._schema())
+            form['seq'].widget = formish.SequenceDefault(min_start_fields=i)
+            html = form()
+            for num in range(i):
+                self.assertTrue('seq.%d.foo'%num in html)
+            self.assertEquals(form.validate(self.Request('form', {})), {'seq': []})
+
+    def test_min_start_with_data(self):
+        form = formish.Form(self._schema())
+        form['seq'].widget = formish.SequenceDefault()
+        form.defaults = {'seq': [{'foo': 'bar'}]}
+        html = form()
+        self.assertTrue('seq.0.foo' in html)
+        self.assertTrue('value="bar"' in html)
+        self.assertTrue('seq.1.foo' not in html)
+
+    def test_min_start_min_empty(self):
+        form = formish.Form(self._schema())
+        form['seq'].widget = formish.SequenceDefault(min_start_fields=1, min_empty_start_fields=1)
+        html = form()
+        self.assertTrue('seq.0.foo' in html)
+        self.assertTrue('seq.1.foo' not in html)
+        form.defaults = {'seq': [{'foo': 'bar'}]}
+        html = form()
+        self.assertTrue('seq.0.foo' in html)
+        self.assertTrue('value="bar"' in html)
+        self.assertTrue('seq.1.foo' in html)
+
+    def test_first_entry(self):
+        form = formish.Form(self._schema())
+        form['seq'].widget = formish.SequenceDefault(min_start_fields=2)
+        self.assertEquals(form.validate(self.Request('form', [('seq.0.foo', 'bar'), ('seq.1.foo', '')])), {'seq': [{'foo': 'bar'}]})
+
+    def test_empty_first_entry(self):
+        form = formish.Form(self._schema())
+        form['seq'].widget = formish.SequenceDefault(min_start_fields=2)
+        self.assertRaises(formish.FormError, form.validate, self.Request('form', [('seq.0.foo', ''), ('seq.1.foo', 'bar')]))
+
+    def _schema(self):
+        return schemaish.Structure([
+                ('seq', schemaish.Sequence(
+                    schemaish.Structure([
+                        ('foo', schemaish.String(validator=validatish.Required()))
+                    ])
+                )),
             ])
-        )
-        form['foo'].widget = formish.SequenceDefault()
-        data = form.validate(self.Request('form', {}))
 
 
 class TestSelectChoice(base.TestCase):
