@@ -564,7 +564,6 @@ class Sequence(Collection):
         else:
             num_fields = len(self.form._request_data.get(self.name, []))
 
-
         for num in xrange(num_fields):
             field = self.bind(num, self.attr.attr)
             yield field
@@ -687,10 +686,10 @@ class Form(object):
         attributes = []
         attributes.append('%r'%self.structure.attr)
         attributes.append('name=%r'%self.name)
-        if self.defaults.data != {}:
-            attributes.append('defaults=%r'%self.defaults.data)
-        if self.errors.data != {}:
-            attributes.append('errors=%r'%self.errors.data)
+        if self.defaults._o != {}:
+            attributes.append('defaults=%r'%self.defaults._o)
+        if self.errors != {}:
+            attributes.append('errors=%r'%self.errors)
         if self.action_url:
             attributes.append('action_url=%r'%self.action_url)
         return 'formish.Form(%s)'%( ', '.join(attributes) )
@@ -757,7 +756,7 @@ class Form(object):
         if raise_exceptions and len(self.errors.keys()):
             raise validation.FormError( \
         'Tried to access data but conversion from request failed with %s errors (%s)'% \
-                   (len(self.errors.keys()), self.errors.data))
+                   (len(self.errors.keys()), self.errors))
         return data
     
 
