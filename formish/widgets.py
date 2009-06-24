@@ -305,8 +305,11 @@ def _default_empty_checker(v):
             _default_empty_checker(i) 
         return
     else:
-        for i in v: 
-            _default_empty_checker(i)
+        try:
+            for i in v: 
+                _default_empty_checker(i)
+        except TypeError:
+            raise ValueError
 
 class SequenceDefault(Widget):
     """
@@ -956,7 +959,7 @@ class RadioChoice(SelectChoice):
     def __repr__(self):
         attributes = []
         attributes.append('options=%r'%self.options)
-        if self.none_option is not UNSET:
+        if self.none_option and self.none_option is not UNSET:
             attributes.append('none_option=%r'%list(self.none_option))
         if self.converter_options != {'delimiter':','}:
             attributes.append('converter_options=%r'%self.converter_options)
