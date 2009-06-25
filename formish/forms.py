@@ -632,7 +632,7 @@ class Form(object):
     _request_data = None
 
     def __init__(self, structure, name=None, defaults=None, errors=None,
-                 action_url=None, renderer=None, method='POST', add_default_action=True, include_charset=True):
+                 action_url=None, renderer=None, method='POST', add_default_action=True, include_charset=True, check_form_name=True):
         """
         Create a new form instance
 
@@ -681,6 +681,7 @@ class Form(object):
         self.method = method
         self.widget = widgets.StructureDefault()
         self.include_charset = include_charset
+        self.check_form_name = check_form_name
 
     def __repr__(self):
         attributes = []
@@ -838,7 +839,7 @@ class Form(object):
         # getattr.
         request_data = getattr(request, self.method.upper())
         # Check this request was submitted by this form.
-        if self.name and request_data.get('__formish_form__') != self.name:
+        if self.name and self.check_form_name == True and request_data.get('__formish_form__') != self.name:
             raise Exception("request does not match form name")
         # Decode request data according to the request's charset.
         request_data = UnicodeMultiDict(request_data,
