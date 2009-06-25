@@ -224,7 +224,6 @@ class CheckedInput(Input):
         Input.__init__(self, **k)
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
-        self.request_data = None
             
     def to_request_data(self, field, data):
         """
