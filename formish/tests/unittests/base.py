@@ -9,6 +9,7 @@ class Request(object):
             POST = {}
         self.POST = MultiDict(POST)
         self.POST['__formish_form__'] = form_name
+        self.GET = self.POST
         self.method = 'POST'
 
 class TestCase(unittest.TestCase):
