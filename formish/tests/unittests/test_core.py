@@ -201,7 +201,7 @@ class TestFormBuilding(unittest.TestCase):
         self.assert_( form.widget.to_request_data(form, {'a': d, 'b': '4'}) == {'a': {'month': [3], 'day': [1], 'year': [1966]}, 'b': ['4']})
 
     def test_form_retains_request_data(self):
-        form = formish.Form(schemaish.Structure([("field", schemaish.String())]))
+        form = formish.Form(schemaish.Structure([("field", schemaish.String())]),'form')
         assert 'name="field" value=""' in form()
         data = form.validate(Request('form', {'field': 'value'}))
         print 'data',data
@@ -235,7 +235,7 @@ class TestFormBuilding(unittest.TestCase):
     def test_method(self):
         schema = schemaish.Structure([('string', schemaish.String())])
         # Default should be POST
-        self.assertTrue('method="post"' in formish.Form(schema)().lower())
+        self.assertTrue('method="post"' in formish.Form(schema,'form')().lower())
         # (Crudely) check that an explicit method is rendered correctly by the
         # templates.
         for method in ['POST', 'GET', 'get', 'Get']:
@@ -247,7 +247,7 @@ class TestFormBuilding(unittest.TestCase):
         # Check that default (POST) and non-default (e.g. GET) forms validate.
         for method, request in [('post', Request(POST={'string': 'abc'})),
                                 ('get', Request(GET={'string': 'abc'}, method='GET'))]:
-            data = formish.Form(schema, method=method).validate(request)
+            data = formish.Form(schema,'form', method=method).validate(request)
             self.assertTrue(data == {'string': 'abc'})
 
     def test_simple_validation(self):
@@ -310,7 +310,7 @@ class TestBugs(unittest.TestCase):
     def test_date_conversion(self):
         from datetime import date, datetime
         schema = schemaish.Structure([('date', schemaish.Date())])
-        form = formish.Form(schema)
+        form = formish.Form(schema,name='form')
         form['date'].widget = formish.SelectChoice([(date(1970,1,1),'a'),
                                                        (date(1980,1,1),'b'),
                                                        (datetime(1990,1,1),'c')])

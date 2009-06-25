@@ -23,7 +23,7 @@ class TestFormExamples(base.TestCase):
         expected_data = {'fieldOne':'a','fieldTwo':'b'}
 
         request = self.Request(form_name,request_data)
-
+        print 'REQEUST IN TEST',request.POST
         data = form.validate(request)
         assert data == expected_data
 
@@ -168,7 +168,7 @@ class TestErrorRendering(base.TestCase):
 class TestSequenceDefault(base.TestCase):
 
     def test_empty_checker(self):
-        form = formish.Form(self._schema())
+        form = formish.Form(self._schema(),'form')
         form['seq'].widget = formish.SequenceDefault()
         # Structure should be in form ...
         self.assertTrue('seq.0.foo' in form())
@@ -176,7 +176,7 @@ class TestSequenceDefault(base.TestCase):
         self.assertEquals(form.validate(self.Request('form', {})), {'seq': []})
 
     def test_min_start_fields_default(self):
-        form = formish.Form(self._schema())
+        form = formish.Form(self._schema(),'form')
         form['seq'].widget = formish.SequenceDefault()
         html = form()
         self.assertTrue('seq.0.foo' in html)
@@ -184,7 +184,7 @@ class TestSequenceDefault(base.TestCase):
 
     def test_min_start_fields(self):
         for i in range(1, 5):
-            form = formish.Form(self._schema())
+            form = formish.Form(self._schema(),'form')
             form['seq'].widget = formish.SequenceDefault(min_start_fields=i)
             html = form()
             for num in range(i):
@@ -192,7 +192,7 @@ class TestSequenceDefault(base.TestCase):
             self.assertEquals(form.validate(self.Request('form', {})), {'seq': []})
 
     def test_min_start_with_data(self):
-        form = formish.Form(self._schema())
+        form = formish.Form(self._schema(),'form')
         form['seq'].widget = formish.SequenceDefault()
         form.defaults = {'seq': [{'foo': 'bar'}]}
         html = form()
@@ -201,7 +201,7 @@ class TestSequenceDefault(base.TestCase):
         self.assertTrue('seq.1.foo' not in html)
 
     def test_min_start_min_empty(self):
-        form = formish.Form(self._schema())
+        form = formish.Form(self._schema(),'form')
         form['seq'].widget = formish.SequenceDefault(min_start_fields=1, min_empty_start_fields=1)
         html = form()
         self.assertTrue('seq.0.foo' in html)
@@ -213,12 +213,12 @@ class TestSequenceDefault(base.TestCase):
         self.assertTrue('seq.1.foo' in html)
 
     def test_first_entry(self):
-        form = formish.Form(self._schema())
+        form = formish.Form(self._schema(),'form')
         form['seq'].widget = formish.SequenceDefault(min_start_fields=2)
         self.assertEquals(form.validate(self.Request('form', [('seq.0.foo', 'bar'), ('seq.1.foo', '')])), {'seq': [{'foo': 'bar'}]})
 
     def test_empty_first_entry(self):
-        form = formish.Form(self._schema())
+        form = formish.Form(self._schema(),'form')
         form['seq'].widget = formish.SequenceDefault(min_start_fields=2)
         self.assertRaises(formish.FormError, form.validate, self.Request('form', [('seq.0.foo', ''), ('seq.1.foo', 'bar')]))
 

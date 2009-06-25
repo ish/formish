@@ -632,7 +632,7 @@ class Form(object):
     _request_data = None
 
     def __init__(self, structure, name=None, defaults=None, errors=None,
-                 action_url=None, renderer=None, method='POST', add_default_action=True, include_charset=True, check_form_name=True):
+                 action_url=None, renderer=None, method='POST', add_default_action=True, include_charset=True):
         """
         Create a new form instance
 
@@ -681,7 +681,6 @@ class Form(object):
         self.method = method
         self.widget = widgets.StructureDefault()
         self.include_charset = include_charset
-        self.check_form_name = check_form_name
 
     def __repr__(self):
         attributes = []
@@ -797,9 +796,41 @@ class Form(object):
    
 
     defaults = property(_get_defaults, _set_defaults)
-    
 
-    def validate(self, request, failure_callable=None, success_callable=None, skip_read_only_defaults=False):
+    def _set_request(self, request):
+        """ 
+        Assign raw request data to the form
+        
+        :arg request_data: raw request data (e.g. request.POST)
+        :type request_data: Dictionary (dotted or nested or dotted or MultiDict)
+        """
+        self._request = request
+        request_data = getattr(request, self.method.upper())
+        # Decode request data according to the request's charset.
+        request_data = UnicodeMultiDict(request_data,
+                                        encoding=util.get_post_charset(request))
+        # Remove the sequence factory data from the request
+        for k in request_data.keys():
+            if '*' in k:
+                request_data.pop(k)
+        # We need the _request_data to be populated so sequences know how many
+        # items they have (i.e. .fields method on a sequence uses the number of
+        # values on the _request_data)
+
+        # Convert request data to a dottedish friendly representation
+        request_data = _unflatten_request_data(request_data)
+        self._request_data = self.widget.pre_parse_incoming_request_data(self.structure,request_data)
+
+    def _get_request(self):
+        return self._request
+
+    request = property(_get_request, _set_request)
+
+    def name_from_request(self, request):
+        request_data = getattr(request, self.method.upper())
+        return request_data.get('__formish_form__')
+
+    def validate(self, request, failure_callable=None, success_callable=None, skip_read_only_defaults=False, check_form_name=True):
         """ 
         Validate the form data in the request.
 
@@ -815,6 +846,10 @@ class Form(object):
         :returns: Python dict of converted and validated data.
         :raises: formish.FormError, raised on validation failure.
         """
+        # Check this request was submitted by this form.
+        self.request = request
+        if check_form_name == True and (self.name != self.name_from_request(request)):
+            raise Exception("request does not match form name")
         try: 
             data = self._validate(request, skip_read_only_defaults=skip_read_only_defaults)
         except validation.FormError, e:
@@ -834,28 +869,6 @@ class Form(object):
         """
         # XXX Should this happen after the basic stuff has happened?
         self.errors = {}
-        # Decide what request data to use. The method will have been validated
-        # already (unless someone's messing around!) so we can just use it in a
-        # getattr.
-        request_data = getattr(request, self.method.upper())
-        # Check this request was submitted by this form.
-        if self.name and self.check_form_name == True and request_data.get('__formish_form__') != self.name:
-            raise Exception("request does not match form name")
-        # Decode request data according to the request's charset.
-        request_data = UnicodeMultiDict(request_data,
-                                        encoding=util.get_post_charset(request))
-        # Remove the sequence factory data from the request
-        for k in request_data.keys():
-            if '*' in k:
-                request_data.pop(k)
-        # We need the _request_data to be populated so sequences know how many
-        # items they have (i.e. .fields method on a sequence uses the number of
-        # values on the _request_data)
-
-        # Convert request data to a dottedish friendly representation
-        self._request_data = _unflatten_request_data(request_data)
-
-        self._request_data = self.widget.pre_parse_incoming_request_data(self.structure,self._request_data)
         data = self.get_unvalidated_data(self._request_data, raise_exceptions=False, skip_read_only_defaults=skip_read_only_defaults)
         try:
             self.structure.attr.validate(data)
