@@ -53,17 +53,17 @@ def functest_String(self):
     sel = self.selenium
     sel.open("/String")
 
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myStringField': None}"))
 
     sel.type("form-myStringField", "Test")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myStringField': u'Test'}"))
 
     sel.type("form-myStringField", "80")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myStringField': u'80'}"))
 
@@ -132,22 +132,22 @@ def functest_Integer(self):
     sel = self.selenium
     sel.open("/Integer")
 
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myIntegerField': None}"))
 
     sel.type("form-myIntegerField", "a")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("Not a valid integer"))
 
     sel.type("form-myIntegerField", "8.0")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("Not a valid integer"))
 
     sel.type("form-myIntegerField", "8")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myIntegerField': 8}"))
 
@@ -194,22 +194,22 @@ def functest_Date(self):
 
     sel.open("/Date")
 
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myDateField': None}"))
 
     sel.type("form-myDateField", "a")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("Invalid date"))
 
     sel.type("form-myDateField", "18/12/1966")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("Invalid date"))
 
     sel.type("form-myDateField", "2008-12-18")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myDateField': datetime.date(2008, 12, 18)}"))
 
@@ -248,22 +248,22 @@ def functest_Float(self):
     sel = self.selenium
     sel.open("/Float")
 
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myFloatField': None}"))
 
     sel.type("form-myFloatField", "a")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("Not a valid number"))
 
     sel.type("form-myFloatField", "11")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myFloatField': 11.0}"))
 
     sel.type("form-myFloatField", "12.27")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myFloatField': 12.27}"))
 
@@ -300,27 +300,27 @@ def functest_Boolean(self):
     sel = self.selenium
     sel.open("/Boolean")
 
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myBooleanField': None}"))
 
     sel.type("form-myBooleanField", "a")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("u'a' should be either True or False"))
 
     sel.type("form-myBooleanField", "t")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("u't' should be either True or False"))
 
     sel.type("form-myBooleanField", "True")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myBooleanField': True}"))
 
     sel.type("form-myBooleanField", "False")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myBooleanField': False}"))
 
@@ -369,22 +369,22 @@ def functest_Decimal(self):
     sel = self.selenium
     sel.open("/Decimal")
 
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myDecimalField': None}"))
 
     sel.type("form-myDecimalField", "a")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("Not a valid number"))
 
     sel.type("form-myDecimalField", "1")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myDecimalField': Decimal('1')}"))
 
     sel.type("form-myDecimalField", "18.001")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myDecimalField': Decimal('18.001')}"))
 
@@ -414,18 +414,18 @@ def functest_RequiredStringAndCheckbox(self):
     sel = self.selenium
     sel.open("/RequiredStringAndCheckbox")
 
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("is required"))
 
     sel.type("form-myString", "anything")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myBoolean': False, 'myString': u'anything'}"))
 
     sel.type("form-myString", "anythingelse")
     sel.click("form-myBoolean")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myBoolean': True, 'myString': u'anythingelse'}"))
 
@@ -445,12 +445,12 @@ def functest_File(self):
     sel = self.selenium
     sel.open("/File")
 
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myFile': None}"))
 
     sel.type("form-myFile", os.path.abspath("testdata/test.txt"))
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     
 
@@ -761,7 +761,7 @@ def functest_RequiredStringAndFile(self):
     sel = self.selenium
     sel.open("/RequiredStringAndFile")
 
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
         
     self.assertEqual("", sel.get_value("myFileField.default"))
@@ -770,14 +770,14 @@ def functest_RequiredStringAndFile(self):
 
 
     sel.type("form-myFileField", os.path.abspath("testdata/photo.png"))
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
         
     self.assertEqual("", sel.get_value("myFileField.default"))
 
     self.assertTrue(sel.get_value("myFileField.name"))
 
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
         
     self.assertEqual("", sel.get_value("myFileField.default"))
@@ -786,7 +786,7 @@ def functest_RequiredStringAndFile(self):
 
     sel.type("form-myFileField", os.path.abspath("testdata/photo.jpg"))
     sel.type("form-required", 'foo')
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
 
     self.assertEqual(sel.get_attribute("//div[@id='actual']/img@src")[-9:],"photo.jpg")
@@ -925,17 +925,17 @@ def functest_SelectWithOtherChoice(self):
 
     self.assertEqual("", sel.get_value("form-mySelect"))
     sel.select("form-mySelect", "label=a")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'mySelect': 1}"))
     sel.select("form-mySelect", "label=Other ...")
     sel.type("form-mySelect-other", "4")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'mySelect': 4}"))
     sel.select("form-mySelect", "label=Other ...")
     sel.type("form-mySelect-other", "d")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("Not a valid integer"))
 
@@ -1005,15 +1005,15 @@ def functest_RadioChoiceNoneOption(self):
     sel = self.selenium
     sel.open("/RadioChoiceNoneOption")
 
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myRadio': None}"))
     sel.click("form-myRadio-noneoption")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myRadio': None}"))
     sel.click("form-myRadio-0")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
     self.failUnless(sel.is_text_present("{'myRadio': 1}"))
 
@@ -1324,7 +1324,7 @@ def functest_SequenceOfUploadStructures(self):
 
     sel.type("form-myList-0-a", os.path.abspath("testdata/test.txt"))
     sel.type("form-myList-0-b", "13")
-    sel.click("form-action-submit")
+    sel.click("form-action")
     sel.wait_for_page_to_load("30000")
 
     self.failUnless(sel.is_text_present("{'myList': [{'a': <schemaish.type.File"))

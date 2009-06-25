@@ -87,10 +87,7 @@ class Widget(object):
         after the form has been submitted, the request data is converted into
         to the schema type.
         """
-        if request_data is None:
-            string_data = ''
-        else:
-            string_data = request_data[0]
+        string_data = request_data[0]
         if string_data == '':
             return self.empty
         return string_converter(field.attr).to_type(string_data, converter_options=self.converter_options)
@@ -129,10 +126,7 @@ class Input(Widget):
         """
         Default to stripping whitespace
         """
-        if request_data is None:
-            string_data = ''
-        else:
-            string_data = request_data[0]
+        string_data = request_data[0]
         if self.strip is True:
             string_data = string_data.strip()
         if string_data == '':
@@ -169,6 +163,7 @@ class CheckedPassword(Input):
 
     type = 'CheckedPassword'
     template = 'field.CheckedPassword'
+    default_value = None
 
     def __init__(self, **k):
         self.strip = k.pop('strip', True)
@@ -227,6 +222,7 @@ class CheckedInput(Input):
 
     type = 'CheckedInput'
     template = 'field.CheckedInput'
+    default_value = {'input': [''], 'confirm': ['']}
 
     def __init__(self, **k):
         self.strip = k.pop('strip', True)
@@ -234,6 +230,7 @@ class CheckedInput(Input):
         Input.__init__(self, **k)
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
+        self.request_data = None
             
     def to_request_data(self, field, data):
         """
@@ -248,12 +245,8 @@ class CheckedInput(Input):
         """
         Check the input and confirm match (when stripped)
         """
-        if request_data is None:
-            input = ''
-            confirm = ''
-        else:
-            input = request_data['input'][0]
-            confirm = request_data['confirm'][0]
+        input = request_data['input'][0]
+        confirm = request_data['confirm'][0]
         if self.strip is True:
             input = input.strip()
             confirm = confirm.strip()
@@ -523,10 +516,7 @@ class TextArea(Input):
         We're using the converter options to allow processing sequence data
         using the csv module
         """
-        if request_data is None:
-            string_data = ''
-        else:
-            string_data = request_data[0]
+        string_data = request_data[0]
         if self.strip is True:
             string_data = string_data.strip()
         if string_data == '':
@@ -561,6 +551,7 @@ class Checkbox(Widget):
 
     type = 'Checkbox'
     template = 'field.Checkbox'
+    default_value = [None]
 
     def __init__(self, checked_value=True, unchecked_value=False, css_class=None):
         self.checked_value = checked_value
@@ -572,8 +563,6 @@ class Checkbox(Widget):
         return [string_data]
 
     def from_request_data(self, field, request_data):
-        if request_data is None:
-            request_data = [None]
         if string_converter(field.attr).to_type(request_data[0]) == self.checked_value:
             return self.checked_value
         return self.unchecked_value
@@ -595,6 +584,7 @@ class DateParts(Widget):
 
     type = 'DateParts'
     template = 'field.DateParts'
+    default_value = {'year':[''], 'month':[''], 'day': ['']}
     
     def __init__(self, **k):
         self.strip = k.pop('strip', True)
@@ -619,14 +609,9 @@ class DateParts(Widget):
         """
         Pull out the parts and convert
         """
-        if request_data is None:
-            year = ''
-            month = ''
-            day = ''
-        else:
-            year = request_data.get('year', [''])[0].strip()
-            month = request_data.get('month', [''])[0].strip()
-            day = request_data.get('day', [''])[0].strip()
+        year = request_data['year'][0].strip()
+        month = request_data['month'][0].strip()
+        day = request_data['day'][0].strip()
         if year or month or day:
             date_parts = (year, month, day)
         else:
@@ -850,6 +835,7 @@ class SelectWithOtherChoice(SelectChoice):
     """
     type = 'SelectWithOtherChoice'
     template = 'field.SelectWithOtherChoice'
+    default = {'select': [''], 'other': ['']}
 
     other_option = ('...', 'Other ...')
 
@@ -875,12 +861,8 @@ class SelectWithOtherChoice(SelectChoice):
         """
         Check to see if we need to use the 'other' value
         """
-        if request_data is None:
-            select = ''
-            other = ''
-        else:
-            select = request_data['select'][0]
-            other = request_data['other'][0]
+        select = request_data['select'][0]
+        other = request_data['other'][0]
         if select == self.other_option[0]:
             value = other
         else:
@@ -939,11 +921,7 @@ class RadioChoice(SelectChoice):
         """
         If we don't have a choice, set a blank value
         """
-
-        if request_data is None:
-            string_data = ''
-        else:
-            string_data = request_data[0]
+        string_data = request_data[0]
 
         if string_data == '':
             return self.empty
@@ -980,6 +958,7 @@ class CheckboxMultiChoice(Widget):
 
     type = 'CheckboxMultiChoice'
     template = 'field.CheckboxMultiChoice'
+    default_value = []
 
     def __init__(self, options, css_class=None):
         self.options = _normalise_options(options)
@@ -997,8 +976,6 @@ class CheckboxMultiChoice(Widget):
         """
         Iterating to convert back to the source data
         """
-        if request_data is None:
-            request_data = []
         return [string_converter(field.attr.attr).to_type(d) \
                 for d in request_data]
 
@@ -1055,6 +1032,7 @@ class CheckboxMultiChoiceTree(Widget):
 
     type = 'CheckboxMultiChoiceTree'
     template = 'field.CheckboxMultiChoiceTree'
+    default_value = []
 
     def __init__(self, options, css_class=None):
         self.options = options
@@ -1062,8 +1040,6 @@ class CheckboxMultiChoiceTree(Widget):
         Widget.__init__(self,css_class=css_class)
             
     def to_request_data(self, field, data):
-        if data is None: 
-            return []
         return [string_converter(field.attr.attr).from_type(d) for d in data]
     
     def from_request_data(self, field, request_data):
