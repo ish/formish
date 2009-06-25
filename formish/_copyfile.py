@@ -4,7 +4,7 @@ import shutil
 
 
 try:
-    from fadvise import posix_fadvise, POSIX_FADV_SEQUENTIAL, POSIX_FADV_DONTNEED
+    from fadvise import posix_fadvise, POSIX_FADV_DONTNEED
 
     def copyfileobj(fsrc, fdst, length=16*1024, advise_after=1024*1024):
         """

@@ -1,4 +1,3 @@
-import pdb
 """
 Commonly needed form widgets.
 """
@@ -375,7 +374,7 @@ class SequenceDefault(Widget):
                 if f.widget.readonly is not True:
                     data.append( f.widget.from_request_data(f, request_data.get(f.nodename)) )
                 else:
-                    if skip_read_only_defaults is False:
+                    if skip_read_only_default is False:
                         data.append( f.defaults )
             except ConvertError, e:
                 f.errors = e.message
