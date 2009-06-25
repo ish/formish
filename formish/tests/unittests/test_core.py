@@ -98,37 +98,6 @@ class TestFormBuilding(unittest.TestCase):
         assert len(list(form.fields)) == 2
 
 
-    def test_data_and_request_conversion(self):
-        """
-        Test convert request to data and convert data to request
-        """
-        schema_nested = schemaish.Structure([
-            ("one", schemaish.Structure([
-                ("a", schemaish.String()),
-                ("b", schemaish.String()),
-                ("c", schemaish.Structure([("x", schemaish.String()),("y", schemaish.String())])),
-                ])
-             ),
-            ])
-        r = {'one.a':'','one.b': '','one.c.x': '','one.c.y': ''}
-        reqr = unflatten({'one.a':None,'one.b': None,'one.c.x': None,'one.c.y': None}.iteritems())
-        reqrdata = unflatten({'one.a':[''],'one.b': [''],'one.c.x': [''],'one.c.y': ['']}.iteritems())
-        data = {'one': {'a': None, 'c': {'y': None, 'x': None}, 'b': None}}
-        
-        name = "Nested Form Two"
-        request =  Request(name, r)
-        form = formish.Form(schema_nested, name)
-        # request to data
-        rdtd = form.widget.from_request_data(form, copy.deepcopy(request.POST))
-        print 'rdtd',rdtd
-        print 'reqr',reqr
-        assert rdtd == reqr
-        # data to request
-        dtrd = form.widget.to_request_data(form, data)
-        print 'dtrd',dtrd
-        print 'reqrdata',reqrdata
-        assert dtrd == reqrdata
-
 
     def test_nested_form_validation_errors(self):
         schema_nested = schemaish.Structure([
