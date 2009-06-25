@@ -332,6 +332,8 @@ class SequenceDefault(Widget):
         self.batch_add_count = k.get('batch_add_count',1)
         self.addremove = k.get('addremove', True)
         self.sortable = k.get('sortable', True)
+        # you can specify strip_empty but if not then we only strip if you can add and remove items
+        self.strip_empty = k.get('strip_empty',self.addremove)
 
     def to_request_data(self, field, data):
         """
@@ -386,15 +388,16 @@ class SequenceDefault(Widget):
                 f.errors = e.message
 
         # Trim empty fields from the end of the list
-        n = None
-        for n in xrange(len(data),0,-1):
-            if not self.empty_checker(data[n-1]):
-                break
-        else:
-            # they are all empty
-            n = 0
-        if n is not None:
-            return data[:n]
+        if self.strip_empty:
+            n = None
+            for n in xrange(len(data),0,-1):
+                if not self.empty_checker(data[n-1]):
+                    break
+            else:
+                # they are all empty
+                n = 0
+            if n is not None:
+                return data[:n]
         return data
 
 
