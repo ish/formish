@@ -819,6 +819,7 @@ class Form(object):
 
         # Convert request data to a dottedish friendly representation
         request_data = _unflatten_request_data(request_data)
+        self._request_data = request_data
         self._request_data = self.widget.pre_parse_incoming_request_data(self.structure,request_data)
 
     def _get_request(self):
