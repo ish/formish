@@ -1,4 +1,3 @@
-import pdb
 """
 Commonly needed form widgets.
 """
@@ -163,7 +162,7 @@ class CheckedPassword(Input):
 
     type = 'CheckedPassword'
     template = 'field.CheckedPassword'
-    default_value = None
+    default_value = {'password': [''], 'confirm': ['']}
 
     def __init__(self, **k):
         self.strip = k.pop('strip', True)
@@ -185,13 +184,8 @@ class CheckedPassword(Input):
         """
         Check the password and confirm match (when stripped)
         """
-        if request_data is None:
-            password = ''
-            confirm = ''
-        else:
-            password = request_data['password'][0]
-            confirm = request_data['confirm'][0]
-
+        password = request_data['password'][0]
+        confirm = request_data['confirm'][0]
         if self.strip is True:
             password = password.strip()
             confirm = confirm.strip()
@@ -230,7 +224,6 @@ class CheckedInput(Input):
         Input.__init__(self, **k)
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
-        self.request_data = None
             
     def to_request_data(self, field, data):
         """
@@ -375,7 +368,7 @@ class SequenceDefault(Widget):
                 if f.widget.readonly is not True:
                     data.append( f.widget.from_request_data(f, request_data.get(f.nodename)) )
                 else:
-                    if skip_read_only_defaults is False:
+                    if skip_read_only_default is False:
                         data.append( f.defaults )
             except ConvertError, e:
                 f.errors = e.message
@@ -835,7 +828,7 @@ class SelectWithOtherChoice(SelectChoice):
     """
     type = 'SelectWithOtherChoice'
     template = 'field.SelectWithOtherChoice'
-    default = {'select': [''], 'other': ['']}
+    default_value = {'select': [''], 'other': ['']}
 
     other_option = ('...', 'Other ...')
 
