@@ -696,14 +696,14 @@ Formish tries to ensure that fields are 'symmetric'. i.e. what goes in comes bac
 
 .. code-block:: python
 
-    class FileHandlerMinimal(object):
+    class MinimalFilestore(object):
         """ Example of File handler for formish file upload support. """
 
-        def store_file(self, fs):
-            """ Method to store a file """
+        def get(self, key, cache_tag=None):
+            pass
 
-        def get_path_for_file(self, filename):
-            """ Method to get a path for a file on disk """
+        def put(self, key, src, cache_tag, content_type, headers=None):
+            pass
 
 As you can see, the two important things are a method to store the file and a method to get the file back off disk given the filename. 
 
@@ -711,68 +711,144 @@ Our tempfile handler implements this as follows.
 
 .. code-block:: python
 
-    class TempFileHandler(FileHandlerMinimal):
-        """
-        File handler using python tempfile module to store file
-        """
+    class CachedTempFilestore(object):
 
-        def store_file(self, fs):
-            fileno, filename = tempfile.mkstemp(suffix='%s-%s'%(uuid.uuid4().hex,fs.filename))
-            fp = os.fdopen(fileno, 'wb')
-            fp.write(fs.value)
-            fp.close()
-            prefix = tempfile.gettempprefix()
-            tempdir = tempfile.gettempdir()
-            filename = ''.join( filename[(len(tempdir)+len(prefix)+1):] )
-            return filename
+        def __init__(self, root_dir=None, name=None):
+            if root_dir is None:
+                self._root_dir = tempfile.gettempdir()
+            else:
+                self._root_dir = root_dir
+            if name is None:
+                self.name = ''
+            else:
+                self.name = name
 
-        def get_path_for_file(self, filename):
-            prefix = tempfile.gettempprefix()
-            tempdir = tempfile.gettempdir()
-            return '%s/%s%s'%(tempdir,prefix,filename)
+        def get(self, key, cache_tag=None):
+            headers, f = FileSystemHeaderedFilestore.get(self, key)
+            headers = dict(headers)
+            if cache_tag and headers.get('Cache-Tag') == cache_tag:
+                f.close()
+                return (cache_tag, None, None)
+            return (headers.get('Cache-Tag'), headers.get('Content-Type'), f)
 
-.. note:: We also implement a ``get_mimetype`` method that helps in building the schemaish.type.File
+        def put(self, key, src, cache_tag, content_type, headers=None):
+            if headers is None:
+                headers = {}
+            else:
+                headers = dict(headers)
+            if cache_tag:
+                headers['Cache-Tag'] = cache_tag
+            if content_type:
+                headers['Content-Type'] = content_type
+            FileSystemHeaderedFilestore.put(self, key, headers, src)
 
-We typically want to access the file again from our widget however (especially in the case of image uploads!). Formish extends the TempFileHandler with a get_url_for_file method as follows..
+
+
+We typically want to access the file again from our widget however (especially in the case of image uploads!). A fileresource is available within formish that should return an appropriate image. The fileresource needs to be able to serve images from either the main image store (database? filesystem?) or from the temporary store if the form is in the middle of being processed (i.e. after a submission that fails through validation and needs to be redisplayed).
 
 .. code-block:: python
 
-    class TempFileHandlerWeb(TempFileHandler):
 
-        def __init__(self, default_url=None,
-                     resource_root='/filehandler',urlfactory=None):
-            self.default_url = default_url
-            self.resource_root = resource_root
-            self.urlfactory = urlfactory
+    class FileResource(resource.Resource):
+        """ A simple file serving utility """
 
-        def get_url_for_file(self, object):
-            if self.urlfactory is not None:
-                return self.urlfactory(object)
-            if id is None:
-                return self.default_url.replace(' ','+')
-            else:
-                return '%s/%s'%(self.resource_root,object)
+        def __init__(self, filestores=None, filestore=None, segments=None, cache=None):
+            pass
 
-This needs configuring with a resource root (where to find files), a default_url (if we have no file, what to use - useful to showing missing images) and a urlfactory (how to convert a object into a url representation). 
+        @resource.child(resource.any)
+        def child(self, request, segments):
+            return FileResource(filestores=self.filestores, segments=segments, cache=self.cache), []
 
+        def __call__(self, request):
+            """ Find the appropriate image to return including cacheing and resizing """
+
+
+        def get_file(self, request, filestore, filename, etag):
+            """ get the file through the cache and possibly resizing """
+       
 So what happens when a file is uploaded?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If we're using the TempFileHandlerWeb handler the following steps take place.
+If we're using the CachedTempFilestore the following steps take place.
 
 .. note:: we'll presume that the first form submit has a missing field and so the form gets redisplayed.
 
-The first time a file is uploaded, formish takes the FieldStorage object and copies the contents of the file to a tempfile using it's ``store_file`` method. 
+The first time a file is uploaded, formish takes the FieldStorage object and copies the contents of the file to a tempfile using it's ``put`` method. It will generate a cachetag using uuid.uuid4().hex (the cache tag is used as an ETAG for cacheing purposes). 
 
-When the form page is redisplayed, the widget uses the handlers ``get_url_for_file``` method to work out a url for the file. The file can then be displayed.
+When the form page is redisplayed, the widget uses its ``urlfactory``` method to work out a url for the file. The urlfactory either uses the ``url_ident_factory`` attribute (which can be supplied when a FileUpload widget is created) or, if there is a temporary file currently used, it uses its own internal method. This means you can customise the urlfactory for your own storage but temporary filestorage during widget use is handled separately.
 
 .. note:: We're not covering how the file is actually displayed. This is framework specific but we'll give an example for restish after this section.
 
-When the users completes the corrections to the form and resubmits, formish processes the file. It first checks to see if the file is new (the widget stores a reference to the old file so it can check) and if it isn't new, it returns a schema.type.File object with None for all of the attributes.
+When the users completes the corrections to the form and resubmits, formish processes the file. It first checks to see if the a new file has been uploaded (the widget stores a reference to the old file so it can check) and if it isn't new, it returns a schema.type.File object with None for all of the attributes (i.e. an empty Schema.type.File object indicates an unchanged file.
 
 If there is no file (i.e. no file was submitted on a clean form or a file was removed using the checkbox) then a None is returned.
 
 If the file is new or has changed, formish generates the schemaish.type.File object from the data stored in the temporary file.
+
+There is a default urlfactory on the FileUpload widget
+
+What happens if I want to use my own tempfile storage and main storage?
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The first thing you would look at doing is writing your own Filestore. You can use the CachedTempFilestore as a model but you will replace the FileSystemHeaderedFilestore with your own class. The FileSystemHeaderedFilestore looks as follows.
+
+.. code-block:: python
+
+    class FileSystemHeaderedFilestore(object):
+        """
+        A general purpose readable and writable file store useful for storing data
+        along with additional metadata (simple key-value pairs).
+
+        This can be used to implement temporary file stores, local caches, etc.
+        XXX file ownership?
+        """
+
+        def __init__(self, root_dir):
+            self._root_dir = root_dir
+
+        def get(self, key):
+            try:
+                f = open(os.path.join(self._root_dir, safefilename.encode(key)), 'rb')
+            except IOError, AttributeError:
+                raise KeyError(key)
+            headers = []
+            while True:
+                line = f.readline().strip()
+                if not line:
+                    break
+                name, value = line.split(': ', 1)
+                headers.append((name, value.decode('utf-8')))
+            return headers, f
+
+        def put(self, key, headers, src):
+            # XXX We should only allow strings as headers keys and values.
+            dest = file(os.path.join(self._root_dir, safefilename.encode(key)), 'wb')
+            try:
+                if isinstance(headers, dict):
+                   headers = headers.items()
+                for name, value in headers:
+                    if isinstance(value, unicode):
+                        value = value.encode('utf-8')
+                    dest.write('%s: %s\n' % (name, value))
+                dest.write('\n')
+                _copyfile.copyfileobj(src, dest)
+            finally:
+                dest.close()
+
+        def delete(self, key, glob=False):
+            # if glob is true will delete all with filename prefix
+            if glob == True:
+                for f in os.listdir(self._root_dir):
+                    if f.startswith(safefilename.encode(key)):
+                        os.remove(os.path.join(self._root_dir,f))
+            else:
+                os.remove( os.path.join(self._root_dir, safefilename.encode(key)))
+
+The get method simply returns a file and some headers based on a key. The only heads that the system is interested in are 'Cache-Tag' and 'Content-Type'. Cache-Tag is just a unique id which will be used to work out if a file has changed or not. Content-Type is fairly obvious (i.e. 'image/jpeg' or 'text/html').
+
+The put method supplies a key, some headers (as above) and src, which is an open filehandle. We've added a delete method too which isn't used within formish at the moment but may be in the future.
+
+Once you have implemented this store, you can replicate the code in CachedTempFilestore but with your own instantiation of your store in place of the tempfile instantiation.
 
 What else can I configure?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^

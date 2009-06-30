@@ -33,9 +33,9 @@ class Action(object):
     """
     An action that that can added to a form.
 
-    :arg callback: A callable with the signature (request, form, *args)
     :arg name: an valid html id used to lookup an action
-    :arg label: The 'value' of the submit button and hence the text that people see
+    :arg value: The 'value' of the submit button and hence the text that people see
+    :arg callback: A callable with the signature (request, form, *args)
     """
     def __init__(self, name=None, value=None, callback=None):
         if name and not util.valid_identifier(name):
@@ -86,6 +86,12 @@ def starify(name):
 
 
 def fall_back_renderer(renderer, name, widget, vars):
+    """
+    Tries to find template in widget directly then tries in top level directory
+    
+    This allows a field level widget override it's container by including the
+    changed version in the widgets directory with the same name
+    """
     import mako
     try:
         return renderer('/formish/widgets/%s/%s.html'%(widget,name), vars)
@@ -159,7 +165,7 @@ class Field(object):
 
     @property
     def title(self):
-        """ The Field schema's title """
+        """ The Field schema's title - derived from name if not specified """
         try:
             return self.form.get_item_data(self.name,'title')
         except KeyError:

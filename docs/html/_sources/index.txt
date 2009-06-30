@@ -15,6 +15,7 @@ Contents:
    restish
    future
    modules
+   recaptcha
 
 Indices and tables
 ==================

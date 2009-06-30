@@ -41,9 +41,6 @@
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
-             accesskey="M">modules</a> |</li>
-        <li class="right" >
           <a href="walkthrough.html" title="A Formish Walkthrough"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -503,33 +500,57 @@
 <h4>Filestores<a class="headerlink" href="#filestores" title="Permalink to this headline">¶</a></h4>
 <p>The filestore job is to persist file uploads up until a form is successfully completed. The FileUpload widget asks the filestore to store the file and remove it after the process has finished. The file is returned as a file handle, mime_type and the filename (or id)</p>
 <p>The filestore uses a headered file format which is similar to an email format with one or more lines of key value pairs followed by the binary data. This allows us to store information on the image file such as cache tags and content types. The files are store in a directory given with root_dir and the filestore can also be given a name (which is used in the fileresource to namespace resized image files to prevent clashes between different filestores)</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">CachedTempFilestore</span><span class="p">(</span><span class="n">FileSystemHeaderedFilestore</span><span class="p">):</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">FileSystemHeaderedFilestore</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A general purpose readable and writable file store useful for storing data</span>
+<span class="sd">    along with additional metadata (simple key-value pairs).</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root_dir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">root_dir</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_root_dir</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_root_dir</span> <span class="o">=</span> <span class="n">root_dir</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+<span class="sd">    This can be used to implement temporary file stores, local caches, etc.</span>
+<span class="sd">    XXX file ownership?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root_dir</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="mf">0660</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new storage space.</span>
+
+<span class="sd">        :arg root_dir: directory for stored files to be written to.</span>
+<span class="sd">        :arg mode: initial mode of created files, defaults to 0660. See os.open</span>
+<span class="sd">                   for details.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_root_dir</span> <span class="o">=</span> <span class="n">root_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mode</span> <span class="o">=</span> <span class="n">mode</span>
+
+<span class="k">class</span> <span class="nc">CachedTempFilestore</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">backend</span> <span class="o">=</span> <span class="n">FileSystemHeaderedFilestore</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
 
     <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">cache_tag</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="n">headers</span><span class="p">,</span> <span class="n">f</span> <span class="o">=</span> <span class="n">FileSystemHeaderedFilestore</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-        <span class="n">headers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">cache_tag</span> <span class="ow">and</span> <span class="n">headers</span><span class="p">[</span><span class="s">&#39;Cache-Tag&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">cache_tag</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="k">return</span> <span class="p">(</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Cache-Tag&#39;</span><span class="p">],</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Cache-Tag&#39;</span><span class="p">],</span><span class="n">headers</span><span class="p">[</span><span class="s">&#39;Content-Type&#39;</span><span class="p">],</span> <span class="n">f</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the file stored for the given key.</span>
 
+<span class="sd">        :arg key: unique key that identifies the file.</span>
+<span class="sd">        :arg cache_tag: opaque value that is used to validate cache freshness</span>
+<span class="sd">                        (similar to an HTTP etag).</span>
+<span class="sd">        :returns: tuple of (header, f) where headers is a list of (name, value)</span>
+<span class="sd">                  pairs and f is a readable file-like object. f will be None if</span>
+<span class="sd">                  the cache_tag was valid. f must be closed by the caller.</span>
+<span class="sd">        :raises KeyError: not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">cache_tag</span><span class="p">,</span> <span class="n">content_type</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">headers</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">headers</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">headers</span><span class="p">[</span><span class="s">&#39;Cache-Tag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cache_tag</span>
-        <span class="n">headers</span><span class="p">[</span><span class="s">&#39;Content-Type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">content_type</span>
-        <span class="n">FileSystemHeaderedFilestore</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">src</span><span class="p">,</span> <span class="n">cache_tag</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a file to the store, overwriting an existing file with the same key.</span>
+
+<span class="sd">        :arg key: unique key that identifies the file.</span>
+<span class="sd">        :arg cache_tag: opaque value that is later used to validate cache</span>
+<span class="sd">                        freshness (similar to an HTTP etag).</span>
+<span class="sd">        :arg headers: list of (name, value) pairs that will be associated with</span>
+<span class="sd">                      the file.</span>
+<span class="sd">        :arg src: readable file-like object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -537,7 +558,9 @@
 <h4>urlfactory<a class="headerlink" href="#urlfactory" title="Permalink to this headline">¶</a></h4>
 <p>When an attribute is stored in a database, an image is often represented by a uuid of somesort. Or possibly a directory and a file. urlfactory is used to take the identifier (lets say &#8216;foo/bar&#8217;) and convert it unto something that the file system can work with.</p>
 <p>So here is a simple FileUpload widget</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">formish</span> <span class="kn">import</span> <span class="n">filestore</span>
+
+<span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
 <span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myFile&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">File</span><span class="p">()</span> <span class="p">)</span>
 
 <span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
@@ -546,20 +569,41 @@
                            <span class="n">image_thumbnail_default</span><span class="o">=</span><span class="s">&#39;/images/nouploadyet.png&#39;</span><span class="p">,</span>
                            <span class="n">show_image_thumbnail</span><span class="o">=</span><span class="bp">True</span>
                            <span class="p">)</span>
+
+<span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
+<span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;myFile&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">File</span><span class="p">())</span>
+<span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="s">&#39;form&#39;</span><span class="p">)</span>
+<span class="n">form</span><span class="p">[</span><span class="s">&#39;myFile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">FileUpload</span><span class="p">(</span>
+                            <span class="n">filestore</span><span class="o">=</span><span class="n">CachedTempFilestore</span><span class="p">()</span>
+                            <span class="p">)</span>
+<span class="k">return</span> <span class="n">form</span>
 </pre></div>
 </div>
-<p>To set up a file resource handler at /filehandler, you could use the following (if you are using restish)</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="nd">@resource</span><span class="o">.</span><span class="n">child</span><span class="p">()</span>
-<span class="k">def</span> <span class="nf">filehandler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">segments</span><span class="p">):</span>
-    <span class="n">tempfilestore</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">filestore</span><span class="o">.</span><span class="n">CachedTempFilestore</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;tmp&#39;</span><span class="p">)</span>
-    <span class="n">filestore</span> <span class="o">=</span> <span class="n">couchish</span><span class="o">.</span><span class="n">filestore</span><span class="o">.</span><span class="n">CouchDBAttachmentSource</span><span class="p">(</span><span class="n">couchish_store</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;cdb&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">FileResource</span><span class="p">(</span><span class="n">filestores</span><span class="o">=</span><span class="p">[</span><span class="n">filestore</span><span class="p">,</span> <span class="n">tempfilestore</span><span class="p">])</span>
+<p>and a more complex example for images</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
+<span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;myImage&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">File</span><span class="p">())</span>
+<span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="s">&#39;form&#39;</span><span class="p">)</span>
+<span class="n">form</span><span class="p">[</span><span class="s">&#39;myImage&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">FileUpload</span><span class="p">(</span>
+                            <span class="n">filestore</span><span class="o">=</span><span class="n">CachedTempFilestore</span><span class="p">(),</span>
+                            <span class="n">show_image_thumbnail</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                            <span class="n">image_thumbnail_default</span><span class="o">=</span><span class="s">&#39;/images/nouploadyet.png&#39;</span><span class="p">,</span>
+                            <span class="n">show_download_link</span><span class="o">=</span><span class="bp">True</span>
+                            <span class="p">)</span>
+<span class="k">return</span> <span class="n">form</span>
 </pre></div>
 </div>
-<p>This looks a little more complicated, and is. This resource needs to serve files that are already in your application&#8217;s persistent storage (the filestore here) and also provide a way of accessing temporary files that have been uploaded as the form is being possibly posted repeatedly before finally succeeding. Don&#8217;t worry though, if you&#8217;re happy with using temporary file storage for a while, your resource could look like this</p>
+<p>To set up a file resource handler at /filehandler, you could use the following (if you are using restish). This example serves stored files from a couchdb store and has a cache for temporary files.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="nd">@resource</span><span class="o">.</span><span class="n">child</span><span class="p">()</span>
 <span class="k">def</span> <span class="nf">filehandler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">segments</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">FileResource</span><span class="p">()</span>
+    <span class="n">cdbfilestore</span> <span class="o">=</span> <span class="n">CouchDBAttachmentSource</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s">&#39;couchish&#39;</span><span class="p">])</span>
+    <span class="n">cache</span> <span class="o">=</span> <span class="n">CachedTempFilestore</span><span class="p">(</span><span class="n">FileSystemHeaderedFilestore</span><span class="p">(</span><span class="n">root_dir</span><span class="o">=</span><span class="s">&#39;cache&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">FileResource</span><span class="p">(</span><span class="n">filestores</span><span class="o">=</span><span class="n">cdbfilestore</span><span class="p">,</span><span class="n">cache</span><span class="o">=</span><span class="n">cache</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you only need to set up some temporary filestore for testing or are happy with this for deployment.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="nd">@resource</span><span class="o">.</span><span class="n">child</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">filehandler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">segments</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">fileresource</span><span class="o">.</span><span class="n">FileResource</span><span class="o">.</span><span class="n">quickstart</span><span class="p">(</span><span class="s">&#39;store&#39;</span><span class="p">,</span> <span class="s">&#39;cache&#39;</span><span class="p">),</span> <span class="n">segments</span><span class="p">[</span><span class="mf">1</span><span class="p">:]</span>
 </pre></div>
 </div>
 <p>Then at some point when you get your storage implemented, you could add your own custom fileaccessor.</p>
@@ -653,9 +697,6 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="modindex.html" title="Global Module Index"
-             accesskey="M">modules</a> |</li>
         <li class="right" >
           <a href="walkthrough.html" title="A Formish Walkthrough"
              accesskey="N">next</a> |</li>

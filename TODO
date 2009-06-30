@@ -9,15 +9,3 @@ Adding additional templating languages
 * Jinja would be a good start
 
 
-Widgets
--------
-
-* Select with other widget
-
-Tests
------
-
-* Add tests for checkedpassword widget
-
-
-
