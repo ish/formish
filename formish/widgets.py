@@ -54,7 +54,7 @@ class Widget(object):
     
     def __init__(self, **k):
         self.css_class = k.get('css_class', None)
-        self.empty = k.get('empty', None)
+        self.empty = k.get('empty',None)
         self.readonly = k.get('readonly',False)
         self.converter_options = k.get('converter_options', {})
         if not self.converter_options.has_key('delimiter'):
