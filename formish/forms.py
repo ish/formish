@@ -14,7 +14,7 @@ from formish import validation
 from formish import widgets
 from formish.renderer import _default_renderer
 
-NOARG = object()
+UNSET = object()
 
 def container_factory(parent_key, item_key):
     if item_key.isdigit():
@@ -586,8 +586,11 @@ class BoundWidget(object):
     
 
     def __init__(self, widget, field):
+        if hasattr(field.form,'empty'):
+            widget.empty = field.form.empty
         self.__dict__['widget'] = widget
         self.__dict__['field'] = field
+
      
 
     def __getattr__(self, name):
@@ -638,7 +641,9 @@ class Form(object):
     _request_data = None
 
     def __init__(self, structure, name=None, defaults=None, errors=None,
-                 action_url=None, renderer=None, method='POST', add_default_action=True, include_charset=True):
+                 action_url=None, renderer=None, method='POST',
+                 add_default_action=True, include_charset=True,
+                 empty=UNSET):
         """
         Create a new form instance
 
@@ -687,6 +692,8 @@ class Form(object):
         self.method = method
         self.widget = widgets.StructureDefault()
         self.include_charset = include_charset
+        if empty is not UNSET:
+            self.empty = empty
 
     def __repr__(self):
         attributes = []
@@ -903,12 +910,12 @@ class Form(object):
             raise KeyError('Cannot set data onto this attribute')
 
 
-    def get_item_data(self, key, name, default=NOARG):
+    def get_item_data(self, key, name, default=UNSET):
         """
         Access item data associates with a field key and an attribute name
         (e.g. title, widget, description')
         """
-        if default is NOARG:
+        if default is UNSET:
             data = self.item_data.get(key, {})[name]
         else:
             data = self.item_data.get(key, {}).get(name, default)
