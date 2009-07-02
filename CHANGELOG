@@ -2,6 +2,12 @@
 Changlelog
 ==========
 
+0.8a
+----
+
+BUGFIX: The request_data was not being set on the form as a dotted_dict post
+        0.8, hence deep sequences were not working correctly
+
 0.8
 ---
 

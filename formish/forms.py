@@ -773,7 +773,7 @@ class Form(object):
         """
         if self._request_data is not None:
             return dotted(self._request_data)
-        self._request_data = self.widget.to_request_data(self.structure, self._defaults)
+        self._request_data = dotted(self.widget.to_request_data(self.structure, self._defaults))
         return dotted(self._request_data)
 
 
@@ -784,7 +784,7 @@ class Form(object):
         :arg request_data: raw request data (e.g. request.POST)
         :type request_data: Dictionary (dotted or nested or dotted or MultiDict)
         """
-        self._request_data = request_data
+        self._request_data = dotted(request_data)
 
 
     request_data = property(_get_request_data, _set_request_data)
@@ -825,8 +825,8 @@ class Form(object):
 
         # Convert request data to a dottedish friendly representation
         request_data = _unflatten_request_data(request_data)
-        self._request_data = request_data
-        self._request_data = self.widget.pre_parse_incoming_request_data(self.structure,request_data)
+        self._request_data = dotted(request_data)
+        self._request_data = dotted(self.widget.pre_parse_incoming_request_data(self.structure,request_data))
 
     def _get_request(self):
         return self._request

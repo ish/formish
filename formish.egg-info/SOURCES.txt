@@ -23,6 +23,7 @@ docs-build/future.rst
 docs-build/index.rst
 docs-build/introduction.rst
 docs-build/modules.rst
+docs-build/recaptcha.rst
 docs-build/restish.rst
 docs-build/run
 docs-build/walkthrough.rst
@@ -93,6 +94,7 @@ docs/html/modindex.html
 docs/html/modules.html
 docs/html/objects.inv
 docs/html/output.txt
+docs/html/recaptcha.html
 docs/html/restish.html
 docs/html/search.html
 docs/html/searchindex.js
@@ -105,6 +107,7 @@ docs/html/_sources/future.txt
 docs/html/_sources/index.txt
 docs/html/_sources/introduction.txt
 docs/html/_sources/modules.txt
+docs/html/_sources/recaptcha.txt
 docs/html/_sources/restish.txt
 docs/html/_sources/walkthrough.txt
 docs/html/_static/basic.css
