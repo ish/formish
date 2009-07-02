@@ -62,7 +62,8 @@ BUGFIX: The request_data was not being set on the form as a dotted_dict post
    dottedish module should no longer be used.
 
  * Charset field can now be disabled. Names on action fields are optional. Form
-   name is optional.
+   name is optional (If you omit the name, it won't appear on the form element
+   or as a prefix for the other html elements).
 
  * A check_form_name keyword argument can be passed to the validate function to
    disable form name checking
