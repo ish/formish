@@ -635,7 +635,6 @@ class Form(object):
 
     renderer = _default_renderer
 
-    _element_name = None
     _name = None
 
     _request_data = None
@@ -706,18 +705,6 @@ class Form(object):
         if self.action_url:
             attributes.append('action_url=%r'%self.action_url)
         return 'formish.Form(%s)'%( ', '.join(attributes) )
-
-    def _element_name_get(self):
-        """ Set the element name """
-        return self._element_name
-
-    def _element_name_set(self, name):
-        """ Get the element name or raise an error """
-        if self._name is not None:
-            raise Exception("Named forms cannot be used as elements.")
-        self._element_name = name
-
-    element_name = property(_element_name_get, _element_name_set)
 
     def add_action(self, name=None, value=None, callback=None):
         """ 

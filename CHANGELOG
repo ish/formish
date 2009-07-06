@@ -2,6 +2,17 @@
 Changlelog
 ==========
 
+0.8d
+----
+
+ * Remove remains of restish element code
+
+0.8c
+----
+
+ * Added an empty attribute to the form to allow global backup setting for
+   widget empty value
+
 0.8a
 ----
 
