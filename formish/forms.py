@@ -631,7 +631,7 @@ class Form(object):
     render and validate data.
     """
 
-    SUPPORTED_METHODS = ['GET', 'POST']
+    SUPPORTED_METHODS = ['get', 'post']
 
     renderer = _default_renderer
 
@@ -640,7 +640,7 @@ class Form(object):
     _request_data = None
 
     def __init__(self, structure, name=None, defaults=None, errors=None,
-                 action_url=None, renderer=None, method='POST',
+                 action_url=None, renderer=None, method='post',
                  add_default_action=True, include_charset=True,
                  empty=UNSET):
         """
@@ -667,7 +667,7 @@ class Form(object):
         :arg method: Option method, default POST
         :type method: string
         """
-        if method.upper() not in self.SUPPORTED_METHODS:
+        if method.lower() not in self.SUPPORTED_METHODS:
             raise ValueError("method must be one of GET or POST")
         # allow a single schema items to be used on a form
         if not isinstance(structure, schemaish.Structure):
