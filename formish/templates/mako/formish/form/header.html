@@ -8,4 +8,4 @@ if form.name:
 else:
     id = ''
 %>
-<form ${id|n}action="${action_url}" class="formish-form" method="${form.method}" enctype="multipart/form-data" accept-charset="utf-8">
+<form ${id|n}action="${action_url}" class="formish-form" method="${form.method.lower()}" enctype="multipart/form-data" accept-charset="utf-8">
