@@ -2,6 +2,12 @@
 Changlelog
 ==========
 
+0.8e
+----
+
+BUGFIX: CheckboxMultiChoiceTree wasn't handling empty data
+BUGFIX: Form method names should be lower case in templates
+
 0.8d
 ----
 
