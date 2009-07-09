@@ -95,6 +95,12 @@ class FileResource(resource.Resource):
             # self.cache.delete(cache_filename, glob=True)
             return 
         width, height = get_size_from_dict(request.GET)
+        if request.GET.get('crop'):
+            crop = True
+            cropmark = '-crop'
+        else:
+            crop = False
+            cropmark = ''
         size= get_size_suffix(width, height)
 
         if not size:
@@ -106,7 +112,7 @@ class FileResource(resource.Resource):
                 return http.not_modified([('ETag', cache_tag)])
 
         try:
-            cache_filename = (filestore_name or '')+'_'+filename+size
+            cache_filename = (filestore_name or '')+'_'+filename+size+cropmark
             resized_cache_tag, headers, rf = self.cache.get(cache_filename, etag)
             content_type = dict(headers)['Content-Type']
             resize_needed = resized_cache_tag != cache_tag
@@ -123,7 +129,7 @@ class FileResource(resource.Resource):
                     content_type = dict(headers)['Content-Type']
                 except KeyError:
                     return 
-            rf = resize_image(f, (width, height), self.resize_quality)
+            rf = resize_image(f, (width, height), quality=self.resize_quality, crop=crop)
             f.close()
             self.cache.put(cache_filename, rf, cache_tag, [('Content-Type', content_type)])
             rf.seek(0)
@@ -141,7 +147,7 @@ class FileResource(resource.Resource):
 
 
 
-def resize_image(src_fh, size, quality=70):
+def resize_image(src_fh, size, quality=70, crop=False):
     """
     this is an example identify
     '/home/tim/Desktop/tim.jpg JPEG 48x48 48x48+0+0 DirectClass 8-bit 920b \n'
@@ -159,8 +165,14 @@ def resize_image(src_fh, size, quality=70):
         width = int(iwidth*(float(height)/float(iheight)))
     if height is None:
         height = int(iheight*(float(width)/float(iwidth)))
-    subprocess.call([CONVERT, '-thumbnail',
+
+    if crop:
+        subprocess.call([CONVERT, '-thumbnail',
+        '%sx%s^'% (width, height), '-crop','%sx%s+0+0'% (width, height),'-gravity','center', '-quality', str(quality), filename, resized_filename])
+    else:
+        subprocess.call([CONVERT, '-thumbnail',
         '%sx%s'% (width, height), '-quality', str(quality), filename, resized_filename])
+        
     return open(resized_filename,'rb')
 
 def get_size_suffix(width, height):

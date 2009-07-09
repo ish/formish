@@ -2,6 +2,11 @@
 Changlelog
 ==========
 
+0.8f
+----
+
+ * added 'crop' flag to the fileresource handler that instead of resizing to bounds, resizes to fill bounds and crops excess.
+
 0.8e
 ----
 
