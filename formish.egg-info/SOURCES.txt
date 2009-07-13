@@ -192,7 +192,6 @@ formish/templates/mako/formish/structure/error.html
 formish/templates/mako/formish/structure/fields.html
 formish/templates/mako/formish/structure/label.html
 formish/templates/mako/formish/structure/main.html
-formish/templates/mako/formish/structure/metadata.html
 formish/templates/mako/formish/widgets/Checkbox/widget.html
 formish/templates/mako/formish/widgets/CheckboxMultiChoice/readonly.html
 formish/templates/mako/formish/widgets/CheckboxMultiChoice/widget.html
@@ -271,7 +270,6 @@ formish/tests/testish/testish/public/images/nouploadyet.png
 formish/tests/testish/testish/public/js/formish.js
 formish/tests/testish/testish/public/js/jquery-1.2.6.min.js
 formish/tests/testish/testish/public/js/jquery-sortable.js
-formish/tests/testish/testish/public/js/jquery.base64.js
 formish/tests/testish/testish/resource/__init__.py
 formish/tests/testish/testish/resource/root.py
 formish/tests/testish/testish/templates/base.html

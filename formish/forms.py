@@ -490,14 +490,6 @@ class Collection(object):
         name = '%s/label'%widget_type
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
-         
-    def metadata(self):
-        """ returns the metadata """
-        widget_type, widget = self.widget.template.split('.')
-        renderer = self.form.renderer
-        name = '%s/metadata'%widget_type
-        vars = {'field':self}
-        return fall_back_renderer(renderer, name, widget, vars)
 
     def inputs(self):
         """ returns the templated widget """
@@ -571,6 +563,14 @@ class Sequence(Collection):
     @property
     def template(self):
         return self.bind('*', self.attr.attr)
+         
+    def metadata(self):
+        """ returns the metadata """
+        widget_type, widget = self.widget.template.split('.')
+        renderer = self.form.renderer
+        name = '%s/metadata'%widget_type
+        vars = {'field':self}
+        return fall_back_renderer(renderer, name, widget, vars)
             
 
 class BoundWidget(object):

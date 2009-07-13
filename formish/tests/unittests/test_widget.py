@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import base
 import unittest
 import formish
@@ -221,6 +222,13 @@ class TestSequenceDefault(base.TestCase):
         form = formish.Form(self._schema(),'form')
         form['seq'].widget = formish.SequenceDefault(min_start_fields=2)
         self.assertRaises(formish.FormError, form.validate, self.Request('form', [('seq.0.foo', ''), ('seq.1.foo', 'bar')]))
+
+    def test_unicode_in_template(self):
+        # Check that new item template encoding is ok with unicode characters.
+        schema = schemaish.Structure([('seq', schemaish.Sequence(schemaish.String()))])
+        form = formish.Form(schema)
+        form['seq.*'].widget = formish.SelectChoice(options=[('GBP', '£'.decode('utf-8'))])
+        form()
 
     def _schema(self):
         return schemaish.Structure([
