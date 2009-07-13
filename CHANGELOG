@@ -2,6 +2,12 @@
 Changlelog
 ==========
 
+0.8.1a
+------
+
+BUGFIX: Sequences were using base64 encoding to store new items. This wasn't handling unicode correctly. Changed to use urlencode decodeURIComponent. The JQuery base64 library is now not needed.
+BUGFIX: Structures were emitting metadata when they are only needed for sequences
+
 0.8.1
 -----
 
