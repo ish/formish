@@ -142,7 +142,7 @@ function renumber_sequences(o) {
 }
 
 function add_new_item(t,o) {
-    // Get the base64 encoded template
+    // Get the encoded template
     var code = t.next('.adder').val();
     // Find out how many fields we already have
     var l = count_previous_fields(t.next('.adder'));
@@ -155,8 +155,8 @@ function add_new_item(t,o) {
     segments[ segments.length -1 ] = l;
     var name = segments.join('.');
     var id = $(o).attr('id')+'-'+segments.join('-');
-    // Decode the base64
-    var html = $.base64Decode(code);
+    // Decode the template.
+    var html = decodeURIComponent(code);
     // Add the links and mousedowns to this generated code
     var h = $(html);
     create_addlinks(h);

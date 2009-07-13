@@ -1,16 +1,13 @@
 <%page args="field" />
 
 <%!
-def b64(text):
-    import base64
-    return base64.b64encode(text)
+from urllib import quote
 %>
 
-<%def name="fieldtemplate(f)" filter="b64, trim">
-  ${f()|n}
+<%def name="fieldtemplate(f)">
+  ${quote(f().encode('utf-8'))|n}
 </%def>
 
-
-% if field.type is 'sequence' and field.widget.addremove is True:
+% if field.widget.addremove is True:
    <input type="hidden" name="${field.template.name}" class="adder" value="${fieldtemplate(field.template)}" />
 % endif
