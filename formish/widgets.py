@@ -54,7 +54,7 @@ class Widget(object):
     
     def __init__(self, **k):
         self.css_class = k.get('css_class', None)
-        self.empty = k.get('empty', None)
+        self.empty = k.get('empty',None)
         self.readonly = k.get('readonly',False)
         self.converter_options = k.get('converter_options', {})
         if not self.converter_options.has_key('delimiter'):
@@ -1031,8 +1031,10 @@ class CheckboxMultiChoiceTree(Widget):
         self.options = options
         self.optiontree = mktree(options)
         Widget.__init__(self,css_class=css_class)
-            
+
     def to_request_data(self, field, data):
+        if data is None:
+            return []
         return [string_converter(field.attr.attr).from_type(d) for d in data]
     
     def from_request_data(self, field, request_data):

@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ReCAPTCHA and Formish Custom Widgets &amp;mdash; Formish v1 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+          URL_ROOT:    '',
+          VERSION:     '1',
+          COLLAPSE_MODINDEX: false,
+          FILE_SUFFIX: '.html'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="top" title="Formish v1 documentation" href="index.html" />
+    <link rel="prev" title="Core formish Modules" href="modules.html" /> 
+
+
+  <link media="screen" href="_static/css/screen.css" type="text/css" rel="stylesheet" />
+  <link media="screen" href="_static/css/images.css" type="text/css" rel="stylesheet" />
+  <link media="screen" href="_static/css/sIFR-screen.css" type="text/css" rel="stylesheet" />
+  <link media="print" href="_static/css/sIFR-print.css" type="text/css" rel="stylesheet" />  
+  <script type="text/javascript" src="_static/js/sifr.js" ></script>
+  <script type="text/javascript" src="_static/js/sifr-config.js" ></script> 
+  <script type="text/javascript" src="_static/js/sifr-debug.js" ></script> 
+
+  </head>
+  <body id="sphinx">
+    <div id="wrapper">
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modules.html" title="Core formish Modules"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Formish v1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div id="header">
+      <div id="logo"><img src="_static/images/logo/ish.io.png" /></div>
+      <div id="overview"><a href="http://ish.io/projects/show/formish">Overview</a></div>
+    </div>
+
+<div id="main">
+    <div  class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="recaptcha-and-formish-custom-widgets">
+<h1>ReCAPTCHA and Formish Custom Widgets<a class="headerlink" href="#recaptcha-and-formish-custom-widgets" title="Permalink to this headline">¶</a></h1>
+<p>Someone posted a comment in my last blog entry about &#8216;why another form library?&#8217; (as predicted I suppose). My personal opinion is that it&#8217;s about easy of use but that is a difficult thing to describe. So I thought I&#8217;d challenge myself to port a Tosca Widget widget to see what it would look like in formish. I decided to include the ReCAPTCHA widget to make it a little more interesting.</p>
+<p>First thing was to write the Widget python code which went roughly as follows. First we set up the widget header with some constants..</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">urllib</span><span class="o">,</span> <span class="nn">urllib2</span>
+<span class="kn">from</span> <span class="nn">validatish</span> <span class="kn">import</span> <span class="n">ConvertError</span>
+<span class="kn">from</span> <span class="nn">convertish.convert</span> <span class="kn">import</span> <span class="n">string_converter</span>
+
+<span class="k">class</span> <span class="nc">ReCAPTCHA</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">Input</span><span class="p">):</span>
+
+    <span class="n">template</span> <span class="o">=</span> <span class="s">&#39;field.ReCAPTCHA&#39;</span>
+
+    <span class="n">API_SSL_SERVER</span><span class="o">=</span><span class="s">&quot;https://api-secure.recaptcha.net&quot;</span>
+    <span class="n">API_SERVER</span><span class="o">=</span><span class="s">&quot;http://api.recaptcha.net&quot;</span>
+    <span class="n">VERIFY_SERVER</span><span class="o">=</span><span class="s">&quot;api-verify.recaptcha.net&quot;</span>
+    <span class="n">USER_AGENT</span> <span class="o">=</span> <span class="s">&quot;reCAPTCHA Formish&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">publickey</span><span class="p">,</span> <span class="n">privatekey</span><span class="p">,</span> <span class="n">environ</span><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_ssl</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;use_ssl&#39;</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>
+        <span class="n">widgets</span><span class="o">.</span><span class="n">Input</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">publickey</span> <span class="o">=</span> <span class="n">publickey</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">privatekey</span> <span class="o">=</span> <span class="n">privatekey</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">remoteip</span> <span class="o">=</span> <span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;REMOTE_ADDR&#39;</span><span class="p">,</span> <span class="s">&#39;127.0.0.1&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This was the easy bit.. next we need to add the recaptcha code..</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">from_request_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">&#39;in from &#39;</span><span class="p">,</span><span class="n">data</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="n">urllib</span><span class="o">.</span><span class="n">urlencode</span><span class="p">({</span>
+                    <span class="s">&#39;privatekey&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">privatekey</span><span class="p">,</span>
+                    <span class="s">&#39;remoteip&#39;</span> <span class="p">:</span>  <span class="bp">self</span><span class="o">.</span><span class="n">remoteip</span><span class="p">,</span>
+                    <span class="s">&#39;challenge&#39;</span><span class="p">:</span>  <span class="n">data</span><span class="p">[</span><span class="s">&#39;recaptcha_challenge_field&#39;</span><span class="p">][</span><span class="mf">0</span><span class="p">],</span>
+                    <span class="s">&#39;response&#39;</span> <span class="p">:</span>  <span class="n">data</span><span class="p">[</span><span class="s">&#39;recaptcha_response_field&#39;</span><span class="p">][</span><span class="mf">0</span><span class="p">],</span>
+                    <span class="p">})</span>
+    <span class="n">request</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">Request</span> <span class="p">(</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="s">&quot;http://</span><span class="si">%s</span><span class="s">/verify&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">VERIFY_SERVER</span><span class="p">,</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">params</span><span class="p">,</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&quot;Content-type&quot;</span><span class="p">:</span> <span class="s">&quot;application/x-www-form-urlencoded&quot;</span><span class="p">,</span>
+            <span class="s">&quot;User-agent&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">USER_AGENT</span>
+              <span class="p">}</span>
+        <span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="n">return_values</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">return_code</span> <span class="o">=</span> <span class="n">return_values</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">return_code</span> <span class="o">==</span> <span class="s">&quot;true&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">string_converter</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">to_type</span><span class="p">(</span><span class="s">&#39;True&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ConvertError</span><span class="p">(</span><span class="s">&#39;reCAPTCHA failed&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This code just prepares a request to make to the captcha server and reads the result. Now this would be it for the python code but unfortunately captcha widgets don&#8217;t let you define your own name for the fields. This is just what the <tt class="docutils literal"><span class="pre">pre_parse_request</span></tt> method is for. It lets you munge some code up front if needed. In this case we move the captcha data into the right request field names.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">pre_parse_incoming_request_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">request_data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; reCaptcha won&#39;t let you use your own field names so we move them &quot;&quot;&quot;</span>
+    <span class="n">full_request_data</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">request_data</span>
+    <span class="k">print</span> <span class="s">&#39;full_request_data&#39;</span><span class="p">,</span><span class="n">full_request_data</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s">&#39;recaptcha_challenge_field&#39;</span><span class="p">:</span> <span class="n">full_request_data</span><span class="p">[</span><span class="s">&#39;recaptcha_challenge_field&#39;</span><span class="p">],</span>
+            <span class="s">&#39;recaptcha_response_field&#39;</span><span class="p">:</span> <span class="n">full_request_data</span><span class="p">[</span><span class="s">&#39;recaptcha_response_field&#39;</span><span class="p">],}</span>
+</pre></div>
+</div>
+<p>Finally we need a template</p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="cp">&lt;%</span><span class="nb">page</span> <span class="na">args=</span><span class="s">&quot;field&quot;</span> <span class="cp">/&gt;</span><span class="x"></span>
+<span class="cp">&lt;%</span>
+<span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="s">&quot;k=</span><span class="si">%s</span><span class="s">&amp;amp;error=incorrect-captcha-sol&quot;</span><span class="o">%</span><span class="n">field</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">publickey</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="s">&quot;k=</span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="n">field</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">publickey</span>
+<span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">use_ssl</span><span class="p">:</span>
+    <span class="n">apiserver</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">API_SSL_SERVER</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">apiserver</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">widget</span><span class="o">.</span><span class="n">API_SERVER</span>
+<span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">&lt;script type=&quot;text/javascript&quot; src=&quot;</span><span class="cp">${</span><span class="n">apiserver</span><span class="cp">}</span><span class="x">/challenge?</span><span class="cp">${</span><span class="n">args</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x">&quot;&gt;&lt;/script&gt;</span>
+<span class="x">&lt;noscript&gt;</span>
+<span class="x">  &lt;iframe src=&quot;</span><span class="cp">${</span><span class="n">apiserver</span><span class="cp">}</span><span class="x">/noscript?</span><span class="cp">${</span><span class="n">args</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x">&quot; height=&quot;300&quot; width=&quot;500&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;&lt;br /&gt;</span>
+<span class="x">  &lt;textarea name=&quot;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="cp">}</span><span class="x">.recaptcha_challenge_field&quot; rows=&quot;3&quot; cols=&quot;40&quot;&gt;&lt;/textarea&gt;</span>
+<span class="x">  &lt;input type=&quot;hidden&quot; name=&quot;</span><span class="cp">${</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="cp">}</span><span class="x">.recaptcha_response_field&quot; value=&quot;manual_challenge&quot; /&gt;</span>
+<span class="x">&lt;/noscript&gt;</span>
+</pre></div>
+</div>
+<p>So the widget just works out if there is an error and prepares the appropriate args and also plans for ssl if needed.</p>
+<p>And using the widget is as simple as .. (ReCAPTCHA isn&#8217;t in the current release as I only wrote it tonight)</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">schemaish</span><span class="o">,</span> <span class="nn">formish</span>
+<span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
+<span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;recaptcha&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Boolean</span><span class="p">())</span>
+<span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="s">&#39;form&#39;</span><span class="p">)</span>
+<span class="n">publickey</span> <span class="o">=</span> <span class="s">&#39;6LcSqgQAAAAAAA1A6MJZXGpY35ZsdvwxvsEq0KQD&#39;</span>
+<span class="n">privatekey</span> <span class="o">=</span> <span class="s">&#39;6LcSqgQAA....................7ugn72Hi2va&#39;</span>
+<span class="n">form</span><span class="p">[</span><span class="s">&#39;recaptcha&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">ReCAPTCHA</span><span class="p">(</span><span class="n">publickey</span><span class="p">,</span> <span class="n">privatekey</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">environ</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Have a look at the widget in action at <a class="reference external" href="http://ish.io:8891/ReCAPTCHA">http://ish.io:8891/ReCAPTCHA</a> .</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="modules.html" title="previous chapter">Core formish Modules</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/recaptcha.txt">Show Source</a></li>
+            </ul>
+          <h3>Quick search</h3>
+            <form class="search" action="search.html" method="get">
+              <input type="text" name="q" size="18" /> <input type="submit" value="Go" />
+              <input type="hidden" name="check_keywords" value="yes" />
+              <input type="hidden" name="area" value="default" />
+            </form>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modules.html" title="Core formish Modules"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Formish v1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2008, Tim Parkin, Matt Goodall.
+    </div>
+  </div> 
+  </div>
+  </body>
+</html>

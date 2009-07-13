@@ -14,7 +14,7 @@ from formish import validation
 from formish import widgets
 from formish.renderer import _default_renderer
 
-NOARG = object()
+UNSET = object()
 
 def container_factory(parent_key, item_key):
     if item_key.isdigit():
@@ -33,9 +33,9 @@ class Action(object):
     """
     An action that that can added to a form.
 
-    :arg callback: A callable with the signature (request, form, *args)
     :arg name: an valid html id used to lookup an action
-    :arg label: The 'value' of the submit button and hence the text that people see
+    :arg value: The 'value' of the submit button and hence the text that people see
+    :arg callback: A callable with the signature (request, form, *args)
     """
     def __init__(self, name=None, value=None, callback=None):
         if name and not util.valid_identifier(name):
@@ -86,6 +86,12 @@ def starify(name):
 
 
 def fall_back_renderer(renderer, name, widget, vars):
+    """
+    Tries to find template in widget directly then tries in top level directory
+    
+    This allows a field level widget override it's container by including the
+    changed version in the widgets directory with the same name
+    """
     import mako
     try:
         return renderer('/formish/widgets/%s/%s.html'%(widget,name), vars)
@@ -159,7 +165,7 @@ class Field(object):
 
     @property
     def title(self):
-        """ The Field schema's title """
+        """ The Field schema's title - derived from name if not specified """
         try:
             return self.form.get_item_data(self.name,'title')
         except KeyError:
@@ -580,8 +586,11 @@ class BoundWidget(object):
     
 
     def __init__(self, widget, field):
+        if hasattr(field.form,'empty'):
+            widget.empty = field.form.empty
         self.__dict__['widget'] = widget
         self.__dict__['field'] = field
+
      
 
     def __getattr__(self, name):
@@ -610,8 +619,14 @@ class FormFieldsWrapper(ObjectWrapper):
         self.form = form
         ObjectWrapper.__init__(self, form.structure.fields)
 
-    def __call__(self):
-        return self.form.renderer('/formish/form/fields.html', {'form':self.form})
+    def keys(self):
+        keys = []
+        for f in self.form.fields:
+            keys.append(f.name)
+        return keys
+
+    def __call__(self,fields=None):
+        return self.form.renderer('/formish/form/fields.html', {'form':self.form,'fields':fields})
     
 
 class Form(object):
@@ -622,17 +637,18 @@ class Form(object):
     render and validate data.
     """
 
-    SUPPORTED_METHODS = ['GET', 'POST']
+    SUPPORTED_METHODS = ['get', 'post']
 
     renderer = _default_renderer
 
-    _element_name = None
     _name = None
 
     _request_data = None
 
     def __init__(self, structure, name=None, defaults=None, errors=None,
-                 action_url=None, renderer=None, method='POST', add_default_action=True, include_charset=True):
+                 action_url=None, renderer=None, method='post',
+                 add_default_action=True, include_charset=True,
+                 empty=UNSET):
         """
         Create a new form instance
 
@@ -657,7 +673,7 @@ class Form(object):
         :arg method: Option method, default POST
         :type method: string
         """
-        if method.upper() not in self.SUPPORTED_METHODS:
+        if method.lower() not in self.SUPPORTED_METHODS:
             raise ValueError("method must be one of GET or POST")
         # allow a single schema items to be used on a form
         if not isinstance(structure, schemaish.Structure):
@@ -681,6 +697,8 @@ class Form(object):
         self.method = method
         self.widget = widgets.StructureDefault()
         self.include_charset = include_charset
+        if empty is not UNSET:
+            self.empty = empty
 
     def __repr__(self):
         attributes = []
@@ -693,18 +711,6 @@ class Form(object):
         if self.action_url:
             attributes.append('action_url=%r'%self.action_url)
         return 'formish.Form(%s)'%( ', '.join(attributes) )
-
-    def _element_name_get(self):
-        """ Set the element name """
-        return self._element_name
-
-    def _element_name_set(self, name):
-        """ Get the element name or raise an error """
-        if self._name is not None:
-            raise Exception("Named forms cannot be used as elements.")
-        self._element_name = name
-
-    element_name = property(_element_name_get, _element_name_set)
 
     def add_action(self, name=None, value=None, callback=None):
         """ 
@@ -767,7 +773,7 @@ class Form(object):
         """
         if self._request_data is not None:
             return dotted(self._request_data)
-        self._request_data = self.widget.to_request_data(self.structure, self._defaults)
+        self._request_data = dotted(self.widget.to_request_data(self.structure, self._defaults))
         return dotted(self._request_data)
 
 
@@ -778,7 +784,7 @@ class Form(object):
         :arg request_data: raw request data (e.g. request.POST)
         :type request_data: Dictionary (dotted or nested or dotted or MultiDict)
         """
-        self._request_data = request_data
+        self._request_data = dotted(request_data)
 
 
     request_data = property(_get_request_data, _set_request_data)
@@ -819,8 +825,8 @@ class Form(object):
 
         # Convert request data to a dottedish friendly representation
         request_data = _unflatten_request_data(request_data)
-        self._request_data = request_data
-        self._request_data = self.widget.pre_parse_incoming_request_data(self.structure,request_data)
+        self._request_data = dotted(request_data)
+        self._request_data = dotted(self.widget.pre_parse_incoming_request_data(self.structure,request_data))
 
     def _get_request(self):
         return self._request
@@ -897,12 +903,12 @@ class Form(object):
             raise KeyError('Cannot set data onto this attribute')
 
 
-    def get_item_data(self, key, name, default=NOARG):
+    def get_item_data(self, key, name, default=UNSET):
         """
         Access item data associates with a field key and an attribute name
         (e.g. title, widget, description')
         """
-        if default is NOARG:
+        if default is UNSET:
             data = self.item_data.get(key, {})[name]
         else:
             data = self.item_data.get(key, {}).get(name, default)

@@ -5,14 +5,14 @@ function count_previous_fields(o) {
     return f;
   } else {
     return g;
-  };
-};   
+  }
+}   
    
 function create_addlinks(o) {
   o.find('.adder').each(function() {
     $(this).before('<a class="adderlink">Add</a>');
   });
-};
+}
 
 function get_sequence_numbers(segments, l) {
   var result = Array();
@@ -49,7 +49,7 @@ function construct(start_segments, n, remainder, divider, strip) {
   var remainder = remainder_bits.slice(1,remainder_bits.length-strip).join(divider);
   var result = Array();
   for(var i=0; i<start_segments.length; i++) {
-    segment = start_segments[i];
+    var segment = start_segments[i];
     if (segment != '') {
       result.push(segment);
     }
@@ -61,7 +61,7 @@ function construct(start_segments, n, remainder, divider, strip) {
       var out = result.join(divider);
   }
   return out
-};
+}
 
 function convert_id_to_name(s) {
   var segments=s.split('-');
@@ -109,7 +109,7 @@ function renumber_sequences(o) {
     var seqid = $(this).parent().attr('id');
     var seqid_prefix = seqid.substr(0,seqid.length-6);
     if (seqid_prefix != previous_seqid_prefix) {
-      n = 0;
+      var n = 0;
     } else {
       n=n+1;
     }    
@@ -150,7 +150,7 @@ function add_new_item(t,o) {
     var originalname = t.next('.adder').attr('name');
     var segments = originalname.split('.');
     // Get the numbers used in the originalname
-    seqnums = get_sequence_numbers(segments, l);
+    var seqnums = get_sequence_numbers(segments, l);
     var originalid = $(o).attr('id')+'-'+segments.join('-');
     segments[ segments.length -1 ] = l;
     var name = segments.join('.');
@@ -190,15 +190,15 @@ function add_new_item(t,o) {
 }
 
 function add_new_items(t,o) {
-   data = t.parent().parent().find('.formish-sequencedata').attr('title').split(',');
+   var data = t.parent().parent().find('.formish-sequencedata').attr('title').split(',');
    for (var i=0; i<data.length; i++) {
-       terms = data[i].split('=');
-       key = terms[0];
+       var terms = data[i].split('=');
+       var key = terms[0];
        if (key == 'batch_add_count') {
-         value = terms[1];
+         var value = terms[1];
          break;
        }
-   }; 
+   } 
    for (var i=0; i<value; i++) {
       add_new_item(t,o);
    }
@@ -206,7 +206,7 @@ function add_new_items(t,o) {
 
 function add_mousedown_to_addlinks(o) {
   o.find('.adderlink').mousedown(function() { add_new_items($(this),o)});
-};
+}
 
 function add_remove_buttons(o) {
   o.find('.addremove .remove').remove() 
@@ -219,7 +219,7 @@ function add_remove_buttons(o) {
         renumber_sequences($('form'));
         add_sortables($('form'));
       });
-    };
+    }
   });
   o.find('.addremove > fieldset > legend').each( function() {
     if ($(this).next().text() != 'delete') {
@@ -231,7 +231,7 @@ function add_remove_buttons(o) {
         add_sortables($('form'));
 
       });
-    };
+    }
   });
 }
 

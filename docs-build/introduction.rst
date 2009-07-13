@@ -541,33 +541,57 @@ The filestore uses a headered file format which is similar to an email format wi
 
 .. code-block:: python
 
-    class CachedTempFilestore(FileSystemHeaderedFilestore):
+    class FileSystemHeaderedFilestore(object):
+        """
+        A general purpose readable and writable file store useful for storing data
+        along with additional metadata (simple key-value pairs).
 
-        def __init__(self, root_dir=None, name=None):
-            if root_dir is None:
-                self._root_dir = tempfile.gettempdir()
-            else:
-                self._root_dir = root_dir
-            if name is None:
-                self.name = ''
-            else:
-                self.name = name
+        This can be used to implement temporary file stores, local caches, etc.
+        XXX file ownership?
+        """
+
+        def __init__(self, root_dir, mode=0660):
+            """
+            Create a new storage space.
+
+            :arg root_dir: directory for stored files to be written to.
+            :arg mode: initial mode of created files, defaults to 0660. See os.open
+                       for details.
+            """
+            self._root_dir = root_dir
+            self._mode = mode
+
+    class CachedTempFilestore(object):
+
+        def __init__(self, backend=None):
+            if backend is None:
+                backend = FileSystemHeaderedFilestore(tempfile.gettempdir())
+            self.backend = backend
 
         def get(self, key, cache_tag=None):
-            headers, f = FileSystemHeaderedFilestore.get(self, key)
-            headers = dict(headers)
-            if not cache_tag and headers['Cache-Tag'] == cache_tag:
-                f.close()
-                return (headers['Cache-Tag'], None, None)
-            return (headers['Cache-Tag'],headers['Content-Type'], f)
+            """
+            Get the file stored for the given key.
 
+            :arg key: unique key that identifies the file.
+            :arg cache_tag: opaque value that is used to validate cache freshness
+                            (similar to an HTTP etag).
+            :returns: tuple of (header, f) where headers is a list of (name, value)
+                      pairs and f is a readable file-like object. f will be None if
+                      the cache_tag was valid. f must be closed by the caller.
+            :raises KeyError: not found
+            """
 
-        def put(self, key, src, cache_tag, content_type, headers=None):
-            if headers is None:
-                headers = {}
-            headers['Cache-Tag'] = cache_tag
-            headers['Content-Type'] = content_type
-            FileSystemHeaderedFilestore.put(self, key, headers, src)
+        def put(self, key, src, cache_tag, headers=None):
+            """
+            Add a file to the store, overwriting an existing file with the same key.
+
+            :arg key: unique key that identifies the file.
+            :arg cache_tag: opaque value that is later used to validate cache
+                            freshness (similar to an HTTP etag).
+            :arg headers: list of (name, value) pairs that will be associated with
+                          the file.
+            :arg src: readable file-like object
+            """
 
 
 
@@ -580,6 +604,8 @@ So here is a simple FileUpload widget
 
 .. code-block:: python
 
+    from formish import filestore
+
     schema = schemaish.Structure()
     schema.add( 'myFile', schemaish.File() )
 
@@ -590,26 +616,50 @@ So here is a simple FileUpload widget
                                show_image_thumbnail=True
                                )
 
+    schema = schemaish.Structure()
+    schema.add('myFile', schemaish.File())
+    form = formish.Form(schema, 'form')
+    form['myFile'].widget = formish.FileUpload(
+                                filestore=CachedTempFilestore()
+                                )
+    return form
+
+
+and a more complex example for images
+
+.. code-block:: python
+
+    schema = schemaish.Structure()
+    schema.add('myImage', schemaish.File())
+    form = formish.Form(schema, 'form')
+    form['myImage'].widget = formish.FileUpload(
+                                filestore=CachedTempFilestore(),
+                                show_image_thumbnail=True,
+                                image_thumbnail_default='/images/nouploadyet.png',
+                                show_download_link=True
+                                )
+    return form
+
     
 
 
-To set up a file resource handler at /filehandler, you could use the following (if you are using restish)
+To set up a file resource handler at /filehandler, you could use the following (if you are using restish). This example serves stored files from a couchdb store and has a cache for temporary files.
 
 .. code-block:: python
 
     @resource.child()
     def filehandler(self, request, segments):
-        tempfilestore = formish.filestore.CachedTempFilestore(name='tmp')
-        filestore = couchish.filestore.CouchDBAttachmentSource(couchish_store,name='cdb')
-        return FileResource(filestores=[filestore, tempfilestore])
+        cdbfilestore = CouchDBAttachmentSource(request.environ['couchish'])
+        cache = CachedTempFilestore(FileSystemHeaderedFilestore(root_dir='cache'))
+        return FileResource(filestores=cdbfilestore,cache=cache)
 
-This looks a little more complicated, and is. This resource needs to serve files that are already in your application's persistent storage (the filestore here) and also provide a way of accessing temporary files that have been uploaded as the form is being possibly posted repeatedly before finally succeeding. Don't worry though, if you're happy with using temporary file storage for a while, your resource could look like this
+If you only need to set up some temporary filestore for testing or are happy with this for deployment. 
 
 .. code-block:: python
 
     @resource.child()
     def filehandler(self, request, segments):
-        return FileResource()
+        return fileresource.FileResource.quickstart('store', 'cache'), segments[1:]
 
 Then at some point when you get your storage implemented, you could add your own custom fileaccessor. 
 
