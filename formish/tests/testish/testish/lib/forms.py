@@ -1640,3 +1640,33 @@ ${form.footer()|n}
 
     """
 
+def form_CustomisedFormLayoutFields(request):
+    """
+    Allow the emission of parts of a form schema using field names.
+    """
+    schema = schemaish.Structure()
+    schema.add( 'firstName', schemaish.String())
+    schema.add( 'surname', schemaish.String())
+    schema.add( 'age', schemaish.Integer())
+    schema.add( 'sex', schemaish.String())
+
+    form = formish.Form(schema, 'form')
+
+    return form
+
+
+def template_CustomisedFormLayoutFields(request):
+    """
+${form.header()|n}
+${form.metadata()|n}
+
+${form.fields(form.fields.keys()[:1])|n}
+<div id="special">
+${form.fields(['surname'])|n}
+</div>
+${form.fields(form.fields.keys()[2:])|n}
+
+${form.actions()|n}
+${form.footer()|n}
+
+    """

@@ -1,3 +1,9 @@
+%if fields is not None:
+%for f in fields:
+${form[f]()|n}
+%endfor
+%else:
 %for f in form.fields:
 ${f()|n}
 %endfor
+%endif
