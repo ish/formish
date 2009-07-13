@@ -2,6 +2,11 @@
 Changlelog
 ==========
 
+0.8.1
+-----
+
+ * Add the ability to emit form fields using field names which will alow emission of 'slices' of form fields.
+
 0.8f
 ----
 

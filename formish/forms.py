@@ -619,8 +619,14 @@ class FormFieldsWrapper(ObjectWrapper):
         self.form = form
         ObjectWrapper.__init__(self, form.structure.fields)
 
-    def __call__(self):
-        return self.form.renderer('/formish/form/fields.html', {'form':self.form})
+    def keys(self):
+        keys = []
+        for f in self.form.fields:
+            keys.append(f.name)
+        return keys
+
+    def __call__(self,fields=None):
+        return self.form.renderer('/formish/form/fields.html', {'form':self.form,'fields':fields})
     
 
 class Form(object):
