@@ -2,6 +2,11 @@
 Changlelog
 ==========
 
+0.8.1b
+------
+
+ * changed behaviour of enctype so that multi-part is only used if there is a file upload on the form
+
 0.8.1a
 ------
 

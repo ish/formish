@@ -449,6 +449,15 @@ class Collection(object):
         """
         return CollectionFieldsWrapper(self)
 
+    @property
+    def allfields(self):
+        fields = []
+        for field in self.fields:
+            if hasattr(field,'allfields'):
+                fields.extend( field.allfields )
+            else:
+                fields.append(field)
+        return fields
 
     def bind(self, attr_name, attr):
         """ 
@@ -942,6 +951,26 @@ class Form(object):
         """
         return FormFieldsWrapper(self)
 
+    def _has_upload_fields(self):
+        for f in self.allfields:
+            if isinstance(f.attr, schemaish.File):
+                return True
+        return False
+
+    @property
+    def allfields(self):
+        """
+        Return a generator that yields all of the fields at the top level of
+        the form (e.g. if a field is a subsection or sequence, it will be up to
+        the application to iterate that field's fields.
+        """
+        fields = []
+        for field in self.fields:
+            if hasattr(field,'allfields'):
+                fields.extend( field.allfields )
+            else:
+                fields.append(field)
+        return fields
 
 
     def get_field(self, name):

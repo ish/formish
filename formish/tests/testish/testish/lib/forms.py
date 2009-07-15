@@ -1267,6 +1267,23 @@ def form_UploadStructure(request):
     form['myStruct.a'].widget = formish.FileUpload(filestore=CachedTempFilestore())
     return form
 
+def form_NestedStructures(request):
+    """
+    Allow the emission of parts of a form schema using field names.
+    """
+    schema = schemaish.Structure()
+    schema.add( 'a', schemaish.String())
+    schema.add( 'b', schemaish.String())
+
+    sub_schema = schemaish.Structure()
+    sub_schema.add('x',schemaish.String())
+
+    schema.add('c', sub_schema)
+
+
+    form = formish.Form(schema, 'form')
+
+    return form
 
 
 #########################
