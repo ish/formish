@@ -2,6 +2,11 @@
 Changlelog
 ==========
 
+0.8.1c
+------
+
+BUGFIX: Enctype wasn't being encoded correctly hence file uploads didn't work
+
 0.8.1b
 ------
 
