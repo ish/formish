@@ -45,7 +45,7 @@ function replace_stars(original, nums, divider) {
   return result.join(divider);
 }
 
-function construct(start_segments, n, remainder, divider, strip, formid) {
+function construct(start_segments, n, remainder, divider, strip) {
   var remainder_bits = remainder.split(divider);
   var remainder = remainder_bits.slice(0,remainder_bits.length-strip).join(divider);
   var result = Array();
@@ -61,17 +61,17 @@ function construct(start_segments, n, remainder, divider, strip, formid) {
   } else {
       var out = result.join(divider);
   }
+  return out
+}
+
+function convert_id_to_name(s, formid) {
+  var segments=s.split('-');
+  var out = segments.join('.');
   if (formid == undefined) {
       return out;
   } else {
-      return out.substr(formid.length);
+      return out.substr(formid.length+1);
   }
-}
-
-function convert_id_to_name(s) {
-  var segments=s.split('-');
-  var out = segments.join('.');
-  return out
 }
 
 function renumber_sequences(o) {
@@ -84,7 +84,7 @@ function renumber_sequences(o) {
     if (seqid_prefix != previous_seqid_prefix) {
       N[seqid_prefix] = 0;
     } else {
-      N[seqid_prefix]=n[seqid_prefix]+1;
+      N[seqid_prefix]=N[seqid_prefix]+1;
     }    
     n = N[seqid_prefix];
     // replace id occurences
@@ -105,10 +105,10 @@ function renumber_sequences(o) {
       $(this).attr('id', construct(seqid_prefix.split('-'),n,name_remainder,'-', 1));
     });
     // replace 'name' occurences
-    $(this).find("[name^='"+convert_id_to_name(seqid_prefix)+"']").each( function () {
+    $(this).find("[name^='"+convert_id_to_name(seqid_prefix, formid)+"']").each( function () {
       var name = $(this).attr('name');
       var name_remainder = name.substring(convert_id_to_name(seqid_prefix).length, name.length);
-      $(this).attr('name', construct(convert_id_to_name(seqid_prefix).split('.'),n,name_remainder,'.', 1, formid));
+      $(this).attr('name', construct(convert_id_to_name(seqid_prefix, formid).split('.'),n,name_remainder,'.', 1));
     });
     previous_seqid_prefix = seqid_prefix;
   });
@@ -118,7 +118,7 @@ function renumber_sequences(o) {
     if (seqid_prefix != previous_seqid_prefix) {
       N[seqid_prefix] = 0;
     } else {
-      N[seqid_prefix]=n[seqid_prefix]+1;
+      N[seqid_prefix]=N[seqid_prefix]+1;
     }    
     n = N[seqid_prefix];
     // replace id occurences
@@ -139,10 +139,10 @@ function renumber_sequences(o) {
       $(this).attr('id', construct(seqid_prefix.split('-'),n,name_remainder,'-', 0));
     });
     // replace 'name' occurences
-    $(this).find("[name^='"+convert_id_to_name(seqid_prefix)+"']").each( function () {
+    $(this).find("[name^='"+convert_id_to_name(seqid_prefix, formid)+"']").each( function () {
       var name = $(this).attr('name');
-      var name_remainder = name.substring(convert_id_to_name(seqid_prefix).length, name.length);
-      $(this).attr('name', construct(convert_id_to_name(seqid_prefix).split('.'),n,name_remainder,'.',0, formid));
+      var name_remainder = name.substring(convert_id_to_name(seqid_prefix, formid).length, name.length);
+      $(this).attr('name', construct(convert_id_to_name(seqid_prefix, formid).split('.'),n,name_remainder,'.',0));
     });
     previous_seqid_prefix = seqid_prefix;
   });
