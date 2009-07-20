@@ -18,6 +18,7 @@ function get_sequence_numbers(segments, l) {
   var result = Array();
   for(var i=0; i<segments.length; i++) {
     if (isNaN(parseInt(segments[i])) == false) {
+      var segment = segments[i];
       result.push(segment);
     }
   }
@@ -44,9 +45,9 @@ function replace_stars(original, nums, divider) {
   return result.join(divider);
 }
 
-function construct(start_segments, n, remainder, divider, strip) {
+function construct(start_segments, n, remainder, divider, strip, formid) {
   var remainder_bits = remainder.split(divider);
-  var remainder = remainder_bits.slice(1,remainder_bits.length-strip).join(divider);
+  var remainder = remainder_bits.slice(0,remainder_bits.length-strip).join(divider);
   var result = Array();
   for(var i=0; i<start_segments.length; i++) {
     var segment = start_segments[i];
@@ -60,26 +61,32 @@ function construct(start_segments, n, remainder, divider, strip) {
   } else {
       var out = result.join(divider);
   }
-  return out
+  if (formid == undefined) {
+      return out;
+  } else {
+      return out.substr(formid.length);
+  }
 }
 
 function convert_id_to_name(s) {
   var segments=s.split('-');
-  var out = segments.slice(1,segments.length).join('.');
+  var out = segments.join('.');
   return out
 }
 
 function renumber_sequences(o) {
-  var n = 0;
+  var formid = $(o).closest('form').attr('id');
+  var N = {};
   var previous_seqid_prefix = '';
   o.find('.type-sequence.widget-sequencedefault > div').each( function () {
     var seqid = $(this).parent().attr('id');
     var seqid_prefix = seqid.substr(0,seqid.length-6);
     if (seqid_prefix != previous_seqid_prefix) {
-      n = 0;
+      N[seqid_prefix] = 0;
     } else {
-      n=n+1;
+      N[seqid_prefix]=n[seqid_prefix]+1;
     }    
+    n = N[seqid_prefix];
     // replace id occurences
     var thisid = $(this).attr('id');
     var newid = seqid_prefix + n + '--field';
@@ -101,7 +108,7 @@ function renumber_sequences(o) {
     $(this).find("[name^='"+convert_id_to_name(seqid_prefix)+"']").each( function () {
       var name = $(this).attr('name');
       var name_remainder = name.substring(convert_id_to_name(seqid_prefix).length, name.length);
-      $(this).attr('name', construct(convert_id_to_name(seqid_prefix).split('.'),n,name_remainder,'.', 1));
+      $(this).attr('name', construct(convert_id_to_name(seqid_prefix).split('.'),n,name_remainder,'.', 1, formid));
     });
     previous_seqid_prefix = seqid_prefix;
   });
@@ -109,10 +116,11 @@ function renumber_sequences(o) {
     var seqid = $(this).parent().attr('id');
     var seqid_prefix = seqid.substr(0,seqid.length-6);
     if (seqid_prefix != previous_seqid_prefix) {
-      var n = 0;
+      N[seqid_prefix] = 0;
     } else {
-      n=n+1;
+      N[seqid_prefix]=n[seqid_prefix]+1;
     }    
+    n = N[seqid_prefix];
     // replace id occurences
     var thisid = $(this).attr('id');
     //$(this).find('> legend').text(n);
@@ -134,7 +142,7 @@ function renumber_sequences(o) {
     $(this).find("[name^='"+convert_id_to_name(seqid_prefix)+"']").each( function () {
       var name = $(this).attr('name');
       var name_remainder = name.substring(convert_id_to_name(seqid_prefix).length, name.length);
-      $(this).attr('name', construct(convert_id_to_name(seqid_prefix).split('.'),n,name_remainder,'.',0));
+      $(this).attr('name', construct(convert_id_to_name(seqid_prefix).split('.'),n,name_remainder,'.',0, formid));
     });
     previous_seqid_prefix = seqid_prefix;
   });

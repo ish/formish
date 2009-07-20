@@ -1291,6 +1291,16 @@ def form_NestedStructures(request):
 #   Sequences
 #
 
+def form_SequenceOfStringsWithoutFormName(request):
+    """
+    A sequence with some defaults
+    """
+    schema = schemaish.Structure()
+    schema.add( 'myList', schemaish.Sequence( schemaish.String() ))
+
+    form = formish.Form(schema)
+    return form
+
 def form_SequenceOfStringsWithSequenceWidgetOptions(request):
     """
     A sequence with some defaults
@@ -1465,6 +1475,16 @@ def form_SequenceOfStructuresGridWidget(request):
     form.defaults = {'rows': [{'a':True,'b':'2'},{'a':False,'b':'4'},{'a':False,'b':'6'}]}
     return form
 
+def form_SequenceOfSequences(request):
+    """
+    A structure witin a sequence, should be enhanced with javascript
+    """
+
+    schema = schemaish.Structure()
+    schema.add( 'myList', schemaish.Sequence( schemaish.Sequence( schemaish.String() ) ))
+
+    form = formish.Form(schema, 'form')
+    return form
 
 def form_GranularFormLayout(request):
     """
