@@ -1,5 +1,5 @@
 ProxyTypes >= 0.9
-schemaish >= 0.5.3
+schemaish >= 0.5.4b
 validatish >= 0.6
 convertish >= 0.5.4a
 dottedish>=0.6
