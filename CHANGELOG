@@ -2,6 +2,13 @@
 Changlelog
 ==========
 
+0.8.2
+-----
+
+ * Rewritten formish javascript for sequences to use class name hooks instead of relative paths. Add SequenceOfSequence support
+
+BUGFIX: Sequence of Sequence javascript manipulation did not work correctly at all. 
+
 0.8.1c
 ------
 

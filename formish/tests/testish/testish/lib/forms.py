@@ -1291,6 +1291,29 @@ def form_NestedStructures(request):
 #   Sequences
 #
 
+def form_SequenceOfStrings(request):
+    """
+    A sequence with some defaults
+    """
+    schema = schemaish.Structure()
+    schema.add( 'myList', schemaish.Sequence( schemaish.String() ))
+
+    form = formish.Form(schema,'formname')
+    return form
+
+def functest_SequenceOfStrings(self):
+    sel = self.selenium
+    sel.open("/SequenceOfStrings")
+    sel.click_at("css=#formname-myList--field > a", "")
+    self.assertEqual("", sel.get_value("formname-myList-0"))
+    self.assertEqual("", sel.get_value("formname-myList-1"))
+    sel.click_at("css=#formname-myList--field > a", "")
+    self.assertEqual("", sel.get_value("formname-myList-2"))
+    sel.click_at("css=#formname-myList-0--field .remove", "")
+    self.assertEqual("", sel.get_value("formname-myList-0"))
+    self.assertEqual("", sel.get_value("formname-myList-1"))
+    self.assertEqual(False, sel.is_element_present("css=#formname-myList-2"))
+    
 def form_SequenceOfStringsWithoutFormName(request):
     """
     A sequence with some defaults
@@ -1301,16 +1324,18 @@ def form_SequenceOfStringsWithoutFormName(request):
     form = formish.Form(schema)
     return form
 
-def form_SequenceOfStringsWithSequenceWidgetOptions(request):
-    """
-    A sequence with some defaults
-    """
-    schema = schemaish.Structure()
-    schema.add( 'myList', schemaish.Sequence( schemaish.String() ))
-
-    form = formish.Form(schema, 'form')
-    form['myList'].widget = formish.SequenceDefault(min_start_fields=1,min_empty_start_fields=0, batch_add_count=5)
-    return form
+def functest_SequenceOfStringsWithoutFormName(self):
+    sel = self.selenium
+    sel.open("/SequenceOfStringsWithoutFormName")
+    sel.click_at("css=#myList--field > a", "")
+    self.assertEqual("", sel.get_value("myList-0"))
+    self.assertEqual("", sel.get_value("myList-1"))
+    sel.click_at("css=#myList--field > a", "")
+    self.assertEqual("", sel.get_value("myList-2"))
+    sel.click_at("css=#myList-0--field .remove", "")
+    self.assertEqual("", sel.get_value("myList-0"))
+    self.assertEqual("", sel.get_value("myList-1"))
+    self.assertEqual(False, sel.is_element_present("css=#myList-2"))
 
 def form_SequenceOfSimpleStructures(request):
     """
@@ -1326,6 +1351,94 @@ def form_SequenceOfSimpleStructures(request):
     form = formish.Form(schema, 'form')
     form['myList'].widget = formish.SequenceDefault()
     return form
+
+def functest_SequenceOfSimpleStructures(self):
+    sel = self.selenium
+    sel.open("/SequenceOfSimpleStructures")
+    sel.type("form-myList-0-a", "form-myList-0-a")
+    self.assertEqual("form-myList-0-a", sel.get_value("form-myList-0-a"))
+    self.assertEqual("", sel.get_value("form-myList-0-b"))
+
+    sel.click_at("css=#form-myList--field > a", "")
+
+    sel.type("form-myList-1-a", "form-myList-1-a")
+    self.assertEqual("form-myList-1-a", sel.get_value("form-myList-1-a"))
+    self.assertEqual("", sel.get_value("form-myList-1-b"))
+
+    sel.click_at("css=#form-myList--field > a", "")
+    
+    sel.type("form-myList-2-a", "form-myList-2-a")
+    self.assertEqual("form-myList-2-a", sel.get_value("form-myList-2-a"))
+    self.assertEqual("", sel.get_value("form-myList-2-b"))
+
+    sel.mouse_down_at("css=#form-myList-1--field .remove", "")
+    sel.mouse_up('body')
+
+    self.assertEqual("form-myList-0-a", sel.get_value("form-myList-0-a"))
+    self.assertEqual("form-myList-2-a", sel.get_value("form-myList-1-a"))
+    self.assertEqual("", sel.get_value("form-myList-1-b"))
+    self.assertEqual(False, sel.is_element_present("css=#form-myList-2"))
+
+
+
+def form_SequenceOfSequences(request):
+    """
+    A structure witin a sequence, should be enhanced with javascript
+    """
+
+    schema = schemaish.Structure()
+    schema.add( 'myList', schemaish.Sequence( schemaish.Sequence( schemaish.String() ) ))
+
+    form = formish.Form(schema, 'form')
+    return form
+
+def functest_SequenceOfSequences(self):
+
+    sel = self.selenium
+    sel.open("/SequenceOfSequences")
+    sel.type("form-myList-0-0", "form-myList-0-0")
+    self.assertEqual("form-myList-0-0", sel.get_value("form-myList-0-0"))
+
+    sel.click_at("css=#form-myList-0--field > a", "")
+
+    sel.type("form-myList-0-1", "form-myList-0-1")
+    self.assertEqual("form-myList-0-0", sel.get_value("form-myList-0-0"))
+    self.assertEqual("form-myList-0-1", sel.get_value("form-myList-0-1"))
+
+    sel.click_at("css=#form-myList--field > a", "")
+    sel.click_at("css=#form-myList-1--field > a", "")
+    
+    sel.type("form-myList-1-0", "form-myList-1-0")
+    self.assertEqual("form-myList-0-0", sel.get_value("form-myList-0-0"))
+    self.assertEqual("form-myList-0-1", sel.get_value("form-myList-0-1"))
+    self.assertEqual("form-myList-1-0", sel.get_value("form-myList-1-0"))
+
+    sel.click_at("css=#form-myList-0--field > a", "")
+
+    sel.type("form-myList-0-2", "form-myList-0-2")
+    self.assertEqual("form-myList-0-0", sel.get_value("form-myList-0-0"))
+    self.assertEqual("form-myList-0-1", sel.get_value("form-myList-0-1"))
+    self.assertEqual("form-myList-0-2", sel.get_value("form-myList-0-2"))
+    self.assertEqual("form-myList-1-0", sel.get_value("form-myList-1-0"))
+
+    sel.mouse_down_at("css=#form-myList-0-1--field .remove", "")
+    self.assertEqual("form-myList-0-0", sel.get_value("form-myList-0-0"))
+    self.assertEqual("form-myList-0-2", sel.get_value("form-myList-0-1"))
+    self.assertEqual(False, sel.is_element_present("css=#form-myList-0-2"))
+    self.assertEqual("form-myList-1-0", sel.get_value("form-myList-1-0"))
+
+
+def form_SequenceOfStringsWithSequenceWidgetOptions(request):
+    """
+    A sequence with some defaults
+    """
+    schema = schemaish.Structure()
+    schema.add( 'myList', schemaish.Sequence( schemaish.String() ))
+
+    form = formish.Form(schema, 'form')
+    form['myList'].widget = formish.SequenceDefault(min_start_fields=1,min_empty_start_fields=0, batch_add_count=5)
+    return form
+
   
 def form_SequenceOfUploadStructures(request):
     """
@@ -1475,16 +1588,6 @@ def form_SequenceOfStructuresGridWidget(request):
     form.defaults = {'rows': [{'a':True,'b':'2'},{'a':False,'b':'4'},{'a':False,'b':'6'}]}
     return form
 
-def form_SequenceOfSequences(request):
-    """
-    A structure witin a sequence, should be enhanced with javascript
-    """
-
-    schema = schemaish.Structure()
-    schema.add( 'myList', schemaish.Sequence( schemaish.Sequence( schemaish.String() ) ))
-
-    form = formish.Form(schema, 'form')
-    return form
 
 def form_GranularFormLayout(request):
     """

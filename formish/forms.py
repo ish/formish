@@ -9,12 +9,26 @@ from webob import UnicodeMultiDict
 
 import schemaish, validatish
 from formish import util
-from dottedish import dotted, unflatten, set
+from dottedish import dotted, unflatten, set as dottedish_set
 from formish import validation
 from formish import widgets
 from formish.renderer import _default_renderer
 
 UNSET = object()
+
+
+def mroattrs(cls, attr):
+    """
+    Yield the values of class attributes that were changed according to the
+    class hierarchy starting with and including the given class, ordered by
+    specificity (i.e. deepest first).
+    """
+    seen = set()
+    for cls in cls.__mro__:
+        value = getattr(cls, attr, None)
+        if value and value not in seen:
+            yield value
+            seen.add(value)
 
 def container_factory(parent_key, item_key):
     if item_key.isdigit():
@@ -54,12 +68,13 @@ def _cssname(self):
 
 def _classes(self):
     """ Works out a list of classes that should be applied to the field """
-    classes = [
-        'field',
-        re.sub('[0-9\*]+','n',_cssname(self)),
-        'type-%s'%self.attr.type.lower(),
-        ]
-    classes.append('widget-%s'%self.widget.type.lower())
+    schema_types = mroattrs(self.attr.__class__,'type')
+    widget_types = mroattrs(self.widget.widget.__class__,'type')
+    classes = ['field',re.sub('[0-9\*]+','n',_cssname(self))]
+    for t in schema_types:
+        classes.append('type-%s'%t.lower())
+    for t in widget_types:
+        classes.append('widget-%s'%t.lower())
     if self.required:
         classes.append('required')
     if self.widget.css_class is not None:
@@ -269,6 +284,34 @@ class Field(object):
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
     
+    def seqdelete(self):
+        widget_type, widget = self.widget.template.split('.')
+        """ creates a seq delete hook if this is an item in a updateable sequence """
+        parentkey = '.'.join(self.name.split('.')[:-1])
+        if not parentkey:
+            return ''
+        parent = self.form.get_field(parentkey)
+        if getattr(parent.widget,'addremove',False) == False:
+            return ''
+        renderer = self.form.renderer
+        name = 'field/seqdelete'
+        vars = {'field':self}
+        return fall_back_renderer(renderer, name, widget, vars)
+    
+    def seqgrab(self):
+        widget_type, widget = self.widget.template.split('.')
+        """ creates a seq grab hook if this is an item in a updateable sequence """
+        parentkey = '.'.join(self.name.split('.')[:-1])
+        if not parentkey:
+            return ''
+        parent = self.form.get_field(parentkey)
+        if getattr(parent.widget,'sortable',False) == False:
+            return ''
+        renderer = self.form.renderer
+        name = 'field/seqgrab'
+        vars = {'field':self}
+        return fall_back_renderer(renderer, name, widget, vars)
+    
     def inputs(self):
         """ returns the templated widget """
         widget_type, widget = self.widget.template.split('.')
@@ -407,7 +450,11 @@ class Collection(object):
         """ return the fields widget bound with extra params. """
         
         try:
-            widget_type = BoundWidget(self.form.get_item_data(starify(self.name),'widget'),self)
+            w = self.form.get_item_data(starify(self.name),'widget')
+            if not isinstance(w, BoundWidget):
+                widget_type = BoundWidget(self.form.get_item_data(starify(self.name),'widget'),self)
+            else:
+                widget_type = w
         except KeyError:
             if self.type == 'group':
                 widget_type = BoundWidget(widgets.StructureDefault(),self)
@@ -417,14 +464,21 @@ class Collection(object):
         return widget_type
 
 
-    def get_field(self, segments):
+    def get_field(self, name):
         """ recursively get dotted field names """
+        segments = name.split('.')
         for field in self.fields:
+            if segments[0] == '*':
+                b = field.bind('*',field.attr)
+                if len(segments) == 1:
+                    return b
+                else:
+                    return b.get_field('.'.join(segments[1:]))
             if field.name.split('.')[-1] == segments[0]:
-                if isinstance(field, Field):
+                if len(segments) == 1:
                     return field
                 else:
-                    return field.get_field(segments[1:])
+                    return field.get_field(''.join(segments[1:]))
 
 
     def __getitem__(self, key):
@@ -503,6 +557,44 @@ class Collection(object):
         widget_type, widget = self.widget.template.split('.')
         renderer = self.form.renderer
         name = '%s/label'%widget_type
+        vars = {'field':self}
+        return fall_back_renderer(renderer, name, widget, vars)
+
+    def seqgrab(self):
+        widget_type, widget = self.widget.template.split('.')
+        """ creates a seq grab hook if this is an item in a updateable sequence """
+        parentkey = '.'.join(self.name.split('.')[:-1])
+        if not parentkey:
+            return ''
+        parent = self.form.get_field(parentkey)
+        if getattr(parent.widget,'sortable',False) == False:
+            return ''
+        renderer = self.form.renderer
+        name = 'field/seqgrab'
+        vars = {'field':self}
+        return fall_back_renderer(renderer, name, widget, vars)
+
+    def seqdelete(self):
+        widget_type, widget = self.widget.template.split('.')
+        """ creates a seq delete hook if this is an item in a updateable sequence """
+        parentkey = '.'.join(self.name.split('.')[:-1])
+        if not parentkey:
+            return ''
+        parent = self.form.get_field(parentkey)
+        if getattr(parent.widget,'addremove',False) == False:
+            return ''
+
+        renderer = self.form.renderer
+        name = 'field/seqdelete'
+        vars = {'field':self}
+        return fall_back_renderer(renderer, name, widget, vars)
+    
+    
+    def inputs(self):
+        """ returns the templated widget """
+        widget_type, widget = self.widget.template.split('.')
+        renderer = self.form.renderer
+        name = 'field/inputs'
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
 
@@ -905,7 +997,7 @@ class Form(object):
         allowed = ['title', 'widget', 'description','default']
         if name in allowed:
             if name == 'default' and '*' not in key:
-                set(self.defaults,key,value,container_factory=container_factory)
+                dottedish_set(self.defaults,key,value,container_factory=container_factory)
             else:
                 self.item_data.setdefault(key, {})[name] = value
         else:
@@ -979,13 +1071,20 @@ class Form(object):
 
         :arg name: Dotted name e.g. names.0.firstname
         """
+        # XXX GET FIELD NEEDS TO CACHE THE * FIELDS
         segments = name.split('.')
         for field in self.fields:
+            if segments[0] == '*':
+                b = field.bind('*',field.attr)
+                if len(segments) == 1:
+                    return b
+                else:
+                    return b.get_field('.'.join(segments[1:]))
             if field.name.split('.')[-1] == segments[0]:
                 if len(segments) == 1:
                     return field
                 else:
-                    return field.get_field(segments[1:])
+                    return field.get_field('.'.join(segments[1:]))
 
 
     def __call__(self):

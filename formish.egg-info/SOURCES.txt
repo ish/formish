@@ -176,6 +176,8 @@ formish/templates/mako/formish/field/error.html
 formish/templates/mako/formish/field/inputs.html
 formish/templates/mako/formish/field/label.html
 formish/templates/mako/formish/field/main.html
+formish/templates/mako/formish/field/seqdelete.html
+formish/templates/mako/formish/field/seqgrab.html
 formish/templates/mako/formish/form/actions.html
 formish/templates/mako/formish/form/error_list.html
 formish/templates/mako/formish/form/fields.html
@@ -190,11 +192,15 @@ formish/templates/mako/formish/sequence/inputs.html
 formish/templates/mako/formish/sequence/label.html
 formish/templates/mako/formish/sequence/main.html
 formish/templates/mako/formish/sequence/metadata.html
+formish/templates/mako/formish/sequence/seqdelete.html
+formish/templates/mako/formish/sequence/seqgrab.html
 formish/templates/mako/formish/structure/description.html
 formish/templates/mako/formish/structure/error.html
 formish/templates/mako/formish/structure/fields.html
 formish/templates/mako/formish/structure/label.html
 formish/templates/mako/formish/structure/main.html
+formish/templates/mako/formish/structure/seqdelete.html
+formish/templates/mako/formish/structure/seqgrab.html
 formish/templates/mako/formish/widgets/Checkbox/widget.html
 formish/templates/mako/formish/widgets/CheckboxMultiChoice/readonly.html
 formish/templates/mako/formish/widgets/CheckboxMultiChoice/widget.html
@@ -272,6 +278,7 @@ formish/tests/testish/testish/public/css/tripoli/plugins/tripoli.visual.css
 formish/tests/testish/testish/public/images/nouploadyet.png
 formish/tests/testish/testish/public/js/formish.js
 formish/tests/testish/testish/public/js/jquery-1.2.6.min.js
+formish/tests/testish/testish/public/js/jquery-1.3.2.min.js
 formish/tests/testish/testish/public/js/jquery-sortable.js
 formish/tests/testish/testish/resource/__init__.py
 formish/tests/testish/testish/resource/root.py

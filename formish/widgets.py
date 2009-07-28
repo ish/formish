@@ -106,6 +106,9 @@ class Widget(object):
         return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
 
 
+class Container(Widget):
+    type = 'Container'
+
 
 class Input(Widget):
     """
@@ -297,7 +300,7 @@ def _default_empty_checker(v):
         except TypeError:
             raise ValueError
 
-class SequenceDefault(Widget):
+class SequenceDefault(Container):
     """
     Sequence handling widget - used by default for schema sequences
 
@@ -411,7 +414,7 @@ class SequenceDefault(Widget):
         return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
 
 
-class StructureDefault(Widget):
+class StructureDefault(Container):
     """
     Sequence handling widget - used by default for schema sequences
 
