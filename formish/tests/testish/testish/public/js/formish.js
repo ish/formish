@@ -17,7 +17,7 @@ function get_sequence_numbers(segments, l) {
     }
   }
   result.push(l);
-  return result
+  return result;
 }
 
 function replace_stars(original, nums, divider) {
@@ -42,7 +42,7 @@ function replace_stars(original, nums, divider) {
 function construct(start_segments, n, remainder, divider, strip) {
   // Takes a set of prefix segments, a number and the remainder plus a flag whether to strip(?)
   var remainder_bits = remainder.split(divider);
-  var remainder = remainder_bits.slice(1,remainder_bits.length-strip).join(divider);
+  remainder = remainder_bits.slice(1,remainder_bits.length-strip).join(divider);
   var result = Array();
   for(var i=0; i<start_segments.length; i++) {
     var segment = start_segments[i];
@@ -56,7 +56,7 @@ function construct(start_segments, n, remainder, divider, strip) {
   } else {
       var out = result.join(divider);
   }
-  return out
+  return out;
 }
 
 function convert_id_to_name(s, formid) {
@@ -155,8 +155,8 @@ function add_new_item(t,o) {
     // Get some variable to help with replacing (originalname, originalid, name, id)
     var originalname = t.next('.adder').attr('name');
     var new_originalname = t.closest('.type-container').attr('id');
-    var new_originalname = new_originalname.substr(0,new_originalname.length-6);
-    var new_originalname = convert_id_to_name(new_originalname,'');
+    new_originalname = new_originalname.substr(0,new_originalname.length-6);
+    new_originalname = convert_id_to_name(new_originalname,'');
     var segments = originalname.split('.');
     // Get the numbers used in the originalname
     var seqnums = get_sequence_numbers(segments, l);
@@ -176,7 +176,7 @@ function add_new_item(t,o) {
       $(this).attr('name', newname );
     });
     
-    var newid = replace_stars(h.attr('id'),seqnums,'-')
+    var newid = replace_stars(h.attr('id'),seqnums,'-');
 
     h.attr('id',newid);
     h.find("[id]").each( function () {
@@ -214,11 +214,11 @@ function add_new_items(t,o) {
 }
 
 function add_mousedown_to_addlinks(o) {
-  o.find('.adderlink').mousedown(function() { add_new_items($(this),o)});
+  o.find('.adderlink').mousedown(function() { add_new_items($(this),o);});
 }
 
 function add_remove_buttons(o) {
-  o.find('.remove').remove() 
+  o.find('.remove').remove();
   o.find('.seqdelete').each( function() {
     if ($(this).next().text() != 'delete') {
       var x = $('<span class="remove">delete</span>');

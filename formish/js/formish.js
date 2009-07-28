@@ -1,11 +1,5 @@
 function count_previous_fields(o) {
-  var f = o.prevAll('.field').length;
-  var g = o.prevAll('.group').length;
-  if (f > g) {
-    return f;
-  } else {
-    return g;
-  }
+  return o.prevAll('.field').length;
 }   
    
 function create_addlinks(o) {
@@ -23,7 +17,7 @@ function get_sequence_numbers(segments, l) {
     }
   }
   result.push(l);
-  return result
+  return result;
 }
 
 function replace_stars(original, nums, divider) {
@@ -46,8 +40,9 @@ function replace_stars(original, nums, divider) {
 }
 
 function construct(start_segments, n, remainder, divider, strip) {
+  // Takes a set of prefix segments, a number and the remainder plus a flag whether to strip(?)
   var remainder_bits = remainder.split(divider);
-  var remainder = remainder_bits.slice(0,remainder_bits.length-strip).join(divider);
+  remainder = remainder_bits.slice(1,remainder_bits.length-strip).join(divider);
   var result = Array();
   for(var i=0; i<start_segments.length; i++) {
     var segment = start_segments[i];
@@ -61,25 +56,21 @@ function construct(start_segments, n, remainder, divider, strip) {
   } else {
       var out = result.join(divider);
   }
-  return out
+  return out;
 }
 
 function convert_id_to_name(s, formid) {
   var segments=s.split('-');
-  var out = segments.join('.');
-  if (formid == undefined) {
-      return out;
-  } else {
-      return out.substr(formid.length+1);
-  }
+  var out = segments.slice(1,segments.length).join('.');
+  return out;
 }
 
 function renumber_sequences(o) {
-  var formid = $(o).closest('form').attr('id');
+  var formid = $(o).attr('id');
   var N = {};
   var previous_seqid_prefix = '';
-  o.find('.type-sequence.widget-sequencedefault > div').each( function () {
-    var seqid = $(this).parent().attr('id');
+  o.find('.type-sequence.widget-sequencedefault > .field:not(.type-container)').each( function () {
+    var seqid = $(this).parent().closest('.field').attr('id');
     var seqid_prefix = seqid.substr(0,seqid.length-6);
     if (seqid_prefix != previous_seqid_prefix) {
       N[seqid_prefix] = 0;
@@ -112,32 +103,39 @@ function renumber_sequences(o) {
     });
     previous_seqid_prefix = seqid_prefix;
   });
-  o.find('.type-sequence.widget-sequencedefault > fieldset').each( function () {
-    var seqid = $(this).parent().attr('id');
+  o.find('.type-sequence.widget-sequencedefault > .type-container').each( function () {
+    // Get the id from the parent - hence this will be the prefix once the --field is stripped
+    var seqid = $(this).parent().closest('.field').attr('id');
     var seqid_prefix = seqid.substr(0,seqid.length-6);
+    // We now count the occurences of any item with the same prefix, as long as
+    // we scan through sequentially we should have the correct, incrementing
+    // numbers..
     if (seqid_prefix != previous_seqid_prefix) {
       N[seqid_prefix] = 0;
     } else {
       N[seqid_prefix]=N[seqid_prefix]+1;
     }    
     n = N[seqid_prefix];
-    // replace id occurences
+    // Store the old id on the sequence item
     var thisid = $(this).attr('id');
-    //$(this).find('> legend').text(n);
+    // replace id occurences
     var newid = seqid_prefix + n + '--field';
     $(this).attr('id',newid);
+
     // Replace 'for' occurences
     $(this).find("[for^='"+seqid_prefix+"']").each( function () {
       var name = $(this).attr('for');
       var name_remainder = name.substring(seqid_prefix.length, name.length);
       $(this).attr('for', construct(seqid_prefix.split('-'),n,name_remainder,'-', 0));
     });
+
     // Replace 'id' occurences
     $(this).find("[id^='"+seqid_prefix+"']").each( function () {
       var name = $(this).attr('id');
       var name_remainder = name.substring(seqid_prefix.length, name.length);
       $(this).attr('id', construct(seqid_prefix.split('-'),n,name_remainder,'-', 0));
     });
+
     // replace 'name' occurences
     $(this).find("[name^='"+convert_id_to_name(seqid_prefix, formid)+"']").each( function () {
       var name = $(this).attr('name');
@@ -156,6 +154,9 @@ function add_new_item(t,o) {
     var l = count_previous_fields(t.next('.adder'));
     // Get some variable to help with replacing (originalname, originalid, name, id)
     var originalname = t.next('.adder').attr('name');
+    var new_originalname = t.closest('.type-container').attr('id');
+    new_originalname = new_originalname.substr(0,new_originalname.length-6);
+    new_originalname = convert_id_to_name(new_originalname,'');
     var segments = originalname.split('.');
     // Get the numbers used in the originalname
     var seqnums = get_sequence_numbers(segments, l);
@@ -175,7 +176,7 @@ function add_new_item(t,o) {
       $(this).attr('name', newname );
     });
     
-    var newid = replace_stars(h.attr('id'),seqnums,'-')
+    var newid = replace_stars(h.attr('id'),seqnums,'-');
 
     h.attr('id',newid);
     h.find("[id]").each( function () {
@@ -198,7 +199,7 @@ function add_new_item(t,o) {
 }
 
 function add_new_items(t,o) {
-   var data = t.parent().parent().find('.formish-sequencedata').attr('title').split(',');
+   var data = t.closest('.field').find('.formish-sequencedata').attr('title').split(',');
    for (var i=0; i<data.length; i++) {
        var terms = data[i].split('=');
        var key = terms[0];
@@ -213,31 +214,19 @@ function add_new_items(t,o) {
 }
 
 function add_mousedown_to_addlinks(o) {
-  o.find('.adderlink').mousedown(function() { add_new_items($(this),o)});
+  o.find('.adderlink').mousedown(function() { add_new_items($(this),o);});
 }
 
 function add_remove_buttons(o) {
-  o.find('.addremove .remove').remove() 
-  o.find('.addremove > div > label').each( function() {
+  o.find('.remove').remove();
+  o.find('.seqdelete').each( function() {
     if ($(this).next().text() != 'delete') {
       var x = $('<span class="remove">delete</span>');
       $(this).after(x);
       x.mousedown(function () {
-        $(this).parent().remove();
+        $(this).closest('.field').remove();
         renumber_sequences($('form'));
         add_sortables($('form'));
-      });
-    }
-  });
-  o.find('.addremove > fieldset > legend').each( function() {
-    if ($(this).next().text() != 'delete') {
-      var x = $('<span class="remove">delete</span>');
-      $(this).after(x);
-      x.mousedown(function () {
-        $(this).parent().remove();
-        renumber_sequences($('form'));
-        add_sortables($('form'));
-
       });
     }
   });
@@ -248,10 +237,9 @@ function order_changed(e,ui) {
 }
 
 function add_sortables(o) {
-  o.find('.sortable > div > label').after('<div class="handle">drag me</div>');
-  o.find('.sortable > fieldset > legend').after('<div class="handle">drag me</div>');
-  o.find('.sortable').sortable({'items':'> .field','stop':order_changed,'handle':'.handle'});
   o.find('.sortable .handle').remove();
+  o.find('.sortable .seqgrab').after('<div class="handle">drag me</div>');
+  o.find('.sortable').sortable({'items':'> .field','stop':order_changed,'handle':'.handle'});
   
 }
 
