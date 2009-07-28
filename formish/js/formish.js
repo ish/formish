@@ -61,7 +61,12 @@ function construct(start_segments, n, remainder, divider, strip) {
 
 function convert_id_to_name(s, formid) {
   var segments=s.split('-');
-  var out = segments.slice(1,segments.length).join('.');
+  if (formid == '') {
+    var start_segment = 0;
+  } else {
+    var start_segment = 1;
+  }
+  var out = segments.slice(start_segment,segments.length).join('.');
   return out;
 }
 
@@ -98,7 +103,7 @@ function renumber_sequences(o) {
     // replace 'name' occurences
     $(this).find("[name^='"+convert_id_to_name(seqid_prefix, formid)+"']").each( function () {
       var name = $(this).attr('name');
-      var name_remainder = name.substring(convert_id_to_name(seqid_prefix).length, name.length);
+      var name_remainder = name.substring(convert_id_to_name(seqid_prefix, formid).length, name.length);
       $(this).attr('name', construct(convert_id_to_name(seqid_prefix, formid).split('.'),n,name_remainder,'.', 1));
     });
     previous_seqid_prefix = seqid_prefix;
@@ -148,6 +153,7 @@ function renumber_sequences(o) {
 }
 
 function add_new_item(t,o) {
+    var formid = $(o).attr('id');
     // Get the encoded template
     var code = t.next('.adder').val();
     // Find out how many fields we already have
@@ -156,7 +162,7 @@ function add_new_item(t,o) {
     var originalname = t.next('.adder').attr('name');
     var new_originalname = t.closest('.type-container').attr('id');
     new_originalname = new_originalname.substr(0,new_originalname.length-6);
-    new_originalname = convert_id_to_name(new_originalname,'');
+    new_originalname = convert_id_to_name(new_originalname,formid);
     var segments = originalname.split('.');
     // Get the numbers used in the originalname
     var seqnums = get_sequence_numbers(segments, l);
