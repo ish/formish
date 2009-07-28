@@ -5,7 +5,11 @@ from testish.resource import root
 
 import os, pkg_resources
 from restish.contrib.makorenderer import MakoRenderer
-
+import mimetypes
+try: 
+    mimetypes.init() 
+except AttributeError: 
+    pass 
 
 def make_app(global_conf, **app_conf):
     """
