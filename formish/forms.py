@@ -469,7 +469,7 @@ class Collection(object):
         segments = name.split('.')
         for field in self.fields:
             if segments[0] == '*':
-                b = field.bind('*',field.attr)
+                b = self.bind('*',field.attr)
                 if len(segments) == 1:
                     return b
                 else:
@@ -1075,7 +1075,7 @@ class Form(object):
         segments = name.split('.')
         for field in self.fields:
             if segments[0] == '*':
-                b = field.bind('*',field.attr)
+                b = self.bind('*',field.attr)
                 if len(segments) == 1:
                     return b
                 else:
