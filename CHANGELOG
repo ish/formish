@@ -2,10 +2,25 @@
 Changlelog
 ==========
 
+0.8.3
+-----
+
+BUGFIX: Many javascript changes to simplify sequence handling and to ensure 
+        sequences work when using custom templates and also when multiple
+        forms are on a page.
+
+0.8.2b
+------
+
+BUGFIX: When using custom templates, the generated 'blob' of data that
+        represents the 'new item' template was not working correctly. This
+        should not have affected normal uses of formish
+
 0.8.2
 -----
 
- * Rewritten formish javascript for sequences to use class name hooks instead of relative paths. Add SequenceOfSequence support
+ * Rewritten formish javascript for sequences to use class name hooks instead
+   of relative paths. Add SequenceOfSequence support
 
 BUGFIX: Sequence of Sequence javascript manipulation did not work correctly at all. 
 
@@ -17,23 +32,29 @@ BUGFIX: Enctype wasn't being encoded correctly hence file uploads didn't work
 0.8.1b
 ------
 
- * changed behaviour of enctype so that multi-part is only used if there is a file upload on the form
+ * changed behaviour of enctype so that multi-part is only used if there is a
+   file upload on the form
 
 0.8.1a
 ------
 
-BUGFIX: Sequences were using base64 encoding to store new items. This wasn't handling unicode correctly. Changed to use urlencode decodeURIComponent. The JQuery base64 library is now not needed.
-BUGFIX: Structures were emitting metadata when they are only needed for sequences
+BUGFIX: Sequences were using base64 encoding to store new items. This wasn't
+        handling unicode correctly. Changed to use urlencode
+        decodeURIComponent. The JQuery base64 library is now not needed.
+BUGFIX: Structures were emitting metadata when they are only needed for
+        sequences
 
 0.8.1
 -----
 
- * Add the ability to emit form fields using field names which will alow emission of 'slices' of form fields.
+ * Add the ability to emit form fields using field names which will alow
+   emission of 'slices' of form fields.
 
 0.8f
 ----
 
- * added 'crop' flag to the fileresource handler that instead of resizing to bounds, resizes to fill bounds and crops excess.
+ * added 'crop' flag to the fileresource handler that instead of resizing to
+   bounds, resizes to fill bounds and crops excess.
 
 0.8e
 ----
@@ -191,7 +212,8 @@ BUG FIX: Missed replacing a reference to _template in formish.validation
  * Documentation improvements
    - Started adding doctests to documentation
    - Reduced the weight of the documentation (simplify styling/templates)
- * Lots of changes to the way file uploads are handled - will document before a tagged release
+ * Lots of changes to the way file uploads are handled - will document before a
+   tagged release
    - Using a 'headered' filestore that allows meta information to be stored
      with the file 
    - this means cached files are not browseable on the filesystem anymore

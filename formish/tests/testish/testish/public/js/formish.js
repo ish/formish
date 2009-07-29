@@ -71,89 +71,63 @@ function convert_id_to_name(s, formid) {
 }
 
 function renumber_sequences(o) {
+  o.each( function() {
+    var form=$(this);
+    renumber_sequence(form);
+  });
+}
+
+function renumber_sequence(o) {
   var formid = $(o).attr('id');
   var N = {};
-  var previous_seqid_prefix = '';
-  o.find('.type-sequence.widget-sequencedefault > .field:not(.type-container)').each( function () {
-    var seqid = $(this).parent().closest('.field').attr('id');
-    var seqid_prefix = seqid.substr(0,seqid.length-6);
-    if (seqid_prefix != previous_seqid_prefix) {
-      N[seqid_prefix] = 0;
+  o.find('.type-sequence.widget-sequencedefault').each( function () {
+    field_id = $(this).attr('id');
+    if ($(this).hasClass('type-container')) {
+       var type_container = 0;
     } else {
-      N[seqid_prefix]=N[seqid_prefix]+1;
-    }    
-    n = N[seqid_prefix];
-    // replace id occurences
-    var thisid = $(this).attr('id');
-    var newid = seqid_prefix + n + '--field';
-    $(this).attr('id',newid);
-    // Replace 'for' occurences
-    $(this).find("[for^='"+seqid_prefix+"']").each( function () {
-      var name = $(this).attr('for');
-      //$(this).text(n);
-      var name_remainder = name.substring(seqid_prefix.length, name.length);
-      $(this).attr('for', construct(seqid_prefix.split('-'),n,name_remainder,'-', 1));
-    });
-    // Replace 'id' occurences
-    $(this).find("[id^='"+seqid_prefix+"']").each( function () {
-      var name = $(this).attr('id');
-      var name_remainder = name.substring(seqid_prefix.length, name.length);
-      $(this).attr('id', construct(seqid_prefix.split('-'),n,name_remainder,'-', 1));
-    });
-    // replace 'name' occurences
-    $(this).find("[name^='"+convert_id_to_name(seqid_prefix, formid)+"']").each( function () {
-      var name = $(this).attr('name');
-      var name_remainder = name.substring(convert_id_to_name(seqid_prefix, formid).length, name.length);
-      $(this).attr('name', construct(convert_id_to_name(seqid_prefix, formid).split('.'),n,name_remainder,'.', 1));
-    });
-    previous_seqid_prefix = seqid_prefix;
-  });
-  o.find('.type-sequence.widget-sequencedefault > .type-container').each( function () {
-    // Get the id from the parent - hence this will be the prefix once the --field is stripped
-    var seqid = $(this).parent().closest('.field').attr('id');
+       var type_container = 1;
+    }
+    var seqid = $(this).attr('id');
     var seqid_prefix = seqid.substr(0,seqid.length-6);
-    // We now count the occurences of any item with the same prefix, as long as
-    // we scan through sequentially we should have the correct, incrementing
-    // numbers..
-    if (seqid_prefix != previous_seqid_prefix) {
-      N[seqid_prefix] = 0;
-    } else {
-      N[seqid_prefix]=N[seqid_prefix]+1;
-    }    
-    n = N[seqid_prefix];
-    // Store the old id on the sequence item
-    var thisid = $(this).attr('id');
     // replace id occurences
-    var newid = seqid_prefix + n + '--field';
-    $(this).attr('id',newid);
-
-    // Replace 'for' occurences
-    $(this).find("[for^='"+seqid_prefix+"']").each( function () {
-      var name = $(this).attr('for');
-      var name_remainder = name.substring(seqid_prefix.length, name.length);
-      $(this).attr('for', construct(seqid_prefix.split('-'),n,name_remainder,'-', 0));
+    $(this).find('.field').each( function () {
+        var thisid = $(this).attr('id');
+        if (seqid.split('-').length+1 == thisid.split('-').length) {
+            if (N[seqid_prefix] == undefined) {
+              N[seqid_prefix] = 0;
+            } else {
+              N[seqid_prefix]=N[seqid_prefix]+1;
+            }
+            n = N[seqid_prefix];
+            var newid = seqid_prefix + n + '--field';
+            $(this).attr('id',newid);
+            // Replace 'for' occurences
+            $(this).find("[for^='"+seqid_prefix+"']").each( function () {
+              var name = $(this).attr('for');
+              //$(this).text(n);
+              var name_remainder = name.substring(seqid_prefix.length, name.length);
+              $(this).attr('for', construct(seqid_prefix.split('-'),n,name_remainder,'-', type_container));
+            });
+            // Replace 'id' occurences
+            $(this).find("[id^='"+seqid_prefix+"']").each( function () {
+              var name = $(this).attr('id');
+              var name_remainder = name.substring(seqid_prefix.length, name.length);
+              $(this).attr('id', construct(seqid_prefix.split('-'),n,name_remainder,'-', type_container));
+            });
+            // replace 'name' occurences
+            $(this).find("[name^='"+convert_id_to_name(seqid_prefix, formid)+"']").each( function () {
+              var name = $(this).attr('name');
+              var name_remainder = name.substring(convert_id_to_name(seqid_prefix, formid).length, name.length);
+              $(this).attr('name', construct(convert_id_to_name(seqid_prefix, formid).split('.'),n,name_remainder,'.', type_container));
+            });
+        }
     });
-
-    // Replace 'id' occurences
-    $(this).find("[id^='"+seqid_prefix+"']").each( function () {
-      var name = $(this).attr('id');
-      var name_remainder = name.substring(seqid_prefix.length, name.length);
-      $(this).attr('id', construct(seqid_prefix.split('-'),n,name_remainder,'-', 0));
-    });
-
-    // replace 'name' occurences
-    $(this).find("[name^='"+convert_id_to_name(seqid_prefix, formid)+"']").each( function () {
-      var name = $(this).attr('name');
-      var name_remainder = name.substring(convert_id_to_name(seqid_prefix, formid).length, name.length);
-      $(this).attr('name', construct(convert_id_to_name(seqid_prefix, formid).split('.'),n,name_remainder,'.',0));
-    });
-    previous_seqid_prefix = seqid_prefix;
   });
 
 }
 
 function add_new_item(t,o) {
-    var formid = $(o).attr('id');
+    var formid = o.attr('id');
     // Get the encoded template
     var code = t.next('.adder').val();
     // Find out how many fields we already have
@@ -220,7 +194,10 @@ function add_new_items(t,o) {
 }
 
 function add_mousedown_to_addlinks(o) {
-  o.find('.adderlink').mousedown(function() { add_new_items($(this),o);});
+  o.each( function() {
+    var form = $(this);
+    form.find('.adderlink').mousedown(function() { add_new_items($(this),form);});
+  });
 }
 
 function add_remove_buttons(o) {
@@ -239,7 +216,7 @@ function add_remove_buttons(o) {
 }
 
 function order_changed(e,ui) {
-  renumber_sequences($('form'));
+    renumber_sequences($('form'));
 }
 
 function add_sortables(o) {
@@ -257,5 +234,4 @@ function formish() {
     add_mousedown_to_addlinks($('form'));
     add_remove_buttons($('form'));
 }
-
 
