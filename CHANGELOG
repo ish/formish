@@ -9,6 +9,7 @@ BUGFIX: Many javascript changes to simplify sequence handling and to ensure
         sequences work when using custom templates and also when multiple
         forms are on a page.
 
+
 0.8.2b
 ------
 
