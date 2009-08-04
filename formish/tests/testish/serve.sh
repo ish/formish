@@ -57,7 +57,7 @@ case "$1" in
     ;;
   run-dev)
     ./run paster serve --reload \
-                   ./development.ini
+    ./development.ini --log-file=./log/development.log
     ;;
   *)
     echo $"Usage: $0 {start|stop|restart|run|start-dev|stop-dev|restart-dev|run-dev}"
