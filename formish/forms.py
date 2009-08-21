@@ -268,12 +268,16 @@ class Field(object):
 
         
 
-    def __call__(self):
+    def __call__(self, class_attribute=None):
         """ returns a serialisation for this field using the form's renderer """
         widget_type, widget = self.widget.template.split('.')
         renderer = self.form.renderer
         name = 'field/main'
-        vars = {'field':self}
+        if class_attribute:
+            class_attribute = ' class="%s"'%custom_classes
+        else:
+            class_attribute = ''
+        vars = {'field':self, 'class_attribute': class_attribute}
         return fall_back_renderer(renderer, name, widget, vars)
             
     def label(self):
@@ -700,13 +704,18 @@ class BoundWidget(object):
     def __setattr__(self, name, value):
         setattr(self.widget, name, value)
 
-    def __call__(self):
+    def __call__(self, class_attribute=None):
         widget_type, widget = self.widget.template.split('.')
         if self.widget.readonly == True:
             widget_template = 'readonly'
         else:
             widget_template = 'widget'
-        return self.field.form.renderer('/formish/widgets/%s/%s.html'%(widget, widget_template), {'field':self.field})
+        if class_attribute:
+            class_attribute = ' class="%s"'%class_attribute
+        else:
+            class_attribute = ''
+        vars = {'field':self.field, 'class_attribute': class_attribute}
+        return self.field.form.renderer('/formish/widgets/%s/%s.html'%(widget, widget_template), vars)
 
     def __repr__(self):
         return 'BoundWidget(widget=%r, field=%r)'%(self.widget, self.field)

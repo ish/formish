@@ -11,4 +11,4 @@ if rows is not None:
 else:
     rows = ''
 %>
-<textarea id="${field.cssname}" name="${field.name}"${cols|n}${rows|n}>${field.value[0]}</textarea>
+<textarea id="${field.cssname}" name="${field.name}"${cols|n}${rows|n}${class_attribute|n}>${field.value[0]}</textarea>
