@@ -2,6 +2,14 @@
 Changlelog
 ==========
 
+0.8.3b 
+------
+
+ * Added the ability to pass vars into templates.
+   The only templates that currently use this are the Input and Textarea
+   widgets. f.widget(classes='myclass yourclass') will add this class
+   attribute to the input/textarea element
+
 0.8.3
 -----
 

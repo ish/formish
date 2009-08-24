@@ -121,3 +121,22 @@ def decode_file_resource_path(path):
         name, key = None, path
     return name, key
 
+def classes_from_vars(classes, include=None):
+    if not include:
+        include = []
+
+    if not classes:
+        return ''
+    classes_list = include
+    if isinstance(classes, basestring):
+        classes_list.extend(classes.split(' '))
+    else:
+        for c in classes:
+            if isinstance(c, basestrong):
+                cs = c.split(' ')
+            else:
+                cs = c
+            classes_list.extend(cs)
+    return ' class="%s"'%' '.join(classes_list)
+        
+
