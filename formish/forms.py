@@ -700,13 +700,15 @@ class BoundWidget(object):
     def __setattr__(self, name, value):
         setattr(self.widget, name, value)
 
-    def __call__(self):
+    def __call__(self, **kw):
         widget_type, widget = self.widget.template.split('.')
         if self.widget.readonly == True:
             widget_template = 'readonly'
         else:
             widget_template = 'widget'
-        return self.field.form.renderer('/formish/widgets/%s/%s.html'%(widget, widget_template), {'field':self.field})
+        vars = {'field':self.field}
+        vars.update(kw)
+        return self.field.form.renderer('/formish/widgets/%s/%s.html'%(widget, widget_template), vars)
 
     def __repr__(self):
         return 'BoundWidget(widget=%r, field=%r)'%(self.widget, self.field)

@@ -1,2 +1,9 @@
 <%page args="field" />
-<input id="${field.cssname}" type="text" name="${field.name}" value="${field.value[0]}" />
+<%!
+from formish import util
+%>
+<input id="${field.cssname}" type="text" name="${field.name}" value="${field.value[0]}"
+% if classes:
+${util.classes_from_vars(classes)|n}
+% endif
+/>
