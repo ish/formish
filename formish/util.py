@@ -132,7 +132,7 @@ def classes_from_vars(classes, include=None):
         classes_list.extend(classes.split(' '))
     else:
         for c in classes:
-            if isinstance(c, basestrong):
+            if isinstance(c, basestring):
                 cs = c.split(' ')
             else:
                 cs = c

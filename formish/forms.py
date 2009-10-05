@@ -589,15 +589,6 @@ class Collection(object):
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
     
-    
-    def inputs(self):
-        """ returns the templated widget """
-        widget_type, widget = self.widget.template.split('.')
-        renderer = self.form.renderer
-        name = 'field/inputs'
-        vars = {'field':self}
-        return fall_back_renderer(renderer, name, widget, vars)
-
     def inputs(self):
         """ returns the templated widget """
         widget_type, widget = self.widget.template.split('.')

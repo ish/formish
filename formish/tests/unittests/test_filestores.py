@@ -27,6 +27,10 @@ class TestFileSystemHeaderedFileStore(unittest.TestCase):
         finally:
             f.close()
 
+    def test_put_headersdict(self):
+        self.store.put('foo', {'Cache-Tag':'1', 'Content-Type':'text/plain'}, StringIO("Yay!"))
+        assert file(os.path.join(self.dirname, 'foo'), 'rb').read() == 'Cache-Tag: 1\nContent-Type: text/plain\n\nYay!'
+
     def test_get(self):
         self.store.put('foo', [('Cache-Tag', '1'), ('Content-Type', 'text/plain')], StringIO("Yay!"))
         headers, f = self.store.get('foo')
@@ -53,6 +57,11 @@ class TestFileSystemHeaderedFileStore(unittest.TestCase):
         self.store.delete('foo')
         self.assertRaises(KeyError, self.store.get, 'foo')
 
+    def test_delete_glob(self):
+        self.store.put('foo', [], StringIO('foo'))
+        self.store.delete('fo', glob=True)
+        self.assertRaises(KeyError, self.store.get, 'foo')
+
     def test_unicode(self):
         gbp = '£'.decode('utf-8')
         self.store.put('foo', [('a', gbp)], StringIO('foo'))
@@ -74,6 +83,11 @@ class TestCachedTempFilestore(unittest.TestCase):
     def test_put(self):
         self.store.put('foo', StringIO('bar'), '1', [('Content-Type', 'text/plain')])
         assert file(os.path.join(self.dirname, 'foo'), 'rb').read() == 'Cache-Tag: 1\nContent-Type: text/plain\n\nbar'
+
+    def test_put_noheaders(self):
+        self.store.put('foo', StringIO('bar'), '1')
+        self.assertEqual(open(os.path.join(self.dirname, 'foo'), 'rb').read(),
+        'Cache-Tag: 1\n\nbar')
 
     def test_get(self):
         self.store.put('foo', StringIO('bar'), '1', [('Content-Type', 'text/plain')])
@@ -121,4 +135,7 @@ class TestCachedTempFilestore(unittest.TestCase):
             assert f
         finally:
             f.close()
+
+    def test_delete(self):
+        self.assertRaises(OSError, self.store.delete, 'not_found')
 
