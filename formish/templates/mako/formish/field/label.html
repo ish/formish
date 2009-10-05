@@ -1,4 +1,10 @@
 <%page args="field" />
+<%
+if field.required:
+    required = ' *'
+else:
+    required = ''
+%>
 % if field.widget.type != 'Hidden':
-<label for="${field.cssname}">${field.title}</label>
+<label for="${field.cssname}">${field.title}${required}</label>
 %endif
