@@ -10,7 +10,6 @@ def oneify(key):
     l = len(keys)
     return ','.join([try_one_base(k) for k in keys])
     %>
-${field.error}
 % if field.error:
 <span class="error">${unicode(field.error)}</span><br />
 % endif
