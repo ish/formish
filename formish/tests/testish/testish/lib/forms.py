@@ -727,6 +727,17 @@ def form_ValidationOnSequenceItem(request):
     form = formish.Form(schema, 'form')
     return form
 
+def form_ValidationOnSequenceItemTextArea(request):
+    """
+    Validation on a sequence item.
+    """
+    schema = schemaish.Structure()
+    schema.add( 'myList', schemaish.Sequence( schemaish.String(validator=validatish.Email()) ))
+
+    form = formish.Form(schema, 'form')
+    form['myList'].widget = formish.TextArea()
+    return form
+
 def form_ValidationOnSequence(request):
     """
     Validation on a collection (sequence).

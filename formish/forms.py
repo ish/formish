@@ -255,6 +255,8 @@ class Field(object):
 
     errors = property(_get_errors, _set_errors)
 
+
+
     @property
     def widget(self):
         """ return the fields widget bound with extra params. """
@@ -266,7 +268,21 @@ class Field(object):
             self.form.set_item_data(starify(self.name),'widget',widget_type)
         return BoundWidget(widget_type, self)
 
+    @property
+    def contains_error(self):
+        """ Check to see if any child elements have errors """
+        for k in self.form.errors.keys():
+            if k.startswith(self.name):
+                return True
+        return False
         
+    @property
+    def contained_errors(self):
+        contained_errors = []
+        for k in self.form.errors.keys():
+            if k.startswith(self.name):
+                contained_errors.append( (k[len(self.name)+1:],self.form.errors[k]) )
+        return contained_errors
 
     def __call__(self):
         """ returns a serialisation for this field using the form's renderer """
@@ -444,6 +460,14 @@ class Collection(object):
             if k.startswith(self.name):
                 return True
         return False
+
+    @property
+    def contained_errors(self):
+        contained_errors = []
+        for k in self.form.errors.keys():
+            if k.startswith(self.name):
+                contained_errors.append( (k[len(self.name)+1:],self.form.errors[k]) )
+        return contained_errors
 
     @property
     def widget(self):
@@ -721,7 +745,44 @@ class FormFieldsWrapper(ObjectWrapper):
 
     def __call__(self,fields=None):
         return self.form.renderer('/formish/form/fields.html', {'form':self.form,'fields':fields})
-    
+  
+
+def tryint(v):
+    try:
+        return int(v)
+    except ValueError:
+        return v
+
+class ErrorDict(dict):
+
+    def __init__(self, form):
+        self.form = form
+
+    def keys(self):
+        return list(self.__iter__())
+
+    def iteritems(self):
+        for key in self:
+            yield (key, self[key])
+
+    def items(self):
+        return list(self.iteritems())
+
+    def __iter__(self):
+        for field in self.form.allfields:
+            if field.name in self:
+                yield self[field.name]
+                if isinstance(basedict, self[field.name]):
+                    keys = []
+                    for k in self[field.name].keys():
+                        keys.append( [tryint(k) for k in k.split('.')] )
+                    keys.sort()
+                    for k in keys:
+                        yield '.'.join(k)
+
+
+
+
 
 class Form(object):
     """
@@ -778,7 +839,7 @@ class Form(object):
         if defaults is None:
             defaults = {}
         if errors is None:
-            errors = {}
+            errors = ErrorDict(self)
         self.defaults = defaults
         self.errors = errors
         self.error = None
@@ -1045,9 +1106,6 @@ class Form(object):
     @property
     def allfields(self):
         """
-        Return a generator that yields all of the fields at the top level of
-        the form (e.g. if a field is a subsection or sequence, it will be up to
-        the application to iterate that field's fields.
         """
         fields = []
         for field in self.fields:
