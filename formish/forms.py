@@ -272,7 +272,7 @@ class Field(object):
     def contains_error(self):
         """ Check to see if any child elements have errors """
         for k in self.form.errors.keys():
-            if k.startswith(self.name):
+            if k != self.name and k.startswith(self.name):
                 return True
         return False
         
@@ -457,7 +457,7 @@ class Collection(object):
     def contains_error(self):
         """ Check to see if any child elements have errors """
         for k in self.form.errors.keys():
-            if k.startswith(self.name):
+            if k != self.name and k.startswith(self.name):
                 return True
         return False
 

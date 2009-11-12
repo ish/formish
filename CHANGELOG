@@ -2,6 +2,19 @@
 Changlelog
 ==========
 
+0.8.4b
+------
+
+BUGFIX: contains_error was reporting errors at the self level. Should only
+        report if child fields had errors
+
+0.8.4
+------
+
+BUGFIX: Sequences represented as textareas were not showing contained errors
+        (although they were failing validation). Fields and Collections
+        now have 'contains_error' and 'contained_errors' properties.
+
 0.8.3b 
 ------
 
