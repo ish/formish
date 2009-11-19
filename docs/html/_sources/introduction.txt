@@ -518,7 +518,7 @@ Fancy Converters
 
 Because we can apply a widget to structures or sequences of items, we thought "How about a schema that is a sequence of sequences. This sounds like a csv. Lets map a TextArea to this and apply a SequenceOfSequences Converter". So the following gives you a csv TextArea following the same layered patterns shown in the diagram at the start of this post.
 
-This produces the widget shown here `here <http://localhost:8080/SequenceOfSequencesAsTextArea>`_. In this instance, the field is expecting an isoformat date for the third item in the tuple so the following data would work.. 
+This produces the widget shown here `here <http://test.ish.io/SequenceOfSequencesAsTextArea>`_. In this instance, the field is expecting an isoformat date for the third item in the tuple so the following data would work.. 
 
 .. code-block:: text
 
