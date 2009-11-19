@@ -72,8 +72,9 @@ class TestHTML(unittest.TestCase):
         try:
             data = f.validate(r)
         except fv.FormError, e:
-            assert str(f.errors['one']) == 'must be greater than 18; must be greater than 20'
-            assert str(f['one'].field.errors.exceptions[0]) == 'must be greater than 18'
+            print '***',str(f.errors['one'])
+            assert str(f.errors['one']) == 'must be greater than or equal to 18; must be greater than or equal to 20'
+            assert str(f['one'].field.errors.exceptions[0]) == 'must be greater than or equal to 18'
 
     def test_complex_error_all_required_1(self):
         
@@ -90,7 +91,7 @@ class TestHTML(unittest.TestCase):
             data = f.validate(r)
         except fv.FormError, e:
             print '---',f.errors['one']
-            assert str(f.errors['one']) == 'is required; must be greater than 18; must be greater than 20'
+            assert str(f.errors['one']) == 'is required; must be greater than or equal to 18; must be greater than or equal to 20'
             assert str(f['one'].field.errors.exceptions[0]) == 'is required'
 
     def test_complex_error_all_required_2(self):
@@ -107,8 +108,8 @@ class TestHTML(unittest.TestCase):
         try:
             data = f.validate(r)
         except fv.FormError, e:
-            assert str(f.errors['one']) == 'is required; Please fix any of: must be greater than 18; must be greater than 20'
-            assert str(f['one'].field.errors.exceptions[1].exceptions[1]) == 'must be greater than 20'
+            assert str(f.errors['one']) == 'is required; Please fix any of: must be greater than or equal to 18; must be greater than or equal to 20'
+            assert str(f['one'].field.errors.exceptions[1].exceptions[1]) == 'must be greater than or equal to 20'
 
 
 

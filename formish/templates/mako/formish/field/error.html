@@ -1,4 +1,21 @@
 <%page args="field" />
+<%
+def try_one_base(v):
+    try:
+        return str(int(v)+1)
+    except ValueError:
+        return v
+def oneify(key):
+    keys = key.split('.')
+    l = len(keys)
+    return ','.join([try_one_base(k) for k in keys])
+    %>
 % if field.error:
-<span class="error">${unicode(field.error)}</span>
+<span class="error">${unicode(field.error)}</span><br />
+% endif
+
+% if field.contains_error:
+% for key,error in field.contained_errors:
+<span class="error">item ${oneify(key)} "${error}"</span><br />
+% endfor
 % endif
