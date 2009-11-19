@@ -11,9 +11,9 @@ We'll start off with one of the examples from the Formish documentation.
 
     class SimpleSchema(schemaish.Structure):
         """ A simple sommets form """
-        email = schemaish.String(validator=schemaish.All(schemaish.NotEmpty, schemaish.Email))
-        first_names = schemaish.String(validator=schemaish.NotEmpty)
-        last_name = schemaish.String(validator=schemaish.NotEmpty)
+        email = schemaish.String(validator=validatish.All(validatish.Required(), validatish.Email()))
+        first_names = schemaish.String(validator=validatish.Required())
+        last_name = schemaish.String(validator=validatish.Required())
         comments = schemaish.String()
 
 
