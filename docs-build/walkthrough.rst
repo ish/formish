@@ -61,7 +61,7 @@ And what about our field? Well it's now become a form field, which means it has 
     >>> field.name
     'myfield'
 
-Obviously the name is what we have it.
+The name is as we defined it in the schema.
 
 .. doctest::
 
