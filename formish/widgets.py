@@ -641,7 +641,7 @@ class FileUpload(Widget):
     def __init__(self, filestore=UNSET, show_file_preview=True,
                  show_download_link=False, show_image_thumbnail=False,
                  url_base=None, css_class=None, image_thumbnail_default=None,
-                 url_ident_factory=None):
+                 show_remove_checkbox=True, url_ident_factory=None):
         """
         :arg filestore: filestore for temporary files
         :arg show_image_thumbnail: a boolean that, if set, will include an image
@@ -668,6 +668,7 @@ class FileUpload(Widget):
         self.show_download_link = show_download_link
         self.show_file_preview = show_file_preview
         self.url_ident_factory = url_ident_factory
+        self.show_remove_checkbox = show_remove_checkbox
 
     def __repr__(self):
         attributes = []

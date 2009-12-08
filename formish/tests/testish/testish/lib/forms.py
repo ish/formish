@@ -761,7 +761,12 @@ def form_RequiredStringAndFile(request):
     schema.add('required', schemaish.String(validator=validatish.Required()))
     schema.add('myFileField', schemaish.File())
     form = formish.Form(schema, 'form')
-    form['myFileField'].widget = formish.FileUpload(filestore=CachedTempFilestore(),show_image_thumbnail=True,image_thumbnail_default='/images/nouploadyet.png',show_download_link=True)
+    form['myFileField'].widget = formish.FileUpload(
+        filestore=CachedTempFilestore(),
+        show_image_thumbnail=True,
+        image_thumbnail_default='/images/nouploadyet.png',
+        show_download_link=True
+    )
     return form
 
 def functest_RequiredStringAndFile(self):

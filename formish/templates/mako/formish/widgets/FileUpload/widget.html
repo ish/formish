@@ -31,14 +31,14 @@ else:
 </div>
 % endif
 
-% if field.widget.show_download_link == True:
+% if value_name and field.widget.show_download_link == True:
 <a href="${field.widget.urlfactory(value_name)}">download</a>
 % endif
 
 </div>
-
-
-<input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" />
+% if value_name and field.widget.show_remove_checkbox:
+<label for="${field.cssname}-remove"><input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" /> check to remove</label>
+% endif
 <input id="${field.cssname}-id" type="hidden" name="${field.name}.name" value="${value_name}" />
 <input id="${field.cssname}-mimetype" type="hidden" name="${field.name}.mimetype" value="${mimetype}" />
 <input id="${field.cssname}-default" type="hidden" name="${field.name}.default" value="${value_default}" />
