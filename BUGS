@@ -1,0 +1,6 @@
+Known Bugs
+----------
+
+* Sorting the outside of a list of lists will not renumber correctly
+
+  If you have a sequence of sequences, the outside sequence will not be renumbered correctly using formish.js renumber_sequences. 
