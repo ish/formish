@@ -37,7 +37,7 @@ else:
 
 </div>
 % if value_name and field.widget.show_remove_checkbox:
-<label for="${field.cssname}-remove"><input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" /> check to remove</label>
+<label for="${field.cssname}-remove"><input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" class="widget-fileupload-remove" /> check to remove</label>
 % endif
 <input id="${field.cssname}-id" type="hidden" name="${field.name}.name" value="${value_name}" />
 <input id="${field.cssname}-mimetype" type="hidden" name="${field.name}.mimetype" value="${mimetype}" />

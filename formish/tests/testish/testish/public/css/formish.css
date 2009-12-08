@@ -104,6 +104,9 @@
 .formish-form .fileupload img {
   height:30px;
 }
+.formish-form .inputs input.widget-fileupload-remove {
+  width: auto;
+}
 
 .formish-form .widget-checkboxmultichoicetree li {
   list-style: none;
