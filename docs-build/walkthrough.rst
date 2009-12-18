@@ -858,13 +858,15 @@ The formish ``FileUpload`` widget takes the following arguments
 .. automethod:: formish.widgets.FileUpload.__init__
 
 
+Uploading large files
+^^^^^^^^^^^^^^^^^^^^^
 
+Uploading very large files can cause the OS's file system cache to fill up with
+a file it doesn't really need to cache. If you're on a POSIX system and you
+have Chris Lamb's fadvise package installed, formish will use a more efficent
+file copier that tells the OS not to bother caching any temporary files.
 
-
-
-
-
-
+You get fadvise from Chris Lamb's web site, http://chris-lamb.co.uk/projects/python-fadvise/.
 
 
 Sequences

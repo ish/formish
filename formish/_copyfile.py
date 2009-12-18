@@ -38,7 +38,5 @@ try:
         posix_fadvise(fsrc.fileno(), 0, 0, POSIX_FADV_DONTNEED)
 
 except ImportError:
-    import warnings
-    warnings.warn("python-fadvise not installed, uploading very large files may adversely affect the OS's file system cache")
     copyfileobj = shutil.copyfileobj
 
