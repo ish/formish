@@ -5,7 +5,7 @@ The form module contains the main form, field, group and sequence classes
 import re
 
 from peak.util.proxies import ObjectWrapper
-from webob import UnicodeMultiDict
+from webob.multidict import UnicodeMultiDict
 
 import schemaish, validatish
 from formish import util
