@@ -3,7 +3,6 @@ import unittest
 import schemaish
 from dottedish.api import dotted, unflatten
 from formish.forms import validation
-import copy
 from webob.multidict import MultiDict
 import validatish
 
@@ -39,7 +38,6 @@ class TestFormBuilding(unittest.TestCase):
         """Test empty form construction """
         schema_empty = schemaish.Structure()        
         name = "Empty Form"
-        request =  Request(name)
         form = formish.Form(schema_empty, name)
 
         # Schema matches
@@ -73,7 +71,6 @@ class TestFormBuilding(unittest.TestCase):
         """Test a form that has no nested sections """
         schema_flat = schemaish.Structure([("a", schemaish.String()), ("b", schemaish.String())])
         name = "Flat Form"
-        request =  Request(name)
         form = formish.Form(schema_flat, name)
 
         # stored schema
@@ -89,7 +86,6 @@ class TestFormBuilding(unittest.TestCase):
         schema_nested = schemaish.Structure([("one", one), ("two", two)])
 
         name = "Nested Form One"
-        request =  Request(name)
         form = formish.Form(schema_nested, name)
 
         # stored schema
@@ -146,7 +142,6 @@ class TestFormBuilding(unittest.TestCase):
         form = formish.Form(schema_flat, name)
         r = {'a': '3', 'b': '4'}
         request = Request(name, r)
-        R = copy.deepcopy(r)
 
         reqr = {'a': ['3'], 'b': ['4']}
         # check scmea matches
@@ -186,7 +181,6 @@ class TestFormBuilding(unittest.TestCase):
         form['a'].widget = formish.DateParts()
 
         r = {'a.day': '1','a.month': '3','a.year': '1966', 'b': '4'}
-        R = copy.deepcopy(r)
         request = Request(name, r)
 
         from datetime import date
@@ -256,7 +250,6 @@ class TestFormBuilding(unittest.TestCase):
         form = formish.Form(schema_flat, name)
         r = {'a': '3'}
         request = Request(name, r)
-        R = copy.deepcopy(r)
 
         reqr = {'a': ['3']}
         # Does the form produce an int and a string
@@ -315,7 +308,7 @@ class TestBugs(unittest.TestCase):
                                                        (date(1980,1,1),'b'),
                                                        (datetime(1990,1,1),'c')])
         self.assertRaises(formish.FormError, form.validate, Request('form', {'date': '1990-01-01T00:00:00'}))
-        rendered = form()
+        form()
 
                
 if __name__ == "__main__":

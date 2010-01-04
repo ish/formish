@@ -2,7 +2,7 @@
 General purpose formish extensions.
 """
 
-from formish import validation, widgets, Form
+from formish import widgets
 from convertish.convert import ConvertError
 from convertish.convert import string_converter
 
