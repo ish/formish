@@ -771,10 +771,11 @@ class ErrorDict(dict):
     def __iter__(self):
         for field in self.form.allfields:
             if field.name in self:
-                yield self[field.name]
-                if isinstance(basedict, self[field.name]):
+                fieldvalue = self[field.name]
+                yield fieldvalue
+                if isinstance(fieldvalue, dict):
                     keys = []
-                    for k in self[field.name].keys():
+                    for k in fieldvalue.keys():
                         keys.append( [tryint(k) for k in k.split('.')] )
                     keys.sort()
                     for k in keys:
