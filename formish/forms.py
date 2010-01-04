@@ -5,7 +5,7 @@ The form module contains the main form, field, group and sequence classes
 import re
 
 from peak.util.proxies import ObjectWrapper
-from webob import UnicodeMultiDict
+from webob.multidict import UnicodeMultiDict
 
 import schemaish, validatish
 from formish import util
@@ -110,7 +110,7 @@ def fall_back_renderer(renderer, name, widget, vars):
     import mako
     try:
         return renderer('/formish/widgets/%s/%s.html'%(widget,name), vars)
-    except mako.exceptions.TopLevelLookupException, e:
+    except mako.exceptions.TopLevelLookupException:
         return renderer('/formish/%s.html'%(name), vars)
     
 
@@ -1015,7 +1015,7 @@ class Form(object):
             raise Exception("request does not match form name")
         try: 
             data = self._validate(request, skip_read_only_defaults=skip_read_only_defaults)
-        except validation.FormError, e:
+        except validation.FormError:
             if failure_callable is None:
                 raise
             else:

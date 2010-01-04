@@ -52,7 +52,7 @@ class Test(unittest.TestCase):
                 continue
             def default_unittest(formdef):
                 """ We just make sure we can build the form """
-                f = formdef(None)    
+                formdef(None)    
                 return
                 ## I'd like to do an automatic check on validation but how?
                 #f.defaults = {}

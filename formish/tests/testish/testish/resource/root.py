@@ -116,7 +116,7 @@ class FormResource(resource.Resource):
         form.renderer = request.environ['restish.templating'].renderer
         try:
             data = form.validate(request)
-        except formish.FormError, e:
+        except formish.FormError:
             return self.render_form(request, form=form)
         else:
             if 'myFileField' in data and data['myFileField'] is not None:

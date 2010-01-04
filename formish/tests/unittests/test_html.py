@@ -13,7 +13,6 @@ class TestHTML(unittest.TestCase):
     """
 
     def test_default_title(self):
-        r = webob.Request.blank('http://localhost/')
         schema = schemaish.Structure([('one', schemaish.String())])
         f = formish.Form(schema,name='form')
         soup = BeautifulSoup(f())
@@ -26,8 +25,8 @@ class TestHTML(unittest.TestCase):
         schema = schemaish.Structure([('one', schemaish.String(validator=v.Required()))])
         f = formish.Form(schema,name="form")
         try:
-            data = f.validate(r)
-        except fv.FormError, e:
+            f.validate(r)
+        except fv.FormError:
             assert str(f.errors['one']) == 'is required'
         soup = BeautifulSoup(f())
         assert soup.find(id='form-one--field').find("span", "error").string == 'is required' , "test that the form error is being created"
@@ -70,8 +69,8 @@ class TestHTML(unittest.TestCase):
         r.POST['__formish_form__'] = 'form'
         r.POST['one'] = '9'
         try:
-            data = f.validate(r)
-        except fv.FormError, e:
+            f.validate(r)
+        except fv.FormError:
             print '***',str(f.errors['one'])
             assert str(f.errors['one']) == 'must be greater than or equal to 18; must be greater than or equal to 20'
             assert str(f['one'].field.errors.exceptions[0]) == 'must be greater than or equal to 18'
@@ -88,8 +87,8 @@ class TestHTML(unittest.TestCase):
         r.POST['__formish_form__'] = 'form'
         r.POST['one'] = ''
         try:
-            data = f.validate(r)
-        except fv.FormError, e:
+            f.validate(r)
+        except fv.FormError:
             print '---',f.errors['one']
             assert str(f.errors['one']) == 'is required; must be greater than or equal to 18; must be greater than or equal to 20'
             assert str(f['one'].field.errors.exceptions[0]) == 'is required'
@@ -106,8 +105,8 @@ class TestHTML(unittest.TestCase):
         r.POST['__formish_form__'] = 'form'
         r.POST['one'] = ''
         try:
-            data = f.validate(r)
-        except fv.FormError, e:
+            f.validate(r)
+        except fv.FormError:
             assert str(f.errors['one']) == 'is required; Please fix any of: must be greater than or equal to 18; must be greater than or equal to 20'
             assert str(f['one'].field.errors.exceptions[1].exceptions[1]) == 'must be greater than or equal to 20'
 

@@ -1,5 +1,5 @@
 import unittest
-from webob import MultiDict
+from webob.multidict import MultiDict
 
 class Request(object):
     headers = {'content-type':'text/html'}

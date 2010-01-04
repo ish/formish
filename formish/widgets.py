@@ -355,7 +355,7 @@ class SequenceDefault(Container):
         for f in field.fields:
             try:
                 r = request_data[int(f.nodename)]
-            except TypeError, KeyError:
+            except (TypeError, KeyError):
                 r = None
             d = f.widget.pre_parse_incoming_request_data(f, r)
             data[f.nodename] = d
@@ -1012,7 +1012,6 @@ def get_parent(segments):
         return '.'.join(segments[:-1])
 
 def mktree(options):
-    last_segments_len = 1
     root = {'': {'data':('root', 'Root'), 'children':[]} }
     for id, label in options:
         segments = id.split('.')

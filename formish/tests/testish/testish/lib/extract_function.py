@@ -5,7 +5,6 @@ def extract(id):
     func_def = []
     in_function = False
     in_quotes = False
-    prev_line = ''
     for line in lines:
         if 'def %s('%id in line:
             in_function = True
@@ -19,8 +18,6 @@ def extract(id):
 
         if in_function and not in_quotes and '   """' not in line and 'def %s('%id not in line:
             func_def.append( line[4:] )
-
-        prev_line = line
 
     func_def = ''.join(func_def)
     try:
@@ -38,7 +35,6 @@ def extract_docstring_highlighted(id):
     docstring = []
     in_function = False
     in_quotes = False
-    prev_line = ''
     for line in lines:
         if 'def %s('%id in line:
             in_function = True
@@ -52,8 +48,6 @@ def extract_docstring_highlighted(id):
 
         if in_quotes and in_function and '   """' not in line and 'def %s('%id not in line:
             docstring.append( line )
-
-        prev_line = line
 
     docstring = ''.join(docstring)
     try:
@@ -69,7 +63,6 @@ def extract_docstring(id):
     docstring = []
     in_function = False
     in_quotes = False
-    prev_line = ''
     for line in lines:
         if 'def %s('%id in line:
             in_function = True
@@ -83,8 +76,6 @@ def extract_docstring(id):
 
         if in_quotes and in_function and '   """' not in line and 'def %s('%id not in line:
             docstring.append( line )
-
-        prev_line = line
 
     docstring = ''.join(docstring)
     return docstring

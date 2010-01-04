@@ -8,7 +8,6 @@ class TestTogether(TestCase):
     """
 
     def test_func(self):
-        sel = self.selenium
         for attr in dir(forms):
             if attr.startswith('functest_'):
                 getattr(forms,attr)(self)
