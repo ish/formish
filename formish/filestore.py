@@ -40,7 +40,7 @@ class FileSystemHeaderedFilestore(object):
         """
         try:
             f = open(os.path.join(self._root_dir, safefilename.encode(key)), 'rb')
-        except IOError, AttributeError:
+        except (IOError, AttributeError):
             raise KeyError(key)
         headers = []
         while True:
