@@ -355,7 +355,7 @@ class SequenceDefault(Container):
         for f in field.fields:
             try:
                 r = request_data[int(f.nodename)]
-            except TypeError, KeyError:
+            except (TypeError, KeyError):
                 r = None
             d = f.widget.pre_parse_incoming_request_data(f, r)
             data[f.nodename] = d
