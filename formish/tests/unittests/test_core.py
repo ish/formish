@@ -4,7 +4,7 @@ import schemaish
 from dottedish.api import dotted, unflatten
 from formish.forms import validation
 import copy
-from webob import MultiDict
+from webob.multidict import MultiDict
 import validatish
 
 
