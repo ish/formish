@@ -165,11 +165,13 @@ class CheckedPassword(Input):
 
     type = 'CheckedPassword'
     template = 'field.CheckedPassword'
+    confirm_label = None
     default_value = {'password': [''], 'confirm': ['']}
 
     def __init__(self, **k):
         self.strip = k.pop('strip', True)
         self.css_class = k.pop('css_class', None)
+        self.confirm_label = k.pop('confirm_label',None)
         Input.__init__(self, **k)
         if not self.converter_options.has_key('delimiter'):
             self.empty.converter_options['delimiter'] = ','
@@ -219,11 +221,13 @@ class CheckedInput(Input):
 
     type = 'CheckedInput'
     template = 'field.CheckedInput'
+    confirm_label = None
     default_value = {'input': [''], 'confirm': ['']}
 
     def __init__(self, **k):
         self.strip = k.pop('strip', True)
         self.css_class = k.pop('css_class', None)
+        self.confirm_label = k.pop('confirm_label',None)
         Input.__init__(self, **k)
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
