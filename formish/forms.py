@@ -801,10 +801,12 @@ class Form(object):
 
     _request_data = None
 
+    base_classes = ['formish-form']
+
     def __init__(self, structure, name=None, defaults=None, errors=None,
                  action_url=None, renderer=None, method='post',
                  add_default_action=True, include_charset=True,
-                 empty=UNSET):
+                 empty=UNSET, error_summary=None,error_summary_message=None,classes=None):
         """
         Create a new form instance
 
@@ -828,6 +830,9 @@ class Form(object):
 
         :arg method: Option method, default POST
         :type method: string
+
+        :arg error_summary: None, 'message', 'list'
+        :type error_summary: string
         """
         if method.lower() not in self.SUPPORTED_METHODS:
             raise ValueError("method must be one of GET or POST")
@@ -844,7 +849,16 @@ class Form(object):
         self.defaults = defaults
         self.errors = errors
         self.error = None
+        self.error_summary = error_summary
+        self.error_summary_message = error_summary_message
         self._actions = []
+        if classes is not None:
+            if isinstance(classes, basestring):
+                self.classes = self.base_classes + [classes]
+            else:
+                self.classes = self.base_classes + classes
+        else:
+            self.classes = self.base_classes
         if add_default_action:
             self.add_action( None, 'Submit' )
         self.action_url = action_url

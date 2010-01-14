@@ -11,5 +11,9 @@ if form._has_upload_fields():
     enctype = ' enctype="multipart/form-data"'
 else:
     enctype = '' 
+
+if form.errors:
+    form.classes.append('error')
+classes_string = ' '.join(form.classes) 
 %>
-<form ${id|n}action="${action_url}" class="formish-form" method="${form.method.lower()}"${enctype|n} accept-charset="utf-8">
+<form ${id|n}action="${action_url}" class="${classes_string}" method="${form.method.lower()}"${enctype|n} accept-charset="utf-8">

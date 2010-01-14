@@ -1,3 +1,19 @@
-%if form.error is not None:
-  <p class="error">${unicode(form.error)}</p>
+%if form.errors is not None:
+%if form.error_summary == 'list':
+<p class="error">
+<ul>
+%for key, error in form.errors.items():
+<li>${form[key].title|n}: ${form[key].error()|n}</li>
+%endfor
+</ul>
+</p>
+%elif form.error_summary == 'string':
+<p class="error">
+%if form.error_summary_message:
+${error_summary_message|n}
+%else:
+The form contained errors, please edit and resubmit.
+%endif
+</p>
+%endif
 %endif
