@@ -12,6 +12,8 @@ if form._has_upload_fields():
 else:
     enctype = '' 
 
+all_classes = []
+all_classes.extend( form.classes )
 if form.errors:
     form.classes.append('error')
 classes_string = ' '.join(form.classes) 
