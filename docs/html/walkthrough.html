@@ -756,11 +756,19 @@ validatish.Invalid, if validation fails.</p>
 <h4>What else can I configure?<a class="headerlink" href="#what-else-can-i-configure" title="Permalink to this headline">¶</a></h4>
 <p>The formish <tt class="docutils literal"><span class="pre">FileUpload</span></tt> widget takes the following arguments</p>
 </div>
+<div class="section" id="uploading-large-files">
+<h4>Uploading large files<a class="headerlink" href="#uploading-large-files" title="Permalink to this headline">¶</a></h4>
+<p>Uploading very large files can cause the OS&#8217;s file system cache to fill up with
+a file it doesn&#8217;t really need to cache. If you&#8217;re on a POSIX system and you
+have Chris Lamb&#8217;s fadvise package installed, formish will use a more efficent
+file copier that tells the OS not to bother caching any temporary files.</p>
+<p>You get fadvise from Chris Lamb&#8217;s web site, <a class="reference external" href="http://chris-lamb.co.uk/projects/python-fadvise/">http://chris-lamb.co.uk/projects/python-fadvise/</a>.</p>
+</div>
 </div>
 </div>
 <div class="section" id="sequences">
 <h2>Sequences<a class="headerlink" href="#sequences" title="Permalink to this headline">¶</a></h2>
-<p>Formish also handles sequences in fields, the basic example of this is the checkbox and the multi-select. However formish can also handle sequences in text areas and also sequences in separate fields.</p>
+<p>Formish also handles sequences in fields, the basic example of this is the checkbox and the multi-select. However formish can also handle sequences in text areas and also sequences in separate fields. For examples of more complex sequences, look in the example code at <a class="reference external" href="http://test.ish.io">http://test.ish.io</a> . Especially SequenceOfDateParts, SequenceOfStructures, SequenceOfUploadStructures. These should give you an idea how more complicated forms can be constructed.</p>
 <div class="section" id="checkbox-multi-choice">
 <h3>Checkbox Multi Choice<a class="headerlink" href="#checkbox-multi-choice" title="Permalink to this headline">¶</a></h3>
 <p>Now we&#8217;ve talked through the basics.. I&#8217;ll skip a lot of the detail and just demonstrate the process..</p>
@@ -1073,6 +1081,7 @@ validatish.Invalid, if validation fails.</p>
 <li><a class="reference external" href="#so-what-happens-when-a-file-is-uploaded">So what happens when a file is uploaded?</a></li>
 <li><a class="reference external" href="#what-happens-if-i-want-to-use-my-own-tempfile-storage-and-main-storage">What happens if I want to use my own tempfile storage and main storage?</a></li>
 <li><a class="reference external" href="#what-else-can-i-configure">What else can I configure?</a></li>
+<li><a class="reference external" href="#uploading-large-files">Uploading large files</a></li>
 </ul>
 </li>
 </ul>
