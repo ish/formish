@@ -872,7 +872,7 @@ You get fadvise from Chris Lamb's web site, http://chris-lamb.co.uk/projects/pyt
 Sequences
 =========
 
-Formish also handles sequences in fields, the basic example of this is the checkbox and the multi-select. However formish can also handle sequences in text areas and also sequences in separate fields. 
+Formish also handles sequences in fields, the basic example of this is the checkbox and the multi-select. However formish can also handle sequences in text areas and also sequences in separate fields. For examples of more complex sequences, look in the example code at http://test.ish.io . Especially SequenceOfDateParts, SequenceOfStructures, SequenceOfUploadStructures. These should give you an idea how more complicated forms can be constructed.
 
 Checkbox Multi Choice
 ---------------------
