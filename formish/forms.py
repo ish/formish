@@ -155,16 +155,21 @@ class RenderableProperty(object):
     the property's instance.
     """
 
-    def __init__(self, property_name, attr_name):
+    def __init__(self, property_name, getter, setter=None, deleter=None):
         self.property_name = property_name
-        self.attr_name = attr_name
+        self.getter = getter
+        self.setter = setter
+        self.deleter = deleter
 
     def __get__(self, instance, owner):
-        return RenderableObjectWrapper(getattr(instance, self.attr_name),
-                                       instance, self.property_name)
+        return RenderableObjectWrapper(self.getter(instance), instance,
+                                       self.property_name)
 
     def __set__(self, instance, value):
-        setattr(instance, self.attr_name, value)
+        self.setter(instance, value)
+
+    def __delete__(self, instance):
+        self.deleter(instance)
 
 
 class RenderableObjectWrapper(ObjectWrapper):
@@ -918,7 +923,13 @@ class Form(object):
         if empty is not UNSET:
             self.empty = empty
 
-    alert = RenderableProperty('alert', '_alert')
+    def alert():
+        def get(self):
+            return self._alert
+        def set(self, alert):
+            self._alert = alert
+        return RenderableProperty('alert', get, set)
+    alert = alert()
 
     @staticmethod
     def _error_warning():
