@@ -242,16 +242,14 @@ class Field(object):
             else:
                 return util.title_from_name(self.name.split('.')[-1])
 
-
-    @property
-    def description(self):
-        """ The Field schema's description """
-        try:
-            val =  self.form.get_item_data(self.name,'description')
-        except KeyError:
-            val = self.attr.description        
-        return TemplatedString(self, 'description', val)
-
+    def description():
+        def get(self):
+            try:
+                return self.form.get_item_data(self.name, 'description')
+            except KeyError:
+                return self.attr.description        
+        return RenderableProperty('description', get)
+    description = description()
 
     @property
     def cssname(self):
@@ -452,11 +450,11 @@ class Collection(object):
         return name
 
 
-    @property
-    def description(self):
-        """ Returns the schema's description """
-        val = self.attr.description        
-        return TemplatedString(self,'description',val)
+    def description():
+        def get(self):
+            return self.attr.description
+        return RenderableProperty('description', get)
+    description = description()
 
 
     @property
