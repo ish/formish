@@ -3,6 +3,7 @@ The form module contains the main form, field, group and sequence classes
 """
 
 import re
+import warnings
 
 from peak.util.proxies import ObjectWrapper
 from webob.multidict import UnicodeMultiDict
@@ -148,6 +149,58 @@ class TemplatedString(object):
         return fall_back_renderer(renderer, name, widget, vars)
 
 
+class RenderableProperty(object):
+    """
+    Property descriptor that returns a renderable proxy when retrieved from the
+    the property's instance.
+    """
+
+    def __init__(self, property_name, getter, setter=None, deleter=None):
+        self.property_name = property_name
+        self.getter = getter
+        self.setter = setter
+        self.deleter = deleter
+
+    def __get__(self, instance, owner):
+        return RenderableObjectWrapper(self.getter(instance), instance,
+                                       self.property_name)
+
+    def __set__(self, instance, value):
+        self.setter(instance, value)
+
+    def __delete__(self, instance):
+        self.deleter(instance)
+
+
+class RenderableObjectWrapper(ObjectWrapper):
+    """
+    Proxy object that, when called, renders itself using a template. The name
+    of the template is derived from the form item and the name of the property.
+    """
+
+    # Non-proxied attributes.
+    __form_item = None
+    __property_name = None
+
+    def __init__(self, obj, form_item, property_name):
+        ObjectWrapper.__init__(self, obj)
+        self.__form_item = form_item
+        self.__property_name = property_name
+
+    def __call__(self):
+        # XXX This is a hack to make it work for a Form property. A Form
+        # doesn't look enough like any other form item right now to work
+        # otherwise.
+        if isinstance(self.__form_item, Form):
+            return self.__form_item.renderer(
+                '/formish/form/%s.html' % self.__property_name,
+                {'form': self.__form_item})
+        # So, we're a field (doesn't seem to support container form items yet).
+        widget_type, widget = self.__form_item.widget.template.split('.')
+        name = '%s/%s'%(widget_type,self.__property_name)
+        vars = {'field':self.__form_item}
+        return fall_back_renderer(self.__form_item.form.renderer, name, widget, vars)
+
 
 class Field(object):
     """
@@ -189,16 +242,14 @@ class Field(object):
             else:
                 return util.title_from_name(self.name.split('.')[-1])
 
-
-    @property
-    def description(self):
-        """ The Field schema's description """
-        try:
-            val =  self.form.get_item_data(self.name,'description')
-        except KeyError:
-            val = self.attr.description        
-        return TemplatedString(self, 'description', val)
-
+    def description():
+        def get(self):
+            try:
+                return self.form.get_item_data(self.name, 'description')
+            except KeyError:
+                return self.attr.description        
+        return RenderableProperty('description', get)
+    description = description()
 
     @property
     def cssname(self):
@@ -399,11 +450,11 @@ class Collection(object):
         return name
 
 
-    @property
-    def description(self):
-        """ Returns the schema's description """
-        val = self.attr.description        
-        return TemplatedString(self,'description',val)
+    def description():
+        def get(self):
+            return self.attr.description
+        return RenderableProperty('description', get)
+    description = description()
 
 
     @property
@@ -848,7 +899,7 @@ class Form(object):
             errors = ErrorDict(self)
         self.defaults = defaults
         self.errors = errors
-        self.error = None
+        self._alert = None
         self.error_summary = error_summary
         self.error_summary_message = error_summary_message
         self._actions = []
@@ -869,6 +920,31 @@ class Form(object):
         self.include_charset = include_charset
         if empty is not UNSET:
             self.empty = empty
+
+    def alert():
+        def get(self):
+            return self._alert
+        def set(self, alert):
+            self._alert = alert
+        return RenderableProperty('alert', get, set)
+    alert = alert()
+
+    @staticmethod
+    def _error_warning():
+        warnings.warn("Form.error has been deprecated and will change behaviour "
+                      "in the future. Please use Form.alert to display a general "
+                      "form error message.",
+                      DeprecationWarning, stacklevel=3)
+
+    def _set_error(self, error):
+        self._error_warning()
+        self.alert = error
+
+    def _get_error(self, error):
+        self._error_warning()
+        return self.alert
+
+    error = property(_get_error, _set_error)
 
     def __repr__(self):
         attributes = []
