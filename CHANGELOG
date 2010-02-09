@@ -2,6 +2,16 @@
 Changlelog
 ==========
 
+0.8.5
+-----
+
+ * required marker to templates
+ * 'allow_remove' flag on fileupload tempalte
+
+BUGFIX: contains_errors should not fire if the container has an error
+BUGFIX: problem with text area sequences not showing errors
+BUGFIX: name error in classes_from_vars
+
 0.8.4c
 ------
 
