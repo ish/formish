@@ -1,6 +1,10 @@
 ==========
 Changlelog
 ==========
+0.8.6
+-----
+
+BUGFIX: too many error classes in the form tag if multiple validation errors
 
 0.8.5
 -----
