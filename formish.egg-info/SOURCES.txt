@@ -180,6 +180,7 @@ formish/templates/mako/formish/field/main.html
 formish/templates/mako/formish/field/seqdelete.html
 formish/templates/mako/formish/field/seqgrab.html
 formish/templates/mako/formish/form/actions.html
+formish/templates/mako/formish/form/alert.html
 formish/templates/mako/formish/form/error_list.html
 formish/templates/mako/formish/form/fields.html
 formish/templates/mako/formish/form/footer.html
