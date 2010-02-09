@@ -171,7 +171,9 @@ and that is it... if you want to render the form now, you just call it (we've im
 
     >>> form()
     '\n<form id="form" action="" class="formish-form" method="post" enctype="multipart/form-data" accept-charset="utf-8">\n\n  <input type="hidden" name="_charset_" />\n  <input type="hidden" name="__formish_form__" value="form" />\n\n<div id="form-name-field" class="field string input">\n\n<label for="form-name">Name</label>\n\n\n<div class="inputs">\n\n<input id="form-name" type="text" name="name" value="" />\n\n</div>\n\n\n\n\n\n</div>\n\n<div id="form-age-field" class="field integer input">\n\n<label for="form-age">Age</label>\n\n\n<div class="inputs">\n\n<input id="form-age" type="text" name="age" value="" />\n\n</div>\n\n\n\n\n\n</div>\n\n\n  <div class="actions">\n      <input type="submit" id="form-action-submit" name="submit" value="Submit" />\n  </div>\n\n</form>\n\n'
-    Lets tidy that up a little
+
+    
+Lets tidy that up a little
 
 .. code-block:: html
 
@@ -202,83 +204,91 @@ Without defining any widgets, formish just uses some defaults. Let's take a look
 
 .. code-block:: python   
 
-    class Widget(object):
 
-        _template = None
+    class Widget(object):
+        type = None
+        template = None
+        default_value = ['']
 
         def __init__(self, **k):
-            self.converter_options = k.get('converter_options', {})
             self.css_class = k.get('css_class', None)
-            self.converttostring = True
+            self.empty = k.get('empty',None)
+            self.readonly = k.get('readonly',False)
+            self.converter_options = k.get('converter_options', {})
             if not self.converter_options.has_key('delimiter'):
                 self.converter_options['delimiter'] = ','
-        
-        def pre_render(self, schema_type, data):
-            string_data = string_converter(schema_type).from_type(data)
-            if string_data is None:
+
+
+        def to_request_data(self, field, data):
+            if data is None:
                 return ['']
+            string_data = string_converter(field.attr).from_type(data, converter_options=self.converter_options)
             return [string_data]
 
-        def pre_parse_request(self, schema_type, request_data):
-            return request_data
 
-        def convert(self, schema_type, request_data):
-            return string_converter(schema_type).to_type(request_data[0])
+        def pre_parse_incoming_request_data(self, field, request_data):
+            return request_data or self.default_value
 
-        def __call__(self, field):
-            return field.form.renderer('/formish/widgets/%s.html'%self._template, {'f':field})
+
+        def from_request_data(self, field, request_data):
+            string_data = request_data[0]
+            if string_data == '':
+                return self.empty
+            return string_converter(field.attr).to_type(string_data, converter_options=self.converter_options)
+
+
 
 This is the base class which shows how widgets work. First of all we have a couple of variables to do with converter options (which we'll come back to in a moment). The four class methods are at the hear of formish though.
 
-pre_render
-..........
+to_request_data
+...............
 
-Before a widget is rendered, the input data is converted from its schema type to raw request data. The data passed to pre_render is just that fields data.
+Before a widget is rendered, the input data is converted from its schema type to raw request data. The data passed to to_request_data is just the fields data.
 
 
-convert
-.......
+from_request_data
+.................
 
 Takes the request data for the field and converts it to the schema type.
-
-__call__
-........
-
-And finally, if you want the widget to render, just call it! That's it..  So we have a path from data -> request data and back from request data > data.. 
 
 
 Oh.. I left out one.. 
 
-pre_parse_request_data
-......................
+pre_parse_incoming_request_data
+...............................
 
 When a field is submitted, the request data can be munged to try to enforce some sort of symmetry between input request data and output request data. This is only really used for file uploads where the field storage is extracted to a temporary location before passing the request data to convert. So, for most cases just ignore this.
 
 Convertish
 ----------
 
-You can see from the example that the main conversion process is done using ``string_converter``. This is one of the converter types in ``convertish`` and maps any of the schemaish types into a consistent string representation. It does so using peak.rules (although we could be convinced otherwise) and each string_converter implements a ``from_type`` and a ``to_type``. For examples
+You can see from the example that the main conversion process is done using ``string_converter``. This is one of the converter types in ``convertish`` and maps any of the schemaish types into a consistent string representation. It does so using simplegeneric and each string_converter implements a ``from_type`` and a ``to_type``. For example..
 
 
 .. code-block:: python   
 
-    class IntegerToStringConverter(Converter):
-        cast = int
-        
+    class NumberToStringConverter(Converter):
+        cast = None
+        type_string = 'number'
+
         def from_type(self, value, converter_options={}):
             if value is None:
-                return ''
-            return str(value)
-        
-        def to_type(self, value, converter_options={}):
-            if value == '':
                 return None
+            return str(value)
+
+        def to_type(self, value, converter_options={}):
+            if value is None:
+                return None
+            # "Cast" the value to the correct type. For some strange reason,
+            # Python's decimal.Decimal type raises an ArithmeticError when it's
+            # given a dodgy value.
             value = value.strip()
             try:
                 value = self.cast(value)
-            except ValueError:
-                raise ConvertError("Not a valid number")
+            except (ValueError, ArithmeticError):
+                raise ConvertError("Not a valid %s"%self.type_string)
             return value
+
 
 So we short circuit None values [#f1]_, strip the data and cast it to the right type and raise a conversion exception if it fails. 
 
@@ -300,7 +310,7 @@ So we now have a form defined and an example of a simple widget. Let's take a lo
 So the form template just calls each individual part. Here are the templates for each part (I've combined them together and separated them by comments to save on space).
 
 
-``form_header.html``
+``form/header.html``
 
 .. code-block:: mako
 
@@ -309,45 +319,89 @@ So the form template just calls each individual part. Here are the templates for
         action_url = form.action_url
     else:
         action_url = ''
+    if form.name:
+        id = 'id="%s" '%form.name
+    else:
+        id = ''
+    if form._has_upload_fields():
+        enctype = ' enctype="multipart/form-data"'
+    else:
+        enctype = '' 
+
+    all_classes = []
+    all_classes.extend( form.classes )
+    if form.errors and 'error' not in form.classes:
+        form.classes.append('error')
+    classes_string = ' '.join(form.classes) 
     %>
-    <form id="${form.name}" action="${action_url}" class="formish-form"
-         method="post" enctype="multipart/form-data" accept-charset="utf-8">
+    <form ${id|n}action="${action_url}" class="${classes_string}" method="${form.method.lower()}"${enctype|n} accept-charset="utf-8">
 
-``form_metadata.html``
+The form header ensures we have the correct classes and id and also adds an error class if there are any errors on the form. To make things simpler, we only use multipart data if there are file uploads on the form.
 
-.. code-block:: mako
 
-    <input type="hidden" name="_charset_" />
-    <input type="hidden" name="__formish_form__" value="${form.name}" />
-
-``form_fields.html``
+``form/metadata.html``
 
 .. code-block:: mako
 
-    %for f in form.fields:
-    ${f()|n}
-    %endfor
+    % if form.include_charset:
+      <div class="hidden"><input type="hidden" name="_charset_" /></div>
+    % endif
+    % if form.name:
+      <div class="hidden"><input type="hidden" name="__formish_form__" value="${form.name}" /></div>
+    % endif
 
-``form_actions.html``
+This conditionally adds hidden fields for the form name and charset
+
+``form/fields.html``
+
+.. code-block:: mako
+
+    %if fields is not None:
+        %for f in fields:
+            ${form[f]()|n}
+        %endfor
+    %else:
+        %for f in form.fields:
+            ${f()|n}
+        %endfor
+    %endif
+
+
+``form/actions.html``
 
 .. code-block:: mako
 
     <div class="actions">
-    %if form._actions == []:
-      <input type="submit" id="${form.name}-action-submit" name="submit" value="Submit" />
-    %else:
-      %for action in form._actions:
-      <input type="submit" id="${form.name}-action-${action.name}" 
-           name="${action.name}" value="${action.label}" />
-      %endfor
-    %endif
+        %for action in form._actions:
+    <%
+    if action.value is None:
+        value = ''
+    else:
+        value = ' value="%s"'%action.value
+    if action.name is None:
+        name = ''
+    else:
+        name = ' name="%s"'%action.name
+    form_id = []
+    if form.name:
+        form_id.append(form.name)
+    form_id.append('action')
+    if action.name:
+        form_id.append(action.name)
+    form_id = '-'.join(form_id)
+    %>
+            <input type="submit" id="${form_id}"${name|n}${value|n} />
+        %endfor
     </div>
 
-``form_footer.html``
+
+``form/footer.html``
 
 .. code-block:: mako
 
     </form>
+
+
 
 The most complicated part is probably the actions because of the default submit action applied if no explicit actions are give. 
 

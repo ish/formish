@@ -3,7 +3,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Introducing Formish &mdash; Formish v1 documentation</title>
+    <title>Introducing Formish &amp;mdash; Formish v1 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -20,7 +20,7 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="top" title="Formish v1 documentation" href="index.html" />
     <link rel="next" title="A Formish Walkthrough" href="walkthrough.html" />
-    <link rel="prev" title="Welcome to Formish&#8217;s documentation!" href="index.html" /> 
+    <link rel="prev" title="Welcome to Formish’s documentation!" href="index.html" /> 
 
 
   <link media="screen" href="_static/css/screen.css" type="text/css" rel="stylesheet" />
@@ -44,7 +44,7 @@
           <a href="walkthrough.html" title="A Formish Walkthrough"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to Formish&#8217;s documentation!"
+          <a href="index.html" title="Welcome to Formish’s documentation!"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Formish v1 documentation</a> &raquo;</li> 
       </ul>
@@ -61,7 +61,6 @@
         <div class="bodywrapper">
           <div class="body">
             
-  
   <div class="section" id="introducing-formish">
 <h1>Introducing Formish<a class="headerlink" href="#introducing-formish" title="Permalink to this headline">¶</a></h1>
 <div class="admonition note">
@@ -204,9 +203,9 @@
 <p>and that is it... if you want to render the form now, you just call it (we&#8217;ve implemented a default mako renderer for testing).</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">()</span>
 <span class="go">&#39;\n&lt;form id=&quot;form&quot; action=&quot;&quot; class=&quot;formish-form&quot; method=&quot;post&quot; enctype=&quot;multipart/form-data&quot; accept-charset=&quot;utf-8&quot;&gt;\n\n  &lt;input type=&quot;hidden&quot; name=&quot;_charset_&quot; /&gt;\n  &lt;input type=&quot;hidden&quot; name=&quot;__formish_form__&quot; value=&quot;form&quot; /&gt;\n\n&lt;div id=&quot;form-name-field&quot; class=&quot;field string input&quot;&gt;\n\n&lt;label for=&quot;form-name&quot;&gt;Name&lt;/label&gt;\n\n\n&lt;div class=&quot;inputs&quot;&gt;\n\n&lt;input id=&quot;form-name&quot; type=&quot;text&quot; name=&quot;name&quot; value=&quot;&quot; /&gt;\n\n&lt;/div&gt;\n\n\n\n\n\n&lt;/div&gt;\n\n&lt;div id=&quot;form-age-field&quot; class=&quot;field integer input&quot;&gt;\n\n&lt;label for=&quot;form-age&quot;&gt;Age&lt;/label&gt;\n\n\n&lt;div class=&quot;inputs&quot;&gt;\n\n&lt;input id=&quot;form-age&quot; type=&quot;text&quot; name=&quot;age&quot; value=&quot;&quot; /&gt;\n\n&lt;/div&gt;\n\n\n\n\n\n&lt;/div&gt;\n\n\n  &lt;div class=&quot;actions&quot;&gt;\n      &lt;input type=&quot;submit&quot; id=&quot;form-action-submit&quot; name=&quot;submit&quot; value=&quot;Submit&quot; /&gt;\n  &lt;/div&gt;\n\n&lt;/form&gt;\n\n&#39;</span>
-<span class="go">Lets tidy that up a little</span>
 </pre></div>
 </div>
+<p>Lets tidy that up a little</p>
 <div class="highlight-html"><div class="highlight"><pre><span class="nt">&lt;form</span> <span class="na">id=</span><span class="s">&quot;form&quot;</span> <span class="na">action=</span><span class="s">&quot;&quot;</span> <span class="na">class=</span><span class="s">&quot;form-form&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span> <span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span> <span class="na">accept-charset=</span><span class="s">&quot;utf-8&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;_charset_&quot;</span> <span class="nt">/&gt;</span>
   <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;__formish_form__&quot;</span> <span class="na">value=</span><span class="s">&quot;form&quot;</span> <span class="nt">/&gt;</span>
@@ -232,70 +231,75 @@
 </div>
 <p>Without defining any widgets, formish just uses some defaults. Let&#8217;s take a look at the default widget to find out what it is doing.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">Widget</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-
-    <span class="n">_template</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="nb">type</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">default_value</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">k</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">converter_options</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;converter_options&#39;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">css_class</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;css_class&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">converttostring</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">empty</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;empty&#39;</span><span class="p">,</span><span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">readonly</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;readonly&#39;</span><span class="p">,</span><span class="bp">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">converter_options</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;converter_options&#39;</span><span class="p">,</span> <span class="p">{})</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">converter_options</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="s">&#39;delimiter&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">converter_options</span><span class="p">[</span><span class="s">&#39;delimiter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;,&#39;</span>
 
-    <span class="k">def</span> <span class="nf">pre_render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_type</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="n">string_data</span> <span class="o">=</span> <span class="n">string_converter</span><span class="p">(</span><span class="n">schema_type</span><span class="p">)</span><span class="o">.</span><span class="n">from_type</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">string_data</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+
+    <span class="k">def</span> <span class="nf">to_request_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[</span><span class="s">&#39;&#39;</span><span class="p">]</span>
+        <span class="n">string_data</span> <span class="o">=</span> <span class="n">string_converter</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">from_type</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">converter_options</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">converter_options</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">string_data</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">pre_parse_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_type</span><span class="p">,</span> <span class="n">request_data</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">request_data</span>
 
-    <span class="k">def</span> <span class="nf">convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">schema_type</span><span class="p">,</span> <span class="n">request_data</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">string_converter</span><span class="p">(</span><span class="n">schema_type</span><span class="p">)</span><span class="o">.</span><span class="n">to_type</span><span class="p">(</span><span class="n">request_data</span><span class="p">[</span><span class="mf">0</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">pre_parse_incoming_request_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">request_data</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">request_data</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">field</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">renderer</span><span class="p">(</span><span class="s">&#39;/formish/widgets/</span><span class="si">%s</span><span class="s">.html&#39;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">_template</span><span class="p">,</span> <span class="p">{</span><span class="s">&#39;f&#39;</span><span class="p">:</span><span class="n">field</span><span class="p">})</span>
+
+    <span class="k">def</span> <span class="nf">from_request_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">request_data</span><span class="p">):</span>
+        <span class="n">string_data</span> <span class="o">=</span> <span class="n">request_data</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">string_data</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty</span>
+        <span class="k">return</span> <span class="n">string_converter</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">attr</span><span class="p">)</span><span class="o">.</span><span class="n">to_type</span><span class="p">(</span><span class="n">string_data</span><span class="p">,</span> <span class="n">converter_options</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">converter_options</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>This is the base class which shows how widgets work. First of all we have a couple of variables to do with converter options (which we&#8217;ll come back to in a moment). The four class methods are at the hear of formish though.</p>
-<div class="section" id="pre-render">
-<h3>pre_render<a class="headerlink" href="#pre-render" title="Permalink to this headline">¶</a></h3>
-<p>Before a widget is rendered, the input data is converted from its schema type to raw request data. The data passed to pre_render is just that fields data.</p>
+<div class="section" id="to-request-data">
+<h3>to_request_data<a class="headerlink" href="#to-request-data" title="Permalink to this headline">¶</a></h3>
+<p>Before a widget is rendered, the input data is converted from its schema type to raw request data. The data passed to to_request_data is just the fields data.</p>
 </div>
-<div class="section" id="convert">
-<h3>convert<a class="headerlink" href="#convert" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="from-request-data">
+<h3>from_request_data<a class="headerlink" href="#from-request-data" title="Permalink to this headline">¶</a></h3>
 <p>Takes the request data for the field and converts it to the schema type.</p>
-</div>
-<div class="section" id="call">
-<h3>__call__<a class="headerlink" href="#call" title="Permalink to this headline">¶</a></h3>
-<p>And finally, if you want the widget to render, just call it! That&#8217;s it..  So we have a path from data -&gt; request data and back from request data &gt; data..</p>
 <p>Oh.. I left out one..</p>
 </div>
-<div class="section" id="pre-parse-request-data">
-<h3>pre_parse_request_data<a class="headerlink" href="#pre-parse-request-data" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="pre-parse-incoming-request-data">
+<h3>pre_parse_incoming_request_data<a class="headerlink" href="#pre-parse-incoming-request-data" title="Permalink to this headline">¶</a></h3>
 <p>When a field is submitted, the request data can be munged to try to enforce some sort of symmetry between input request data and output request data. This is only really used for file uploads where the field storage is extracted to a temporary location before passing the request data to convert. So, for most cases just ignore this.</p>
 </div>
 </div>
 <div class="section" id="convertish">
 <h2>Convertish<a class="headerlink" href="#convertish" title="Permalink to this headline">¶</a></h2>
-<p>You can see from the example that the main conversion process is done using <tt class="docutils literal"><span class="pre">string_converter</span></tt>. This is one of the converter types in <tt class="docutils literal"><span class="pre">convertish</span></tt> and maps any of the schemaish types into a consistent string representation. It does so using peak.rules (although we could be convinced otherwise) and each string_converter implements a <tt class="docutils literal"><span class="pre">from_type</span></tt> and a <tt class="docutils literal"><span class="pre">to_type</span></tt>. For examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">IntegerToStringConverter</span><span class="p">(</span><span class="n">Converter</span><span class="p">):</span>
-    <span class="n">cast</span> <span class="o">=</span> <span class="nb">int</span>
+<p>You can see from the example that the main conversion process is done using <tt class="docutils literal"><span class="pre">string_converter</span></tt>. This is one of the converter types in <tt class="docutils literal"><span class="pre">convertish</span></tt> and maps any of the schemaish types into a consistent string representation. It does so using simplegeneric and each string_converter implements a <tt class="docutils literal"><span class="pre">from_type</span></tt> and a <tt class="docutils literal"><span class="pre">to_type</span></tt>. For example..</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">NumberToStringConverter</span><span class="p">(</span><span class="n">Converter</span><span class="p">):</span>
+    <span class="n">cast</span> <span class="o">=</span> <span class="bp">None</span>
+    <span class="n">type_string</span> <span class="o">=</span> <span class="s">&#39;number&#39;</span>
 
     <span class="k">def</span> <span class="nf">from_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">converter_options</span><span class="o">=</span><span class="p">{}):</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="s">&#39;&#39;</span>
+            <span class="k">return</span> <span class="bp">None</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">converter_options</span><span class="o">=</span><span class="p">{}):</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">None</span>
+        <span class="c"># &quot;Cast&quot; the value to the correct type. For some strange reason,</span>
+        <span class="c"># Python&#39;s decimal.Decimal type raises an ArithmeticError when it&#39;s</span>
+        <span class="c"># given a dodgy value.</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ConvertError</span><span class="p">(</span><span class="s">&quot;Not a valid number&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">ArithmeticError</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ConvertError</span><span class="p">(</span><span class="s">&quot;Not a valid </span><span class="si">%s</span><span class="s">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">type_string</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span>
 </pre></div>
 </div>
@@ -313,42 +317,77 @@
 </pre></div>
 </div>
 <p>So the form template just calls each individual part. Here are the templates for each part (I&#8217;ve combined them together and separated them by comments to save on space).</p>
-<p><tt class="docutils literal"><span class="pre">form_header.html</span></tt></p>
+<p><tt class="docutils literal"><span class="pre">form/header.html</span></tt></p>
 <div class="highlight-mako"><div class="highlight"><pre><span class="cp">&lt;%</span>
 <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">action_url</span><span class="p">:</span>
     <span class="n">action_url</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">action_url</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">action_url</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+<span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="s">&#39;id=&quot;</span><span class="si">%s</span><span class="s">&quot; &#39;</span><span class="o">%</span><span class="n">form</span><span class="o">.</span><span class="n">name</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+<span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">_has_upload_fields</span><span class="p">():</span>
+    <span class="n">enctype</span> <span class="o">=</span> <span class="s">&#39; enctype=&quot;multipart/form-data&quot;&#39;</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">enctype</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+
+<span class="n">all_classes</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_classes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span> <span class="n">form</span><span class="o">.</span><span class="n">classes</span> <span class="p">)</span>
+<span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">errors</span> <span class="ow">and</span> <span class="s">&#39;error&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">classes</span><span class="p">:</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;error&#39;</span><span class="p">)</span>
+<span class="n">classes_string</span> <span class="o">=</span> <span class="s">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">classes</span><span class="p">)</span>
 <span class="cp">%&gt;</span><span class="x"></span>
-<span class="x">&lt;form id=&quot;</span><span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">name</span><span class="cp">}</span><span class="x">&quot; action=&quot;</span><span class="cp">${</span><span class="n">action_url</span><span class="cp">}</span><span class="x">&quot; class=&quot;formish-form&quot;</span>
-<span class="x">     method=&quot;post&quot; enctype=&quot;multipart/form-data&quot; accept-charset=&quot;utf-8&quot;&gt;</span>
+<span class="x">&lt;form </span><span class="cp">${</span><span class="nb">id</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x">action=&quot;</span><span class="cp">${</span><span class="n">action_url</span><span class="cp">}</span><span class="x">&quot; class=&quot;</span><span class="cp">${</span><span class="n">classes_string</span><span class="cp">}</span><span class="x">&quot; method=&quot;</span><span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="cp">}</span><span class="x">&quot;</span><span class="cp">${</span><span class="n">enctype</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x"> accept-charset=&quot;utf-8&quot;&gt;</span>
 </pre></div>
 </div>
-<p><tt class="docutils literal"><span class="pre">form_metadata.html</span></tt></p>
-<div class="highlight-mako"><div class="highlight"><pre><span class="x">&lt;input type=&quot;hidden&quot; name=&quot;_charset_&quot; /&gt;</span>
-<span class="x">&lt;input type=&quot;hidden&quot; name=&quot;__formish_form__&quot; value=&quot;</span><span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">name</span><span class="cp">}</span><span class="x">&quot; /&gt;</span>
+<p><tt class="docutils literal"><span class="pre">form/metadata.html</span></tt></p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="cp">%</span> <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">include_charset</span><span class="p">:</span><span class="x"></span>
+<span class="x">  &lt;div class=&quot;hidden&quot;&gt;&lt;input type=&quot;hidden&quot; name=&quot;_charset_&quot; /&gt;&lt;/div&gt;</span>
+<span class="cp">%</span><span class="k"> endif</span><span class="x"></span>
+<span class="cp">%</span> <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">name</span><span class="p">:</span><span class="x"></span>
+<span class="x">  &lt;div class=&quot;hidden&quot;&gt;&lt;input type=&quot;hidden&quot; name=&quot;__formish_form__&quot; value=&quot;</span><span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">name</span><span class="cp">}</span><span class="x">&quot; /&gt;&lt;/div&gt;</span>
+<span class="cp">%</span><span class="k"> endif</span><span class="x"></span>
 </pre></div>
 </div>
-<p><tt class="docutils literal"><span class="pre">form_fields.html</span></tt></p>
-<div class="highlight-mako"><div class="highlight"><pre><span class="cp">%</span><span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span><span class="x"></span>
-<span class="cp">${</span><span class="n">f</span><span class="p">()</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span>
-<span class="cp">%</span><span class="k">endfor</span><span class="x"></span>
-</pre></div>
-</div>
-<p><tt class="docutils literal"><span class="pre">form_actions.html</span></tt></p>
-<div class="highlight-mako"><div class="highlight"><pre><span class="x">&lt;div class=&quot;actions&quot;&gt;</span>
-<span class="cp">%</span><span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">_actions</span> <span class="o">==</span> <span class="p">[]:</span><span class="x"></span>
-<span class="x">  &lt;input type=&quot;submit&quot; id=&quot;</span><span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">name</span><span class="cp">}</span><span class="x">-action-submit&quot; name=&quot;submit&quot; value=&quot;Submit&quot; /&gt;</span>
+<p><tt class="docutils literal"><span class="pre">form/fields.html</span></tt></p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="cp">%</span><span class="k">if</span> <span class="n">fields</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span><span class="x"></span>
+    <span class="cp">%</span><span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span><span class="x"></span>
+<span class="x">        </span><span class="cp">${</span><span class="n">form</span><span class="p">[</span><span class="n">f</span><span class="p">]()</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span>
+    <span class="cp">%</span><span class="k">endfor</span><span class="x"></span>
 <span class="cp">%</span><span class="k">else</span><span class="p">:</span><span class="x"></span>
-  <span class="cp">%</span><span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">_actions</span><span class="p">:</span><span class="x"></span>
-<span class="x">  &lt;input type=&quot;submit&quot; id=&quot;</span><span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">name</span><span class="cp">}</span><span class="x">-action-</span><span class="cp">${</span><span class="n">action</span><span class="o">.</span><span class="n">name</span><span class="cp">}</span><span class="x">&quot;</span>
-<span class="x">       name=&quot;</span><span class="cp">${</span><span class="n">action</span><span class="o">.</span><span class="n">name</span><span class="cp">}</span><span class="x">&quot; value=&quot;</span><span class="cp">${</span><span class="n">action</span><span class="o">.</span><span class="n">label</span><span class="cp">}</span><span class="x">&quot; /&gt;</span>
-  <span class="cp">%</span><span class="k">endfor</span><span class="x"></span>
+    <span class="cp">%</span><span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span><span class="x"></span>
+<span class="x">        </span><span class="cp">${</span><span class="n">f</span><span class="p">()</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span>
+    <span class="cp">%</span><span class="k">endfor</span><span class="x"></span>
 <span class="cp">%</span><span class="k">endif</span><span class="x"></span>
+</pre></div>
+</div>
+<p><tt class="docutils literal"><span class="pre">form/actions.html</span></tt></p>
+<div class="highlight-mako"><div class="highlight"><pre><span class="x">&lt;div class=&quot;actions&quot;&gt;</span>
+    <span class="cp">%</span><span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">_actions</span><span class="p">:</span><span class="x"></span>
+<span class="cp">&lt;%</span>
+<span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="s">&#39; value=&quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span><span class="o">%</span><span class="n">action</span><span class="o">.</span><span class="n">value</span>
+<span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s">&#39; name=&quot;</span><span class="si">%s</span><span class="s">&quot;&#39;</span><span class="o">%</span><span class="n">action</span><span class="o">.</span><span class="n">name</span>
+<span class="n">form_id</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+    <span class="n">form_id</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">form</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="n">form_id</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;action&#39;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+    <span class="n">form_id</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="n">form_id</span> <span class="o">=</span> <span class="s">&#39;-&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">form_id</span><span class="p">)</span>
+<span class="cp">%&gt;</span><span class="x"></span>
+<span class="x">        &lt;input type=&quot;submit&quot; id=&quot;</span><span class="cp">${</span><span class="n">form_id</span><span class="cp">}</span><span class="x">&quot;</span><span class="cp">${</span><span class="n">name</span><span class="o">|</span><span class="n">n</span><span class="cp">}${</span><span class="n">value</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x"> /&gt;</span>
+    <span class="cp">%</span><span class="k">endfor</span><span class="x"></span>
 <span class="x">&lt;/div&gt;</span>
 </pre></div>
 </div>
-<p><tt class="docutils literal"><span class="pre">form_footer.html</span></tt></p>
+<p><tt class="docutils literal"><span class="pre">form/footer.html</span></tt></p>
 <div class="highlight-mako"><div class="highlight"><pre><span class="x">&lt;/form&gt;</span>
 </pre></div>
 </div>
@@ -649,10 +688,9 @@
 <li><a class="reference external" href="#data-schema">Data Schema</a></li>
 <li><a class="reference external" href="#validatish">Validatish</a></li>
 <li><a class="reference external" href="#the-form-and-the-widget">The Form and the Widget</a><ul>
-<li><a class="reference external" href="#pre-render">pre_render</a></li>
-<li><a class="reference external" href="#convert">convert</a></li>
-<li><a class="reference external" href="#call">__call__</a></li>
-<li><a class="reference external" href="#pre-parse-request-data">pre_parse_request_data</a></li>
+<li><a class="reference external" href="#to-request-data">to_request_data</a></li>
+<li><a class="reference external" href="#from-request-data">from_request_data</a></li>
+<li><a class="reference external" href="#pre-parse-incoming-request-data">pre_parse_incoming_request_data</a></li>
 </ul>
 </li>
 <li><a class="reference external" href="#convertish">Convertish</a></li>
@@ -702,7 +740,7 @@
           <a href="walkthrough.html" title="A Formish Walkthrough"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="index.html" title="Welcome to Formish&#8217;s documentation!"
+          <a href="index.html" title="Welcome to Formish’s documentation!"
              accesskey="P">previous</a> |</li>
         <li><a href="index.html">Formish v1 documentation</a> &raquo;</li> 
       </ul>
