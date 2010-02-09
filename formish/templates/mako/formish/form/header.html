@@ -14,7 +14,7 @@ else:
 
 all_classes = []
 all_classes.extend( form.classes )
-if form.errors:
+if form.errors and 'error' not in form.classes:
     form.classes.append('error')
 classes_string = ' '.join(form.classes) 
 %>
