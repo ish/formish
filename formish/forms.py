@@ -940,7 +940,7 @@ class Form(object):
         self._error_warning()
         self.alert = error
 
-    def _get_error(self, error):
+    def _get_error(self):
         self._error_warning()
         return self.alert
 

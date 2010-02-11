@@ -3,6 +3,11 @@ Changlelog
 ==========
 
 
+0.8.8
+-----
+
+BUGFIX: error introduced in _get_error function 
+
 0.8.7
 -----
 
