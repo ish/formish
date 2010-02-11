@@ -1,6 +1,14 @@
 ==========
 Changlelog
 ==========
+
+
+0.8.7
+-----
+
+ * Added support for schemaish's default property. Forms use the defaults from
+   the schema if no explcit ones are passed
+
 0.8.6
 -----
 

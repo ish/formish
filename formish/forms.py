@@ -894,7 +894,7 @@ class Form(object):
         self.item_data = {}
         self.name = name
         if defaults is None:
-            defaults = {}
+            defaults = self.structure.attr.default
         if errors is None:
             errors = ErrorDict(self)
         self.defaults = defaults

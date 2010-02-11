@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import sys, os, glob
 
-version = '0.8.6'
+version = '0.8.7'
 
 setup(name='formish',
       version=version,
@@ -36,7 +36,7 @@ Formish is a schema backed, templating language agnostic form generation and han
       install_requires=[
           # -*- Extra requirements: -*-
           'ProxyTypes >= 0.9',
-          'schemaish >= 0.5.4b',
+          'schemaish >= 0.5.5',
           'validatish >= 0.6.1',
           'convertish >= 0.5.4a',
           'dottedish>=0.6',

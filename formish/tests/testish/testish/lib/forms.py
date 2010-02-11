@@ -629,11 +629,11 @@ def form_MinMaxLength(request):
 
 def form_MinLengthCheckboxMultiChoice(request):
     """
-    A checkbox multi choice with minimum length 3 (NOT WORKING)
+    A checkbox multi choice with minimum length 3 
     """
     schema = schemaish.Structure()
     schema.add('multiChoice', schemaish.Sequence(
-        schemaish.String(validation=validatish.Length(min=2))
+        schemaish.String(validator=validatish.Length(min=2))
         ))
     options = [(1,'a'),(2,'b'),(3,'c')]
 
