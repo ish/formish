@@ -1,7 +1,7 @@
 ProxyTypes >= 0.9
-schemaish >= 0.5.5
-validatish >= 0.6.1
-convertish >= 0.5.4a
+schemaish >= 0.5.6
+validatish >= 0.6.3
+convertish >= 0.5.5
 dottedish>=0.6
 webob >= 0.9.5
 Mako
