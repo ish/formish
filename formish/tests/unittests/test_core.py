@@ -147,8 +147,10 @@ class TestFormBuilding(unittest.TestCase):
         # check scmea matches
         self.assert_(form.structure.attr is schema_flat)
         # Does the form produce an int and a string
+        print 'RPpre', repr(request.POST['a'])
         self.assertEquals(form.validate(request), {'a': 3, 'b': '4'})
         # Does the convert request to data work
+        print 'RP', repr(request.POST['a'])
         self.assertEqual( form.widget.from_request_data(form, request.POST) , {'a': 3, 'b': '4'})
         # Does the convert data to request work
         self.assert_( form.widget.to_request_data(form, {'a': 3, 'b': '4'} ) == reqr)

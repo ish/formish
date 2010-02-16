@@ -2,6 +2,24 @@
 Changlelog
 ==========
 
+0.9.0-alpha
+-----------
+
+ * Updated documentation
+ * Added better defaults for schema types
+ * Updated JQuery in testish
+ * Overhauled the missing/empty strategies
+   In order to allow a user to represent both an empty string and a None value
+   at the same time, a few updates had to be made to how the widgets worked.
+   Hopefully most of these will be backward comptaible but we can't assure this
+   without a lot of checking. We now have a none_value attribute which
+   represents the value that is shown to a user to represent None. We also have
+   the old empty  attribute which is used if the widget produces data which
+   matches the none_value. Have a look in testish for InputNoneValue for an
+   example and also InputDateNoneValue. Another example is
+   SelectChoiceWithEmptyString which shows how to allow both '' and None to be
+   selected.
+   
 
 0.8.8
 -----

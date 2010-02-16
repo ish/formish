@@ -289,59 +289,13 @@ def unittest_Float(self, formdef):
 
 def form_Boolean(request):
     """
-    A simple form with a single boolean field
+    A simple form with a single boolean field, defaults to a RadioChoice widget. Add a required validator if you want a checkbox widget.
     """
     schema = schemaish.Structure()
     schema.add('myBooleanField', schemaish.Boolean())
     form = formish.Form(schema, 'form')
     return form
 
-def functest_Boolean(self):
-    sel = self.selenium
-    sel.open("/Boolean")
-
-    sel.click("form-action")
-    sel.wait_for_page_to_load("30000")
-    self.failUnless(sel.is_text_present("{'myBooleanField': None}"))
-
-    sel.type("form-myBooleanField", "a")
-    sel.click("form-action")
-    sel.wait_for_page_to_load("30000")
-    self.failUnless(sel.is_text_present("u'a' should be either True or False"))
-
-    sel.type("form-myBooleanField", "t")
-    sel.click("form-action")
-    sel.wait_for_page_to_load("30000")
-    self.failUnless(sel.is_text_present("u't' should be either True or False"))
-
-    sel.type("form-myBooleanField", "True")
-    sel.click("form-action")
-    sel.wait_for_page_to_load("30000")
-    self.failUnless(sel.is_text_present("{'myBooleanField': True}"))
-
-    sel.type("form-myBooleanField", "False")
-    sel.click("form-action")
-    sel.wait_for_page_to_load("30000")
-    self.failUnless(sel.is_text_present("{'myBooleanField': False}"))
-
-    return
-
-def unittest_Boolean(self, formdef):
-    # Test no data
-    f =  formdef(None)
-    self.assertIdHasValue(f, 'form-myBooleanField', '')
-    # Test None data
-    f = formdef(None)
-    testdata = {'myBooleanField': None}
-    f.defaults = testdata
-    self.assertIdHasValue(f, 'form-myBooleanField', '')
-    self.assertRoundTrip(f, testdata)
-    # Test sample data
-    f = formdef(None)
-    testdata = {'myBooleanField': True}
-    f.defaults = testdata
-    self.assertIdHasValue(f, 'form-myBooleanField', 'True')
-    self.assertRoundTrip(f, testdata)
 
 def form_BooleanWithDefaults(request):
     """
@@ -438,7 +392,6 @@ def form_File(request):
     schema = schemaish.Structure()
     schema.add('myFile', schemaish.File())
     form = formish.Form(schema, 'form')
-    form['myFile'].widget = formish.FileUpload(filestore=CachedTempFilestore())
     return form
 
 def functest_File(self):
@@ -472,6 +425,28 @@ def form_Input(request):
 
     form = formish.Form(schema, 'form')
     form['inputStrip'].widget = formish.Input(strip=True)
+    return form
+
+def form_InputNoneValue(request):
+    """
+    Simple input field with a strip parameter and a substitue none_value (allows user to return a None and an empty string). Notice use of schema default value.
+    """
+    schema = schemaish.Structure()
+    schema.add('inputStrip', schemaish.String(default=''))
+
+    form = formish.Form(schema, 'form')
+    form['inputStrip'].widget = formish.Input(strip=True, none_value='BANG')
+    return form
+
+def form_InputDateNoneValue(request):
+    """
+    Simple input field with a strip parameter and a substitue none_value (allows user to return a None and an empty string). Notice use of schema default value.
+    """
+    schema = schemaish.Structure()
+    schema.add('inputStrip', schemaish.Date(default=datetime.date(1900,1,1)))
+
+    form = formish.Form(schema, 'form')
+    form['inputStrip'].widget = formish.Input(empty=datetime.date(1900,1,1),roundtrip_empty=True)
     return form
 
 def form_Hidden(request):
@@ -573,15 +548,27 @@ def form_Required(request):
     form = formish.Form(schema, 'form')
     return form
 
+
+
 def form_CheckboxRequired(request):
+    """
+    Simple Boolean Checkbox with a required validator. Add an empty value if you want to force the user to add a tick
+    """
+    schema = schemaish.Structure()
+    schema.add('checkbox', schemaish.Boolean(validator=validatish.Required()))
+
+    form = formish.Form(schema, 'form')
+    return form
+
+def form_CheckboxRequiredWithEmptyValue(request):
     """
     Simple Boolean Checkbox
     """
     schema = schemaish.Structure()
-    schema.add('checkbox', schemaish.Boolean(validator=validatish.Equal(True)))
+    schema.add('checkbox', schemaish.Boolean(validator=validatish.Required()))
 
     form = formish.Form(schema, 'form')
-    form['checkbox'].widget = formish.Checkbox()
+    form['checkbox'].widget = formish.Checkbox(empty=None)
     return form
 
 def form_RadioChoiceRequired(request):
@@ -924,6 +911,18 @@ def form_SelectChoiceNoneOption(request):
 
     form = formish.Form(schema, 'form')
     form['mySelect'].widget = formish.SelectChoice(options,none_option=(None, '--select--'))
+    return form
+
+def form_SelectChoiceWithEmptyString(request):
+    """
+    A select choice which includes an empty string and a none value
+    """
+    schema = schemaish.Structure()
+    schema.add('mySelect', schemaish.String())
+    options = [('','empty string'),('b','b'),('c','c')]
+
+    form = formish.Form(schema, 'form')
+    form['mySelect'].widget = formish.SelectChoice(options, none_value='BANG')
     return form
 
 def form_SelectChoiceCallableOptions(request):

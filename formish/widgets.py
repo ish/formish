@@ -50,16 +50,24 @@ class Widget(object):
     
     type = None
     template = None
-    default_value = ['']
     
     def __init__(self, **k):
         self.css_class = k.get('css_class', None)
+        # what to show on the form (or embed in select) if the input is empty, this is specific to Input type fields
+        self.none_value = k.get('none_value','')
+        # what value is considered 'empty' for input data (i.e. what value to
+        # use on the data side if the form is submitted with nothing in it)
         self.empty = k.get('empty',None)
+        # Should we show and empty input box if the incoming data matches empty
+        self.roundtrip_empty = k.get('roundtrip_empty',False)
         self.readonly = k.get('readonly',False)
         self.converter_options = k.get('converter_options', {})
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
-    
+        # if none_value is something different e.g. 999, do we show 999 or '' when reshowing form.
+
+    def none_value_as_request_data(self, field):
+        return [self.none_value]
 
     def to_request_data(self, field, data):
         """
@@ -67,32 +75,28 @@ class Widget(object):
         format.If the data is None then we return an empty string. The sequence
         is request data representation.
         """
-        if data is None:
-            return ['']
+        if data is None or (data == self.empty and self.roundtrip_empty is True):
+            return self.none_value_as_request_data(field)
         string_data = string_converter(field.attr).from_type(data, converter_options=self.converter_options)
         return [string_data]
-
 
     def pre_parse_incoming_request_data(self, field, request_data):
         """
         Prior to convert being run, we have a chance to munge the data. This is
         only used by file upload at the moment
         """
-        return request_data or self.default_value
-
+        return request_data or self.none_value_as_request_data(field)
 
     def from_request_data(self, field, request_data):
         """
         after the form has been submitted, the request data is converted into
         to the schema type.
         """
-        string_data = request_data[0]
-        if string_data == '':
-            return self.empty
-        return string_converter(field.attr).to_type(string_data, converter_options=self.converter_options)
-
-
-
+        if request_data == self.none_value_as_request_data(field):
+            data = self.empty
+        else:
+            data = string_converter(field.attr).to_type(request_data[0], converter_options=self.converter_options)
+        return data
 
     def __repr__(self):
         attributes = []
@@ -128,12 +132,9 @@ class Input(Widget):
         """
         Default to stripping whitespace
         """
-        string_data = request_data[0]
         if self.strip is True:
-            string_data = string_data.strip()
-        if string_data == '':
-            return self.empty
-        return string_converter(field.attr).to_type(string_data, converter_options=self.converter_options)
+            request_data = [request_data[0].strip()]
+        return super(Input, self).from_request_data(field, request_data)
 
     def __repr__(self):
         attributes = []
@@ -158,60 +159,7 @@ class Password(Input):
 
 
    
-class CheckedPassword(Input):
-    """
-    Checked Password ensures that the password has been entered twice
-    """
 
-    type = 'CheckedPassword'
-    template = 'field.CheckedPassword'
-    confirm_label = None
-    default_value = {'password': [''], 'confirm': ['']}
-
-    def __init__(self, **k):
-        self.strip = k.pop('strip', True)
-        self.css_class = k.pop('css_class', None)
-        self.confirm_label = k.pop('confirm_label',None)
-        Input.__init__(self, **k)
-        if not self.converter_options.has_key('delimiter'):
-            self.empty.converter_options['delimiter'] = ','
-            
-    def to_request_data(self, field, data):
-        """
-        Extract both the password and confirm fields
-        """
-        string_data = string_converter(field.attr).from_type(data)
-        if string_data is None:
-            return {'password': [''], 'confirm': ['']}
-        return {'password': [string_data], 'confirm': [string_data]}
-    
-    def from_request_data(self, field, request_data):
-        """
-        Check the password and confirm match (when stripped)
-        """
-        password = request_data['password'][0]
-        confirm = request_data['confirm'][0]
-        if self.strip is True:
-            password = password.strip()
-            confirm = confirm.strip()
-        if password != confirm:
-            raise ConvertError('Password did not match')
-        if password == '':
-            return self.empty
-        return string_converter(field.attr).to_type(password)
-
-    def __repr__(self):
-        attributes = []
-        if self.strip is False:
-            attributes.append('strip=%r'%self.strip)
-        if self.converter_options != {'delimiter':','}:
-            attributes.append('converter_options=%r'%self.converter_options)
-        if self.css_class:
-            attributes.append('css_class=%r'%self.css_class)
-        if self.empty is not None:
-            attributes.append('empty=%r'%self.empty)
-
-        return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
 
 
 class CheckedInput(Input):
@@ -222,6 +170,7 @@ class CheckedInput(Input):
     type = 'CheckedInput'
     template = 'field.CheckedInput'
     confirm_label = None
+    mismatch_message = 'Fields did not match'
     default_value = {'input': [''], 'confirm': ['']}
 
     def __init__(self, **k):
@@ -231,28 +180,33 @@ class CheckedInput(Input):
         Input.__init__(self, **k)
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
+
+    def none_value_as_request_data(self, field):
+        return {'input': [self.none_value], 'confirm': [self.none_value]}
             
     def to_request_data(self, field, data):
         """
         Extract both the input and confirm fields
         """
+        if data is None or (data == self.empty and self.roundtrip_empty is True):
+            return self.none_value_as_request_data(field)
         string_data = string_converter(field.attr).from_type(data)
-        if string_data is None:
-            return {'input': [''], 'confirm': ['']}
         return {'input': [string_data], 'confirm': [string_data]}
-    
+
     def from_request_data(self, field, request_data):
         """
         Check the input and confirm match (when stripped)
         """
+        if request_data == self.none_value_as_request_data(field):
+            return self.empty
         input = request_data['input'][0]
         confirm = request_data['confirm'][0]
         if self.strip is True:
             input = input.strip()
             confirm = confirm.strip()
         if input != confirm:
-            raise ConvertError('Fields did not match')
-        if input == '':
+            raise ConvertError(self.mismatch_message)
+        if input == self.none_value:
             return self.empty
         return string_converter(field.attr).to_type(input)
 
@@ -268,6 +222,16 @@ class CheckedInput(Input):
             attributes.append('empty=%r'%self.empty)
 
         return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
+
+
+class CheckedPassword(CheckedInput):
+    """
+    Checked Password ensures that the password has been entered twice
+    """
+
+    type = 'CheckedPassword'
+    template = 'field.CheckedPassword'
+    mismatch_message = 'Passwords did not match'
 
 
 class Hidden(Input):
@@ -501,28 +465,6 @@ class TextArea(Input):
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = '\n'
     
-    def to_request_data(self, field, data):
-        """
-        We're using the converter options to allow processing sequence data
-        using the csv module
-        """
-        string_data = string_converter(field.attr).from_type(data, converter_options=self.converter_options)
-        if string_data is None:
-            return ['']
-        return [string_data]
-    
-    def from_request_data(self, field, request_data):
-        """
-        We're using the converter options to allow processing sequence data
-        using the csv module
-        """
-        string_data = request_data[0]
-        if self.strip is True:
-            string_data = string_data.strip()
-        if string_data == '':
-            return self.empty
-        return string_converter(field.attr).to_type(string_data, converter_options=self.converter_options)
-
     def __repr__(self):
         attributes = []
         if self.strip is False:
@@ -551,18 +493,30 @@ class Checkbox(Widget):
 
     type = 'Checkbox'
     template = 'field.Checkbox'
-    default_value = [None]
+    none_value=''
+    empty = False
 
-    def __init__(self, checked_value=True, unchecked_value=False, css_class=None):
+    def __init__(self, checked_value=True, unchecked_value=False, css_class=None, **k):
         self.checked_value = checked_value
         self.unchecked_value = unchecked_value
-        Widget.__init__(self, css_class=css_class)
+        self.empty = k.pop('empty',self.empty)
+        Widget.__init__(self, css_class=css_class, none_value=self.none_value, empty=self.empty, **k)
 
     def to_request_data(self, field, data):
-        string_data = string_converter(field.attr).from_type(data)
+        """
+        Before the widget is rendered, the data is converted to a string
+        format.If the data is None then we return an empty string. The sequence
+        is request data representation.
+        """
+        if data is None or (data == self.empty and self.roundtrip_empty is True):
+            return self.none_value_as_request_data(field)
+        string_data = string_converter(field.attr).from_type(data, converter_options=self.converter_options)
         return [string_data]
 
+
     def from_request_data(self, field, request_data):
+        if request_data[0] == '':
+            return self.empty
         if string_converter(field.attr).to_type(request_data[0]) == self.checked_value:
             return self.checked_value
         return self.unchecked_value
@@ -571,7 +525,7 @@ class Checkbox(Widget):
         """
         For each value, convert it and check to see if it matches the input data
         """
-        if field.value and string_converter(field.attr).to_type(field.value[0]) == self.checked_value:
+        if field.value and field.value[0] and string_converter(field.attr).to_type(field.value[0]) == self.checked_value:
             return ' checked="checked"'
         else:
             return ''
@@ -609,6 +563,8 @@ class DateParts(Widget):
         """
         Pull out the parts and convert
         """
+        if request_data == self.default_value:
+            return self.empty
         year = request_data['year'][0].strip()
         month = request_data['month'][0].strip()
         day = request_data['day'][0].strip()
@@ -771,7 +727,7 @@ class SelectChoice(Widget):
     type = 'SelectChoice'
     template = 'field.SelectChoice'
 
-    none_option = (None, '- choose -')
+    none_option = ('', '- choose -')
 
     def __init__(self, options, **k):
         """
@@ -782,6 +738,10 @@ class SelectChoice(Widget):
         none_option = k.pop('none_option', UNSET)
         if none_option is not UNSET:
             self.none_option = none_option
+        if self.none_option and self.none_option[0] and 'none_value' not in k:
+            k['none_value'] = self.none_option[0]
+        else:
+            k['none_value'] = ''
         Widget.__init__(self, **k)
         self.options = _normalise_options(options)
 
@@ -790,7 +750,7 @@ class SelectChoice(Widget):
         """
         Check the value passed matches the actual value
         """
-        if option[0] == field.value[0]:
+        if option[0] == field.value[0] and option[0] != self.empty:
             return ' selected="selected"'
         else:
             return ''
@@ -801,21 +761,9 @@ class SelectChoice(Widget):
         """
         options = []
         for value, label in self.options:
-            if value == self.empty:
-                options.append( ('',label) )
-            else:
-                options.append( (string_converter(field.attr).from_type(value),label) )
+            options.append( (string_converter(field.attr).from_type(value),label) )
         return options
     
-    def get_none_option_value(self, field):
-        """
-        Get the default option (the 'unselected' option)
-        """
-        none_option =  string_converter(field.attr).from_type(self.none_option[0])
-        if none_option is self.empty:
-            return ''
-        return none_option
-
     def __repr__(self):
         attributes = []
         attributes.append('options=%s'%repr(self.options))
@@ -853,10 +801,13 @@ class SelectWithOtherChoice(SelectChoice):
         """
         string_data = string_converter(field.attr).from_type(data)
         if string_data is None:
-            return {'select': [self.get_none_option_value(field)], 'other': ['']}
+            return self.none_value_as_request_data(field)
         if string_data in [value for value, label in self.options]:
             return {'select': [string_data], 'other': ['']}
         return {'select': [self.other_option[0]], 'other': [string_data]}
+
+    def none_value_as_request_data(self, field):
+        return {'select': [self.none_value], 'other': ['']}
 
     def from_request_data(self, field, request_data):
         """
@@ -907,7 +858,7 @@ class RadioChoice(SelectChoice):
     type = 'RadioChoice'
     template = 'field.RadioChoice'
 
-    none_option = (None, '- choose -')
+    none_option = None
 
     def selected(self, option, field):
         """
@@ -969,9 +920,12 @@ class CheckboxMultiChoice(Widget):
         """
         Iterate over the data, converting each one
         """
-        if data is None: 
-            return []
         return [string_converter(field.attr.attr).from_type(d) for d in data]
+
+
+    def pre_parse_incoming_request_data(self, field, request_data):
+        return  request_data or []
+
     
     def from_request_data(self, field, request_data):
         """
