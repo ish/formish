@@ -180,7 +180,7 @@
 <span class="gp">... </span><span class="k">except</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Invalid</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="n">e</span><span class="o">.</span><span class="n">error_dict</span>
 <span class="gp">...</span>
-<span class="go">{&#39;age&#39;: validatish.Invalid(&quot;must be greater than 18&quot;, validator=validatish.Range(min=18, max=None)), &#39;name&#39;: validatish.Invalid(&quot;must be a string&quot;, validator=validatish.String())}</span>
+<span class="go">{&#39;age&#39;: validatish.Invalid(&quot;must be greater than or equal to 18&quot;, validator=validatish.Range(min=18, max=None)), &#39;name&#39;: validatish.Invalid(&quot;must be a string&quot;, validator=validatish.String())}</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">schema</span><span class="o">.</span><span class="n">validate</span><span class="p">({</span><span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;John Drake&#39;</span><span class="p">,</span> <span class="s">&#39;age&#39;</span><span class="p">:</span> <span class="mf">28</span><span class="p">})</span>
 <span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;success!&#39;</span>
@@ -341,6 +341,7 @@
 <span class="x">&lt;form </span><span class="cp">${</span><span class="nb">id</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x">action=&quot;</span><span class="cp">${</span><span class="n">action_url</span><span class="cp">}</span><span class="x">&quot; class=&quot;</span><span class="cp">${</span><span class="n">classes_string</span><span class="cp">}</span><span class="x">&quot; method=&quot;</span><span class="cp">${</span><span class="n">form</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="cp">}</span><span class="x">&quot;</span><span class="cp">${</span><span class="n">enctype</span><span class="o">|</span><span class="n">n</span><span class="cp">}</span><span class="x"> accept-charset=&quot;utf-8&quot;&gt;</span>
 </pre></div>
 </div>
+<p>The form header ensures we have the correct classes and id and also adds an error class if there are any errors on the form. To make things simpler, we only use multipart data if there are file uploads on the form.</p>
 <p><tt class="docutils literal"><span class="pre">form/metadata.html</span></tt></p>
 <div class="highlight-mako"><div class="highlight"><pre><span class="cp">%</span> <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">include_charset</span><span class="p">:</span><span class="x"></span>
 <span class="x">  &lt;div class=&quot;hidden&quot;&gt;&lt;input type=&quot;hidden&quot; name=&quot;_charset_&quot; /&gt;&lt;/div&gt;</span>
@@ -350,6 +351,7 @@
 <span class="cp">%</span><span class="k"> endif</span><span class="x"></span>
 </pre></div>
 </div>
+<p>This conditionally adds hidden fields for the form name and charset</p>
 <p><tt class="docutils literal"><span class="pre">form/fields.html</span></tt></p>
 <div class="highlight-mako"><div class="highlight"><pre><span class="cp">%</span><span class="k">if</span> <span class="n">fields</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span><span class="x"></span>
     <span class="cp">%</span><span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">:</span><span class="x"></span>

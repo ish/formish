@@ -142,7 +142,7 @@ If we apply validators to multiple items in a structure, we can validate them al
     ... except schemaish.Invalid, e:
     ...     print e.error_dict
     ... 
-    {'age': validatish.Invalid("must be greater than 18", validator=validatish.Range(min=18, max=None)), 'name': validatish.Invalid("must be a string", validator=validatish.String())}
+    {'age': validatish.Invalid("must be greater than or equal to 18", validator=validatish.Range(min=18, max=None)), 'name': validatish.Invalid("must be a string", validator=validatish.String())}
     >>> try:
     ...     schema.validate({'name': 'John Drake', 'age': 28})
     ...     print 'success!'

@@ -89,7 +89,6 @@
 <h4>Attributes of a form<a class="headerlink" href="#attributes-of-a-form" title="Permalink to this headline">¶</a></h4>
 <p>And what can we do with the form? Well at the moment we have a form name and some fields</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">name</span>
-<span class="go">&#39;form&#39;</span>
 </pre></div>
 </div>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">form</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
@@ -118,7 +117,7 @@
 </div>
 <p>The title, if not specified in the schema field, is derived from the form name by converting camel case into capitalised words.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">field</span><span class="o">.</span><span class="n">cssname</span>
-<span class="go">&#39;form-myfield&#39;</span>
+<span class="go">&#39;myfield&#39;</span>
 </pre></div>
 </div>
 <p>This is the start of the templating stuff.. The cssname is an identifier that can be inserted into forms, used for ids and class names.</p>
@@ -128,7 +127,7 @@
 <h3>How to create HTML<a class="headerlink" href="#how-to-create-html" title="Permalink to this headline">¶</a></h3>
 <p>We create our HTML by calling the form as follows..</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">()</span>
-<span class="go">u&#39;...&lt;form id=&quot;form&quot; action=&quot;&quot; class=&quot;formish-form&quot; method=&quot;POST&quot; enctype=&quot;multipart/form-data&quot; accept-charset=&quot;utf-8&quot;&gt;...&#39;</span>
+<span class="go">u&#39;...&lt;form action=&quot;&quot; class=&quot;formish-form&quot; method=&quot;post&quot; accept-charset=&quot;utf-8&quot;&gt;...&#39;</span>
 </pre></div>
 </div>
 <p>I&#8217;ve skipped the majority of this output as it&#8217;s probably better shown formatted</p>
@@ -156,7 +155,7 @@
 <p>Firstly we have the form setup itself. The form name/id can be set by passing it into the Form as follows.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">named_form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">&#39;myformname&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">named_form</span>
-<span class="go">formish.Form(schemaish.Structure(&quot;myfield&quot;: schemaish.String()), name=&#39;myformname&#39;)</span>
+<span class="go">formish.Form(schemaish.Structure(&quot;myfield&quot;: schemaish.String()), name=&#39;myformname&#39;, defaults={&#39;myfield&#39;: None})</span>
 </pre></div>
 </div>
 <p>Otherwise the form defaults to &#8216;formish&#8217;.</p>
@@ -209,7 +208,6 @@
 <p>Once the form is submitted, we can get the data by calling &#8216;validate&#8217;. In order to simulate this, we&#8217;re going to create a request object by hand using webob..</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">webob</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">webob</span><span class="o">.</span><span class="n">Request</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="s">&#39;http://localhost/&#39;</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;REQUEST_METHOD&#39;</span><span class="p">:</span> <span class="s">&#39;POST&#39;</span><span class="p">})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;__formish_form__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;form&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;myfield&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;myvalue&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 <span class="go">{&#39;myfield&#39;: u&#39;myvalue&#39;}</span>
@@ -240,7 +238,7 @@
 <span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;termsAndConditions&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Boolean</span><span class="p">()</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span>
-<span class="go">formish.Form(schemaish.Structure(&quot;firstName&quot;: schemaish.String(), &quot;surname&quot;: schemaish.String(), &quot;dateOfBirth&quot;: schemaish.Date(), &quot;streetNumber&quot;: schemaish.Integer(), &quot;country&quot;: schemaish.String(), &quot;termsAndConditions&quot;: schemaish.Boolean()), name=&#39;form&#39;)</span>
+<span class="go">formish.Form(schemaish.Structure(&quot;firstName&quot;: schemaish.String(), &quot;surname&quot;: schemaish.String(), &quot;dateOfBirth&quot;: schemaish.Date(), &quot;streetNumber&quot;: schemaish.Integer(), &quot;country&quot;: schemaish.String(), &quot;termsAndConditions&quot;: schemaish.Boolean()), name=None, defaults={&#39;termsAndConditions&#39;: None, &#39;surname&#39;: None, &#39;firstName&#39;: None, &#39;country&#39;: None, &#39;dateOfBirth&#39;: None, &#39;streetNumber&#39;: None})</span>
 </pre></div>
 </div>
 <p>As you can see, we&#8217;ve got strings, an integer, a data and a boolean.</p>
@@ -255,7 +253,7 @@
 <span class="gp">...</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">MySchema</span><span class="p">())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span>
-<span class="go">formish.Form(schemaish.Structure(&quot;firstName&quot;: schemaish.String(), &quot;surname&quot;: schemaish.String(), &quot;dateOfBirth&quot;: schemaish.Date(), &quot;streetNumber&quot;: schemaish.Integer(), &quot;country&quot;: schemaish.String(), &quot;termsAndConditions&quot;: schemaish.Boolean()), name=&#39;form&#39;)</span>
+<span class="go">formish.Form(schemaish.Structure(&quot;firstName&quot;: schemaish.String(), &quot;surname&quot;: schemaish.String(), &quot;dateOfBirth&quot;: schemaish.Date(), &quot;streetNumber&quot;: schemaish.Integer(), &quot;country&quot;: schemaish.String(), &quot;termsAndConditions&quot;: schemaish.Boolean()), name=None, defaults={&#39;termsAndConditions&#39;: None, &#39;surname&#39;: None, &#39;firstName&#39;: None, &#39;country&#39;: None, &#39;dateOfBirth&#39;: None, &#39;streetNumber&#39;: None})</span>
 </pre></div>
 </div>
 <p>By default, all of the fields use input boxes with the date asking for isoformat and the boolean asking for True or False. We want to make the form a little friendlier though.</p>
@@ -387,7 +385,6 @@
 <p>Repeating the creation of a request using webob, setting some input values and validating gives us:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">webob</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">webob</span><span class="o">.</span><span class="n">Request</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="s">&#39;http://localhost/&#39;</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;REQUEST_METHOD&#39;</span><span class="p">:</span> <span class="s">&#39;POST&#39;</span><span class="p">})</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;__formish_form__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;form&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;firstName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Tim&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;surname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;Parkin&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;streetNumber&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;123&#39;</span>
@@ -519,7 +516,6 @@ validatish.Invalid, if validation fails.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span> <span class="o">=</span> <span class="n">webob</span><span class="o">.</span><span class="n">Request</span><span class="o">.</span><span class="n">blank</span><span class="p">(</span><span class="s">&#39;http://localhost/&#39;</span><span class="p">,</span> <span class="n">environ</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;REQUEST_METHOD&#39;</span><span class="p">:</span> <span class="s">&#39;POST&#39;</span><span class="p">})</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;myfield&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;aa&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s">&#39;__formish_form__&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;form&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="n">form</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
 <span class="gp">... </span><span class="k">except</span> <span class="n">formish</span><span class="o">.</span><span class="n">FormError</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
@@ -561,10 +557,10 @@ validatish.Invalid, if validation fails.</p>
 <h3>Short Version<a class="headerlink" href="#short-version" title="Permalink to this headline">¶</a></h3>
 <p>We handle files for you so that all you have to do is process the file handle given to you.. Here is an example using the default filehandlers..</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span> <span class="o">=</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">Structure</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myfile&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">File</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">schema</span><span class="o">.</span><span class="n">add</span><span class="p">(</span> <span class="s">&#39;myfile&#39;</span><span class="p">,</span> <span class="n">schemaish</span><span class="o">.</span><span class="n">File</span><span class="p">()</span> <span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">form</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">formish</span> <span class="kn">import</span> <span class="n">filestore</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;myfile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">FileUpload</span><span class="p">(</span><span class="n">filestore</span><span class="o">.</span><span class="n">CachedTempFilestore</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">form</span><span class="p">[</span><span class="s">&#39;myfile&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="n">formish</span><span class="o">.</span><span class="n">FileUpload</span><span class="p">()</span>
 </pre></div>
 </div>
 <div class="section" id="what-does-this-produce">

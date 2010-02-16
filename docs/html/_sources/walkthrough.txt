@@ -41,7 +41,7 @@ And what can we do with the form? Well at the moment we have a form name and som
 .. doctest:: 
 
     >>> form.name
-    'form'
+    
 
 .. doctest::
 
@@ -78,7 +78,7 @@ The title, if not specified in the schema field, is derived from the form name b
 .. doctest:: 
 
     >>> field.cssname
-    'form-myfield'
+    'myfield'
 
 This is the start of the templating stuff.. The cssname is an identifier that can be inserted into forms, used for ids and class names.
 
@@ -90,7 +90,7 @@ We create our HTML by calling the form as follows..
 .. doctest:: 
 
     >>> form()
-    u'...<form id="form" action="" class="formish-form" method="POST" enctype="multipart/form-data" accept-charset="utf-8">...'
+    u'...<form action="" class="formish-form" method="post" accept-charset="utf-8">...'
 
 I've skipped the majority of this output as it's probably better shown formatted
 
@@ -123,7 +123,7 @@ Firstly we have the form setup itself. The form name/id can be set by passing it
 
     >>> named_form = formish.Form(schema, name='myformname')
     >>> named_form
-    formish.Form(schemaish.Structure("myfield": schemaish.String()), name='myformname')
+    formish.Form(schemaish.Structure("myfield": schemaish.String()), name='myformname', defaults={'myfield': None})
 
 Otherwise the form defaults to 'formish'. 
 
@@ -192,7 +192,6 @@ Once the form is submitted, we can get the data by calling 'validate'. In order 
 
     >>> import webob
     >>> r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
-    >>> r.POST['__formish_form__'] = 'form'
     >>> r.POST['myfield'] = 'myvalue'
     >>> form.validate(r)
     {'myfield': u'myvalue'}
@@ -226,7 +225,7 @@ For our contrived example, we'll build a simple registration form.
     >>> schema.add( 'termsAndConditions', schemaish.Boolean() )
     >>> form = formish.Form(schema)
     >>> form
-    formish.Form(schemaish.Structure("firstName": schemaish.String(), "surname": schemaish.String(), "dateOfBirth": schemaish.Date(), "streetNumber": schemaish.Integer(), "country": schemaish.String(), "termsAndConditions": schemaish.Boolean()), name='form')
+    formish.Form(schemaish.Structure("firstName": schemaish.String(), "surname": schemaish.String(), "dateOfBirth": schemaish.Date(), "streetNumber": schemaish.Integer(), "country": schemaish.String(), "termsAndConditions": schemaish.Boolean()), name=None, defaults={'termsAndConditions': None, 'surname': None, 'firstName': None, 'country': None, 'dateOfBirth': None, 'streetNumber': None})
 
 As you can see, we've got strings, an integer, a data and a boolean. 
 
@@ -244,7 +243,7 @@ We could also have built the schema using a declarative style
     ...
     >>> form = formish.Form(MySchema())
     >>> form
-    formish.Form(schemaish.Structure("firstName": schemaish.String(), "surname": schemaish.String(), "dateOfBirth": schemaish.Date(), "streetNumber": schemaish.Integer(), "country": schemaish.String(), "termsAndConditions": schemaish.Boolean()), name='form')
+    formish.Form(schemaish.Structure("firstName": schemaish.String(), "surname": schemaish.String(), "dateOfBirth": schemaish.Date(), "streetNumber": schemaish.Integer(), "country": schemaish.String(), "termsAndConditions": schemaish.Boolean()), name=None, defaults={'termsAndConditions': None, 'surname': None, 'firstName': None, 'country': None, 'dateOfBirth': None, 'streetNumber': None})
 
 By default, all of the fields use input boxes with the date asking for isoformat and the boolean asking for True or False. We want to make the form a little friendlier though. 
 
@@ -411,7 +410,6 @@ Repeating the creation of a request using webob, setting some input values and v
 
     >>> import webob
     >>> r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
-    >>> r.POST['__formish_form__'] = 'form'
     >>> r.POST['firstName'] = 'Tim'
     >>> r.POST['surname'] = 'Parkin'
     >>> r.POST['streetNumber'] = '123'
@@ -580,7 +578,6 @@ Let's see this one in action
     >>> form = formish.Form(schema)
     >>> r = webob.Request.blank('http://localhost/', environ={'REQUEST_METHOD': 'POST'})
     >>> r.POST['myfield'] = 'aa'
-    >>> r.POST['__formish_form__'] = 'form'
     >>> try:
     ...     form.validate(r)
     ... except formish.FormError, e:
@@ -632,10 +629,10 @@ We handle files for you so that all you have to do is process the file handle gi
 .. doctest::
 
     >>> schema = schemaish.Structure()
-    >>> schema.add( 'myfile', schemaish.File )
+    >>> schema.add( 'myfile', schemaish.File() )
     >>> form = formish.Form(schema)
     >>> from formish import filestore
-    >>> form['myfile'].widget = formish.FileUpload(filestore.CachedTempFilestore())
+    >>> form['myfile'].widget = formish.FileUpload()
 
 What does this produce?
 ^^^^^^^^^^^^^^^^^^^^^^^

@@ -142,7 +142,7 @@ If we apply validators to multiple items in a structure, we can validate them al
     ... except schemaish.Invalid, e:
     ...     print e.error_dict
     ... 
-    {'age': validatish.Invalid("must be greater than 18", validator=validatish.Range(min=18, max=None)), 'name': validatish.Invalid("must be a string", validator=validatish.String())}
+    {'age': validatish.Invalid("must be greater than or equal to 18", validator=validatish.Range(min=18, max=None)), 'name': validatish.Invalid("must be a string", validator=validatish.String())}
     >>> try:
     ...     schema.validate({'name': 'John Drake', 'age': 28})
     ...     print 'success!'
@@ -336,6 +336,9 @@ So the form template just calls each individual part. Here are the templates for
     %>
     <form ${id|n}action="${action_url}" class="${classes_string}" method="${form.method.lower()}"${enctype|n} accept-charset="utf-8">
 
+The form header ensures we have the correct classes and id and also adds an error class if there are any errors on the form. To make things simpler, we only use multipart data if there are file uploads on the form.
+
+
 ``form/metadata.html``
 
 .. code-block:: mako
@@ -346,6 +349,8 @@ So the form template just calls each individual part. Here are the templates for
     % if form.name:
       <div class="hidden"><input type="hidden" name="__formish_form__" value="${form.name}" /></div>
     % endif
+
+This conditionally adds hidden fields for the form name and charset
 
 ``form/fields.html``
 
