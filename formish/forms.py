@@ -315,7 +315,15 @@ class Field(object):
         try:
             widget_type = self.form.get_item_data(starify(self.name),'widget')
         except KeyError:
-            widget_type = widgets.Input()
+            if self.attr.type == 'Boolean':
+                if self.required is True:
+                    widget_type = widgets.Checkbox()
+                else:
+                    widget_type = widgets.RadioChoice(options = [(True,'True'),(False,'False')], none_option=(None,'None'))
+            elif self.attr.type == 'File':
+                widget_type = widgets.FileUpload()
+            else:
+                widget_type = widgets.Input()
             self.form.set_item_data(starify(self.name),'widget',widget_type)
         return BoundWidget(widget_type, self)
 
