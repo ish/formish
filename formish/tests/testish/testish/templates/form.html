@@ -8,9 +8,9 @@ from mako.template import Template
 ${description|n}
 
 % if not template:
-${Template('${form()|n}', input_encoding='utf-8', output_encoding='utf-8', default_filters=['unicode', 'h']).render(form=form)|n}
+${Template('${form()|n}', input_encoding='utf-8', output_encoding='utf-8', default_filters=['unicode', 'h']).render_unicode(form=form)|n}
 %else:
-${Template(template, input_encoding='utf-8', output_encoding='utf-8', default_filters=['unicode', 'h']).render(form=form)|n}
+${Template(template, input_encoding='utf-8', output_encoding='utf-8', default_filters=['unicode', 'h']).render_unicode(form=form)|n}
 %endif
 
 
