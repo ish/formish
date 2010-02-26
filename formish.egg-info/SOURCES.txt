@@ -303,6 +303,7 @@ formish/tests/unittests/test_core.py
 formish/tests/unittests/test_filestores.py
 formish/tests/unittests/test_formdata.py
 formish/tests/unittests/test_html.py
+formish/tests/unittests/test_renderer.py
 formish/tests/unittests/test_util.py
 formish/tests/unittests/test_widget.py
 formish/tests/unittests/expectations/test_complex_form.html

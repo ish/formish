@@ -18,9 +18,14 @@ try:
 
     class Renderer(object):
 
-        def __init__(self):
+        def __init__(self, directories=None):
+            if directories is None:
+                directories = []
+            else:
+                directories = list(directories)
+            directories.append(resource_filename('formish', 'templates/mako'))
             self.lookup = mako.lookup.TemplateLookup(
-                    directories=[resource_filename('formish', 'templates/mako')],
+                    directories=directories,
                     input_encoding='utf-8', default_filters=['unicode', 'h']
                     )
 
