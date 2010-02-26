@@ -71,7 +71,6 @@ class TestHTML(unittest.TestCase):
         try:
             f.validate(r)
         except fv.FormError:
-            print '***',str(f.errors['one'])
             assert str(f.errors['one']) == 'must be greater than or equal to 18; must be greater than or equal to 20'
             assert str(f['one'].field.errors.exceptions[0]) == 'must be greater than or equal to 18'
 
@@ -89,7 +88,6 @@ class TestHTML(unittest.TestCase):
         try:
             f.validate(r)
         except fv.FormError:
-            print '---',f.errors['one']
             assert str(f.errors['one']) == 'is required; must be greater than or equal to 18; must be greater than or equal to 20'
             assert str(f['one'].field.errors.exceptions[0]) == 'is required'
 

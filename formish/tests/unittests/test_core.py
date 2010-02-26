@@ -57,14 +57,13 @@ class TestFormBuilding(unittest.TestCase):
         request = Request(name, {'b': 'bar'})
         actualdata = form.validate(request)
         expecteddata = {'a': None,'b': 'bar'}
-        print actualdata, expecteddata
         assert  actualdata == expecteddata
         form.defaults = {'a': 'foo'}
         actualdata = form.validate(request)
         expecteddata = {'a': 'foo','b': 'bar'}
-        print actualdata, expecteddata
         assert  actualdata == expecteddata
-        print form()
+        # XXX Is building a form part of the test? Leaving it in, just in case.
+        form()
 
 
     def test_flat_form(self):
@@ -147,10 +146,8 @@ class TestFormBuilding(unittest.TestCase):
         # check scmea matches
         self.assert_(form.structure.attr is schema_flat)
         # Does the form produce an int and a string
-        print 'RPpre', repr(request.POST['a'])
         self.assertEquals(form.validate(request), {'a': 3, 'b': '4'})
         # Does the convert request to data work
-        print 'RP', repr(request.POST['a'])
         self.assertEqual( form.widget.from_request_data(form, request.POST) , {'a': 3, 'b': '4'})
         # Does the convert data to request work
         self.assert_( form.widget.to_request_data(form, {'a': 3, 'b': '4'} ) == reqr)
@@ -191,7 +188,6 @@ class TestFormBuilding(unittest.TestCase):
         # Check the data is converted correctly
         self.assertEquals(form.validate(request), {'a': d, 'b': '4'})
         # Check req to data
-        print 'repr post',repr(request.get_post())
         self.assertEqual( form.widget.from_request_data(form, request.get_post()) , {'a': d, 'b': '4'})
         # Check data to req
         self.assert_( form.widget.to_request_data(form, {'a': d, 'b': '4'}) == {'a': {'month': [3], 'day': [1], 'year': [1966]}, 'b': ['4']})
@@ -200,16 +196,13 @@ class TestFormBuilding(unittest.TestCase):
         form = formish.Form(schemaish.Structure([("field", schemaish.String())]),'form')
         assert 'name="field" value=""' in form()
         data = form.validate(Request('form', {'field': 'value'}))
-        print 'data',data
         assert data == {'field': 'value'}
-        print 'form.request_data[field] =',form.request_data['field']
         assert form.request_data['field'] == ['value']
         assert 'name="field" value="value"' in form()
 
     def test_form_accepts_request_data(self):
         form = formish.Form(schemaish.Structure([("field", schemaish.String())]))
         form.request_data = {'field': ['value']}
-        print 'FRD',form._request_data
         assert form._request_data == {'field': ['value']}
 
     def test_form_with_defaults_accepts_request_data(self):
