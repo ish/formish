@@ -1,5 +1,0 @@
-
-      # -*- Entry points: -*-
-      [paste.app_factory]
-      main = testish.wsgiapp:make_app
-      
