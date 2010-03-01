@@ -24,7 +24,6 @@ class TestFormExamples(base.TestCase):
         expected_data = {'fieldOne':'a','fieldTwo':'b'}
 
         request = self.Request(form_name,request_data)
-        print 'REQEUST IN TEST',request.POST
         data = form.validate(request)
         assert data == expected_data
 
@@ -151,11 +150,6 @@ class TestErrorRendering(base.TestCase):
         ERROR_TEXT = '!!!WOOP!!!WOOP!!!WOOP!!!'
         form = formish.Form(schema, errors={attr: validatish.Invalid(ERROR_TEXT)})
         html = form()
-        print 'form.errors',form.errors
-        print 'error : ',form[attr].errors
-        print '>>>>>>>>>>>>>>>>>>>>'
-        print html
-        print '<<<<<<<<<<<<<<<<<<<<'
         element = BeautifulSoup(html).find(id='%s--field'%(attr.replace('.', '-'),))
         div_error = element.find('div',{'class': 'error'})
         span_error = element.find('span',{'class': 'error'})
