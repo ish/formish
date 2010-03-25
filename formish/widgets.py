@@ -537,7 +537,6 @@ class DateParts(Widget):
 
     type = 'DateParts'
     template = 'field.DateParts'
-    default_value = {'year':[''], 'month':[''], 'day': ['']}
     
     def __init__(self, **k):
         self.strip = k.pop('strip', True)
@@ -546,14 +545,16 @@ class DateParts(Widget):
         if not self.converter_options.has_key('delimiter'):
             self.converter_options['delimiter'] = ','
 
-        
+    def none_value_as_request_data(self, field):
+        return {'year':[''], 'month':[''], 'day': ['']}
+
     def to_request_data(self, field, data):
         """
         Convert to date parts
         """
         dateparts = datetuple_converter(field.attr).from_type(data)
         if dateparts is None:
-            return {'year': [''], 'month': [''], 'day': ['']}
+            return self.none_value_as_request_data(field)
         return {'year': [dateparts[0]],
                 'month': [dateparts[1]],
                 'day': [dateparts[2]]}
@@ -562,7 +563,7 @@ class DateParts(Widget):
         """
         Pull out the parts and convert
         """
-        if request_data == self.default_value:
+        if request_data == self.none_value_as_request_data(field):
             return self.empty
         year = request_data['year'][0].strip()
         month = request_data['month'][0].strip()
