@@ -171,7 +171,6 @@ class CheckedInput(Input):
     template = 'field.CheckedInput'
     confirm_label = None
     mismatch_message = 'Fields did not match'
-    default_value = {'input': [''], 'confirm': ['']}
 
     def __init__(self, **k):
         self.strip = k.pop('strip', True)
@@ -784,7 +783,6 @@ class SelectWithOtherChoice(SelectChoice):
     """
     type = 'SelectWithOtherChoice'
     template = 'field.SelectWithOtherChoice'
-    default_value = {'select': [''], 'other': ['']}
 
     other_option = ('...', 'Other ...')
 
@@ -910,7 +908,6 @@ class CheckboxMultiChoice(Widget):
 
     type = 'CheckboxMultiChoice'
     template = 'field.CheckboxMultiChoice'
-    default_value = []
 
     def __init__(self, options, css_class=None):
         self.options = _normalise_options(options)
@@ -986,7 +983,6 @@ class CheckboxMultiChoiceTree(Widget):
 
     type = 'CheckboxMultiChoiceTree'
     template = 'field.CheckboxMultiChoiceTree'
-    default_value = []
 
     def __init__(self, options, css_class=None):
         self.options = options
