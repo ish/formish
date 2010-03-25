@@ -994,10 +994,11 @@ class CheckboxMultiChoiceTree(Widget):
         if data is None:
             return []
         return [string_converter(field.attr.attr).from_type(d) for d in data]
-    
+
+    def pre_parse_incoming_request_data(self, field, request_data):
+        return  request_data or []
+
     def from_request_data(self, field, request_data):
-        if request_data is None:
-            request_data = []
         return [string_converter(field.attr.attr).to_type(d) for d in request_data]
 
     def checked(self, option, field):
