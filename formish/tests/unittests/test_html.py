@@ -12,6 +12,18 @@ class TestHTML(unittest.TestCase):
     """ Basic tests - we need lots more to make this robust
     """
 
+    def test_form_error_css(self):
+        schema = schemaish.Structure([('a', schemaish.String(validator=v.Required()))])
+        form = formish.Form(schema)
+        soup = BeautifulSoup(form())
+        self.assertTrue('error' not in soup.find('form').get('class').split())
+        try:
+            form.validate(webob.Request.blank('/', POST={}))
+        except formish.FormError:
+            pass
+        soup = BeautifulSoup(form())
+        self.assertTrue('error' in soup.find('form').get('class').split())
+
     def test_default_title(self):
         schema = schemaish.Structure([('one', schemaish.String())])
         f = formish.Form(schema,name='form')

@@ -12,10 +12,9 @@ if form._has_upload_fields():
 else:
     enctype = '' 
 
-all_classes = []
-all_classes.extend( form.classes )
-if form.errors and 'error' not in form.classes:
-    form.classes.append('error')
-classes_string = ' '.join(form.classes) 
+all_classes = list(form.classes)
+if form.errors:
+    all_classes.append('error')
+classes_string = ' '.join(all_classes) 
 %>
 <form ${id|n}action="${action_url}" class="${classes_string}" method="${form.method.lower()}"${enctype|n} accept-charset="utf-8">
