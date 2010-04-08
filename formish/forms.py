@@ -917,7 +917,7 @@ class Form(object):
             else:
                 self.classes = self.base_classes + classes
         else:
-            self.classes = self.base_classes
+            self.classes = list(self.base_classes)
         if add_default_action:
             self.add_action( None, 'Submit' )
         self.action_url = action_url

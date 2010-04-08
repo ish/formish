@@ -47,6 +47,23 @@ class TestFormBuilding(unittest.TestCase):
         # this is really empty
         assert list(form.fields) == []
 
+    def test_form_classes(self):
+        schema = schemaish.Structure()
+        form = formish.Form(schema)
+        self.assertTrue(set(form.classes) == set(['formish-form']))
+        form = formish.Form(schema, classes='foo')
+        self.assertTrue(set(form.classes) == set(['formish-form', 'foo']))
+        form = formish.Form(schema, classes=['foo', 'bar'])
+        self.assertTrue(set(form.classes) == set(['formish-form', 'foo', 'bar']))
+
+    def test_form_classes_not_shared(self):
+        schema = schemaish.Structure()
+        form = formish.Form(schema)
+        form.classes.append('foo')
+        form = formish.Form(schema)
+        print "*****", form.classes
+        self.assertTrue(set(form.classes) == set(['formish-form']))
+
     def test_readonly_field(self):
         """Test a form that has no a read only field"""
         schema_readonly = schemaish.Structure([("a", schemaish.String()), ("b", schemaish.String())])
