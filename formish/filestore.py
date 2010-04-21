@@ -86,6 +86,68 @@ class FileSystemHeaderedFilestore(object):
         else:
             os.remove( os.path.join(self._root_dir, safefilename.encode(key)))
 
+class FileSystemFilestore(object):
+    """
+    A general purpose readable and writable file store useful for storing data
+    """
+
+    def __init__(self, root_dir, mode=0660):
+        """
+        Create a new storage space.
+
+        :arg root_dir: directory for stored files to be written to.
+        :arg mode: initial mode of created files, defaults to 0660. See os.open
+                   for details.
+        """
+        self._root_dir = root_dir
+        self._mode = mode
+
+    def get(self, key):
+        """
+        Get the file stored for the given key.
+
+        :arg key: unique key that identifies the file.
+        :returns: tuple of (header, f) where headers is a list of (name, value)
+                  pairs and f is a readable file-like object.
+        :raises KeyError: not found
+        """
+        filename = os.path.join(self._root_dir, key)
+        try:
+            f = open(filename, 'rb')
+        except (IOError, AttributeError):
+            raise KeyError(key)
+        contenttype = mimetype.content_type(filename)
+        return [], f
+
+    def put(self, key, headers, src):
+        """
+        Add a file to the store, overwriting an existing file with the same key.
+
+        :arg key: unique key that identifies the file.
+        :arg headers: list of (name, value) pairs that will be associated with
+                      the file.
+        :arg src: readable file-like object
+        """
+        # XXX We should only allow strings as headers keys and values.
+        # Open the file with minimal permissions..
+        filename = os.path.join(self._root_dir, key)
+        fd = os.open(filename, os.O_RDWR|os.O_CREAT, self._mode)
+        dest = os.fdopen(fd, 'wb')
+        try:
+            _copyfile.copyfileobj(src, dest)
+        finally:
+            dest.close()
+
+    def delete(self, key, glob=False):
+        # if glob is true will delete all with filename prefix
+        if glob == True:
+            for f in os.listdir(self._root_dir):
+                if f.startswith(key):
+                    os.remove(os.path.join(self._root_dir,f))
+        else:
+            os.remove( os.path.join(self._root_dir, safefilename.encode(key)))
+
+
 
 class CachedTempFilestore(object):
 
