@@ -275,6 +275,19 @@ class TestSelectWithOther(base.TestCase):
         self.assertTrue('value="..." selected="selected"' in form())
 
 
+class TestCheckboxMultiChoice(base.TestCase):
+
+    def test_renders_with_options(self):
+        schema = schemaish.Structure()
+        schema.add('foo', schemaish.Sequence(schemaish.String()))
+        form = formish.Form(schema)
+        form['foo'].widget = formish.CheckboxMultiChoice(options=[('opt1', 'Opt #1')])
+        html = form()
+        assert 'foo' in html
+        assert 'opt1' in html
+        assert 'Opt #1' in html
+
+
 if __name__ == '__main__':
     unittest.main()
 

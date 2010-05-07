@@ -918,6 +918,8 @@ class CheckboxMultiChoice(Widget):
         """
         Iterate over the data, converting each one
         """
+        if data is None:
+            data = []
         return [string_converter(field.attr.attr).from_type(d) for d in data]
 
 
