@@ -2,6 +2,7 @@
 General purpose utility module.
 """
 
+import codecs
 import re
 import urllib
 
@@ -77,20 +78,26 @@ def get_post_charset(request):
         ...     
       </form> 
     """     
+    # Default answer if nothing else found.
+    DEFAULT = 'utf-8'
     # Try the magic '_charset_' field, Mozilla and IE set this.
-    charset = request.POST.get('_charset_', None)
-    if charset:
-        return charset
-
+    charset = request.POST.get('_charset_')
     # Look in the 'content-type' request header
-    content_type = request.headers.get('content-type')
-    if content_type:
-        charset = dict([ s.strip().split('=') \
-                 for s in content_type.split(';')[1:] ]).get('charset')
-        if charset:
-            return charset
-
-    return 'utf-8'
+    if not charset:
+        content_type = request.headers.get('content-type')
+        if content_type:
+            charset = dict([ s.strip().split('=') \
+                     for s in content_type.split(';')[1:] ]).get('charset')
+    # Resort to default
+    if not charset:
+        charset = DEFAULT
+    # Check it's a valid codec.
+    try:
+        codecs.lookup(charset)
+    except LookupError:
+        charset = DEFAULT
+    # Return answer
+    return charset
 
 
 def encode_file_resource_path(name, key):

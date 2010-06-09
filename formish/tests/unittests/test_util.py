@@ -43,6 +43,8 @@ class TestUtil(unittest.TestCase):
             (('', 'iso-8859-1'), 'iso-8859-1'),
             # default to utf-8
             (('', ''), 'utf-8'),
+            # nonsense in form field
+            (('Xuhuwef', 'utf-8'), 'utf-8'),
         ]
         for test, expected in tests:
             request = webob.Request.blank(
