@@ -1,3 +1,4 @@
+import webob
 import unittest
 
 from formish import util
@@ -33,6 +34,22 @@ class TestUtil(unittest.TestCase):
             encoded = util.encode_file_resource_path(name, key)
             self.assertTrue(encoded == path)
             self.assertTrue(util.decode_file_resource_path(encoded) == (name, key))
+
+    def test_charset_detection(self):
+        tests = [
+            # form field takes precedence
+            (('utf-8', 'iso-8859-1'), 'utf-8'),
+            # header used next
+            (('', 'iso-8859-1'), 'iso-8859-1'),
+            # default to utf-8
+            (('', ''), 'utf-8'),
+        ]
+        for test, expected in tests:
+            request = webob.Request.blank(
+                '/', POST={'_charset_': test[0]},
+                headers=[('Content-Type', 'application/x-www-form-urlencoded;charset=%s'%test[1])])
+            self.assertEqual(util.get_post_charset(request), expected)
+
 
 class Test_classes_from_vars(unittest.TestCase):
     def _callFUT(self, classes, include=None):
