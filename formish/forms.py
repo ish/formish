@@ -59,12 +59,12 @@ class Action(object):
         self.name = name
         self.value = value
 
-            
+
 def _cssname(self):
     """ Returns a hyphenated identifier using the form name and field name """
     if self.form.name:
-        return '%s-%s'% (self.form.name, '-'.join(self.name.split('.')))    
-    return '%s'% ('-'.join(self.name.split('.')))    
+        return '%s-%s'% (self.form.name, '-'.join(self.name.split('.')))
+    return '%s'% ('-'.join(self.name.split('.')))
 
 
 def _classes(self):
@@ -85,7 +85,7 @@ def _classes(self):
     if getattr(self,'contains_error',None):
         classes.append('contains-error')
     return ' '.join(classes)
-            
+
 
 def starify(name):
     """
@@ -104,7 +104,7 @@ def starify(name):
 def fall_back_renderer(renderer, name, widget, vars):
     """
     Tries to find template in widget directly then tries in top level directory
-    
+
     This allows a field level widget override it's container by including the
     changed version in the widgets directory with the same name
     """
@@ -113,7 +113,7 @@ def fall_back_renderer(renderer, name, widget, vars):
         return renderer('/formish/widgets/%s/%s.html'%(widget,name), vars)
     except mako.exceptions.TopLevelLookupException:
         return renderer('/formish/%s.html'%(name), vars)
-    
+
 
 class TemplatedString(object):
     """
@@ -133,7 +133,7 @@ class TemplatedString(object):
         if not self.val:
             return ''
         return unicode(self.val)
-        
+
 
     def __nonzero__(self):
         if self.val:
@@ -205,13 +205,13 @@ class RenderableObjectWrapper(ObjectWrapper):
 class Field(object):
     """
     A wrapper for a schema field type that includes form information.
-    
+
     The Schema Type Atribute does not have any bindings to the form library, it can be
     used on it's own. We bind the Schema Attribute to a Field in order to include form
     related information.
 
     :method __call__: returns a serialisation for this field using the form's renderer - read only
-    
+
     """
     type = 'field'
 
@@ -247,7 +247,7 @@ class Field(object):
             try:
                 return self.form.get_item_data(self.name, 'description')
             except KeyError:
-                return self.attr.description        
+                return self.attr.description
         return RenderableProperty('description', get)
     description = description()
 
@@ -261,7 +261,7 @@ class Field(object):
     def classes(self):
         """ Works out a list of classes that should be applied to the field """
         return _classes(self)
-  
+
 
     @property
     def value(self):
@@ -271,7 +271,7 @@ class Field(object):
         return self.form.request_data.get(self.name, None)
 
 
-    @property 
+    @property
     def required(self):
         """ Does this field have a Not Empty validator of some sort """
         return validatish.validation_includes(self.attr.validator, validatish.Required)
@@ -292,11 +292,11 @@ class Field(object):
         error = self.form.errors.get(self.name, None)
         if error is not None:
             val = str(error)
-        else: 
+        else:
             val = ''
         return TemplatedString(self, 'error', val)
 
-    
+
     def _get_errors(self):
         """ Lazily get the error from the form.errors when needed """
         return self.form.errors.get(self.name, None)
@@ -334,7 +334,7 @@ class Field(object):
             if k != self.name and k.startswith(self.name):
                 return True
         return False
-        
+
     @property
     def contained_errors(self):
         contained_errors = []
@@ -350,7 +350,7 @@ class Field(object):
         name = 'field/main'
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
-            
+
     def label(self):
         widget_type, widget = self.widget.template.split('.')
         """ returns the templated title """
@@ -358,7 +358,7 @@ class Field(object):
         name = 'field/label'
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
-    
+
     def seqdelete(self):
         widget_type, widget = self.widget.template.split('.')
         """ creates a seq delete hook if this is an item in a updateable sequence """
@@ -372,7 +372,7 @@ class Field(object):
         name = 'field/seqdelete'
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
-    
+
     def seqgrab(self):
         widget_type, widget = self.widget.template.split('.')
         """ creates a seq grab hook if this is an item in a updateable sequence """
@@ -386,7 +386,7 @@ class Field(object):
         name = 'field/seqgrab'
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
-    
+
     def inputs(self):
         """ returns the templated widget """
         widget_type, widget = self.widget.template.split('.')
@@ -421,13 +421,13 @@ class Collection(object):
     The Schema structure does not have any bindings to the form library, it can
     be used on it's own. We bind the schema Structure Attribute to a Group
     which includes form information.
-    """    
+    """
     type = None
 
 
     def __init__(self, name, attr, form):
         """
-        :arg name: Name for the Collection 
+        :arg name: Name for the Collection
         :arg attr: Schema attr to bind to the field
         :type attr:  schemaish.attr.*
         :param form: The form the field belongs to.
@@ -440,7 +440,7 @@ class Collection(object):
             self.nodename = ''
         self.attr = attr
         self.form = form
-        self._fields = {}    
+        self._fields = {}
         # Construct a title
         self.title = self.attr.title
         if self.title is None and name is not None:
@@ -452,7 +452,7 @@ class Collection(object):
         if self.attr.type == 'Structure':
             name = 'structure'
         elif self.attr.type == 'Sequence' and self.widget.type == 'SequenceDefault':
-            name = 'sequence' 
+            name = 'sequence'
         else:
             name = 'field'
         return name
@@ -469,22 +469,22 @@ class Collection(object):
     def cssname(self):
         """ Works out a list of classes that can be applied to the field """
         return _cssname(self)
-    
+
 
     @property
     def classes(self):
         """
         Works out a list of classes that can be applied to the field """
-        return _classes(self)           
-   
+        return _classes(self)
+
 
     @property
     def value(self):
         """Convert the request_data to a value object for the form or None."""
         return self.form.request_data.get(self.name, [''])
-   
 
-    @property 
+
+    @property
     def required(self):
         """ Does this field have a Not Empty validator of some sort """
         return validatish.validation_includes(self.attr.validator, validatish.Required)
@@ -531,7 +531,7 @@ class Collection(object):
     @property
     def widget(self):
         """ return the fields widget bound with extra params. """
-        
+
         try:
             w = self.form.get_item_data(starify(self.name),'widget')
             if not isinstance(w, BoundWidget):
@@ -575,12 +575,12 @@ class Collection(object):
 
     def collection_fields(self):
         for attr in self.attrs:
-            yield self.bind(attr[0], attr[1])        
-        
+            yield self.bind(attr[0], attr[1])
+
 
     @property
     def fields(self):
-        """ 
+        """
         Iterate through the fields, lazily bind the schema to the fields
         before returning.
         """
@@ -597,10 +597,10 @@ class Collection(object):
         return fields
 
     def bind(self, attr_name, attr):
-        """ 
+        """
         return cached bound schema as a field; Otherwise bind the attr to a
         Group or Field as appropriate and store on the _fields cache
-        
+
         :param attr_name:     Form Field/Group identifier
         :type attr_name:      Python identifier string
         :param attr:          Attribute to bind
@@ -613,7 +613,7 @@ class Collection(object):
                 keyprefix = attr_name
             else:
                 keyprefix = '%s.%s'% (self.name, attr_name)
-                
+
             if isinstance(attr, schemaish.Sequence):
                 bound_field = Sequence(keyprefix, attr, self.form)
             elif isinstance(attr, schemaish.Structure):
@@ -634,7 +634,7 @@ class Collection(object):
         name = '%s/main'%widget_type
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
-            
+
     def label(self):
         """ returns the templated title """
         widget_type, widget = self.widget.template.split('.')
@@ -671,7 +671,7 @@ class Collection(object):
         name = 'field/seqdelete'
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
-    
+
     def inputs(self):
         """ returns the templated widget """
         widget_type, widget = self.widget.template.split('.')
@@ -699,12 +699,24 @@ class Sequence(Collection):
     type = 'sequence'
     template = 'sequence'
 
+
+    @property
+    def num_fields(self):
+        if not self.form._request_data:
+            if self.defaults is not None:
+                num_fields = len(self.defaults)
+            else:
+                num_fields = 0
+        else:
+            num_fields = len(self.form._request_data.get(self.name, []))
+        return num_fields
+
     def collection_fields(self):
-        """ 
-        For sequences we check to see if the name is numeric. As names cannot be numeric normally, the first iteration loops 
-        on a fields values and spits out a 
         """
-        
+        For sequences we check to see if the name is numeric. As names cannot be numeric normally, the first iteration loops
+        on a fields values and spits out a
+        """
+
         # Work out how many fields are in the sequence.
         # XXX We can't use self.form.request_data here because to build the
         # request_data we need to recurse throught the fields ... which calls
@@ -724,7 +736,7 @@ class Sequence(Collection):
                 for n,d in enumerate(self.defaults):
                     if not empty_checker(d):
                         num_nonempty_fields=n+1
-                
+
             min_start_fields = None
             min_empty_start_fields = None
             if self.widget is not None:
@@ -740,11 +752,11 @@ class Sequence(Collection):
         for num in xrange(num_fields):
             field = self.bind(num, self.attr.attr)
             yield field
-            
+
     @property
     def template(self):
         return self.bind('*', self.attr.attr)
-         
+
     def metadata(self):
         """ returns the metadata """
         widget_type, widget = self.widget.template.split('.')
@@ -752,13 +764,13 @@ class Sequence(Collection):
         name = '%s/metadata'%widget_type
         vars = {'field':self}
         return fall_back_renderer(renderer, name, widget, vars)
-            
+
 
 class BoundWidget(object):
     """
     Because widget's need to be able to render themselves
-    """   
-    
+    """
+
 
     def __init__(self, widget, field):
         if hasattr(field.form,'empty'):
@@ -766,7 +778,7 @@ class BoundWidget(object):
         self.__dict__['widget'] = widget
         self.__dict__['field'] = field
 
-     
+
 
     def __getattr__(self, name):
         return getattr(self.widget, name)
@@ -804,7 +816,7 @@ class FormFieldsWrapper(ObjectWrapper):
 
     def __call__(self,fields=None):
         return self.form.renderer('/formish/form/fields.html', {'form':self.form,'fields':fields})
-  
+
 
 def tryint(v):
     try:
@@ -874,7 +886,7 @@ class Form(object):
 
         :arg name: Optional form name used to identify multiple forms on the same page
         :type name: str "valid html id"
-            
+
         :arg defaults: Default values for the form
         :type defaults: dict
 
@@ -967,7 +979,7 @@ class Form(object):
         return 'formish.Form(%s)'%( ', '.join(attributes) )
 
     def add_action(self, name=None, value=None, callback=None):
-        """ 
+        """
         Add an action callable to the form
 
         :arg callback: A function to call if this action is triggered
@@ -979,11 +991,11 @@ class Form(object):
         :arg label: Use this label instead of the form.name for the value of
             the action (for buttons, the value is used as the text on the button)
         :type label: string
-        
+
         """
         if name and name in [action.name for action in self._actions]:
             raise ValueError('Action with name %r already exists.'% name)
-        self._actions.append( Action(name, value, callback) )              
+        self._actions.append( Action(name, value, callback) )
 
     def action(self, request, *args):
         """
@@ -1012,13 +1024,13 @@ class Form(object):
         :arg request_data: Webob style request data
         :arg raise_exceptions: Whether to raise exceptions or return errors
         """
-        data = self.widget.from_request_data(self.structure, request_data, skip_read_only_defaults=skip_read_only_defaults) 
+        data = self.widget.from_request_data(self.structure, request_data, skip_read_only_defaults=skip_read_only_defaults)
         if raise_exceptions and len(self.errors.keys()):
             raise validation.FormError( \
         'Tried to access data but conversion from request failed with %s errors (%s)'% \
                    (len(self.errors.keys()), self.errors))
         return data
-    
+
 
     def _get_request_data(self):
         """
@@ -1032,9 +1044,9 @@ class Form(object):
 
 
     def _set_request_data(self, request_data):
-        """ 
+        """
         Assign raw request data to the form
-        
+
         :arg request_data: raw request data (e.g. request.POST)
         :type request_data: Dictionary (dotted or nested or dotted or MultiDict)
         """
@@ -1042,25 +1054,25 @@ class Form(object):
 
 
     request_data = property(_get_request_data, _set_request_data)
-    
-    
+
+
     def _get_defaults(self):
         """ Get the raw default data """
         return dotted(self._defaults)
-   
+
 
     def _set_defaults(self, data):
         """ assign data """
         self._defaults = data
         self._request_data = None
-   
+
 
     defaults = property(_get_defaults, _set_defaults)
 
     def _set_request(self, request):
-        """ 
+        """
         Assign raw request data to the form
-        
+
         :arg request_data: raw request data (e.g. request.POST)
         :type request_data: Dictionary (dotted or nested or dotted or MultiDict)
         """
@@ -1092,7 +1104,7 @@ class Form(object):
         return request_data.get('__formish_form__')
 
     def validate(self, request, failure_callable=None, success_callable=None, skip_read_only_defaults=False, check_form_name=True):
-        """ 
+        """
         Validate the form data in the request.
 
         By default, this method returns either a dict of data or raises an
@@ -1111,7 +1123,7 @@ class Form(object):
         self.request = request
         if check_form_name == True and (self.name != self.name_from_request(request)):
             raise Exception("request does not match form name")
-        try: 
+        try:
             data = self._validate(request, skip_read_only_defaults=skip_read_only_defaults)
         except validation.FormError:
             if failure_callable is None:
@@ -1246,11 +1258,11 @@ class Form(object):
     def header(self):
         """ Return just the header part of the template """
         return self.renderer('/formish/form/header.html', {'form':self})
-        
+
     def footer(self):
         """ Return just the footer part of the template """
         return self.renderer('/formish/form/footer.html', {'form':self})
-        
+
     def metadata(self):
         """ Return just the metada part of the template """
         return self.renderer('/formish/form/metadata.html', {'form':self})
@@ -1263,7 +1275,7 @@ class Form(object):
         """ Return just the actions part of the template """
         return self.renderer('/formish/form/actions.html', {'form':self})
 
-        
+
 def _unflatten_request_data(request_data):
     """
     Unflatten the request data into nested dicts and lists.
@@ -1277,14 +1289,14 @@ def _unflatten_request_data(request_data):
         if key not in keys:
             keys.append(key)
     return unflatten(((key, request_data.getall(key)) for key in keys),
-                     container_factory=container_factory) 
+                     container_factory=container_factory)
 
 
 class FormAccessor(object):
     """
     Helps in setting item_data on a form
 
-    :arg form: The form instance we're setting data on 
+    :arg form: The form instance we're setting data on
     :arg key: The dotted key of the field we want to set/get an attribute on e.g. ['x.y']
     :arg prefix: A prefix used internally for recursion and allowing ['x']['y'] type access
     """
@@ -1305,11 +1317,11 @@ class FormAccessor(object):
             return field
         else:
             return getattr(field, name)
-    
+
     def __getitem__(self, key):
         return FormAccessor(self.form, key, prefix=self.key)
 
     def __call__(self):
         return self.form.get_field(self.key)()
-    
-        
+
+
