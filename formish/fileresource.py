@@ -185,18 +185,14 @@ def get_size_from_dict(data):
     """
     parse the dict for a width and height
     """
-    size = data.get('size', None)
-    if size is not None:
-        width = int(size.split('x')[0])
-        height = int(size.split('x')[1])
+    size = data.get('size', '').strip() or None
+    if size:
+        width, height = size.split('x')
     else:
-        width = data.get('width', None)
-        if width is not None:
-            width = int(width)
-        height = data.get('height', None)
-        if height is not None:
-            height = int(height)
-    if not width and not height:
-        return (None, None)
+        width = data.get('width', '').strip() or None
+        height = data.get('height', '').strip() or None
+    if width:
+        width = int(width)
+    if height:
+        height = int(height)
     return (width, height)
-
