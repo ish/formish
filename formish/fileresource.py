@@ -94,7 +94,10 @@ class FileResource(resource.Resource):
             # cache_filename = filestore.name+'_'+filename
             # self.cache.delete(cache_filename, glob=True)
             return 
-        width, height = get_size_from_dict(request.GET)
+        try:
+            width, height = get_size_from_dict(request.GET)
+        except ValueError:
+            return http.bad_request()
         if request.GET.get('crop'):
             crop = True
             cropmark = '-crop'
