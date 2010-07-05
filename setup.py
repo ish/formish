@@ -50,5 +50,5 @@ Formish is a schema backed, templating language agnostic form generation and han
       # -*- Entry points: -*-
       """,
       test_suite='formish.tests.unittests',
-      tests_require = ['BeautifulSoup'],
+      tests_require = ['BeautifulSoup', 'restish'],
       )
