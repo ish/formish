@@ -4,6 +4,6 @@ import os, sys, subprocess
 
 args = sys.argv[1:]
 env = dict(os.environ)
-env['PYTHONPATH'] = '.:../dottedish:../schemaish:../validatish:../convertish'
+env['PYTHONPATH'] = '.:../dottedish:../schemaish:../validatish:../convertish:../restish'
 subprocess.call(args, env=env)
 

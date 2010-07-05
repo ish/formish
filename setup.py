@@ -43,6 +43,9 @@ Formish is a schema backed, templating language agnostic form generation and han
           'webob >= 0.9.5',
           'Mako',
       ],
+      extras_require={
+          'File Resource': ['restish'],
+      },
       entry_points="""
       # -*- Entry points: -*-
       """,
