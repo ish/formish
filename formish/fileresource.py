@@ -13,7 +13,6 @@ import logging
 log = logging.getLogger('formish')
 
 # Binaries
-IDENTIFY = '/usr/bin/identify'
 CONVERT = '/usr/bin/convert'
 
 
@@ -95,7 +94,7 @@ class FileResource(resource.Resource):
             # self.cache.delete(cache_filename, glob=True)
             return 
         try:
-            width, height = get_size_from_dict(request.GET)
+            width, height, ismax = get_size_from_dict(request.GET)
         except ValueError:
             return http.bad_request()
         if request.GET.get('crop'):
@@ -104,7 +103,7 @@ class FileResource(resource.Resource):
         else:
             crop = False
             cropmark = ''
-        size= get_size_suffix(width, height)
+        size = get_size_suffix(width, height, ismax)
 
         if not size:
             if f:
@@ -132,7 +131,7 @@ class FileResource(resource.Resource):
                     content_type = dict(headers)['Content-Type']
                 except KeyError:
                     return 
-            rf = resize_image(f, (width, height), quality=self.resize_quality, crop=crop)
+            rf = resize_image(f, (width, height), ismax, quality=self.resize_quality, crop=crop)
             f.close()
             self.cache.put(cache_filename, rf, cache_tag, [('Content-Type', content_type)])
             rf.seek(0)
@@ -150,7 +149,7 @@ class FileResource(resource.Resource):
 
 
 
-def resize_image(src_fh, size, quality=70, crop=False):
+def resize_image(src_fh, size, ismax, quality=70, crop=False):
     """
     this is an example identify
     '/home/tim/Desktop/tim.jpg JPEG 48x48 48x48+0+0 DirectClass 8-bit 920b \n'
@@ -160,42 +159,42 @@ def resize_image(src_fh, size, quality=70, crop=False):
     shutil.copyfileobj(src_fh, fh)
     fh.close()
     resized_filename = filename + '-resized'
+    # Convert size and ismax args to string replacement values.
     width, height = size
-    stdout = subprocess.Popen([IDENTIFY, filename], \
-                            stdout=subprocess.PIPE).communicate()[0]
-    iwidth, iheight = [int(s) for s in stdout.split(' ')[2].split('x')]
-    if width is None:
-        width = int(iwidth*(float(height)/float(iheight)))
-    if height is None:
-        height = int(iheight*(float(width)/float(iwidth)))
-
+    width = width or ''
+    height = height or ''
+    ismax = ['', '>'][ismax]
     if crop:
         subprocess.call([CONVERT, '-thumbnail',
-        '%sx%s^'% (width, height), '-crop','%sx%s+0+0'% (width, height),'-gravity','center', '-quality', str(quality), filename, resized_filename])
+        '%sx%s^'% (width, height), '-crop','%sx%s%s+0+0'% (width, height, ismax),'-gravity','center', '-quality', str(quality), filename, resized_filename])
     else:
         subprocess.call([CONVERT, '-thumbnail',
-        '%sx%s'% (width, height), '-quality', str(quality), filename, resized_filename])
+        '%sx%s%s'% (width, height, ismax), '-quality', str(quality), filename, resized_filename])
         
     return open(resized_filename,'rb')
 
-def get_size_suffix(width, height):
+def get_size_suffix(width, height, ismax):
     if width is None and height is None:
         return ''
+    ismax = ['', 'max'][ismax]
     if height or width:
-        return '-%sx%s'% (width, height)
+        return '-%sx%s%s'% (width, height, ismax)
 
 def get_size_from_dict(data):
     """
     parse the dict for a width and height
     """
-    size = data.get('size', '').strip() or None
-    if size:
-        width, height = size.split('x')
-    else:
-        width = data.get('width', '').strip() or None
-        height = data.get('height', '').strip() or None
-    if width:
-        width = int(width)
-    if height:
-        height = int(height)
-    return (width, height)
+    for prefix, ismax in [('', False), ('max-', True)]:
+        size = data.get(prefix+'size', '').strip() or None
+        if size:
+            width, height = size.split('x')
+        else:
+            width = data.get(prefix+'width', '').strip() or None
+            height = data.get(prefix+'height', '').strip() or None
+        if width:
+            width = int(width)
+        if height:
+            height = int(height)
+        if width or height:
+            break
+    return width, height, ismax
