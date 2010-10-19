@@ -197,4 +197,6 @@ def get_size_from_dict(data):
             height = int(height)
         if width or height:
             break
+    else:
+        return None, None, False
     return width, height, ismax

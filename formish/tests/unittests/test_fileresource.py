@@ -6,17 +6,17 @@ class TestCase(unittest.TestCase):
     def test_size_from_dict(self):
         tests = [
             # Easy stuff
-            ({}, (None, None)),
-            ({'size': '10x20'}, (10, 20)),
-            ({'width': '10'}, (10, None)),
-            ({'height': '20'}, (None, 20)),
+            ({}, (None, None, False)),
+            ({'size': '10x20'}, (10, 20, False)),
+            ({'width': '10'}, (10, None, False)),
+            ({'height': '20'}, (None, 20, False)),
             # "Empty" request args
-            ({'size': ''}, (None, None)),
-            ({'width': ''}, (None, None)),
-            ({'height': ''}, (None, None)),
-            ({'size': ' '}, (None, None)),
-            ({'width': ' '}, (None, None)),
-            ({'height': ' '}, (None, None)),
+            ({'size': ''}, (None, None, False)),
+            ({'width': ''}, (None, None, False)),
+            ({'height': ''}, (None, None, False)),
+            ({'size': ' '}, (None, None, False)),
+            ({'width': ' '}, (None, None, False)),
+            ({'height': ' '}, (None, None, False)),
         ]
         for test, expected in tests:
             result = fileresource.get_size_from_dict(test)
