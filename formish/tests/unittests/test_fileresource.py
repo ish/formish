@@ -10,6 +10,13 @@ class TestCase(unittest.TestCase):
             ({'size': '10x20'}, (10, 20, False)),
             ({'width': '10'}, (10, None, False)),
             ({'height': '20'}, (None, 20, False)),
+            ({'width': '10', 'height': '20'}, (10, 20, False)),
+            ({'max-size': '10x20'}, (10, 20, True)),
+            ({'max-width': '10'}, (10, None, True)),
+            ({'max-height': '20'}, (None, 20, True)),
+            ({'max-width': '10', 'max-height': '20'}, (10, 20, True)),
+            # Anything non-max has precedence
+            ({'width': '10', 'max-height': '20'}, (10, None, False)),
             # "Empty" request args
             ({'size': ''}, (None, None, False)),
             ({'width': ''}, (None, None, False)),
