@@ -418,7 +418,7 @@ More interesting is how each field is rendered.
     ${field.description()|n}
     </div>
 
-So each field is built in the same way as the main form. Here are the parst used.
+So each field is built in the same way as the main form. Here are the parts used.
 
 ``field_label.html``
 
