@@ -663,15 +663,18 @@ class FileUpload(Widget):
         as the name. We also store it in the 'default' field so we can check if
         something has been uploaded (the identifier doesn't match the name)
         """
+        filename = ''
         mimetype = ''
         if isinstance(data, SchemaFile):
             default = util.encode_file_resource_path(None, self.url_ident_factory(data))
             mimetype = data.mimetype
+            filename = data.filename
         elif data is not None:
             default = util.encode_file_resource_path(None, data)
         else:
             default = ''
-        return {'name': [default], 'default':[default], 'mimetype':[mimetype]}
+        return {'name': [default], 'default':[default], 'mimetype':[mimetype],
+                'filename': [filename]}
     
     def pre_parse_incoming_request_data(self, field, data):
         """
