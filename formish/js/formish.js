@@ -127,22 +127,16 @@ function renumber_sequence(o) {
 }
 
 function add_new_item(t,o) {
-    var formid = o.attr('id');
     // Get the encoded template
     var code = t.next('.adder').val();
     // Find out how many fields we already have
     var l = count_previous_fields(t.next('.adder'));
-    // Get some variable to help with replacing (originalname, originalid, name, id)
+    // Get some variable to help with replacing (originalname, id)
     var originalname = t.next('.adder').attr('name');
-    var new_originalname = t.closest('.type-container').attr('id');
-    new_originalname = new_originalname.substr(0,new_originalname.length-6);
-    new_originalname = convert_id_to_name(new_originalname,formid);
     var segments = originalname.split('.');
     // Get the numbers used in the originalname
     var seqnums = get_sequence_numbers(segments, l);
-    var originalid = $(o).attr('id')+'-'+segments.join('-');
     segments[ segments.length -1 ] = l;
-    var name = segments.join('.');
     var id = $(o).attr('id')+'-'+segments.join('-');
     // Decode the template.
     var html = decodeURIComponent(code);
