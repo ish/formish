@@ -146,10 +146,10 @@ function add_new_item(t,o) {
     var id = $(o).attr('id')+'-'+segments.join('-');
     // Decode the template.
     var html = decodeURIComponent(code);
-    // Add the links and mousedowns to this generated code
+    // Add the links and mouse clicks to this generated code
     var h = $(html);
     create_addlinks(h);
-    add_mousedown_to_addlinks(h);
+    add_mouseclick_to_addlinks(h);
 
     h.find("[name]").each( function () {
       var newname = replace_stars($(this).attr('name'), seqnums, '.');
@@ -193,10 +193,10 @@ function add_new_items(t,o) {
    }
 }
 
-function add_mousedown_to_addlinks(o) {
+function add_mouseclick_to_addlinks(o) {
   o.each( function() {
     var form = $(this);
-    form.find('.adderlink').mousedown(function() { add_new_items($(this),form);});
+    form.find('.adderlink').click(function() { add_new_items($(this),form);});
   });
 }
 
@@ -206,7 +206,7 @@ function add_remove_buttons(o) {
     if ($(this).next().text() != 'delete') {
       var x = $('<span class="remove">delete</span>');
       $(this).after(x);
-      x.mousedown(function () {
+      x.click(function () {
         $(this).closest('.field').remove();
         renumber_sequences($('form'));
         add_sortables($('form'));
@@ -231,7 +231,7 @@ function add_sortables(o) {
 function formish() {
     add_sortables($('form'));
     create_addlinks($('form'));
-    add_mousedown_to_addlinks($('form'));
+    add_mouseclick_to_addlinks($('form'));
     add_remove_buttons($('form'));
 }
 
