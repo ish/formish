@@ -78,7 +78,7 @@ function renumber_sequences(o) {
 }
 
 function renumber_sequence(o) {
-  var formid = $(o).attr('id');
+  var formid = formish_form_id(o);
   var N = {};
   o.find('.type-sequence.widget-sequencedefault').each( function () {
     field_id = $(this).attr('id');
@@ -124,6 +124,17 @@ function renumber_sequence(o) {
     });
   });
 
+}
+
+/*
+ * Find the form element's id attribute.
+ */
+function formish_form_id(form) {
+    var formid = $(form).attr('id');
+    if (typeof(formid) != typeof('')) {
+        formid = ''
+    }
+    return formid;
 }
 
 function add_new_item(t,o) {
