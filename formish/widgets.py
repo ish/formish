@@ -601,7 +601,8 @@ class FileUpload(Widget):
     def __init__(self, filestore=UNSET, show_file_preview=True,
                  show_download_link=False, show_image_thumbnail=False,
                  url_base=None, css_class=None, image_thumbnail_default=None,
-                 show_remove_checkbox=True, url_ident_factory=None):
+                 show_remove_checkbox=True, url_ident_factory=None,
+                 thumbnail_size="20x20"):
         """
         :arg filestore: filestore for temporary files
         :arg show_image_thumbnail: a boolean that, if set, will include an image
@@ -629,6 +630,7 @@ class FileUpload(Widget):
         self.show_file_preview = show_file_preview
         self.url_ident_factory = url_ident_factory
         self.show_remove_checkbox = show_remove_checkbox
+        self.thumbnail_size = thumbnail_size
 
     def __repr__(self):
         attributes = []
@@ -649,6 +651,7 @@ class FileUpload(Widget):
             attributes.append('css_class=%r'%self.css_class)
         if self.empty is not None:
             attributes.append('empty=%r'%self.empty)
+        attributes.append('thumbnailsize=%r'%self.thumbnail_size)
 
         return 'formish.%s(%s)'%(self.__class__.__name__, ', '.join(attributes))
 

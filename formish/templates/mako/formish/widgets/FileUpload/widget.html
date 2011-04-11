@@ -21,9 +21,9 @@ else:
 
 % if field.widget.show_image_thumbnail == True:
 %   if value_name != '' and mimetype.startswith('image'):
-  <img src="${field.widget.urlfactory(value_name)}?size=20x20" />
+  <img src="${field.widget.urlfactory(value_name)}?size=${field.widget.thumbnail_size}" />
 %   elif field.widget.image_thumbnail_default is not None:
-  <img src="${field.widget.image_thumbnail_default}" />
+  <img src="${field.widget.image_thumbnail_default}?size=${field.widget.thumbnail_size}" />
 %   endif
 % endif
 

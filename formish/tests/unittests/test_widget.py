@@ -288,6 +288,28 @@ class TestCheckboxMultiChoice(base.TestCase):
         assert 'Opt #1' in html
 
 
+class TestFileUpload(base.TestCase):
+
+    def test_thumbnail_sizing(self):
+        schema = schemaish.Structure()
+        schema.add('foo', schemaish.File())
+        basic_form = formish.Form(schema)
+        basic_form['foo'].widget = formish.FileUpload(
+            image_thumbnail_default='/images/blank.png',
+            show_image_thumbnail=True)
+        advanced_form = formish.Form(schema)
+        advanced_form['foo'].widget = formish.FileUpload(
+            thumbnail_size="40x40",
+            image_thumbnail_default='/images/blank.png',
+            show_image_thumbnail=True)
+        html = basic_form()
+        assert 'foo' in html
+        assert '/images/blank.png?size=20x20' in html
+        html = advanced_form()
+        assert 'foo' in html
+        assert '/images/blank.png?size=40x40' in html
+
+
 if __name__ == '__main__':
     unittest.main()
 
