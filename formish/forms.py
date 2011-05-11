@@ -550,22 +550,25 @@ class Collection(object):
     def get_field(self, name):
         """ recursively get dotted field names """
         segments = name.split('.')
-        # Bind '*' to a fake field.
         if segments[0] == '*':
-            b = self.bind('*', self.attr)
-            if len(segments) == 1:
-                return b
+            # Bind '*' to a fake field.
+            field = self.bind('*', self.attr)
+        else:
+            # Find named field.
+            for field in self.fields:
+                if field.name.split('.')[-1] == segments[0]:
+                    break
             else:
-                return b.get_field('.'.join(segments[1:]))
-        # Find the field in the segments.
-        for field in self.fields:
-            if field.name.split('.')[-1] == segments[0]:
-                if len(segments) == 1:
-                    return field
-                else:
-                    return field.get_field(''.join(segments[1:]))
-        raise KeyError('%s %r has no field %r' % (self.__class__.__name__,
-                                                  self.name, segments[0]))
+                field = None
+        # Raise a nice error if the field was not found.
+        if not field:
+            raise KeyError('%s %r has no field %r' % (self.__class__.__name__,
+                                                      self.name, segments[0]))
+        # Return field or recurse.
+        if len(segments) == 1:
+            return field
+        else:
+            return field.get_field('.'.join(segments[1:]))
 
 
     def __getitem__(self, key):
