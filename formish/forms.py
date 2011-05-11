@@ -550,13 +550,15 @@ class Collection(object):
     def get_field(self, name):
         """ recursively get dotted field names """
         segments = name.split('.')
+        # Bind '*' to a fake field.
+        if segments[0] == '*':
+            b = self.bind('*', self.attr)
+            if len(segments) == 1:
+                return b
+            else:
+                return b.get_field('.'.join(segments[1:]))
+        # Find the field in the segments.
         for field in self.fields:
-            if segments[0] == '*':
-                b = self.bind('*',field.attr)
-                if len(segments) == 1:
-                    return b
-                else:
-                    return b.get_field('.'.join(segments[1:]))
             if field.name.split('.')[-1] == segments[0]:
                 if len(segments) == 1:
                     return field
