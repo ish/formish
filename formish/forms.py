@@ -564,6 +564,8 @@ class Collection(object):
                     return field
                 else:
                     return field.get_field(''.join(segments[1:]))
+        raise KeyError('%s %r has no field %r' % (self.__class__.__name__,
+                                                  self.name, segments[0]))
 
 
     def __getitem__(self, key):
