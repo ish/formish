@@ -756,6 +756,11 @@ class SelectChoice(Widget):
         """
         Check the value passed matches the actual value
         """
+
+        # Don't mark additional none option as selected.
+        if self.none_option and option[0] == self.none_option[0]:
+            return ''
+
         if option[0] == field.value[0] and option[0] != self.empty:
             return ' selected="selected"'
         else:
