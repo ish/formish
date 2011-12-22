@@ -714,7 +714,7 @@ class FileUpload(Widget):
         if request_data['name'] == ['']:
             return None
         elif request_data['name'] == request_data['default']:
-            return SchemaFile(None, None, None)
+            return SchemaFile(None, None, None, {'old_name':list(i for i in request_data['name'])})
         else:
             key = util.decode_file_resource_path(request_data['name'][0])[1]
             try:
