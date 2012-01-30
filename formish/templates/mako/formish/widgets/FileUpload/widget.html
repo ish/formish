@@ -39,7 +39,7 @@ else:
 % if value_name and field.widget.show_remove_checkbox:
 <label for="${field.cssname}-remove">
   <input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" class="widget-fileupload-remove" />
-  Remove ${field.value['filename'][0]}
+  Remove ${field.value.get('filename', ['this file'])[0]}
 </label>
 % endif
 <input id="${field.cssname}-id" type="hidden" name="${field.name}.name" value="${value_name}" />
