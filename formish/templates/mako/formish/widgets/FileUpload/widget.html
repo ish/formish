@@ -4,10 +4,12 @@ if '*' in field.name:
     value_name = ''
     value_default = ''
     mimetype = ''
+    filename = ''
 else:
     value_name = field.value['name'][0]
     value_default = field.value['default'][0]
     mimetype = field.value['mimetype'][0]
+    filename = field.value['filename'][0]
     if mimetype is None:
         mimetype = ''
 %>
@@ -39,10 +41,11 @@ else:
 % if value_name and field.widget.show_remove_checkbox:
 <label for="${field.cssname}-remove">
   <input id="${field.cssname}-remove" type="checkbox" name="${field.name}.remove" value="true" class="widget-fileupload-remove" />
-  Remove ${field.value.get('filename', ['this file'])[0]}
+  Remove ${filename}
 </label>
 % endif
 <input id="${field.cssname}-id" type="hidden" name="${field.name}.name" value="${value_name}" />
 <input id="${field.cssname}-mimetype" type="hidden" name="${field.name}.mimetype" value="${mimetype}" />
 <input id="${field.cssname}-default" type="hidden" name="${field.name}.default" value="${value_default}" />
+<input id="${field.cssname}-filename" type="hidden" name="${field.name}.filename" value="${filename}" />
 <input id="${field.cssname}" type="file" name="${field.name}.file" />
